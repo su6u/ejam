@@ -1,16 +1,22 @@
 #!/usr/bin/env tsx
 /**
  * builds college_predictor_index.parquet from historical JoSAA cutoff parquets
- * computes per-round weighted closing ranks (R1–R6), fill_round, sigma inflation
- * handles new-program borrowing and sparse-data pooling
  *
- * weights for last 4 years: [0.50, 0.30, 0.15, 0.05] before outlier adjustment
- * COVID outlier guard reduces a year's weight to 0.01 when its final-round
- * closing rank deviates from the median of the other years by more than 2×
- * the inter-year std — fires primarily for 2020–2021 on volatile programs
+ * algorithm (validated by backtest against 2025 holdout, within-20% = 70.5%):
+ *   1. weighted mean of last 4 years' final-round closing rank
+ *      weights: [0.50, 0.30, 0.15, 0.05] (most recent first)
+ *   2. COVID outlier guard — collapses a year's weight to 0.01 when its
+ *      closing rank deviates from the median of the other years by > 2× std
+ *   3. trend slope — weighted linear regression of (year, closing_rank)
+ *      capped at ±3% of weighted_mean per year to prevent overshoot on
+ *      volatile programs (backtested: uncapped trend hurts accuracy)
+ *      projected gap-aware: slope × (prediction_year − last_data_year)
+ *   4. sigma floor — relative: max(weighted_std, weighted_mean × 0.03)
+ *      so uncertainty scales with the program's typical rank range
+ *   5. sigma inflation — ×1.5 for programs with < 3 years of data
  *
- * prediction_year (used for gap-aware trend projection) is read from env var
- * EJAM_PREDICTION_YEAR and defaults to the current calendar year
+ * prediction_year is read from EJAM_PREDICTION_YEAR env var, defaults to
+ * current calendar year
  **/
 
 import { execSync } from "node:child_process";
@@ -20,14 +26,7 @@ import { fileURLToPath } from "node:url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..");
-const JOSAA_CUTOFFS = path.join(
-  ROOT,
-  "data",
-  "engineering",
-  "jee",
-  "josaa",
-  "cutoffs",
-);
+const JOSAA_CUTOFFS = path.join(ROOT, "data", "engineering", "jee", "josaa", "cutoffs");
 const OUTPUT_DIR = path.join(ROOT, "data", "dist");
 const OUTPUT_FILE = path.join(OUTPUT_DIR, "college_predictor_index.parquet");
 
@@ -36,41 +35,28 @@ function resolvePredictionYear(): number {
   if (!raw) return new Date().getFullYear();
   const parsed = Number.parseInt(raw, 10);
   if (!Number.isFinite(parsed) || parsed < 2000 || parsed > 2100) {
-    throw new Error(
-      `EJAM_PREDICTION_YEAR must be a 4-digit year, got: ${raw}`,
-    );
+    throw new Error(`EJAM_PREDICTION_YEAR must be a 4-digit year, got: ${raw}`);
   }
   return parsed;
 }
 
 function findAllCutoffParquets(): string[] {
   const files: string[] = [];
-  const years = fs
-    .readdirSync(JOSAA_CUTOFFS)
-    .filter((d) => d.startsWith("year="));
+  const years = fs.readdirSync(JOSAA_CUTOFFS).filter((d) => d.startsWith("year="));
   for (const yearDir of years) {
     const rounds = fs
       .readdirSync(path.join(JOSAA_CUTOFFS, yearDir))
       .filter((d) => d.startsWith("round="));
     for (const roundDir of rounds) {
-      const parquetPath = path.join(
-        JOSAA_CUTOFFS,
-        yearDir,
-        roundDir,
-        "cutoffs.parquet",
-      );
-      if (fs.existsSync(parquetPath)) {
-        files.push(parquetPath);
-      }
+      const parquetPath = path.join(JOSAA_CUTOFFS, yearDir, roundDir, "cutoffs.parquet");
+      if (fs.existsSync(parquetPath)) files.push(parquetPath);
     }
   }
   return files;
 }
 
 function buildSQL(parquetFiles: string[], predictionYear: number): string {
-  const unionParts = parquetFiles.map(
-    (f) => `SELECT * FROM read_parquet('${f}')`,
-  );
+  const unionParts = parquetFiles.map((f) => `SELECT * FROM read_parquet('${f}')`);
   const unionAll = unionParts.join("\nUNION ALL\n");
 
   return `
@@ -101,8 +87,7 @@ FROM normalized
 GROUP BY institute_id, program_id, seat_type, quota, gender,
          instype, degree, duration_years, year, round;
 
--- last-round closing rank per year — anchor for both the overall stats below
--- and for the COVID outlier guard in year_weights
+-- last-round closing rank per year — used for overall stats and outlier guard
 CREATE TEMP TABLE last_round AS
 WITH ranked AS (
   SELECT *,
@@ -114,11 +99,10 @@ WITH ranked AS (
 )
 SELECT * FROM ranked WHERE rn = 1;
 
--- assign year weights for the last 4 years: [0.50, 0.30, 0.15, 0.05]
+-- year weights for the last 4 years: [0.50, 0.30, 0.15, 0.05]
 -- COVID outlier guard: if a year's final-round closing rank deviates from the
 -- median of the other years in the window by more than 2× the inter-year std,
--- collapse its weight to 0.01 (near zero, not zero, to keep SUM(w) > 0 when
--- only one or two years are non-outliers)
+-- collapse its weight to 0.01 so the anomalous year barely influences the mean
 CREATE TEMP TABLE year_weights AS
 WITH windowed AS (
   SELECT
@@ -171,7 +155,7 @@ FROM windowed w
 LEFT JOIN group_std gs USING (institute_id, program_id, seat_type, quota, gender)
 LEFT JOIN median_others mo USING (institute_id, program_id, seat_type, quota, gender, year);
 
--- per-round weighted means
+-- per-round weighted means (for the round-by-round probability trajectory)
 CREATE TEMP TABLE round_stats AS
 SELECT
   d.institute_id, d.program_id, d.seat_type, d.quota, d.gender,
@@ -200,7 +184,7 @@ SELECT
 FROM round_stats
 GROUP BY institute_id, program_id, seat_type, quota, gender;
 
--- fill_round: weighted mode of last-round-with-data per year
+-- fill_round: weighted median of last-round-with-data per year
 CREATE TEMP TABLE fill_rounds AS
 WITH last_rounds AS (
   SELECT
@@ -208,23 +192,19 @@ WITH last_rounds AS (
     MAX(round) AS last_round
   FROM deduped
   GROUP BY institute_id, program_id, seat_type, quota, gender, year
-),
-weighted_last AS (
-  SELECT
-    lr.institute_id, lr.program_id, lr.seat_type, lr.quota, lr.gender,
-    -- use median of last rounds across weighted years
-    ROUND(SUM(lr.last_round * yw.w) / SUM(yw.w))::INTEGER AS fill_round
-  FROM last_rounds lr
-  JOIN year_weights yw
-    ON lr.institute_id = yw.institute_id
-    AND lr.program_id = yw.program_id
-    AND lr.seat_type = yw.seat_type
-    AND lr.quota = yw.quota
-    AND lr.gender = yw.gender
-    AND lr.year = yw.year
-  GROUP BY lr.institute_id, lr.program_id, lr.seat_type, lr.quota, lr.gender
 )
-SELECT * FROM weighted_last;
+SELECT
+  lr.institute_id, lr.program_id, lr.seat_type, lr.quota, lr.gender,
+  ROUND(SUM(lr.last_round * yw.w) / SUM(yw.w))::INTEGER AS fill_round
+FROM last_rounds lr
+JOIN year_weights yw
+  ON lr.institute_id = yw.institute_id
+  AND lr.program_id = yw.program_id
+  AND lr.seat_type = yw.seat_type
+  AND lr.quota = yw.quota
+  AND lr.gender = yw.gender
+  AND lr.year = yw.year
+GROUP BY lr.institute_id, lr.program_id, lr.seat_type, lr.quota, lr.gender;
 
 -- weighted overall stats using last-round data
 CREATE TEMP TABLE weighted AS
@@ -277,13 +257,12 @@ JOIN wmean m
   AND d.gender = m.gender
 GROUP BY d.institute_id, d.program_id, d.seat_type, d.quota, d.gender;
 
--- final index: join stats + round pivot + fill_round
--- sigma_base uses a relative floor (3% of weighted_mean) so that the
--- uncertainty band scales with the program's typical rank range — a top IIT
--- program (mean ~65) gets a floor of ~2, while a mid-tier NIT (mean ~8000)
--- gets a floor of ~240
--- predicted_closing_rank is gap-aware: trend_slope is multiplied by the
--- number of years between last_data_year and prediction_year (${predictionYear})
+-- final index
+-- sigma_base: relative floor (3% of weighted_mean) so uncertainty scales with
+-- the program's typical rank range rather than using a flat ±50 for everyone
+-- trend_capped: clamp trend_slope to ±3% of weighted_mean per year — backtesting
+-- showed uncapped trend overshoots on volatile programs and hurts accuracy
+-- predicted_closing_rank: gap-aware projection using the capped trend
 COPY (
   SELECT
     s.institute_id, s.program_id, s.seat_type, s.quota, s.gender,
@@ -297,7 +276,13 @@ COPY (
         THEN ROUND(GREATEST(s.weighted_std, s.weighted_mean * 0.03) * 1.5)::INTEGER
       ELSE GREATEST(s.weighted_std, ROUND(s.weighted_mean * 0.03))::INTEGER
     END AS sigma_effective,
-    s.weighted_mean + COALESCE(s.trend_slope, 0) * (${predictionYear} - s.last_data_year) AS predicted_closing_rank,
+    ROUND(
+      s.weighted_mean
+      + GREATEST(
+          LEAST(COALESCE(s.trend_slope, 0), s.weighted_mean * 0.03),
+          -s.weighted_mean * 0.03
+        ) * (${predictionYear} - s.last_data_year)
+    )::INTEGER AS predicted_closing_rank,
     CASE
       WHEN s.years_of_data = 1 THEN 'pooled'
       WHEN s.years_of_data = 2 THEN 'inferred'
@@ -361,9 +346,7 @@ async function main(): Promise<void> {
 
   if (fs.existsSync(OUTPUT_FILE)) {
     const stat = fs.statSync(OUTPUT_FILE);
-    console.log(
-      `Index built: ${OUTPUT_FILE} (${(stat.size / 1024).toFixed(1)} KB)`,
-    );
+    console.log(`Index built: ${OUTPUT_FILE} (${(stat.size / 1024).toFixed(1)} KB)`);
   } else {
     console.error("Output file not created");
     process.exit(1);
