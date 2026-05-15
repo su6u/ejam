@@ -16,7 +16,7 @@ interface PredictorQueryOptions {
   apiGender: string;
   quota: string;
   homeState: string;
-  ews: boolean;
+  has_ews_certificate: boolean;
   instituteTypeFilter: Set<string>;
   searchBranch: string;
 }
@@ -35,7 +35,7 @@ function buildRequestBody(
     rank: Number.parseInt(opts.rank, 10),
     seat_type: opts.apiSeatType,
     gender: opts.apiGender,
-    ews_toggle: opts.ews,
+    has_ews_certificate: opts.has_ews_certificate,
   };
 
   const filters: Record<string, unknown> = {};

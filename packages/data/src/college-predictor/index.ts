@@ -34,6 +34,10 @@ export {
   normalCDF,
   predictPrograms,
 } from "./engine";
+export {
+  _resetCanonicalStatesCache,
+  loadCanonicalStates,
+} from "./state-registry";
 export type { CollegePredictorUrlInput } from "./url-params";
 export {
   buildCollegePredictorSharePath,

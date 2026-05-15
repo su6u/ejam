@@ -27,13 +27,15 @@ const JeeAdvancedInput = z.object({
       band: z.array(z.enum(["safe", "target", "reach", "long-shot"])).optional(),
     })
     .optional(),
-  ews_toggle: z.boolean().optional(),
+  has_ews_certificate: z.boolean().optional(),
   include_all: z.boolean().optional(),
 });
 type JeeAdvancedInput = z.infer<typeof JeeAdvancedInput>;
 
 const JEE_ADVANCED_QUOTA = "AI";
 const EWS_SEAT_TYPE = "Gen-EWS";
+const EWS_CAVEAT =
+  "EWS seats are only available to candidates holding a valid EWS certificate issued by a competent authority. These results assume you are EWS-eligible.";
 
 type RegistryMaps = {
   instituteStates: Map<string, string>;
@@ -150,7 +152,7 @@ export const predictor: ExamPredictor<JeeAdvancedInput, CollegePredictionResult>
       filters: input.filters,
     });
 
-    if (input.ews_toggle) {
+    if (input.has_ews_certificate) {
       const baseResult: CollegePredictionResult = {
         programs: result.programs,
         metadata: result.metadata,
@@ -167,6 +169,7 @@ export const predictor: ExamPredictor<JeeAdvancedInput, CollegePredictionResult>
           includeAll: input.include_all,
           filters: input.filters,
         }),
+        caveat: EWS_CAVEAT,
       };
     }
 
