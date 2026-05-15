@@ -28,7 +28,7 @@ const JeeMainInput = z.object({
     .default("")
     .refine(
       (value) => value === "" || loadCanonicalStates().has(value),
-      (value) => ({ message: `unknown state: '${value}'` }),
+      "state must be a canonical value from the institute registry",
     ),
   filters: z
     .object({
