@@ -1,5 +1,6 @@
 /**
  * JEE Main college predictor — NIT/IIIT/CFI with HS/OS/special-state quota resolution
+ * uses the shared JoSAA index loader; filters to non-IIT rows in JS after load
  * quota filtering happens in JS after loading the shared index; state must be a canonical
  * value from institutes.json — validated at the Zod schema layer before predict() is called
  */
@@ -9,11 +10,10 @@ import {
   type CollegePredictionResult,
   type CollegePredictorFilters,
   type CollegePredictorIndexRow,
+  getJosaaIndex,
   loadCanonicalStates,
   type ProgramPrediction,
   predictPrograms,
-  readPredictionResultCache,
-  writePredictionResultCache,
 } from "@ejam/data/college-predictor";
 import { z } from "zod";
 
@@ -61,30 +61,37 @@ type RegistryMaps = {
   programNames: Map<string, string>;
 };
 
-let _cachedIndex: CollegePredictorIndexRow[] | null = null;
+// in-memory server cache — keyed by FNV1a hash of canonical input
+// sessionStorage is a no-op on the server; this Map persists for the process lifetime
+// predictions are deterministic for a given index version, so no TTL is needed
+const _serverCache = new Map<string, ProgramPrediction[]>();
+
 let _cachedRegistry: RegistryMaps | null = null;
 
-async function loadIndex(): Promise<CollegePredictorIndexRow[]> {
-  if (_cachedIndex) return _cachedIndex;
+function stableNormalize(value: unknown): unknown {
+  if (Array.isArray(value)) return value.map(stableNormalize);
+  if (value && typeof value === "object") {
+    return Object.fromEntries(
+      Object.entries(value)
+        .filter(([, entry]) => entry !== undefined)
+        .sort(([a], [b]) => a.localeCompare(b))
+        .map(([key, entry]) => [key, stableNormalize(entry)]),
+    );
+  }
+  return value;
+}
 
-  const { join, resolve } = await import("node:path");
-  const indexPath = resolve(
-    process.env.EJAM_DIST_DATA_ROOT ?? join(process.cwd(), "data", "dist"),
-    "college_predictor_index.parquet",
-  );
+function stableStringify(value: unknown): string {
+  return JSON.stringify(stableNormalize(value));
+}
 
-  const { DuckDBInstance } = await import("@duckdb/node-api");
-  const instance = await DuckDBInstance.create(":memory:");
-  const connection = await instance.connect();
-  const result = await connection.run(
-    `SELECT * FROM read_parquet('${indexPath}') WHERE instype != 'IIT'`,
-  );
-  const rows = await result.fetchAllRows();
-  await connection.close();
-  await instance.close();
-
-  _cachedIndex = rows as unknown as CollegePredictorIndexRow[];
-  return _cachedIndex;
+function fnv1a(value: string): string {
+  let hash = 0x811c9dc5;
+  for (const char of value) {
+    hash ^= char.codePointAt(0) ?? 0;
+    hash = Math.imul(hash, 0x01000193);
+  }
+  return (hash >>> 0).toString(16).padStart(8, "0");
 }
 
 async function loadRegistryMaps(): Promise<RegistryMaps> {
@@ -161,7 +168,8 @@ export const predictor: ExamPredictor<JeeMainInput, CollegePredictionResult> = {
 
   async predict(input, _deps) {
     const cacheInput = { exam_id: _deps.examId, ...input };
-    const cachedPrograms = readPredictionResultCache<ProgramPrediction>(cacheInput);
+    const cacheKey = fnv1a(stableStringify(cacheInput));
+    const cachedPrograms = _serverCache.get(cacheKey);
     if (cachedPrograms) {
       return {
         result: resultFromCachedPrograms(cachedPrograms, input.filters),
@@ -174,8 +182,10 @@ export const predictor: ExamPredictor<JeeMainInput, CollegePredictionResult> = {
       };
     }
 
-    const [allRows, registry] = await Promise.all([loadIndex(), loadRegistryMaps()]);
-    const enrichedRows = enrichRows(allRows, registry);
+    const [allRows, registry] = await Promise.all([getJosaaIndex(), loadRegistryMaps()]);
+    // filter to non-IIT rows in JS — shared loader returns all instype values
+    const nonIitRows = allRows.filter((row) => row.instype !== "IIT");
+    const enrichedRows = enrichRows(nonIitRows, registry);
     const quotaFiltered = filterByQuota(enrichedRows, input.state, registry.instituteStates);
 
     const result = predictPrograms({
@@ -211,7 +221,7 @@ export const predictor: ExamPredictor<JeeMainInput, CollegePredictionResult> = {
       ? { level: "medium" as const, caveat: "probabilities are based on historical closing rank trends" }
       : { level: "low" as const, caveat: "no programs found above the probability threshold for this rank" };
 
-    writePredictionResultCache(cacheInput, result.programs);
+    _serverCache.set(cacheKey, result.programs);
     return { result, confidence };
   },
 };
