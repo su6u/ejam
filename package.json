@@ -1,0 +1,27 @@
+{
+  "name": "ejam",
+  "private": true,
+  "packageManager": "pnpm@11.1.2",
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "scripts": {
+    "build": "turbo run build",
+    "dev": "turbo run dev --parallel",
+    "lint": "turbo run lint",
+    "format": "turbo run format",
+    "typecheck": "turbo run typecheck",
+    "check": "biome check .",
+    "check:write": "biome check --write .",
+    "validate:data": "tsx scripts/validate-jee-data.ts",
+    "build:data": "tsx scripts/build-data.ts",
+    "build:predictor-index": "tsx scripts/build-college-predictor-index.ts"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.4.14",
+    "tsx": "^4.21.0",
+    "turbo": "^2.9.8",
+    "typescript": "^6.0.3",
+    "zod": "^4.4.2"
+  }
+}

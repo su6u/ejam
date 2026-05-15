@@ -1,0 +1,802 @@
+[
+  {
+    "id": "computer-science",
+    "name": "Computer Science and Engineering",
+    "aliases": [
+      "CSE",
+      "Computer Science & Engineering",
+      "Computer Sc. and Engg.",
+      "Computer Science Engineering",
+      "Computer Science and Engg"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "electrical",
+    "name": "Electrical Engineering",
+    "aliases": ["EE", "Electrical Engg.", "Electrical Engg"],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "electronics-communication",
+    "name": "Electronics and Communication Engineering",
+    "aliases": [
+      "ECE",
+      "Electronics & Communication",
+      "Electronics and Communication",
+      "Electronics & Communication Engineering"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "mechanical",
+    "name": "Mechanical Engineering",
+    "aliases": ["ME", "Mechanical Engg.", "Mech", "Mechanical Engg"],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "civil",
+    "name": "Civil Engineering",
+    "aliases": ["CE", "Civil Engg.", "Civil Engg"],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "chemical",
+    "name": "Chemical Engineering",
+    "aliases": ["CHE", "ChE", "Chemical Engg.", "Chem Engg"],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "aerospace",
+    "name": "Aerospace Engineering",
+    "aliases": ["AE", "Aerospace Engg.", "Aero"],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "metallurgical-materials",
+    "name": "Metallurgical and Materials Engineering",
+    "aliases": [
+      "MME",
+      "Metallurgical Engineering",
+      "Metallurgical and Materials",
+      "Metallurgical Engg.",
+      "Materials Engineering"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "biotechnology",
+    "name": "Biotechnology",
+    "aliases": ["BT", "Biotech", "Biotechnology Engg.", "Bio Technology"],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "production-industrial",
+    "name": "Production and Industrial Engineering",
+    "aliases": ["PIE", "Industrial Engineering", "Production Engineering"],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "engineering-physics",
+    "name": "Engineering Physics",
+    "aliases": ["EP", "Engg Physics"],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "mathematics-computing",
+    "name": "Mathematics and Computing",
+    "aliases": ["MnC", "Mathematics & Computing", "Maths and Computing"],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "artificial-intelligence",
+    "name": "Artificial Intelligence",
+    "aliases": ["AI", "AI Engineering", "Artificial Intelligence Engineering"],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "data-science-ai",
+    "name": "Data Science and Artificial Intelligence",
+    "aliases": [
+      "DS and AI",
+      "Data Science and AI",
+      "Artificial Intelligence and Data Science",
+      "AI and Data Science"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "architecture",
+    "name": "Architecture",
+    "aliases": ["B.Arch", "Architecture (5 years)"],
+    "degree": "B.Arch",
+    "duration_years": 5
+  },
+  {
+    "id": "planning",
+    "name": "Planning",
+    "aliases": ["B.Plan", "Planning (4 years)"],
+    "degree": "B.Plan",
+    "duration_years": 4
+  },
+  {
+    "id": "information-technology",
+    "name": "Information Technology",
+    "aliases": [
+      "IT",
+      "Information Technology (4 Years, Bachelor of Technology)",
+      "Information Technology (5 Years, Bachelor and Master of Technology (Dual Degree))"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "electronics-engineering",
+    "name": "Electronics Engineering",
+    "aliases": [
+      "Electronics Engineering (4 Years, Bachelor of Technology)",
+      "Electronics and Electrical Communication Engineering with M.Tech. in any of the listed specializations (5 Years, Bachelor and Master of Technology (Dual Degree))"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "electronics-instrumentation",
+    "name": "Electronics and Instrumentation Engineering",
+    "aliases": [
+      "Electronics and Instrumentation Engineering (4 Years, Bachelor of Technology)",
+      "Electronics and Instrumentation Engineering and M.Tech VLSI Design and Embedded (5 Years, Bachelor and Master of Technology (Dual Degree))"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "electronics-vlsi",
+    "name": "Electronics and VLSI Engineering",
+    "aliases": [
+      "Electronics and VLSI Engineering (4 Years, Bachelor of Technology)"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "instrumentation-engineering",
+    "name": "Instrumentation Engineering",
+    "aliases": [
+      "Instrumentation Engineering (4 Years, Bachelor of Technology)"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "instrumentation-control",
+    "name": "Instrumentation and Control Engineering",
+    "aliases": [
+      "Instrumentation and Control Engineering (4 Years, Bachelor of Technology)"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "microelectronics-vlsi",
+    "name": "Microelectronics and VLSI Engineering",
+    "aliases": [
+      "Microelectronics & VLSI Engineering (4 Years, Bachelor of Technology)",
+      "B.Tech in Microelectronics & VLSI (4 Years, Bachelor of Technology)",
+      "VLSI Design and Technology (4 Years, Bachelor of Technology)",
+      "Integrated Circuit Design & Technology (4 Years, Bachelor of Technology)"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "robotics-automation",
+    "name": "Robotics and Automation",
+    "aliases": [
+      "ROBOTICS & AUTOMATION (4 Years, Bachelor of Technology)",
+      "Mechatronics and Automation Engineering (4 Years, Bachelor of Technology)"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "computational-data-science",
+    "name": "Computational and Data Science",
+    "aliases": [
+      "Computational and Data Science (4 Years, Bachelor of Technology)",
+      "Computational Engineering (4 Years, Bachelor of Technology)",
+      "Data Science and Engineering (4 Years, Bachelor of Technology)"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "industrial-iot",
+    "name": "Industrial Internet of Things",
+    "aliases": [
+      "Industrial Internet of Things (4 Years, Bachelor of Technology)"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "space-sciences-engineering",
+    "name": "Space Sciences and Engineering",
+    "aliases": [
+      "Space Sciences and Engineering (4 Years, Bachelor of Technology)"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "energy-engineering",
+    "name": "Energy Engineering",
+    "aliases": [
+      "Energy Engineering (4 Years, Bachelor of Technology)",
+      "Energy Engineering with M.Tech. in Energy Systems Engineering (5 Years, Bachelor and Master of Technology (Dual Degree))",
+      "SUSTAINABLE ENERGY TECHNOLOGIES (4 Years, Bachelor of Technology)"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "environmental-engineering",
+    "name": "Environmental Engineering",
+    "aliases": [
+      "Environmental Engineering (4 Years, Bachelor of Technology)",
+      "Environmental Science and Engineering (4 Years, Bachelor of Technology)",
+      "Environmental Science and Engineering (5 Years, Bachelor and Master of Technology (Dual Degree))"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "industrial-design",
+    "name": "Industrial Design",
+    "aliases": ["Industrial Design (4 Years, Bachelor of Technology)"],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "industrial-systems-engineering",
+    "name": "Industrial and Systems Engineering",
+    "aliases": [
+      "Industrial and Systems Engineering (4 Years, Bachelor of Technology)",
+      "Industrial and Systems Engineering with M.Tech. in Industrial and Systems Engineering and Management (5 Years, Bachelor and Master of Technology (Dual Degree))",
+      "B.Tech in General Engineering (4 Years, Bachelor of Technology)"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "manufacturing-science-engineering",
+    "name": "Manufacturing Science and Engineering",
+    "aliases": [
+      "Manufacturing Science and Engineering (4 Years, Bachelor of Technology)",
+      "Manufacturing Science and Engineering with M.Tech. in Industrial and Systems Engineering and Management (5 Years, Bachelor and Master of Technology (Dual Degree))",
+      "Quality Engineering Design and Manufacturing (5 Years, Bachelor and Master of Technology (Dual Degree))"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "engineering-design",
+    "name": "Engineering Design",
+    "aliases": [
+      "Engineering Design (5 Years, Bachelor and Master of Technology (Dual Degree))",
+      "Engineering and Computational Mechanics (4 Years, Bachelor of Technology)"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 5
+  },
+  {
+    "id": "materials-science-engineering",
+    "name": "Materials Science and Engineering",
+    "aliases": [
+      "Materials Science and Engineering (4 Years, Bachelor of Technology)",
+      "B.Tech in Materials Science and Engineering (4 Years, Bachelor of Technology)",
+      "Material Science and Engineering (5 Years, Bachelor and Master of Technology (Dual Degree))",
+      "Materials Science and Technology (5 Years, Bachelor and Master of Technology (Dual Degree))"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "ceramic-engineering",
+    "name": "Ceramic Engineering",
+    "aliases": [
+      "Ceramic Engineering (4 Years, Bachelor of Technology)",
+      "Ceramic Engineering (5 Years, Bachelor and Master of Technology (Dual Degree))",
+      "Ceramic Engineering and M.Tech Industrial Ceramic (5 Years, Bachelor and Master of Technology (Dual Degree))"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "mining-engineering",
+    "name": "Mining Engineering",
+    "aliases": [
+      "Mining Engineering (4 Years, Bachelor of Technology)",
+      "Mining Engineering (5 Years, Bachelor and Master of Technology (Dual Degree))",
+      "Mineral Engineering (4 Years, Bachelor of Technology)"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "mining-machinery-engineering",
+    "name": "Mining Machinery Engineering",
+    "aliases": [
+      "Mining Machinery Engineering (4 Years, Bachelor of Technology)",
+      "Mining Safety Engineering (5 Years, Bachelor and Master of Technology (Dual Degree))"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "petroleum-engineering",
+    "name": "Petroleum Engineering",
+    "aliases": ["Petroleum Engineering (4 Years, Bachelor of Technology)"],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "pharmaceutical-engineering",
+    "name": "Pharmaceutical Engineering and Technology",
+    "aliases": [
+      "Pharmaceutical Engineering & Technology (4 Years, Bachelor of Technology)",
+      "Pharmaceutical Engineering & Technology (5 Years, Bachelor and Master of Technology (Dual Degree))"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "textile-technology",
+    "name": "Textile Technology",
+    "aliases": ["Textile Technology (4 Years, Bachelor of Technology)"],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "polymer-science-engineering",
+    "name": "Polymer Science and Engineering",
+    "aliases": [
+      "Polymer Science and Engineering (4 Years, Bachelor of Technology)"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "food-process-engineering",
+    "name": "Food Process Engineering",
+    "aliases": ["Food Process Engineering (4 Years, Bachelor of Technology)"],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "agricultural-food-engineering",
+    "name": "Agricultural and Food Engineering",
+    "aliases": [
+      "Agricultural and Food Engineering (4 Years, Bachelor of Technology)",
+      "Agricultural and Food Engineering with M.Tech. in any of the listed specializations (5 Years, Bachelor and Master of Technology (Dual Degree))"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "biomedical-engineering",
+    "name": "Biomedical Engineering",
+    "aliases": [
+      "Biomedical Engineering (4 Years, Bachelor of Technology)",
+      "Bio Medical Engineering (4 Years, Bachelor of Technology)",
+      "Bioengineering with M.Tech in Biomedical Technology (5 Years, Bachelor and Master of Technology (Dual Degree))"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "biological-engineering",
+    "name": "Biological Engineering",
+    "aliases": [
+      "Biological Engineering (4 Years, Bachelor of Technology)",
+      "Biological Engineering (5 Years, Bachelor and Master of Technology (Dual Degree))",
+      "Biological Sciences and Bioengineering (4 Years, Bachelor of Technology)",
+      "Biosciences and Bioengineering (4 Years, Bachelor of Technology)"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "applied-geology",
+    "name": "Applied Geology",
+    "aliases": [
+      "Applied Geology (4 Years, Bachelor of Science)",
+      "Applied Geology (5 Years, Integrated Master of Science)",
+      "Applied Geology (5 Years, Integrated Master of Technology)",
+      "Geological Technology (5 Years, Integrated Master of Technology)"
+    ],
+    "degree": "Integrated M.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "applied-geophysics",
+    "name": "Applied Geophysics",
+    "aliases": [
+      "Applied Geophysics (5 Years, Integrated Master of Technology)",
+      "Exploration Geophysics (4 Years, Bachelor of Science)",
+      "Exploration Geophysics (5 Years, Integrated Master of Science)",
+      "Geophysical Technology (5 Years, Integrated Master of Technology)"
+    ],
+    "degree": "Integrated M.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "mathematics-bs",
+    "name": "Mathematics",
+    "aliases": [
+      "BS in Mathematics (4 Years, Bachelor of Science)",
+      "Applied Mathematics (5 Years, Integrated Master of Science)",
+      "Computational Mathematics (5 Years, Bachelor and Master of Technology (Dual Degree))"
+    ],
+    "degree": "B.Sc",
+    "duration_years": 4
+  },
+  {
+    "id": "physics-bs",
+    "name": "Physics",
+    "aliases": ["Physics with Specialization (4 Years, Bachelor of Science)"],
+    "degree": "B.Sc",
+    "duration_years": 4
+  },
+  {
+    "id": "chemistry-bs",
+    "name": "Chemistry",
+    "aliases": ["Chemistry with Specialization (4 Years, Bachelor of Science)"],
+    "degree": "B.Sc",
+    "duration_years": 4
+  },
+  {
+    "id": "statistics-data-science-bs",
+    "name": "Statistics and Data Science",
+    "aliases": ["Statistics and Data Science (4 Years, Bachelor of Science)"],
+    "degree": "B.Sc",
+    "duration_years": 4
+  },
+  {
+    "id": "economics-bs",
+    "name": "Economics",
+    "aliases": [
+      "Economics (4 Years, Bachelor of Science)",
+      "Economics (5 Years, Bachelor of Science and Master of Science (Dual Degree))",
+      "Economics (5 Years, Integrated Master of Science)",
+      "BS in Economics with MBA (IIM Bodh Gaya) (5 Years, Bachelor of Science and MBA (Dual Degree))"
+    ],
+    "degree": "B.Sc",
+    "duration_years": 4
+  },
+  {
+    "id": "biological-sciences-bs",
+    "name": "Biological Sciences",
+    "aliases": [
+      "Biological Science (4 Years, Bachelor of Science)",
+      "Biological Sciences (5 Years, Bachelor of Science and Master of Science (Dual Degree))",
+      "Interdisciplinary Sciences (5 Years, Bachelor of Science and Master of Science (Dual Degree))"
+    ],
+    "degree": "B.Sc",
+    "duration_years": 4
+  },
+  {
+    "id": "civil-geotechnical-dual",
+    "name": "Civil Engineering with M.Tech in Geotechnical Engineering",
+    "aliases": [
+      "B. Tech in CE. - M. Tech. in Geotechnical Engineering (5 Years, B.Tech. + M.Tech./MS (Dual Degree))"
+    ],
+    "degree": "Dual B.Tech-M.Tech",
+    "duration_years": 5
+  },
+  {
+    "id": "civil-structural-dual",
+    "name": "Civil Engineering with M.Tech in Structural Engineering",
+    "aliases": [
+      "B. Tech in CE. - M. Tech. in Structural Engineering (5 Years, B.Tech. + M.Tech./MS (Dual Degree))"
+    ],
+    "degree": "Dual B.Tech-M.Tech",
+    "duration_years": 5
+  },
+  {
+    "id": "cse-mtech-dual",
+    "name": "Computer Science and Engineering with M.Tech",
+    "aliases": [
+      "B. Tech. (CSE) and M.Tech in CSE (5 Years, B.Tech. + M.Tech./MS (Dual Degree))"
+    ],
+    "degree": "Dual B.Tech-M.Tech",
+    "duration_years": 5
+  },
+  {
+    "id": "ece-vlsi-dual",
+    "name": "Electronics and Communication Engineering with M.Tech in VLSI",
+    "aliases": [
+      "B. Tech. (ECE) -M. Tech. in VLSI (5 Years, B.Tech. + M.Tech./MS (Dual Degree))"
+    ],
+    "degree": "Dual B.Tech-M.Tech",
+    "duration_years": 5
+  },
+  {
+    "id": "eee-power-control-dual",
+    "name": "Electrical and Electronics Engineering with M.Tech in Power and Control",
+    "aliases": [
+      "B. Tech. (EEE)-M. Tech. in (Power &. Control) (5 Years, B.Tech. + M.Tech./MS (Dual Degree))"
+    ],
+    "degree": "Dual B.Tech-M.Tech",
+    "duration_years": 5
+  },
+  {
+    "id": "me-mechatronics-dual",
+    "name": "Mechanical Engineering with M.Tech in Mechatronics",
+    "aliases": [
+      "B. Tech. (ME) - M. Tech. in Mechatronics (5 Years, B.Tech. + M.Tech./MS (Dual Degree))"
+    ],
+    "degree": "Dual B.Tech-M.Tech",
+    "duration_years": 5
+  },
+  {
+    "id": "me-mba-nitie-dual",
+    "name": "Mechanical Engineering with MBA",
+    "aliases": [
+      "B. Tech. (ME) - MBA (NITIE) (5 Years, Bachelor of Technology and MBA (Dual Degree))",
+      "B.Tech (Chemical Science and Technology) - MBA in Hospital and Health Care Management (IIM Bodh Gaya) (5 Years, Bachelor of Technology and MBA (Dual Degree))"
+    ],
+    "degree": "Dual B.Tech-M.Tech",
+    "duration_years": 5
+  },
+  {
+    "id": "food-engineering-technology",
+    "name": "Food Engineering and Technology",
+    "aliases": [
+      "Food Engineering and Technology (4 Years, Bachelor of Technology)"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "food-technology",
+    "name": "Food Technology",
+    "aliases": [
+      "Food Technology (4 Years, Bachelor of Technology)",
+      "Food Technology (5 Years, Integrated Master of Science)"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "food-technology-management",
+    "name": "Food Technology and Management",
+    "aliases": [
+      "Food Technology and Management (4 Years, Bachelor of Technology)"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "integrated-it-mtech",
+    "name": "Integrated B.Tech IT and M.Tech IT",
+    "aliases": [
+      "Integrated B. Tech.(IT) and M. Tech (IT) (5 Years, Integrated B. Tech. and M. Tech. /MBA)",
+      "Integrated B. Tech.(IT) and M. Tech (IT) (5 Years, Integrated B. Tech. and M. Tech.)"
+    ],
+    "degree": "Integrated M.Tech",
+    "duration_years": 5
+  },
+  {
+    "id": "integrated-it-mba",
+    "name": "Integrated B.Tech IT and MBA",
+    "aliases": [
+      "Integrated B. Tech.(IT) and MBA (5 Years, Integrated B. Tech. and M. Tech. /MBA)",
+      "Integrated B. Tech.(IT) and MBA (5 Years, Integrated B. Tech. and MBA)"
+    ],
+    "degree": "Integrated M.Tech",
+    "duration_years": 5
+  },
+  {
+    "id": "smart-manufacturing",
+    "name": "Smart Manufacturing",
+    "aliases": ["Smart Manufacturing (4 Years, Bachelor of Technology)"],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "fashion-apparel-engineering",
+    "name": "Fashion and Apparel Engineering",
+    "aliases": [
+      "Fashion and Apparel Engineering (4 Years, Bachelor of Technology)"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "printing-packaging-technology",
+    "name": "Printing and Packaging Technology",
+    "aliases": [
+      "Printing and Packaging Technology (4 Years, Bachelor of Technology)"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "artificial-intelligence-data-science",
+    "name": "Artificial Intelligence and Data Science",
+    "aliases": [
+      "B.Tech in Artificial Intelligenece and Data Science (Transportation and Logistics) (4 Years, Bachelor of Technology)",
+      "CSE ( Data Science & Analytics) (4 Years, Bachelor of Technology)"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "aviation-engineering",
+    "name": "Aviation Engineering",
+    "aliases": [
+      "B.Tech in Aviation Engineering (4 Years, Bachelor of Technology)"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "animation-vfx",
+    "name": "Animation and VFX",
+    "aliases": ["Animation and VFX (4 Years, Bachelor of Technology)"],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "engineering-computational-mechanics-dual",
+    "name": "Engineering and Computational Mechanics",
+    "aliases": [
+      "B. Tech. and M. Tech. in Engineering and Computational Mechanics (Dual Degree) (5 Years, Bachelor and Master of Technology (Dual Degree))"
+    ],
+    "degree": "Dual B.Tech-M.Tech",
+    "duration_years": 5
+  },
+  {
+    "id": "chemical-science",
+    "name": "Chemical Science",
+    "aliases": [
+      "Chemical  Science (5 Years, Integrated Bachelor of Science-Master of Science)",
+      "Chemical Science and Technology (4 Years, Bachelor of Technology)"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "civil-infrastructure-engineering",
+    "name": "Civil and Infrastructure Engineering",
+    "aliases": [
+      "Civil and Infrastructure Engineering (4 Years, Bachelor of Technology)"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "digital-agriculture",
+    "name": "Digital Agriculture",
+    "aliases": ["Digital Agriculture (4 Years, Bachelor of Technology)"],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "earth-sciences",
+    "name": "Earth Sciences",
+    "aliases": ["Earth Sciences (4 Years, Bachelor of Science)"],
+    "degree": "B.Sc",
+    "duration_years": 4
+  },
+  {
+    "id": "materials-science-technology",
+    "name": "Materials Science and Technology",
+    "aliases": [
+      "Materials Science and Technology (4 Years, Bachelor of Technology)"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "physical-science",
+    "name": "Physical Science",
+    "aliases": [
+      "Physical Science (5 Years, Integrated Bachelor of Science-Master of Science)"
+    ],
+    "degree": "Integrated M.Sc",
+    "duration_years": 5
+  },
+  {
+    "id": "robotics-ai",
+    "name": "Robotics and AI",
+    "aliases": ["Robotics and AI (4 Years, Bachelor of Technology)"],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "cse-ai-ml",
+    "name": "Computer Science and Engineering (AI and ML)",
+    "aliases": ["B.Tech in CSE (AI and ML) (4 Years, Bachelor of Technology)"],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "industrial-chemistry-dual",
+    "name": "Industrial Chemistry",
+    "aliases": [
+      "Industrial Chemistry (5 Years, Bachelor and Master of Technology (Dual Degree))"
+    ],
+    "degree": "Dual B.Tech-M.Tech",
+    "duration_years": 5
+  },
+  {
+    "id": "civil-construction-management-dual",
+    "name": "Civil Engineering with Specialization in Construction Technology and Management",
+    "aliases": [
+      "Civil Engineering with Specialization in Construction Technology and Management (5 Years, Bachelor and Master of Technology (Dual Degree))",
+      "Civil Engineering with Specialization in Construction Technology and Management"
+    ],
+    "degree": "Dual B.Tech-M.Tech",
+    "duration_years": 5
+  },
+  {
+    "id": "life-science-msc",
+    "name": "Life Science",
+    "aliases": [
+      "Life Science (5 Years, Integrated Master of Science)",
+      "Life Sciences"
+    ],
+    "degree": "Integrated M.Sc",
+    "duration_years": 5
+  },
+  {
+    "id": "quantitative-economics-data-science-msc",
+    "name": "Quantitative Economics and Data Science",
+    "aliases": [
+      "Quantitative Economics & Data Science (5 Years, Integrated Master of Science)",
+      "Quantitative Economics & Data Science",
+      "Quantitative Economics and Data Science"
+    ],
+    "degree": "Integrated M.Sc",
+    "duration_years": 5
+  },
+  {
+    "id": "bachelor-of-design",
+    "name": "Bachelor of Design",
+    "aliases": [
+      "Bachelor of Design (4 Years, Bachelor of Design)",
+      "B.Des.",
+      "B.Des"
+    ],
+    "degree": "B.Des",
+    "duration_years": 4
+  },
+  {
+    "id": "electrical-mba-dual",
+    "name": "B.Tech. Electrical Engineering with MBA",
+    "aliases": [
+      "B.Tech. (Elctrical Engineering) - MBA (5 Years, Bachelor of Technology and MBA (Dual Degree))",
+      "B.Tech. (Electrical Engineering) - MBA",
+      "B.Tech. (Elctrical Engineering) - MBA",
+      "Electrical Engineering with MBA"
+    ],
+    "degree": "Dual B.Tech-MBA",
+    "duration_years": 5
+  }
+]

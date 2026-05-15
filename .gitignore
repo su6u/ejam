@@ -1,0 +1,62 @@
+# dependencies
+node_modules
+.pnpm-debug.log*
+
+# build outputs
+.next
+dist
+dist-data
+build
+out
+*.tsbuildinfo
+
+# environment
+.env
+.env.local
+.env.*.local
+
+# ide
+.vscode
+.idea
+*.swp
+*.swo
+
+# os
+.DS_Store
+Thumbs.db
+
+# logs
+*.log
+logs
+
+# misc
+.turbo
+coverage
+
+# raw scraped sources (regenerable from ejam-ingest)
+data/**/_raw/
+
+# data lake
+/data/manifest/
+!/data/registry/
+
+# pnpm
+node_modules/
+.pnpm-store/
+
+# Next.js
+.next/
+out/
+
+# Turbo
+.turbo/
+
+# env
+.env
+.env.local
+.env.*.local
+
+# scraper runtime logs
+data/manifest/sources.jsonl
+data/manifest/runs.jsonl
+apps/scraper/data/cache/
