@@ -19,6 +19,7 @@
   },
   "devDependencies": {
     "@biomejs/biome": "^2.4.14",
+    "@duckdb/node-api": "^1.5.2-r.1",
     "tsx": "^4.21.0",
     "turbo": "^2.9.8",
     "typescript": "^6.0.3",
