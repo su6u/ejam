@@ -9,6 +9,7 @@ import {
   type CollegePredictorFilters,
   type CollegePredictorIndexRow,
   type ProgramPrediction,
+  deriveConfidence,
   getJosaaIndex,
   predictPrograms,
 } from "@ejam/data/college-predictor";
@@ -137,12 +138,7 @@ export const predictor: ExamPredictor<JeeAdvancedInput, CollegePredictionResult>
     if (cachedPrograms) {
       return {
         result: resultFromCachedPrograms(cachedPrograms, input.filters),
-        confidence: {
-          level: cachedPrograms.length > 0 ? "medium" : "low",
-          caveat: cachedPrograms.length > 0
-            ? "probabilities are based on historical closing rank trends"
-            : "no programs found above the probability threshold for this rank",
-        },
+        confidence: deriveConfidence(cachedPrograms),
       };
     }
 
@@ -182,9 +178,7 @@ export const predictor: ExamPredictor<JeeAdvancedInput, CollegePredictionResult>
       };
     }
 
-    const confidence = result.metadata.total_above_threshold > 0
-      ? { level: "medium" as const, caveat: "probabilities are based on historical closing rank trends" }
-      : { level: "low" as const, caveat: "no programs found above the probability threshold for this rank" };
+    const confidence = deriveConfidence(result.programs);
 
     _serverCache.set(cacheKey, result.programs);
     return { result, confidence };
