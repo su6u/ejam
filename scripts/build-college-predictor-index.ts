@@ -3,7 +3,14 @@
  * builds college_predictor_index.parquet from historical JoSAA cutoff parquets
  * computes per-round weighted closing ranks (R1–R6), fill_round, sigma inflation
  * handles new-program borrowing and sparse-data pooling
- * weights for last 4 years: [0.50, 0.30, 0.15, 0.05]
+ *
+ * weights for last 4 years: [0.50, 0.30, 0.15, 0.05] before outlier adjustment
+ * COVID outlier guard reduces a year's weight to 0.01 when its final-round
+ * closing rank deviates from the median of the other years by more than 2×
+ * the inter-year std — fires primarily for 2020–2021 on volatile programs
+ *
+ * prediction_year (used for gap-aware trend projection) is read from env var
+ * EJAM_PREDICTION_YEAR and defaults to the current calendar year
  **/
 
 import { execSync } from "node:child_process";
@@ -21,8 +28,20 @@ const JOSAA_CUTOFFS = path.join(
   "josaa",
   "cutoffs",
 );
-const OUTPUT_DIR = path.join(ROOT, "dist-data");
+const OUTPUT_DIR = path.join(ROOT, "data", "dist");
 const OUTPUT_FILE = path.join(OUTPUT_DIR, "college_predictor_index.parquet");
+
+function resolvePredictionYear(): number {
+  const raw = process.env.EJAM_PREDICTION_YEAR;
+  if (!raw) return new Date().getFullYear();
+  const parsed = Number.parseInt(raw, 10);
+  if (!Number.isFinite(parsed) || parsed < 2000 || parsed > 2100) {
+    throw new Error(
+      `EJAM_PREDICTION_YEAR must be a 4-digit year, got: ${raw}`,
+    );
+  }
+  return parsed;
+}
 
 function findAllCutoffParquets(): string[] {
   const files: string[] = [];
@@ -48,7 +67,7 @@ function findAllCutoffParquets(): string[] {
   return files;
 }
 
-function buildSQL(parquetFiles: string[]): string {
+function buildSQL(parquetFiles: string[], predictionYear: number): string {
   const unionParts = parquetFiles.map(
     (f) => `SELECT * FROM read_parquet('${f}')`,
   );
@@ -58,11 +77,14 @@ function buildSQL(parquetFiles: string[]): string {
 CREATE TEMP TABLE raw_cutoffs AS
 ${unionAll};
 
--- normalize rounds: cap at 6 (some years have 7, merge 7 into 6)
+-- normalize rounds (some years have 7, fold 7 into 6) and instype
+-- the raw JoSAA PDFs encode IIITs as '3IT' — rewrite to canonical 'IIIT'
+-- so no downstream code ever sees the raw artifact; CFI stays as-is
 CREATE TEMP TABLE normalized AS
 SELECT
   institute_id, program_id, seat_type, quota, gender,
-  instype, degree, duration_years,
+  CASE WHEN instype = '3IT' THEN 'IIIT' ELSE instype END AS instype,
+  degree, duration_years,
   year,
   LEAST(round, 6) AS round,
   closing_rank
@@ -79,24 +101,75 @@ FROM normalized
 GROUP BY institute_id, program_id, seat_type, quota, gender,
          instype, degree, duration_years, year, round;
 
--- assign year weights: last 4 years get [0.50, 0.30, 0.15, 0.05]
-CREATE TEMP TABLE year_weights AS
-WITH distinct_years AS (
-  SELECT DISTINCT institute_id, program_id, seat_type, quota, gender, year
-  FROM deduped
-),
-ranked AS (
+-- last-round closing rank per year — anchor for both the overall stats below
+-- and for the COVID outlier guard in year_weights
+CREATE TEMP TABLE last_round AS
+WITH ranked AS (
   SELECT *,
+    ROW_NUMBER() OVER (
+      PARTITION BY institute_id, program_id, seat_type, quota, gender, year
+      ORDER BY round DESC
+    ) AS rn
+  FROM deduped
+)
+SELECT * FROM ranked WHERE rn = 1;
+
+-- assign year weights for the last 4 years: [0.50, 0.30, 0.15, 0.05]
+-- COVID outlier guard: if a year's final-round closing rank deviates from the
+-- median of the other years in the window by more than 2× the inter-year std,
+-- collapse its weight to 0.01 (near zero, not zero, to keep SUM(w) > 0 when
+-- only one or two years are non-outliers)
+CREATE TEMP TABLE year_weights AS
+WITH windowed AS (
+  SELECT
+    institute_id, program_id, seat_type, quota, gender, year, closing_rank,
     ROW_NUMBER() OVER (
       PARTITION BY institute_id, program_id, seat_type, quota, gender
       ORDER BY year DESC
     ) AS yr
-  FROM distinct_years
+  FROM last_round
+  QUALIFY yr <= 4
+),
+group_std AS (
+  SELECT
+    institute_id, program_id, seat_type, quota, gender,
+    STDDEV_POP(closing_rank) AS inter_year_std
+  FROM windowed
+  GROUP BY institute_id, program_id, seat_type, quota, gender
+),
+median_others AS (
+  SELECT
+    a.institute_id, a.program_id, a.seat_type, a.quota, a.gender, a.year,
+    MEDIAN(b.closing_rank) AS med_others
+  FROM windowed a
+  JOIN windowed b
+    ON a.institute_id = b.institute_id
+    AND a.program_id = b.program_id
+    AND a.seat_type = b.seat_type
+    AND a.quota = b.quota
+    AND a.gender = b.gender
+    AND a.year != b.year
+  GROUP BY a.institute_id, a.program_id, a.seat_type, a.quota, a.gender, a.year
 )
-SELECT *,
-  CASE yr WHEN 1 THEN 0.50 WHEN 2 THEN 0.30 WHEN 3 THEN 0.15 WHEN 4 THEN 0.05 END AS w
-FROM ranked
-WHERE yr <= 4;
+SELECT
+  w.institute_id, w.program_id, w.seat_type, w.quota, w.gender,
+  w.year, w.yr,
+  CASE
+    WHEN gs.inter_year_std IS NOT NULL
+      AND gs.inter_year_std > 0
+      AND mo.med_others IS NOT NULL
+      AND ABS(w.closing_rank - mo.med_others) > 2 * gs.inter_year_std
+    THEN 0.01
+    ELSE CASE w.yr
+      WHEN 1 THEN 0.50
+      WHEN 2 THEN 0.30
+      WHEN 3 THEN 0.15
+      WHEN 4 THEN 0.05
+    END
+  END AS w
+FROM windowed w
+LEFT JOIN group_std gs USING (institute_id, program_id, seat_type, quota, gender)
+LEFT JOIN median_others mo USING (institute_id, program_id, seat_type, quota, gender, year);
 
 -- per-round weighted means
 CREATE TEMP TABLE round_stats AS
@@ -153,18 +226,6 @@ weighted_last AS (
 )
 SELECT * FROM weighted_last;
 
--- last-round closing rank per year (for overall stats)
-CREATE TEMP TABLE last_round AS
-WITH ranked AS (
-  SELECT *,
-    ROW_NUMBER() OVER (
-      PARTITION BY institute_id, program_id, seat_type, quota, gender, year
-      ORDER BY round DESC
-    ) AS rn
-  FROM deduped
-)
-SELECT * FROM ranked WHERE rn = 1;
-
 -- weighted overall stats using last-round data
 CREATE TEMP TABLE weighted AS
 SELECT
@@ -217,6 +278,12 @@ JOIN wmean m
 GROUP BY d.institute_id, d.program_id, d.seat_type, d.quota, d.gender;
 
 -- final index: join stats + round pivot + fill_round
+-- sigma_base uses a relative floor (3% of weighted_mean) so that the
+-- uncertainty band scales with the program's typical rank range — a top IIT
+-- program (mean ~65) gets a floor of ~2, while a mid-tier NIT (mean ~8000)
+-- gets a floor of ~240
+-- predicted_closing_rank is gap-aware: trend_slope is multiplied by the
+-- number of years between last_data_year and prediction_year (${predictionYear})
 COPY (
   SELECT
     s.institute_id, s.program_id, s.seat_type, s.quota, s.gender,
@@ -224,12 +291,13 @@ COPY (
     s.weighted_mean,
     s.weighted_std,
     s.trend_slope,
-    GREATEST(s.weighted_std, 50) AS sigma_base,
+    GREATEST(s.weighted_std, ROUND(s.weighted_mean * 0.03))::INTEGER AS sigma_base,
     CASE
-      WHEN s.years_of_data < 3 THEN ROUND(GREATEST(s.weighted_std, 50) * 1.5)::INTEGER
-      ELSE GREATEST(s.weighted_std, 50)
+      WHEN s.years_of_data < 3
+        THEN ROUND(GREATEST(s.weighted_std, s.weighted_mean * 0.03) * 1.5)::INTEGER
+      ELSE GREATEST(s.weighted_std, ROUND(s.weighted_mean * 0.03))::INTEGER
     END AS sigma_effective,
-    s.weighted_mean + COALESCE(s.trend_slope, 0) AS predicted_closing_rank,
+    s.weighted_mean + COALESCE(s.trend_slope, 0) * (${predictionYear} - s.last_data_year) AS predicted_closing_rank,
     CASE
       WHEN s.years_of_data = 1 THEN 'pooled'
       WHEN s.years_of_data = 2 THEN 'inferred'
@@ -265,7 +333,9 @@ COPY (
 }
 
 async function main(): Promise<void> {
+  const predictionYear = resolvePredictionYear();
   console.log("Building college predictor index...");
+  console.log(`prediction_year=${predictionYear}`);
 
   const parquetFiles = findAllCutoffParquets();
   console.log(`Found ${parquetFiles.length} cutoff parquet files`);
@@ -277,7 +347,7 @@ async function main(): Promise<void> {
 
   fs.mkdirSync(OUTPUT_DIR, { recursive: true });
 
-  const sql = buildSQL(parquetFiles);
+  const sql = buildSQL(parquetFiles, predictionYear);
   const sqlFile = path.join(OUTPUT_DIR, "_build_index.sql");
   fs.writeFileSync(sqlFile, sql, "utf-8");
 
