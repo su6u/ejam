@@ -35,6 +35,10 @@ export {
   predictPrograms,
 } from "./engine";
 export {
+  _resetJosaaIndexCache,
+  getJosaaIndex,
+} from "./index-loader";
+export {
   _resetCanonicalStatesCache,
   loadCanonicalStates,
 } from "./state-registry";
