@@ -1,6 +1,7 @@
 /**
- * JEE Main college predictor — NIT/IIIT/GFTI with HS/OS quota resolution
- * loads college_predictor_index.parquet via @duckdb/node-api
+ * JEE Main college predictor — NIT/IIIT/CFI with HS/OS/special-state quota resolution
+ * quota filtering happens in JS after loading the shared index; state must be a canonical
+ * value from institutes.json — validated at the Zod schema layer before predict() is called
  */
 
 import type { ExamPredictor } from "@ejam/data";
@@ -8,6 +9,7 @@ import {
   type CollegePredictionResult,
   type CollegePredictorFilters,
   type CollegePredictorIndexRow,
+  loadCanonicalStates,
   type ProgramPrediction,
   predictPrograms,
   readPredictionResultCache,
@@ -19,7 +21,14 @@ const JeeMainInput = z.object({
   rank: z.number().int().min(1).max(500000),
   seat_type: z.string().regex(/^[A-Za-z0-9 ()-]+$/),
   gender: z.string().regex(/^[A-Za-z0-9 ()-]+$/),
-  state: z.string().optional().default(""),
+  state: z
+    .string()
+    .optional()
+    .default("")
+    .refine(
+      (value) => value === "" || loadCanonicalStates().has(value),
+      (value) => ({ message: `unknown state: '${value}'` }),
+    ),
   filters: z
     .object({
       institute_type: z.array(z.string()).optional(),
@@ -28,11 +37,15 @@ const JeeMainInput = z.object({
       band: z.array(z.enum(["safe", "target", "reach", "long-shot"])).optional(),
     })
     .optional(),
-  ews_toggle: z.boolean().optional(),
+  has_ews_certificate: z.boolean().optional(),
   include_all: z.boolean().optional(),
 });
 type JeeMainInput = z.infer<typeof JeeMainInput>;
 
+// values must match the corresponding state strings in data/registry/engineering/institutes.json
+// exactly — HS/OS/special-state quota matching does string equality on row.state
+// Ladakh has no institutes in the registry today; keep the entry so a future
+// Ladakh institute (e.g. an upcoming NIT/IIIT) is recognised the moment its row is added
 const SPECIAL_STATE_QUOTAS: Record<string, string> = {
   GO: "Goa",
   JK: "Jammu and Kashmir",
@@ -40,6 +53,8 @@ const SPECIAL_STATE_QUOTAS: Record<string, string> = {
   AP: "Andhra Pradesh",
 };
 const EWS_SEAT_TYPE = "Gen-EWS";
+const EWS_CAVEAT =
+  "EWS seats are only available to candidates holding a valid EWS certificate issued by a competent authority. These results assume you are EWS-eligible.";
 
 type RegistryMaps = {
   instituteStates: Map<string, string>;
@@ -172,7 +187,7 @@ export const predictor: ExamPredictor<JeeMainInput, CollegePredictionResult> = {
       filters: input.filters,
     });
 
-    if (input.ews_toggle) {
+    if (input.has_ews_certificate) {
       const baseResult: CollegePredictionResult = {
         programs: result.programs,
         metadata: result.metadata,
@@ -188,6 +203,7 @@ export const predictor: ExamPredictor<JeeMainInput, CollegePredictionResult> = {
           includeAll: input.include_all,
           filters: input.filters,
         }),
+        caveat: EWS_CAVEAT,
       };
     }
 

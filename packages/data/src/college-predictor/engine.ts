@@ -76,6 +76,8 @@ export interface CollegePredictionResult {
   ews_comparison?: {
     base: CollegePredictionResult;
     ews: CollegePredictionResult;
+    // shown when the student asserted they hold a valid EWS certificate
+    caveat?: string;
   };
 }
 
