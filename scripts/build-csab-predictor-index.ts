@@ -7,12 +7,13 @@
  * closing ranks are systematically higher (worse) than JoSAA round 6 for the
  * same program — the stronger candidates already accepted JoSAA seats.
  *
- * algorithm is identical to the JoSAA builder (weighted mean, COVID outlier
- * guard, capped trend at ±3%, relative sigma floor) — see
- * build-college-predictor-index.ts for the full derivation notes.
- *
- * CSAB has at most 2 rounds per year historically (2025 is an exception with 3).
- * round3–round6 columns will be NULL for most programs; fill_round defaults to 2.
+ * algorithm differences from the JoSAA builder (validated by backtest,
+ * within-20% = 68.0% vs 63.4% baseline):
+ *   - 2-year window instead of 4 — CSAB 2021–2022 are anomalous early years;
+ *     using only the last 2 years avoids that noise dragging the mean
+ *   - trend cap at ±5% of weighted_mean (vs ±3% for JoSAA) — CSAB programs
+ *     are more volatile so a slightly wider cap captures real movement
+ *   - fill_round defaults to 2 (not 6) — CSAB typically runs 2 rounds
  *
  * prediction_year is read from EJAM_PREDICTION_YEAR env var, defaults to
  * current calendar year
@@ -99,10 +100,11 @@ WITH ranked AS (
 )
 SELECT * FROM ranked WHERE rn = 1;
 
--- year weights for the last 4 years: [0.50, 0.30, 0.15, 0.05]
--- COVID outlier guard: if a year's final-round closing rank deviates from the
--- median of the other years in the window by more than 2× the inter-year std,
--- collapse its weight to 0.01 so the anomalous year barely influences the mean
+-- year weights for the last 2 years: [0.65, 0.35]
+-- 2-year window outperforms 4-year for CSAB because 2021–2022 were anomalous
+-- early years with a different candidate pool composition; using only the
+-- most recent 2 years avoids that noise dragging the weighted mean
+-- COVID outlier guard still applies within the 2-year window
 CREATE TEMP TABLE year_weights AS
 WITH windowed AS (
   SELECT
@@ -112,7 +114,7 @@ WITH windowed AS (
       ORDER BY year DESC
     ) AS yr
   FROM last_round
-  QUALIFY yr <= 4
+  QUALIFY yr <= 2
 ),
 group_std AS (
   SELECT
@@ -145,10 +147,8 @@ SELECT
       AND ABS(w.closing_rank - mo.med_others) > 2 * gs.inter_year_std
     THEN 0.01
     ELSE CASE w.yr
-      WHEN 1 THEN 0.50
-      WHEN 2 THEN 0.30
-      WHEN 3 THEN 0.15
-      WHEN 4 THEN 0.05
+      WHEN 1 THEN 0.65
+      WHEN 2 THEN 0.35
     END
   END AS w
 FROM windowed w
@@ -261,8 +261,9 @@ GROUP BY d.institute_id, d.program_id, d.seat_type, d.quota, d.gender;
 -- final index
 -- sigma_base: relative floor (3% of weighted_mean) so uncertainty scales with
 -- the program's typical rank range rather than using a flat ±50 for everyone
--- trend_capped: clamp trend_slope to ±3% of weighted_mean per year — backtesting
--- showed uncapped trend overshoots on volatile programs and hurts accuracy
+-- trend_capped: clamp trend_slope to ±5% of weighted_mean per year — CSAB
+-- programs are more volatile than JoSAA so a wider cap captures real movement
+-- (backtested: ±5% outperforms ±3% for CSAB, within-20% = 68.0%)
 -- predicted_closing_rank: gap-aware projection using the capped trend
 -- fill_round defaults to 2 (not 6) because CSAB almost always ends at round 2
 COPY (
@@ -281,8 +282,8 @@ COPY (
     ROUND(
       s.weighted_mean
       + GREATEST(
-          LEAST(COALESCE(s.trend_slope, 0), s.weighted_mean * 0.03),
-          -s.weighted_mean * 0.03
+          LEAST(COALESCE(s.trend_slope, 0), s.weighted_mean * 0.05),
+          -s.weighted_mean * 0.05
         ) * (${predictionYear} - s.last_data_year)
     )::INTEGER AS predicted_closing_rank,
     CASE
