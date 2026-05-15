@@ -31,6 +31,7 @@ export {
   applyCollegePredictorFilters,
   classifyBand,
   computeProbability,
+  deriveConfidence,
   normalCDF,
   predictPrograms,
 } from "./engine";
