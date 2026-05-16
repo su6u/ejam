@@ -38,7 +38,9 @@
     "lint": "biome check .",
     "lint:write": "biome check --write .",
     "format": "biome format --write .",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
     "@duckdb/node-api": "^1.5.2-r.1",
@@ -47,6 +49,7 @@
     "zod": "^4.4.2"
   },
   "devDependencies": {
-    "typescript": "^6.0.3"
+    "typescript": "^6.0.3",
+    "vitest": "^3.2.4"
   }
 }
