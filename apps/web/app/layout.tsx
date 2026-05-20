@@ -1,9 +1,17 @@
 import type { Metadata } from "next";
+import { Manrope } from "next/font/google";
 import "./globals.css";
 
+const manrope = Manrope({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  display: "swap",
+  variable: "--font-manrope",
+});
+
 export const metadata: Metadata = {
-  title: "ejam — College Predictor",
-  description: "Predict your college admissions for JEE Advanced and JEE Main.",
+  title: "ejam",
+  description: "ejam",
 };
 
 export default function RootLayout({
@@ -12,8 +20,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body>{children}</body>
+    <html lang="en" className={`${manrope.variable} antialiased`}>
+      <body className="font-[family-name:var(--font-manrope)]" suppressHydrationWarning>{children}</body>
     </html>
   );
 }

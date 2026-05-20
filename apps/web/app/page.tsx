@@ -1,9 +1,12 @@
-// tool-first: predictor is the homepage
-// full UI redesign — this is a placeholder shell
+import { Navbar } from "./components/navbar";
+
 export default function Home() {
   return (
-    <main>
-      <p>ejam college predictor — UI coming soon</p>
-    </main>
+    <>
+      <Navbar />
+      <main className="mx-auto max-w-[1100px] px-6 pt-32">
+        {/* Hero section — coming next */}
+      </main>
+    </>
   );
 }

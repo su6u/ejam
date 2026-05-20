@@ -1,1 +1,45 @@
 @import "tailwindcss";
+
+:root {
+  --bg-base: #141414;
+  --bg-secondary: #1b1b1b;
+  --bg-interactive: #262626;
+
+  /* Semantic z-index scale */
+  --z-navbar: 50;
+  --z-dropdown: 100;
+  --z-modal-backdrop: 300;
+  --z-modal: 400;
+  --z-toast: 500;
+  --z-tooltip: 600;
+}
+
+html {
+  background-color: var(--bg-base);
+  /* Slightly tinted neutral — oklch with minimal chroma toward brand hue */
+  color: oklch(92% 0.005 260);
+}
+
+body {
+  background-color: var(--bg-base);
+  min-height: 100dvh;
+  font-kerning: normal;
+}
+
+/* Focus rings */
+:focus {
+  outline: none;
+}
+
+:focus-visible {
+  outline: 2px solid oklch(92% 0.005 260);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/* Hover states only on devices that support hover */
+@media (hover: none) {
+  .nav-pill:hover {
+    opacity: 1 !important;
+  }
+}
