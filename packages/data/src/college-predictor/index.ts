@@ -31,9 +31,18 @@ export {
   applyCollegePredictorFilters,
   classifyBand,
   computeProbability,
+  deriveConfidence,
   normalCDF,
   predictPrograms,
 } from "./engine";
+export {
+  _resetJosaaIndexCache,
+  getJosaaIndex,
+} from "./index-loader";
+export {
+  _resetCanonicalStatesCache,
+  loadCanonicalStates,
+} from "./state-registry";
 export type { CollegePredictorUrlInput } from "./url-params";
 export {
   buildCollegePredictorSharePath,

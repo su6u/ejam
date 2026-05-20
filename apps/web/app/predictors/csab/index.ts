@@ -1,8 +1,11 @@
 /**
- * JEE Main college predictor — NIT/IIIT/CFI with HS/OS/special-state quota resolution
- * uses the shared JoSAA index loader; filters to non-IIT rows in JS after load
- * quota filtering happens in JS after loading the shared index; state must be a canonical
- * value from institutes.json — validated at the Zod schema layer before predict() is called
+ * CSAB college predictor — NIT/IIIT/CFI supplementary rounds
+ * uses a separate index built from CSAB-only cutoff data so the candidate
+ * pool (post-JoSAA students) is never blended with the JoSAA population
+ *
+ * quota resolution is identical to JEE Main: HS/OS/AI/special-state
+ * state must be a canonical value from institutes.json — validated at the
+ * Zod schema layer before predict() is called
  */
 
 import type { ExamPredictor } from "@ejam/data";
@@ -10,15 +13,13 @@ import {
   type CollegePredictionResult,
   type CollegePredictorFilters,
   type CollegePredictorIndexRow,
-  deriveConfidence,
-  getJosaaIndex,
   loadCanonicalStates,
   type ProgramPrediction,
   predictPrograms,
 } from "@ejam/data/college-predictor";
 import { z } from "zod";
 
-const JeeMainInput = z.object({
+const CsabInput = z.object({
   rank: z.number().int().min(1).max(500000),
   seat_type: z.string().regex(/^[A-Za-z0-9 ()-]+$/),
   gender: z.string().regex(/^[A-Za-z0-9 ()-]+$/),
@@ -41,18 +42,17 @@ const JeeMainInput = z.object({
   has_ews_certificate: z.boolean().optional(),
   include_all: z.boolean().optional(),
 });
-type JeeMainInput = z.infer<typeof JeeMainInput>;
+type CsabInput = z.infer<typeof CsabInput>;
 
 // values must match the corresponding state strings in data/registry/engineering/institutes.json
 // exactly — HS/OS/special-state quota matching does string equality on row.state
-// Ladakh has no institutes in the registry today; keep the entry so a future
-// Ladakh institute (e.g. an upcoming NIT/IIIT) is recognised the moment its row is added
 const SPECIAL_STATE_QUOTAS: Record<string, string> = {
   GO: "Goa",
   JK: "Jammu and Kashmir",
   LA: "Ladakh",
   AP: "Andhra Pradesh",
 };
+
 const EWS_SEAT_TYPE = "Gen-EWS";
 const EWS_CAVEAT =
   "EWS seats are only available to candidates holding a valid EWS certificate issued by a competent authority. These results assume you are EWS-eligible.";
@@ -62,29 +62,13 @@ type RegistryMaps = {
   programNames: Map<string, string>;
 };
 
-// in-memory server cache — keyed by FNV1a hash of canonical input
-// sessionStorage is a no-op on the server; this Map persists for the process lifetime
-// predictions are deterministic for a given index version, so no TTL is needed
-const _serverCache = new Map<string, ProgramPrediction[]>();
-
+// module-level caches — populated on first request, cleared on process restart
+let _cachedIndex: CollegePredictorIndexRow[] | null = null;
 let _cachedRegistry: RegistryMaps | null = null;
 
-function stableNormalize(value: unknown): unknown {
-  if (Array.isArray(value)) return value.map(stableNormalize);
-  if (value && typeof value === "object") {
-    return Object.fromEntries(
-      Object.entries(value)
-        .filter(([, entry]) => entry !== undefined)
-        .sort(([a], [b]) => a.localeCompare(b))
-        .map(([key, entry]) => [key, stableNormalize(entry)]),
-    );
-  }
-  return value;
-}
-
-function stableStringify(value: unknown): string {
-  return JSON.stringify(stableNormalize(value));
-}
+// in-memory prediction result cache — keyed by FNV1a hash of canonical input
+// avoids re-running the probability computation for identical requests
+const _resultCache = new Map<string, ProgramPrediction[]>();
 
 function fnv1a(value: string): string {
   let hash = 0x811c9dc5;
@@ -95,12 +79,47 @@ function fnv1a(value: string): string {
   return (hash >>> 0).toString(16).padStart(8, "0");
 }
 
+function cacheKey(input: unknown): string {
+  return fnv1a(JSON.stringify(input));
+}
+
+async function loadIndex(): Promise<CollegePredictorIndexRow[]> {
+  if (_cachedIndex) return _cachedIndex;
+
+  const { join, resolve } = await import("node:path");
+  const indexPath = resolve(
+    process.env.EJAM_DIST_DATA_ROOT ?? join(process.cwd(), "data", "dist"),
+    "csab_predictor_index.parquet",
+  );
+
+  // graceful degradation: if the CSAB index hasn't been built yet, return empty
+  const { existsSync } = await import("node:fs");
+  if (!existsSync(indexPath)) {
+    _cachedIndex = [];
+    return _cachedIndex;
+  }
+
+  const { DuckDBInstance } = await import("@duckdb/node-api");
+  const instance = await DuckDBInstance.create(":memory:");
+  const connection = await instance.connect();
+  const result = await connection.run(
+    `SELECT * FROM read_parquet('${indexPath}')`,
+  );
+  const rows = await result.fetchAllRows();
+  await connection.close();
+  await instance.close();
+
+  _cachedIndex = rows as unknown as CollegePredictorIndexRow[];
+  return _cachedIndex;
+}
+
 async function loadRegistryMaps(): Promise<RegistryMaps> {
   if (_cachedRegistry) return _cachedRegistry;
 
   const { readFileSync } = await import("node:fs");
   const { join, resolve } = await import("node:path");
-  const registryRoot = process.env.EJAM_REGISTRY_ROOT ?? join(process.cwd(), "data", "registry");
+  const registryRoot =
+    process.env.EJAM_REGISTRY_ROOT ?? join(process.cwd(), "data", "registry");
   const institutes = JSON.parse(
     readFileSync(resolve(registryRoot, "engineering", "institutes.json"), "utf-8"),
   ) as Array<{ id: string; state: string }>;
@@ -115,7 +134,10 @@ async function loadRegistryMaps(): Promise<RegistryMaps> {
   return _cachedRegistry;
 }
 
-function enrichRows(rows: CollegePredictorIndexRow[], registry: RegistryMaps): CollegePredictorIndexRow[] {
+function enrichRows(
+  rows: CollegePredictorIndexRow[],
+  registry: RegistryMaps,
+): CollegePredictorIndexRow[] {
   return rows.map((row) => ({
     ...row,
     state: registry.instituteStates.get(row.institute_id),
@@ -137,6 +159,30 @@ function filterByQuota(
     if (specialState) return studentState === specialState;
     return false;
   });
+}
+
+function deriveConfidence(
+  programs: ProgramPrediction[],
+): { level: "high" | "medium" | "low"; caveat: string } {
+  if (programs.length === 0) {
+    return { level: "low", caveat: "no programs found above the probability threshold for this rank" };
+  }
+  // worst data_quality among returned programs drives the confidence level
+  // high is reserved until backtesting proves calibration
+  const hasPooled = programs.some((p) => p.data_quality === "pooled");
+  const hasInferred = programs.some((p) => p.data_quality === "inferred");
+  if (hasPooled || hasInferred) {
+    return {
+      level: "low",
+      caveat: hasPooled
+        ? "some programs are based on a single year of CSAB data — treat with caution"
+        : "some programs are based on only 2 years of CSAB data — treat with caution",
+    };
+  }
+  return {
+    level: "medium",
+    caveat: "probabilities are based on historical CSAB closing rank data",
+  };
 }
 
 function resultFromCachedPrograms(
@@ -164,24 +210,30 @@ function resultFromCachedPrograms(
   };
 }
 
-export const predictor: ExamPredictor<JeeMainInput, CollegePredictionResult> = {
-  inputSchema: JeeMainInput,
+export const predictor: ExamPredictor<CsabInput, CollegePredictionResult> = {
+  inputSchema: CsabInput,
 
-  async predict(input, _deps) {
-    const cacheInput = { exam_id: _deps.examId, ...input };
-    const cacheKey = fnv1a(stableStringify(cacheInput));
-    const cachedPrograms = _serverCache.get(cacheKey);
-    if (cachedPrograms) {
+  async predict(input, deps) {
+    const key = cacheKey({ exam_id: deps.examId, ...input });
+    const cached = _resultCache.get(key);
+    if (cached) {
       return {
-        result: resultFromCachedPrograms(cachedPrograms, input.filters),
-        confidence: deriveConfidence(cachedPrograms),
+        result: resultFromCachedPrograms(cached, input.filters),
+        confidence: deriveConfidence(cached),
       };
     }
 
-    const [allRows, registry] = await Promise.all([getJosaaIndex(), loadRegistryMaps()]);
-    // filter to non-IIT rows in JS — shared loader returns all instype values
-    const nonIitRows = allRows.filter((row) => row.instype !== "IIT");
-    const enrichedRows = enrichRows(nonIitRows, registry);
+    const [allRows, registry] = await Promise.all([loadIndex(), loadRegistryMaps()]);
+
+    // graceful degradation: CSAB index not built yet
+    if (allRows.length === 0) {
+      return {
+        result: resultFromCachedPrograms([], input.filters),
+        confidence: { level: "low", caveat: "CSAB index is not yet available" },
+      };
+    }
+
+    const enrichedRows = enrichRows(allRows, registry);
     const quotaFiltered = filterByQuota(enrichedRows, input.state, registry.instituteStates);
 
     const result = predictPrograms({
@@ -213,9 +265,7 @@ export const predictor: ExamPredictor<JeeMainInput, CollegePredictionResult> = {
       };
     }
 
-    const confidence = deriveConfidence(result.programs);
-
-    _serverCache.set(cacheKey, result.programs);
-    return { result, confidence };
+    _resultCache.set(key, result.programs);
+    return { result, confidence: deriveConfidence(result.programs) };
   },
 };

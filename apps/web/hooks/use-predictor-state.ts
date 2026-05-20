@@ -2,6 +2,9 @@
  * central state for the JEE college predictor
  * prediction inputs live in URL search params for shareable links
  * UI-only state stays in local React state
+ *
+ * the URL key for the EWS certificate flag is the short `ews` for compact links
+ * the TypeScript field name is `has_ews_certificate` to reflect what the student is actually asserting
  */
 
 "use client";
@@ -22,7 +25,8 @@ const CATEGORY_TO_SEAT_TYPE: Record<string, string> = {
 };
 
 const GENDER_TO_API: Record<string, string> = {
-  neutr  neutr  neutr  neutr  neutr  neutr  neutr   (including Supernumerary)",
+  neutral: "Gender-Neutral",
+  female: "Female-only (including Supernumerary)",
 };
 
 export interface PredictorInputState {
@@ -32,7 +36,7 @@ export interface PredictorInputState {
   gender: string;
   quota: string;
   homeState: string;
-  ews: boolean;
+  has_ews_certificate: boolean;
 }
 
 export interface PredictorUiState {
@@ -54,7 +58,7 @@ export interface PredictorStateReturn
   setGender: (v: string) => void;
   setQuota: (v: string) => void;
   setHomeState: (v: string) => void;
-  setEws: (v: boolean) => void;
+  setHasEwsCertificate: (v: boolean) => void;
   setSidebarOpen: (v: boolean) => void;
   setBandTab: (v: number) => void;
   setSortBy: (v: SortBy) => void;
@@ -76,7 +80,7 @@ export function usePredictorState(): PredictorStateReturn {
   const gender = params.get("gender") ?? "neutral";
   const quota = params.get("quota") ?? "os";
   const homeState = params.get("state") ?? "";
-  const ews = params.get("ews") === "true";
+  const has_ews_certificate = params.get("ews") === "true";
 
   const updateParam = useCallback(
     (updates: Record<string, string | null>) => {
@@ -98,7 +102,10 @@ export function usePredictorState(): PredictorStateReturn {
   const setCategory = useCallback((v: string) => updateParam({ category: v }), [updateParam]);
   const setGender = useCallback((v: string) => updateParam({ gender: v }), [updateParam]);
   const setQuota = useCallback((v: string) => updateParam({ quota: v }), [updateParam]);
-  const setEws = useCallback((v: boolean) => updateParam({ ews: v ? "true" : null }), [updateParam]);
+  const setHasEwsCertificate = useCallback(
+    (v: boolean) => updateParam({ ews: v ? "true" : null }),
+    [updateParam],
+  );
 
   const setHomeState = useCallback(
     (v: string) => {
@@ -128,8 +135,8 @@ export function usePredictorState(): PredictorStateReturn {
   }, []);
 
   return {
-    rank, exam, category, gender, quota, homeState, ews,
-    setRank, setExam, setCategory, setGender, setQuota, setHomeState, setEws,
+    rank, exam, category, gender, quota, homeState, has_ews_certificate,
+    setRank, setExam, setCategory, setGender, setQuota, setHomeState, setHasEwsCertificate,
     sidebarOpen, bandTab, sortBy, searchBranch, hideLongShot, expandedRowId, instituteTypeFilter,
     setSidebarOpen, setBandTab, setSortBy, setSearchBranch, setHideLongShot, setExpandedRowId, toggleInstituteType,
     apiSeatType: CATEGORY_TO_SEAT_TYPE[category] ?? "OPEN",

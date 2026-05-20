@@ -24,6 +24,10 @@ const REGISTRY: Record<string, RegistryEntry> = {
     load: () =>
       import("../../predictors/jee-advanced/index").then((m) => m.predictor),
   },
+  csab: {
+    load: () =>
+      import("../../predictors/csab/index").then((m) => m.predictor),
+  },
 };
 
 /** returns the predictor for the given exam_id, or null if unregistered */

@@ -76,6 +76,8 @@ export interface CollegePredictionResult {
   ews_comparison?: {
     base: CollegePredictionResult;
     ews: CollegePredictionResult;
+    // shown when the student asserted they hold a valid EWS certificate
+    caveat?: string;
   };
 }
 
@@ -240,6 +242,56 @@ export function computeRoundProbs(
   }
 
   return result;
+}
+
+// quality rank: pooled is worst, sufficient is best — used to find the floor across a result set
+const DATA_QUALITY_RANK: Record<CollegePredictorIndexRow["data_quality"], number> = {
+  sufficient: 0,
+  inferred: 1,
+  pooled: 2,
+};
+
+/**
+ * derives response-level confidence from the worst data_quality present in the result set
+ * "high" is never returned — reserved until backtesting proves the model is well-calibrated
+ */
+export function deriveConfidence(
+  programs: ProgramPrediction[],
+): { level: "medium" | "low"; caveat: string } {
+  if (programs.length === 0) {
+    return {
+      level: "low",
+      caveat: "no programs found above the probability threshold for this rank",
+    };
+  }
+
+  let worstRank = 0;
+  let worstQuality: CollegePredictorIndexRow["data_quality"] = "sufficient";
+  for (const p of programs) {
+    const rank = DATA_QUALITY_RANK[p.data_quality];
+    if (rank > worstRank) {
+      worstRank = rank;
+      worstQuality = p.data_quality;
+    }
+  }
+
+  if (worstQuality === "sufficient") {
+    return {
+      level: "medium",
+      caveat: "probabilities are based on 3+ years of historical closing rank data",
+    };
+  }
+  if (worstQuality === "inferred") {
+    return {
+      level: "low",
+      caveat: "based on only 2 years of data — treat this prediction with caution",
+    };
+  }
+  // pooled
+  return {
+    level: "low",
+    caveat: "based on a single year of data — this prediction is highly uncertain",
+  };
 }
 
 export function predictPrograms(opts: {

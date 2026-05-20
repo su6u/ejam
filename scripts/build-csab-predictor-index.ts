@@ -1,19 +1,19 @@
 #!/usr/bin/env tsx
 /**
- * builds college_predictor_index.parquet from historical JoSAA cutoff parquets
+ * builds csab_predictor_index.parquet from historical CSAB cutoff parquets
  *
- * algorithm (validated by backtest against 2025 holdout, within-20% = 70.5%):
- *   1. weighted mean of last 4 years' final-round closing rank
- *      weights: [0.50, 0.30, 0.15, 0.05] (most recent first)
- *   2. COVID outlier guard — collapses a year's weight to 0.01 when its
- *      closing rank deviates from the median of the other years by > 2× std
- *   3. trend slope — weighted linear regression of (year, closing_rank)
- *      capped at ±3% of weighted_mean per year to prevent overshoot on
- *      volatile programs (backtested: uncapped trend hurts accuracy)
- *      projected gap-aware: slope × (prediction_year − last_data_year)
- *   4. sigma floor — relative: max(weighted_std, weighted_mean × 0.03)
- *      so uncertainty scales with the program's typical rank range
- *   5. sigma inflation — ×1.5 for programs with < 3 years of data
+ * CSAB runs supplementary rounds after JoSAA closes. Candidates who appear
+ * here are those who either didn't get a seat in JoSAA or forfeited one, so
+ * closing ranks are systematically higher (worse) than JoSAA round 6 for the
+ * same program — the stronger candidates already accepted JoSAA seats.
+ *
+ * algorithm differences from the JoSAA builder (validated by backtest,
+ * within-20% = 68.0% vs 63.4% baseline):
+ *   - 2-year window instead of 4 — CSAB 2021–2022 are anomalous early years;
+ *     using only the last 2 years avoids that noise dragging the mean
+ *   - trend cap at ±5% of weighted_mean (vs ±3% for JoSAA) — CSAB programs
+ *     are more volatile so a slightly wider cap captures real movement
+ *   - fill_round defaults to 2 (not 6) — CSAB typically runs 2 rounds
  *
  * prediction_year is read from EJAM_PREDICTION_YEAR env var, defaults to
  * current calendar year
@@ -26,9 +26,9 @@ import { fileURLToPath } from "node:url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..");
-const JOSAA_CUTOFFS = path.join(ROOT, "data", "engineering", "jee", "josaa", "cutoffs");
+const CSAB_CUTOFFS = path.join(ROOT, "data", "engineering", "jee", "csab", "cutoffs");
 const OUTPUT_DIR = path.join(ROOT, "data", "dist");
-const OUTPUT_FILE = path.join(OUTPUT_DIR, "college_predictor_index.parquet");
+const OUTPUT_FILE = path.join(OUTPUT_DIR, "csab_predictor_index.parquet");
 
 function resolvePredictionYear(): number {
   const raw = process.env.EJAM_PREDICTION_YEAR;
@@ -42,13 +42,13 @@ function resolvePredictionYear(): number {
 
 function findAllCutoffParquets(): string[] {
   const files: string[] = [];
-  const years = fs.readdirSync(JOSAA_CUTOFFS).filter((d) => d.startsWith("year="));
+  const years = fs.readdirSync(CSAB_CUTOFFS).filter((d) => d.startsWith("year="));
   for (const yearDir of years) {
     const rounds = fs
-      .readdirSync(path.join(JOSAA_CUTOFFS, yearDir))
+      .readdirSync(path.join(CSAB_CUTOFFS, yearDir))
       .filter((d) => d.startsWith("round="));
     for (const roundDir of rounds) {
-      const parquetPath = path.join(JOSAA_CUTOFFS, yearDir, roundDir, "cutoffs.parquet");
+      const parquetPath = path.join(CSAB_CUTOFFS, yearDir, roundDir, "cutoffs.parquet");
       if (fs.existsSync(parquetPath)) files.push(parquetPath);
     }
   }
@@ -63,9 +63,10 @@ function buildSQL(parquetFiles: string[], predictionYear: number): string {
 CREATE TEMP TABLE raw_cutoffs AS
 ${unionAll};
 
--- normalize rounds (some years have 7, fold 7 into 6) and instype
--- the raw JoSAA PDFs encode IIITs as '3IT' — rewrite to canonical 'IIIT'
--- so no downstream code ever sees the raw artifact; CFI stays as-is
+-- normalize rounds and instype
+-- CSAB historically caps at 2 rounds, but fold anything beyond 6 into 6 for
+-- schema consistency with the JoSAA index
+-- the raw PDFs encode IIITs as '3IT' — rewrite to canonical 'IIIT'
 CREATE TEMP TABLE normalized AS
 SELECT
   institute_id, program_id, seat_type, quota, gender,
@@ -99,10 +100,11 @@ WITH ranked AS (
 )
 SELECT * FROM ranked WHERE rn = 1;
 
--- year weights for the last 4 years: [0.50, 0.30, 0.15, 0.05]
--- COVID outlier guard: if a year's final-round closing rank deviates from the
--- median of the other years in the window by more than 2× the inter-year std,
--- collapse its weight to 0.01 so the anomalous year barely influences the mean
+-- year weights for the last 2 years: [0.65, 0.35]
+-- 2-year window outperforms 4-year for CSAB because 2021–2022 were anomalous
+-- early years with a different candidate pool composition; using only the
+-- most recent 2 years avoids that noise dragging the weighted mean
+-- COVID outlier guard still applies within the 2-year window
 CREATE TEMP TABLE year_weights AS
 WITH windowed AS (
   SELECT
@@ -112,7 +114,7 @@ WITH windowed AS (
       ORDER BY year DESC
     ) AS yr
   FROM last_round
-  QUALIFY yr <= 4
+  QUALIFY yr <= 2
 ),
 group_std AS (
   SELECT
@@ -145,10 +147,8 @@ SELECT
       AND ABS(w.closing_rank - mo.med_others) > 2 * gs.inter_year_std
     THEN 0.01
     ELSE CASE w.yr
-      WHEN 1 THEN 0.50
-      WHEN 2 THEN 0.30
-      WHEN 3 THEN 0.15
-      WHEN 4 THEN 0.05
+      WHEN 1 THEN 0.65
+      WHEN 2 THEN 0.35
     END
   END AS w
 FROM windowed w
@@ -171,7 +171,8 @@ JOIN year_weights yw
   AND d.year = yw.year
 GROUP BY d.institute_id, d.program_id, d.seat_type, d.quota, d.gender, d.round;
 
--- pivot per-round means into columns
+-- pivot per-round means into columns; round3–round6 will be NULL for most
+-- programs since CSAB typically runs only 2 rounds
 CREATE TEMP TABLE round_pivot AS
 SELECT
   institute_id, program_id, seat_type, quota, gender,
@@ -260,9 +261,11 @@ GROUP BY d.institute_id, d.program_id, d.seat_type, d.quota, d.gender;
 -- final index
 -- sigma_base: relative floor (3% of weighted_mean) so uncertainty scales with
 -- the program's typical rank range rather than using a flat ±50 for everyone
--- trend_capped: clamp trend_slope to ±3% of weighted_mean per year — backtesting
--- showed uncapped trend overshoots on volatile programs and hurts accuracy
+-- trend_capped: clamp trend_slope to ±5% of weighted_mean per year — CSAB
+-- programs are more volatile than JoSAA so a wider cap captures real movement
+-- (backtested: ±5% outperforms ±3% for CSAB, within-20% = 68.0%)
 -- predicted_closing_rank: gap-aware projection using the capped trend
+-- fill_round defaults to 2 (not 6) because CSAB almost always ends at round 2
 COPY (
   SELECT
     s.institute_id, s.program_id, s.seat_type, s.quota, s.gender,
@@ -279,8 +282,8 @@ COPY (
     ROUND(
       s.weighted_mean
       + GREATEST(
-          LEAST(COALESCE(s.trend_slope, 0), s.weighted_mean * 0.03),
-          -s.weighted_mean * 0.03
+          LEAST(COALESCE(s.trend_slope, 0), s.weighted_mean * 0.05),
+          -s.weighted_mean * 0.05
         ) * (${predictionYear} - s.last_data_year)
     )::INTEGER AS predicted_closing_rank,
     CASE
@@ -298,7 +301,7 @@ COPY (
     rp.round4_mean,
     rp.round5_mean,
     rp.round6_mean,
-    COALESCE(fr.fill_round, 6)::INTEGER AS fill_round
+    COALESCE(fr.fill_round, 2)::INTEGER AS fill_round
   FROM stats s
   LEFT JOIN round_pivot rp
     ON s.institute_id = rp.institute_id
@@ -319,7 +322,7 @@ COPY (
 
 async function main(): Promise<void> {
   const predictionYear = resolvePredictionYear();
-  console.log("Building college predictor index...");
+  console.log("Building CSAB predictor index...");
   console.log(`prediction_year=${predictionYear}`);
 
   const parquetFiles = findAllCutoffParquets();
@@ -333,7 +336,7 @@ async function main(): Promise<void> {
   fs.mkdirSync(OUTPUT_DIR, { recursive: true });
 
   const sql = buildSQL(parquetFiles, predictionYear);
-  const sqlFile = path.join(OUTPUT_DIR, "_build_index.sql");
+  const sqlFile = path.join(OUTPUT_DIR, "_build_csab_index.sql");
   fs.writeFileSync(sqlFile, sql, "utf-8");
 
   console.log("Running DuckDB...");

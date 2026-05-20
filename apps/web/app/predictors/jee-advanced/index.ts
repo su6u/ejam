@@ -1,6 +1,6 @@
 /**
  * JEE Advanced college predictor — IIT-only, AI quota
- * loads college_predictor_index.parquet via @duckdb/node-api
+ * uses the shared JoSAA index loader; filters to IIT rows in JS after load
  */
 
 import type { ExamPredictor } from "@ejam/data";
@@ -9,9 +9,9 @@ import {
   type CollegePredictorFilters,
   type CollegePredictorIndexRow,
   type ProgramPrediction,
+  deriveConfidence,
+  getJosaaIndex,
   predictPrograms,
-  readPredictionResultCache,
-  writePredictionResultCache,
 } from "@ejam/data/college-predictor";
 import { z } from "zod";
 
@@ -27,43 +27,52 @@ const JeeAdvancedInput = z.object({
       band: z.array(z.enum(["safe", "target", "reach", "long-shot"])).optional(),
     })
     .optional(),
-  ews_toggle: z.boolean().optional(),
+  has_ews_certificate: z.boolean().optional(),
   include_all: z.boolean().optional(),
 });
 type JeeAdvancedInput = z.infer<typeof JeeAdvancedInput>;
 
 const JEE_ADVANCED_QUOTA = "AI";
 const EWS_SEAT_TYPE = "Gen-EWS";
+const EWS_CAVEAT =
+  "EWS seats are only available to candidates holding a valid EWS certificate issued by a competent authority. These results assume you are EWS-eligible.";
 
 type RegistryMaps = {
   instituteStates: Map<string, string>;
   programNames: Map<string, string>;
 };
 
-let _cachedIndex: CollegePredictorIndexRow[] | null = null;
+// in-memory server cache — keyed by FNV1a hash of canonical input
+// sessionStorage is a no-op on the server; this Map persists for the process lifetime
+// predictions are deterministic for a given index version, so no TTL is needed
+const _serverCache = new Map<string, ProgramPrediction[]>();
+
 let _cachedRegistry: RegistryMaps | null = null;
 
-async function loadIndex(): Promise<CollegePredictorIndexRow[]> {
-  if (_cachedIndex) return _cachedIndex;
+function stableNormalize(value: unknown): unknown {
+  if (Array.isArray(value)) return value.map(stableNormalize);
+  if (value && typeof value === "object") {
+    return Object.fromEntries(
+      Object.entries(value)
+        .filter(([, entry]) => entry !== undefined)
+        .sort(([a], [b]) => a.localeCompare(b))
+        .map(([key, entry]) => [key, stableNormalize(entry)]),
+    );
+  }
+  return value;
+}
 
-  const { join, resolve } = await import("node:path");
-  const indexPath = resolve(
-    process.env.EJAM_DIST_DATA_ROOT ?? join(process.cwd(), "data", "dist"),
-    "college_predictor_index.parquet",
-  );
+function stableStringify(value: unknown): string {
+  return JSON.stringify(stableNormalize(value));
+}
 
-  const { DuckDBInstance } = await import("@duckdb/node-api");
-  const instance = await DuckDBInstance.create(":memory:");
-  const connection = await instance.connect();
-  const result = await connection.run(
-    `SELECT * FROM read_parquet('${indexPath}') WHERE instype = 'IIT'`,
-  );
-  const rows = await result.fetchAllRows();
-  await connection.close();
-  await instance.close();
-
-  _cachedIndex = rows as unknown as CollegePredictorIndexRow[];
-  return _cachedIndex;
+function fnv1a(value: string): string {
+  let hash = 0x811c9dc5;
+  for (const char of value) {
+    hash ^= char.codePointAt(0) ?? 0;
+    hash = Math.imul(hash, 0x01000193);
+  }
+  return (hash >>> 0).toString(16).padStart(8, "0");
 }
 
 async function loadRegistryMaps(): Promise<RegistryMaps> {
@@ -124,21 +133,19 @@ export const predictor: ExamPredictor<JeeAdvancedInput, CollegePredictionResult>
 
   async predict(input, deps) {
     const cacheInput = { exam_id: deps.examId, ...input, quota: JEE_ADVANCED_QUOTA };
-    const cachedPrograms = readPredictionResultCache<ProgramPrediction>(cacheInput);
+    const cacheKey = fnv1a(stableStringify(cacheInput));
+    const cachedPrograms = _serverCache.get(cacheKey);
     if (cachedPrograms) {
       return {
         result: resultFromCachedPrograms(cachedPrograms, input.filters),
-        confidence: {
-          level: cachedPrograms.length > 0 ? "medium" : "low",
-          caveat: cachedPrograms.length > 0
-            ? "probabilities are based on historical closing rank trends"
-            : "no programs found above the probability threshold for this rank",
-        },
+        confidence: deriveConfidence(cachedPrograms),
       };
     }
 
-    const [indexRows, registry] = await Promise.all([loadIndex(), loadRegistryMaps()]);
-    const enrichedRows = enrichRows(indexRows, registry);
+    const [allRows, registry] = await Promise.all([getJosaaIndex(), loadRegistryMaps()]);
+    // filter to IIT rows in JS — shared loader returns all instype values
+    const iitRows = allRows.filter((row) => row.instype === "IIT");
+    const enrichedRows = enrichRows(iitRows, registry);
 
     const result = predictPrograms({
       indexRows: enrichedRows,
@@ -150,7 +157,7 @@ export const predictor: ExamPredictor<JeeAdvancedInput, CollegePredictionResult>
       filters: input.filters,
     });
 
-    if (input.ews_toggle) {
+    if (input.has_ews_certificate) {
       const baseResult: CollegePredictionResult = {
         programs: result.programs,
         metadata: result.metadata,
@@ -167,14 +174,13 @@ export const predictor: ExamPredictor<JeeAdvancedInput, CollegePredictionResult>
           includeAll: input.include_all,
           filters: input.filters,
         }),
+        caveat: EWS_CAVEAT,
       };
     }
 
-    const confidence = result.metadata.total_above_threshold > 0
-      ? { level: "medium" as const, caveat: "probabilities are based on historical closing rank trends" }
-      : { level: "low" as const, caveat: "no programs found above the probability threshold for this rank" };
+    const confidence = deriveConfidence(result.programs);
 
-    writePredictionResultCache(cacheInput, result.programs);
+    _serverCache.set(cacheKey, result.programs);
     return { result, confidence };
   },
 };
