@@ -1,0 +1,84 @@
+/**
+ * desktop predictor workspace — results table and selected-program drawer
+ **/
+
+"use client";
+
+import type { ProgramPrediction } from "@ejam/data/college-predictor";
+import { useState } from "react";
+import { usePredictor } from "@/components/predictor/predictor-context";
+import { CollegeDetailSheet } from "./college-detail-sheet";
+import {
+  EmptyState,
+  ErrorState,
+  LoadingState,
+} from "./empty-state";
+import { programKey, ResultsTable } from "./results-table";
+
+export function Dashboard() {
+  const { state, query } = usePredictor();
+  const [selected, setSelected] = useState<ProgramPrediction | null>(null);
+  const [sheetOpen, setSheetOpen] = useState(false);
+
+  const programs = query.data?.programs ?? [];
+  const hasResults = programs.length > 0;
+  const selectedId = selected ? programKey(selected) : null;
+
+  const middle = renderMiddle({
+    isLoading: query.isLoading,
+    error: query.error,
+    hasResults,
+    programs,
+    hasRank: Boolean(state.rank),
+    selectedId,
+    onSelect: (p) => {
+      setSelected(p);
+      setSheetOpen(true);
+    },
+  });
+
+  return (
+    <div className="h-[calc(100dvh-7rem)] overflow-visible bg-border p-px">
+      <div className="h-full min-h-0 min-w-0 overflow-visible">{middle}</div>
+
+      <CollegeDetailSheet
+        program={selected}
+        open={sheetOpen}
+        onOpenChange={(next) => {
+          setSheetOpen(next);
+          if (!next) {
+            // keep selected-row styling until the drawer finishes closing
+            setTimeout(() => setSelected(null), 150);
+          }
+        }}
+      />
+    </div>
+  );
+}
+
+function renderMiddle({
+  isLoading,
+  error,
+  hasResults,
+  programs,
+  hasRank,
+  selectedId,
+  onSelect,
+}: {
+  isLoading: boolean;
+  error: string | null;
+  hasResults: boolean;
+  programs: ProgramPrediction[];
+  hasRank: boolean;
+  selectedId: string | null;
+  onSelect: (p: ProgramPrediction) => void;
+}) {
+  if (error) return <ErrorState message={error} />;
+  if (!hasResults) {
+    if (isLoading) return <LoadingState />;
+    return <EmptyState hasRank={hasRank} />;
+  }
+  return (
+    <ResultsTable rows={programs} selectedId={selectedId} onSelect={onSelect} />
+  );
+}
