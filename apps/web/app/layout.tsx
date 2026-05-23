@@ -1,12 +1,17 @@
-import type { Metadata } from "next";
-import { Manrope } from "next/font/google";
-import "./globals.css";
+// .dark is pinned because --bg-base is dark; without it shadcn tokens
+// resolve to the light palette and surfaces mismatch the page background
 
-const manrope = Manrope({
+import type { Metadata } from "next";
+import { IBM_Plex_Sans } from "next/font/google";
+import { Toaster } from "sonner";
+import "./globals.css";
+import { cn } from "@/lib/utils";
+
+const ibmPlex = IBM_Plex_Sans({
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
+  weight: ["300", "400", "500", "600", "700"],
   display: "swap",
-  variable: "--font-manrope",
+  variable: "--font-sans",
 });
 
 export const metadata: Metadata = {
@@ -20,8 +25,21 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${manrope.variable} antialiased`}>
-      <body className="font-[family-name:var(--font-manrope)]" suppressHydrationWarning>{children}</body>
+    <html
+      lang="en"
+      className={cn("dark antialiased", ibmPlex.variable, "font-sans")}
+    >
+      <body suppressHydrationWarning>
+        {children}
+        <Toaster
+          position="bottom-right"
+          toastOptions={{
+            style: {
+              fontFamily: "var(--font-sans)",
+            },
+          }}
+        />
+      </body>
     </html>
   );
 }
