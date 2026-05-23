@@ -1,6 +1,7 @@
 "use client";
 
 import { CircleAlert } from "lucide-react";
+import { useReducedMotion } from "motion/react";
 import { ResultsCardShell } from "@/components/predictor/results-card-shell";
 import {
   Empty,
@@ -12,11 +13,13 @@ import {
 } from "@/components/ui/empty";
 
 function EmptyIllustration() {
+  const shouldReduceMotion = useReducedMotion();
+
   return (
     <EmptyMedia className="mb-0 w-full max-w-72">
       <video
-        autoPlay
-        loop
+        autoPlay={!shouldReduceMotion}
+        loop={!shouldReduceMotion}
         muted
         playsInline
         aria-hidden

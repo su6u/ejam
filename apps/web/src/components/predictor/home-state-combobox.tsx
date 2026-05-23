@@ -26,13 +26,8 @@ export function HomeStateCombobox({
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
   const containerRef = useRef<HTMLDivElement>(null);
-  const {
-    activeIndex,
-    itemRects,
-    handlers,
-    registerItem,
-    measureItems,
-  } = useProximityHover(containerRef, { axis: "y" });
+  const { activeIndex, itemRects, handlers, registerItem, measureItems } =
+    useProximityHover(containerRef, { axis: "y" });
 
   const filteredStates = useMemo(() => {
     const query = search.trim().toLowerCase();
@@ -42,7 +37,7 @@ export function HomeStateCombobox({
 
   useEffect(() => {
     if (open) measureItems();
-  }, [open, filteredStates.length, measureItems]);
+  }, [open, measureItems]);
 
   useEffect(() => {
     if (!open) setSearch("");
@@ -91,11 +86,10 @@ export function HomeStateCombobox({
           {activeIndex !== null && itemRects[activeIndex] ? (
             <div
               aria-hidden
-              className="pointer-events-none absolute rounded-none bg-muted transition-[top,height,left,width] duration-150 ease-out"
+              className="pointer-events-none absolute top-0 left-0 rounded-none bg-muted transition-transform duration-150 ease-out will-change-transform"
               style={{
-                top: itemRects[activeIndex].top,
                 height: itemRects[activeIndex].height,
-                left: itemRects[activeIndex].left,
+                transform: `translate3d(${itemRects[activeIndex].left}px, ${itemRects[activeIndex].top}px, 0)`,
                 width: itemRects[activeIndex].width,
               }}
             />

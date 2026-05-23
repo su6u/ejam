@@ -34,17 +34,12 @@ export function ProximityPicker({
 }: ProximityPickerProps) {
   const [open, setOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
-  const {
-    activeIndex,
-    itemRects,
-    handlers,
-    registerItem,
-    measureItems,
-  } = useProximityHover(containerRef, { axis: "y" });
+  const { activeIndex, itemRects, handlers, registerItem, measureItems } =
+    useProximityHover(containerRef, { axis: "y" });
 
   useEffect(() => {
     if (open) measureItems();
-  }, [open, options.length, measureItems]);
+  }, [open, measureItems]);
 
   const selected = options.find((option) => option.value === value);
 
@@ -77,11 +72,10 @@ export function ProximityPicker({
           {activeIndex !== null && itemRects[activeIndex] ? (
             <div
               aria-hidden
-              className="pointer-events-none absolute rounded-none bg-muted transition-[top,height,left,width] duration-150 ease-out"
+              className="pointer-events-none absolute top-0 left-0 rounded-none bg-muted transition-transform duration-150 ease-out will-change-transform"
               style={{
-                top: itemRects[activeIndex].top,
                 height: itemRects[activeIndex].height,
-                left: itemRects[activeIndex].left,
+                transform: `translate3d(${itemRects[activeIndex].left}px, ${itemRects[activeIndex].top}px, 0)`,
                 width: itemRects[activeIndex].width,
               }}
             />

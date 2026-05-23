@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, useReducedMotion, useSpring } from "motion/react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 
 const COUNTDOWN_DURATION = 2000;
@@ -29,6 +29,7 @@ export default function GitHubStars({
   const [error, setError] = useState(false);
   const shouldReduceMotion = useReducedMotion();
   const countSpring = useSpring(0, SPRING);
+  const rafIdRef = useRef<number | null>(null);
 
   useEffect(() => {
     if (providedStarCount !== undefined) {
@@ -70,10 +71,15 @@ export default function GitHubStars({
       return;
     }
 
-    const startTime = Date.now();
+    if (rafIdRef.current !== null) {
+      cancelAnimationFrame(rafIdRef.current);
+      rafIdRef.current = null;
+    }
+
+    const startTime = performance.now();
 
     const animate = () => {
-      const elapsed = Date.now() - startTime;
+      const elapsed = performance.now() - startTime;
       const progress = Math.min(elapsed / COUNTDOWN_DURATION, 1);
       // cubic ease-out
       const eased = 1 - (1 - progress) ** 3;
@@ -83,14 +89,22 @@ export default function GitHubStars({
       countSpring.set(current);
 
       if (progress < 1) {
-        requestAnimationFrame(animate);
+        rafIdRef.current = requestAnimationFrame(animate);
       } else {
+        rafIdRef.current = null;
         setDisplayCount(starCount);
         countSpring.set(starCount);
       }
     };
 
     animate();
+
+    return () => {
+      if (rafIdRef.current !== null) {
+        cancelAnimationFrame(rafIdRef.current);
+        rafIdRef.current = null;
+      }
+    };
   }, [starCount, countSpring, shouldReduceMotion]);
 
   if (isLoading) {

@@ -1,12 +1,12 @@
 "use client";
 
 import Image from "next/image";
-import { Suspense, useEffect, type ReactNode } from "react";
-import { usePredictor } from "@/components/predictor/predictor-context";
+import { type ReactNode, Suspense, useEffect } from "react";
 import { HomeStateCombobox } from "@/components/predictor/home-state-combobox";
+import { usePredictor } from "@/components/predictor/predictor-context";
 import { ProximityPicker } from "@/components/predictor/proximity-picker";
+import { RankInput } from "@/components/predictor/rank-input";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
   Tooltip,
@@ -14,7 +14,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { type ExamType } from "@/hooks/use-predictor-state";
+import type { ExamType } from "@/hooks/use-predictor-state";
 import { cn } from "@/lib/utils";
 
 /** border-only triggers — dropdown panels keep popover surface */
@@ -97,8 +97,7 @@ function PredictorSidebarPanelInner() {
   const showQuota = state.exam === "jee-main";
   const showHomeState = state.exam === "jee-main" && state.quota === "hs";
   const canPredict =
-    Boolean(state.rank) &&
-    !(showHomeState && !state.homeState.trim());
+    Boolean(state.rank) && !(showHomeState && !state.homeState.trim());
 
   return (
     <TooltipProvider delay={200}>
@@ -143,7 +142,9 @@ function PredictorSidebarPanelInner() {
                     aria-hidden
                     className={cn(
                       "size-9 shrink-0 object-contain transition-opacity",
-                      exam.enabled && !isActive && "opacity-55 group-hover/exam:opacity-80",
+                      exam.enabled &&
+                        !isActive &&
+                        "opacity-55 group-hover/exam:opacity-80",
                       isActive && "opacity-100",
                     )}
                   />
@@ -164,23 +165,7 @@ function PredictorSidebarPanelInner() {
 
         <div className="flex flex-col gap-3 border-t border-border px-2 py-3">
           <SetupField label="Rank" required>
-            <Input
-              type="text"
-              inputMode="numeric"
-              pattern="[0-9]*"
-              value={state.rank}
-              onChange={(e) =>
-                state.setRank(e.target.value.replace(/\D/g, ""))
-              }
-              placeholder="e.g. 4521"
-              maxLength={7}
-              required
-              aria-required
-              className={cn(
-                "w-full rounded-none tabular-nums",
-                sidebarControlClass,
-              )}
-            />
+            <RankInput value={state.rank} onValueChange={state.setRank} />
           </SetupField>
 
           <div className="grid grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)] gap-2">
@@ -251,7 +236,10 @@ function OptionToggle({
 }) {
   return (
     <div
-      className={cn("grid gap-1", columns === 2 ? "grid-cols-2" : "grid-cols-3")}
+      className={cn(
+        "grid gap-1",
+        columns === 2 ? "grid-cols-2" : "grid-cols-3",
+      )}
     >
       {options.map((option) => {
         const isActive = option.value === value;

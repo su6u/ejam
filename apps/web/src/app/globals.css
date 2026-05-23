@@ -132,6 +132,23 @@ body {
   font-kerning: normal;
 }
 
+h1,
+h2,
+h3,
+[data-slot="card-title"],
+[data-slot="sheet-title"],
+[data-slot="empty-title"] {
+  text-wrap: balance;
+}
+
+p,
+li,
+[data-slot="card-description"],
+[data-slot="sheet-description"],
+[data-slot="empty-description"] {
+  text-wrap: pretty;
+}
+
 :focus {
   outline: none;
 }
@@ -158,6 +175,25 @@ input {
   }
   html {
     @apply font-sans;
+  }
+
+  /* Chrome autofill (#E9F0FE) — transparent inputs inherit the sidebar canvas */
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus,
+  input:-webkit-autofill:active {
+    -webkit-text-fill-color: var(--foreground);
+    caret-color: var(--foreground);
+    transition: background-color 99999s ease-in-out 0s;
+  }
+
+  .dark input[data-transparent-input]:-webkit-autofill,
+  .dark input[data-transparent-input]:-webkit-autofill:hover,
+  .dark input[data-transparent-input]:-webkit-autofill:focus,
+  .dark input[data-transparent-input]:-webkit-autofill:active {
+    background-color: transparent !important;
+    -webkit-box-shadow: 0 0 0 1000px var(--background) inset !important;
+    box-shadow: 0 0 0 1000px var(--background) inset !important;
   }
 }
 

@@ -6,7 +6,6 @@
 "use client";
 
 import type { ProgramPrediction } from "@ejam/data/college-predictor";
-import { useId } from "react";
 import { CartesianGrid, Line, LineChart, XAxis, YAxis } from "recharts";
 import { DashboardCard } from "@/components/dashboard-card";
 import { formatInteger } from "@/components/formater";
@@ -192,8 +191,6 @@ const roundChartConfig = {
 } satisfies ChartConfig;
 
 function RoundProbabilityChart({ program }: { program: ProgramPrediction }) {
-  const chartUid = useId().replace(/:/g, "");
-  const idLineGlow = `round-probability-line-glow-${chartUid}`;
   const rows = program.round_probs.map((value, index) => ({
     round: `R${index + 1}`,
     chance: Math.round(Math.min(1, Math.max(0, value)) * 100),
@@ -237,22 +234,9 @@ function RoundProbabilityChart({ program }: { program: ProgramPrediction }) {
             }
             cursor={false}
           />
-          <defs>
-            <filter
-              height="140%"
-              id={idLineGlow}
-              width="140%"
-              x="-20%"
-              y="-20%"
-            >
-              <feGaussianBlur result="blur" stdDeviation="10" />
-              <feComposite in="SourceGraphic" in2="blur" operator="over" />
-            </filter>
-          </defs>
           <Line
             dataKey="chance"
             dot={{ r: 3 }}
-            filter={`url(#${idLineGlow})`}
             stroke="var(--color-chance)"
             strokeWidth={2}
             type="monotone"

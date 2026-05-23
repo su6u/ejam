@@ -1,5 +1,5 @@
-import Image from "next/image";
 import { BookOpenIcon } from "lucide-react";
+import Image from "next/image";
 import GitHubStars from "@/components/github-stars";
 import { cn } from "@/lib/utils";
 
@@ -17,7 +17,7 @@ export function AppHeader() {
       )}
     >
       <a
-        href=""
+        href="https://github.com/su6u/ejam#readme"
         target="_blank"
         rel="noopener noreferrer"
         className={headerPillClass}
@@ -27,7 +27,7 @@ export function AppHeader() {
         Docs
       </a>
       <a
-        href=""
+        href="https://github.com/su6u/ejam"
         target="_blank"
         rel="noopener noreferrer"
         className={headerPillClass}
