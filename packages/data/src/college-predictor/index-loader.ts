@@ -45,8 +45,9 @@ export async function getPredictorIndexFromDeps(
 /** @deprecated use getPredictorIndexFromDeps — kept for scripts that run outside the API */
 export async function getJosaaIndex(): Promise<CollegePredictorIndexRow[]> {
   const { join, resolve } = await import("node:path");
+  const { resolveDataRoot } = await import("../data-root");
   const indexPath = resolve(
-    process.env.EJAM_DIST_DATA_ROOT ?? join(process.cwd(), "data", "dist"),
+    process.env.EJAM_DIST_DATA_ROOT ?? join(resolveDataRoot(), "dist"),
     "college_predictor_index.parquet",
   );
   const rows = await readParquetRows<CollegePredictorIndexRow>(indexPath);

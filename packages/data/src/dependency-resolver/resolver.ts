@@ -6,6 +6,7 @@
 import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import type { DataDependency } from "../exam-config/types";
+import { resolveManifestRoot } from "../data-root";
 import { expandPathTemplate } from "../paths";
 import { pickLatestManifestFile } from "../semver";
 import {
@@ -17,9 +18,7 @@ import {
 } from "./types";
 
 function manifestRoot(): string {
-  return (
-    process.env.EJAM_MANIFEST_ROOT ?? join(process.cwd(), "data", "manifest")
-  );
+  return resolveManifestRoot();
 }
 
 /** load and validate the manifest JSON at the given file path */

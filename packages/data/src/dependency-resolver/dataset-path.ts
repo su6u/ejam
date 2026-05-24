@@ -12,8 +12,10 @@ export type ResolvedDatasetRef = {
   sha256: string;
 };
 
+import { resolveDataRoot } from "../data-root";
+
 function dataRoot(): string {
-  return process.env.EJAM_DATA_ROOT ?? join(process.cwd(), "data");
+  return resolveDataRoot();
 }
 
 /** manifest paths omit the data/ prefix — prepend it for filesystem access */

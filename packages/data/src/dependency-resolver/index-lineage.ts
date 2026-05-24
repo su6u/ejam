@@ -6,6 +6,7 @@
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { z } from "zod";
+import { resolveDataRoot } from "../data-root";
 
 const IndexLineageEntry = z.object({
   path: z.string(),
@@ -21,7 +22,7 @@ export const IndexLineage = z.object({
 export type IndexLineage = z.infer<typeof IndexLineage>;
 
 function dataRoot(): string {
-  return process.env.EJAM_DATA_ROOT ?? join(process.cwd(), "data");
+  return resolveDataRoot();
 }
 
 export function readIndexLineageSidecar(

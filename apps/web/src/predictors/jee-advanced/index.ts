@@ -86,9 +86,9 @@ async function loadRegistryMaps(): Promise<RegistryMaps> {
   if (_cachedRegistry) return _cachedRegistry;
 
   const { readFileSync } = await import("node:fs");
-  const { join, resolve } = await import("node:path");
-  const registryRoot =
-    process.env.EJAM_REGISTRY_ROOT ?? join(process.cwd(), "data", "registry");
+  const { resolve } = await import("node:path");
+  const { resolveRegistryRoot } = await import("@ejam/data");
+  const registryRoot = resolveRegistryRoot();
   const institutes = JSON.parse(
     readFileSync(
       resolve(registryRoot, "engineering", "institutes.json"),

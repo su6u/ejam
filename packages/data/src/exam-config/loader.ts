@@ -4,8 +4,9 @@
  */
 
 import { readFileSync } from "node:fs";
-import { isAbsolute, join, relative, resolve } from "node:path";
+import { isAbsolute, relative, resolve } from "node:path";
 import { load as parseYaml } from "js-yaml";
+import { resolveTaxonomyRoot } from "../data-root";
 import type {
   ExamConfig,
   ResolvedExamConfig,
@@ -20,10 +21,7 @@ import {
 
 /** resolve REGISTRY_ROOT from env or default to repo-relative data/registry/taxonomy */
 function taxonomyRoot(): string {
-  return resolve(
-    process.env.EJAM_TAXONOMY_ROOT ??
-      join(process.cwd(), "data", "registry", "taxonomy"),
-  );
+  return resolve(resolveTaxonomyRoot());
 }
 
 function assertSlug(value: string, label: string): void {

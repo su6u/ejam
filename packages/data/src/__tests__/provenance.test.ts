@@ -1,7 +1,8 @@
-import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { _resetDataRootCache } from "../data-root";
 import { buildPredictionProvenance } from "../dependency-resolver/provenance";
 
 let fixtureRoot = "";
@@ -9,9 +10,11 @@ let fixtureRoot = "";
 beforeEach(() => {
   fixtureRoot = mkdtempSync(join(tmpdir(), "ejam-provenance-"));
   process.env.EJAM_DATA_ROOT = fixtureRoot;
+  _resetDataRootCache();
 });
 
 afterEach(() => {
+  _resetDataRootCache();
   delete process.env.EJAM_DATA_ROOT;
   rmSync(fixtureRoot, { recursive: true, force: true });
 });
@@ -19,6 +22,7 @@ afterEach(() => {
 describe("buildPredictionProvenance", () => {
   it("marks predictor_index loaded and sidecar cutoffs linked", () => {
     const indexPath = "dist/index.parquet";
+    mkdirSync(join(fixtureRoot, "dist"), { recursive: true });
     writeFileSync(
       join(fixtureRoot, "dist", "index.lineage.json"),
       JSON.stringify({
