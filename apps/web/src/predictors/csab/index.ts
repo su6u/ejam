@@ -9,7 +9,6 @@
  */
 
 import type { ExamPredictor } from "@ejam/data";
-import { findResolvedDataset } from "@ejam/data/dependency-resolver";
 import {
   type CollegePredictionResult,
   type CollegePredictorFilters,
@@ -196,14 +195,16 @@ export const predictor: ExamPredictor<CsabInput, CollegePredictionResult> = {
       };
     }
 
-    if (!findResolvedDataset(deps.resolvedDatasets, "predictor_index")) {
+    const allRows = await getPredictorIndexFromDeps(deps);
+    if (allRows.length === 0) {
       return {
         result: resultFromCachedPrograms([], input.filters),
-        confidence: { level: "low", caveat: "CSAB index is not yet available" },
+        confidence: {
+          level: "low",
+          caveat: "CSAB predictor index is empty — rebuild csab_predictor_index.parquet",
+        },
       };
     }
-
-    const allRows = await getPredictorIndexFromDeps(deps);
 
     const registry = await loadRegistryMaps();
 
