@@ -23,11 +23,21 @@ import {
   finalizePredictionResult,
   resultFromRankedPrograms,
 } from "@/predictors/shared/finalize-prediction";
+import {
+  indexShaFromDeps,
+  type ServerCacheEntry,
+} from "@/predictors/shared/predictor-cache";
+import {
+  QuotaApi,
+  refineQuotaRequiresState,
+} from "@/predictors/shared/quota-input";
 
-const CsabInput = z.object({
+const CsabInput = z
+  .object({
   rank: z.number().int().min(1).max(500000),
   seat_type: z.string().regex(/^[A-Za-z0-9 ()-]+$/),
   gender: z.string().regex(/^[A-Za-z0-9 ()-]+$/),
+  quota: QuotaApi.default("OS"),
   state: z
     .string()
     .optional()
@@ -48,7 +58,8 @@ const CsabInput = z.object({
     .optional(),
   has_ews_certificate: z.boolean().optional(),
   include_all: z.boolean().optional(),
-});
+})
+  .superRefine(refineQuotaRequiresState);
 type CsabInput = z.infer<typeof CsabInput>;
 
 // values must match the corresponding state strings in data/registry/engineering/institutes.json
@@ -75,7 +86,24 @@ let _cachedRegistry: RegistryMaps | null = null;
 
 // in-memory prediction result cache — keyed by FNV1a hash of canonical input
 // avoids re-running the probability computation for identical requests
-const _resultCache = new Map<string, ProgramPrediction[]>();
+const _resultCache = new Map<string, ServerCacheEntry>();
+
+function stableNormalize(value: unknown): unknown {
+  if (Array.isArray(value)) return value.map(stableNormalize);
+  if (value && typeof value === "object") {
+    return Object.fromEntries(
+      Object.entries(value)
+        .filter(([, entry]) => entry !== undefined)
+        .sort(([a], [b]) => a.localeCompare(b))
+        .map(([key, entry]) => [key, stableNormalize(entry)]),
+    );
+  }
+  return value;
+}
+
+function stableStringify(value: unknown): string {
+  return JSON.stringify(stableNormalize(value));
+}
 
 function fnv1a(value: string): string {
   let hash = 0x811c9dc5;
@@ -87,7 +115,7 @@ function fnv1a(value: string): string {
 }
 
 function cacheKey(input: unknown): string {
-  return fnv1a(JSON.stringify(input));
+  return fnv1a(stableStringify(input));
 }
 
 async function loadRegistryMaps(): Promise<RegistryMaps> {
@@ -176,29 +204,36 @@ function deriveConfidence(programs: ProgramPrediction[]): {
 }
 
 function resultFromCachedPrograms(
-  cachedPrograms: ProgramPrediction[],
+  cached: ServerCacheEntry,
   filters: CollegePredictorFilters | undefined,
 ): CollegePredictionResult {
-  return resultFromRankedPrograms(cachedPrograms, filters);
+  const result = resultFromRankedPrograms(cached.programs, filters);
+  return cached.ews_comparison
+    ? { ...result, ews_comparison: cached.ews_comparison }
+    : result;
 }
 
 export const predictor: ExamPredictor<CsabInput, CollegePredictionResult> = {
   inputSchema: CsabInput,
 
   async predict(input, deps) {
-    const key = cacheKey({ exam_id: deps.examId, ...input });
+    const key = cacheKey({
+      index_sha: indexShaFromDeps(deps),
+      exam_id: deps.examId,
+      ...input,
+    });
     const cached = _resultCache.get(key);
     if (cached) {
       return {
         result: resultFromCachedPrograms(cached, input.filters),
-        confidence: deriveConfidence(cached),
+        confidence: deriveConfidence(cached.programs),
       };
     }
 
     const allRows = await getPredictorIndexFromDeps(deps);
     if (allRows.length === 0) {
       return {
-        result: resultFromCachedPrograms([], input.filters),
+        result: resultFromRankedPrograms([], input.filters),
         confidence: {
           level: "low",
           caveat: "CSAB predictor index is empty — rebuild csab_predictor_index.parquet",
@@ -219,6 +254,7 @@ export const predictor: ExamPredictor<CsabInput, CollegePredictionResult> = {
       indexRows: quotaFiltered,
       studentRank: input.rank,
       seatType: input.seat_type,
+      quota: input.quota,
       gender: input.gender,
       includeAll: input.include_all,
       filters: input.filters,
@@ -239,6 +275,7 @@ export const predictor: ExamPredictor<CsabInput, CollegePredictionResult> = {
         indexRows: quotaFiltered,
         studentRank: input.rank,
         seatType: EWS_SEAT_TYPE,
+        quota: input.quota,
         gender: input.gender,
         includeAll: input.include_all,
         filters: input.filters,
@@ -255,7 +292,10 @@ export const predictor: ExamPredictor<CsabInput, CollegePredictionResult> = {
       };
     }
 
-    _resultCache.set(key, result.programs);
+    _resultCache.set(key, {
+      programs: result.programs,
+      ews_comparison: result.ews_comparison,
+    });
     return { result, confidence: deriveConfidence(result.programs) };
   },
 };

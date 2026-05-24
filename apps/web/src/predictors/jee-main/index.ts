@@ -13,7 +13,6 @@ import {
   deriveConfidence,
   getPredictorIndexFromDeps,
   loadCanonicalStates,
-  type ProgramPrediction,
   predictPrograms,
 } from "@ejam/data/college-predictor";
 import { z } from "zod";
@@ -21,11 +20,21 @@ import {
   finalizePredictionResult,
   resultFromRankedPrograms,
 } from "@/predictors/shared/finalize-prediction";
+import {
+  indexShaFromDeps,
+  type ServerCacheEntry,
+} from "@/predictors/shared/predictor-cache";
+import {
+  QuotaApi,
+  refineQuotaRequiresState,
+} from "@/predictors/shared/quota-input";
 
-const JeeMainInput = z.object({
+const JeeMainInput = z
+  .object({
   rank: z.number().int().min(1).max(500000),
   seat_type: z.string().regex(/^[A-Za-z0-9 ()-]+$/),
   gender: z.string().regex(/^[A-Za-z0-9 ()-]+$/),
+  quota: QuotaApi.default("OS"),
   state: z
     .string()
     .optional()
@@ -46,7 +55,8 @@ const JeeMainInput = z.object({
     .optional(),
   has_ews_certificate: z.boolean().optional(),
   include_all: z.boolean().optional(),
-});
+})
+  .superRefine(refineQuotaRequiresState);
 type JeeMainInput = z.infer<typeof JeeMainInput>;
 
 // values must match the corresponding state strings in data/registry/engineering/institutes.json
@@ -72,7 +82,7 @@ type RegistryMaps = {
 // in-memory server cache — keyed by FNV1a hash of canonical input
 // sessionStorage is a no-op on the server; this Map persists for the process lifetime
 // predictions are deterministic for a given index version, so no TTL is needed
-const _serverCache = new Map<string, ProgramPrediction[]>();
+const _serverCache = new Map<string, ServerCacheEntry>();
 
 let _cachedRegistry: RegistryMaps | null = null;
 
@@ -160,10 +170,13 @@ function filterByQuota(
 }
 
 function resultFromCachedPrograms(
-  cachedPrograms: ProgramPrediction[],
+  cached: ServerCacheEntry,
   filters: CollegePredictorFilters | undefined,
 ): CollegePredictionResult {
-  return resultFromRankedPrograms(cachedPrograms, filters);
+  const result = resultFromRankedPrograms(cached.programs, filters);
+  return cached.ews_comparison
+    ? { ...result, ews_comparison: cached.ews_comparison }
+    : result;
 }
 
 export const predictor: ExamPredictor<JeeMainInput, CollegePredictionResult> = {
@@ -171,12 +184,17 @@ export const predictor: ExamPredictor<JeeMainInput, CollegePredictionResult> = {
 
   async predict(input, deps) {
     const cacheInput = { exam_id: deps.examId, ...input };
-    const cacheKey = fnv1a(stableStringify(cacheInput));
-    const cachedPrograms = _serverCache.get(cacheKey);
-    if (cachedPrograms) {
+    const cacheKey = fnv1a(
+      stableStringify({
+        index_sha: indexShaFromDeps(deps),
+        ...cacheInput,
+      }),
+    );
+    const cached = _serverCache.get(cacheKey);
+    if (cached) {
       return {
-        result: resultFromCachedPrograms(cachedPrograms, input.filters),
-        confidence: deriveConfidence(cachedPrograms),
+        result: resultFromCachedPrograms(cached, input.filters),
+        confidence: deriveConfidence(cached.programs),
       };
     }
 
@@ -197,6 +215,7 @@ export const predictor: ExamPredictor<JeeMainInput, CollegePredictionResult> = {
       indexRows: quotaFiltered,
       studentRank: input.rank,
       seatType: input.seat_type,
+      quota: input.quota,
       gender: input.gender,
       includeAll: input.include_all,
       filters: input.filters,
@@ -217,6 +236,7 @@ export const predictor: ExamPredictor<JeeMainInput, CollegePredictionResult> = {
         indexRows: quotaFiltered,
         studentRank: input.rank,
         seatType: EWS_SEAT_TYPE,
+        quota: input.quota,
         gender: input.gender,
         includeAll: input.include_all,
         filters: input.filters,
@@ -235,7 +255,10 @@ export const predictor: ExamPredictor<JeeMainInput, CollegePredictionResult> = {
 
     const confidence = deriveConfidence(result.programs);
 
-    _serverCache.set(cacheKey, result.programs);
+    _serverCache.set(cacheKey, {
+      programs: result.programs,
+      ews_comparison: result.ews_comparison,
+    });
     return { result, confidence };
   },
 };

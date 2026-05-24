@@ -10,7 +10,6 @@ import {
   type CollegePredictorIndexRow,
   deriveConfidence,
   getPredictorIndexFromDeps,
-  type ProgramPrediction,
   predictPrograms,
 } from "@ejam/data/college-predictor";
 import { z } from "zod";
@@ -18,6 +17,10 @@ import {
   finalizePredictionResult,
   resultFromRankedPrograms,
 } from "@/predictors/shared/finalize-prediction";
+import {
+  indexShaFromDeps,
+  type ServerCacheEntry,
+} from "@/predictors/shared/predictor-cache";
 
 const JeeAdvancedInput = z.object({
   rank: z.number().int().min(1).max(50000),
@@ -52,7 +55,7 @@ type RegistryMaps = {
 // in-memory server cache — keyed by FNV1a hash of canonical input
 // sessionStorage is a no-op on the server; this Map persists for the process lifetime
 // predictions are deterministic for a given index version, so no TTL is needed
-const _serverCache = new Map<string, ProgramPrediction[]>();
+const _serverCache = new Map<string, ServerCacheEntry>();
 
 let _cachedRegistry: RegistryMaps | null = null;
 
@@ -122,10 +125,13 @@ function enrichRows(
 }
 
 function resultFromCachedPrograms(
-  cachedPrograms: ProgramPrediction[],
+  cached: ServerCacheEntry,
   filters: CollegePredictorFilters | undefined,
 ): CollegePredictionResult {
-  return resultFromRankedPrograms(cachedPrograms, filters);
+  const result = resultFromRankedPrograms(cached.programs, filters);
+  return cached.ews_comparison
+    ? { ...result, ews_comparison: cached.ews_comparison }
+    : result;
 }
 
 export const predictor: ExamPredictor<
@@ -140,12 +146,17 @@ export const predictor: ExamPredictor<
       ...input,
       quota: JEE_ADVANCED_QUOTA,
     };
-    const cacheKey = fnv1a(stableStringify(cacheInput));
-    const cachedPrograms = _serverCache.get(cacheKey);
-    if (cachedPrograms) {
+    const cacheKey = fnv1a(
+      stableStringify({
+        index_sha: indexShaFromDeps(deps),
+        ...cacheInput,
+      }),
+    );
+    const cached = _serverCache.get(cacheKey);
+    if (cached) {
       return {
-        result: resultFromCachedPrograms(cachedPrograms, input.filters),
-        confidence: deriveConfidence(cachedPrograms),
+        result: resultFromCachedPrograms(cached, input.filters),
+        confidence: deriveConfidence(cached.programs),
       };
     }
 
@@ -201,7 +212,10 @@ export const predictor: ExamPredictor<
 
     const confidence = deriveConfidence(result.programs);
 
-    _serverCache.set(cacheKey, result.programs);
+    _serverCache.set(cacheKey, {
+      programs: result.programs,
+      ews_comparison: result.ews_comparison,
+    });
     return { result, confidence };
   },
 };
