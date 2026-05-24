@@ -191,7 +191,7 @@ function ProbabilityBar({ value }: { value: number }) {
     <div className="flex items-center gap-2">
       <div className="relative h-1 w-20 overflow-hidden rounded-full bg-muted">
         <div
-          className="absolute inset-y-0 left-0 rounded-full bg-foreground/80"
+          className="absolute inset-y-0 left-0 rounded-full bg-foreground/80 transition-[width] duration-300 ease-out"
           style={{ width: `${pct * 100}%` }}
         />
       </div>

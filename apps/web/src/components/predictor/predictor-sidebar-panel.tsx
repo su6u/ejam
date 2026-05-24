@@ -155,7 +155,7 @@ function PredictorSidebarPanelInner() {
                     height={36}
                     aria-hidden
                     className={cn(
-                      "size-9 shrink-0 object-contain transition-opacity",
+                      "image-outline size-9 shrink-0 object-contain transition-opacity",
                       exam.enabled &&
                         !isActive &&
                         "opacity-55 group-hover/exam:opacity-80",

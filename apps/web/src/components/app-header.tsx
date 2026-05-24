@@ -29,7 +29,7 @@ export function AppHeader() {
           width={16}
           height={16}
           aria-hidden
-          className="size-4 shrink-0 invert"
+          className="image-outline size-4 shrink-0 invert"
         />
         <GitHubStars className="text-xs" countClassName="text-xs" />
       </a>

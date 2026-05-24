@@ -6,7 +6,11 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 
 const COUNTDOWN_DURATION = 2000;
-const EASE_OUT_CUBIC = [0.215, 0.61, 0.355, 1] as const;
+const STAR_REVEAL_TRANSITION = {
+  type: "spring" as const,
+  duration: 0.3,
+  bounce: 0,
+};
 const CACHE_KEY = "github-stars:su6u/ejam";
 const FALLBACK_SIZER = 99;
 
@@ -160,9 +164,7 @@ export default function GitHubStars({
             shouldReduceMotion ? { opacity: 1 } : { opacity: 0, scale: 0.98 }
           }
           transition={
-            shouldReduceMotion
-              ? { duration: 0 }
-              : { duration: 0.25, ease: EASE_OUT_CUBIC }
+            shouldReduceMotion ? { duration: 0 } : STAR_REVEAL_TRANSITION
           }
         >
           <span>{displayCount.toLocaleString()}</span>

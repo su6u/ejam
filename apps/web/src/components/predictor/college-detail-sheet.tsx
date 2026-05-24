@@ -85,19 +85,16 @@ function DetailBody({ program }: { program: ProgramPrediction }) {
           label="Predicted closing"
           value={formatInteger(program.predicted_closing_rank)}
           caption="Estimated rank"
-          mono
         />
         <ProgramMetricCard
           label="Weighted mean"
           value={formatInteger(program.weighted_mean)}
           caption="Historical center"
-          mono
         />
         <ProgramMetricCard
           label="Sigma"
           value={formatInteger(program.sigma_effective)}
           caption="Model spread"
-          mono
         />
       </section>
 
@@ -131,11 +128,11 @@ function DetailBody({ program }: { program: ProgramPrediction }) {
           <DT>Signal</DT>
           <DD className="capitalize">{program.data_quality}</DD>
           <DT>Years of data</DT>
-          <DD>{program.years_of_data}</DD>
+          <DD className="tabular-nums">{program.years_of_data}</DD>
           <DT>Most recent</DT>
-          <DD>{program.last_data_year}</DD>
+          <DD className="tabular-nums">{program.last_data_year}</DD>
           <DT>Final round</DT>
-          <DD>{program.fill_round}</DD>
+          <DD className="tabular-nums">{program.fill_round}</DD>
         </dl>
       </section>
 
@@ -152,12 +149,10 @@ function ProgramMetricCard({
   label,
   value,
   caption,
-  mono,
 }: {
   label: string;
   value: string;
   caption: string;
-  mono?: boolean;
 }) {
   return (
     <DashboardCard className="gap-2 border-0 bg-background px-4 py-3" size="sm">
@@ -167,12 +162,7 @@ function ProgramMetricCard({
         </CardTitle>
       </CardHeader>
       <CardContent className="px-0">
-        <div
-          className={cn(
-            "text-lg font-semibold text-foreground",
-            mono && "tabular-nums",
-          )}
-        >
+        <div className="text-lg font-semibold tabular-nums text-foreground">
           {value}
         </div>
         <CardDescription className="mt-0.5 text-[11px]">

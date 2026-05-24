@@ -200,6 +200,12 @@ input {
     display: none;
   }
 
+  /* Pure white inset outline — dark-only app; never use tinted neutrals on images. */
+  .image-outline {
+    outline: 1px solid rgba(255, 255, 255, 0.1);
+    outline-offset: -1px;
+  }
+
   /* Press feedback — scale on compositor, colors on main thread separately. */
   .pressable {
     --press-scale-dur: 100ms;
@@ -211,7 +217,6 @@ input {
       background-color 150ms ease,
       border-color 150ms ease,
       color 150ms ease;
-    will-change: scale;
   }
 
   .pressable:active:not(:disabled) {
@@ -228,7 +233,6 @@ input {
         background-color 150ms ease,
         border-color 150ms ease,
         color 150ms ease;
-      will-change: auto;
     }
 
     .pressable:active:not(:disabled) {
