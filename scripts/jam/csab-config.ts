@@ -6,17 +6,6 @@
 
 export const JAM_CSAB_V2 = "jam-csab-v2";
 
-export const CSAB_BASE = {
-  windowSize: 2 as const,
-  yearWeights: [0.65, 0.35, 0, 0, 0] as const,
-  trendCapPct: 0.05,
-  trendGapMultiplier: 1.0,
-  sigmaFloorPct: 0.03,
-  sigmaInflation: 1.5,
-  outlierGuardMultiplier: 2,
-  sparseYearsThreshold: 3,
-};
-
 export const CSAB_TUNED = {
   windowSize: 2 as const,
   yearWeights: [0.7, 0.3, 0, 0, 0] as const,
@@ -105,20 +94,11 @@ export function csabEnsemblePredictedRankSql(
   predictionYear: number,
   alias = "s",
 ): string {
-  const parts = CSAB_PRODUCTION.ensemble.map((v) =>
-    csabPredictedRankForProfileSql(v.profile, predictionYear, alias),
+  const members = CSAB_PRODUCTION.ensemble;
+  const totalWeight = members.reduce((sum, member) => sum + member.weight, 0);
+  const weighted = members.map(
+    (member) =>
+      `(${csabPredictedRankForProfileSql(member.profile, predictionYear, alias)}) * ${member.weight}`,
   );
-  return `ROUND((${parts.join(" + ")}) / ${parts.length}.0)`;
-}
-
-export function csabBlendedMeanSql(tableAlias = "s"): string {
-  const b = CSAB_TUNED.medianBlend;
-  if (b === 0) return `${tableAlias}.weighted_mean`;
-  return `(1-${b})*${tableAlias}.weighted_mean + ${b}*${tableAlias}.median_mean`;
-}
-
-export function csabYearWeightCaseSql(
-  weights: readonly [number, number, number, number, number],
-): string {
-  return `CASE w.yr WHEN 1 THEN ${weights[0]} WHEN 2 THEN ${weights[1]} WHEN 3 THEN ${weights[2]} WHEN 4 THEN ${weights[3]} WHEN 5 THEN ${weights[4]} END`;
+  return `ROUND((${weighted.join(" + ")}) / ${totalWeight}.0)`;
 }
