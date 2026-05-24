@@ -115,14 +115,8 @@ export function usePredictorState(): PredictorStateReturn {
   );
 
   const setHomeState = useCallback(
-    (v: string) => {
-      if (exam === "jee-main" && quota === "hs") {
-        updateParam({ state: v });
-      } else {
-        updateParam({ state: null });
-      }
-    },
-    [exam, quota, updateParam],
+    (v: string) => updateParam({ state: v }),
+    [updateParam],
   );
 
   return {

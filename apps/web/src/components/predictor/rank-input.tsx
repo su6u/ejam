@@ -1,11 +1,15 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 
 const MAX_RANK_LENGTH = 7;
 const URL_SYNC_MS = 400;
+
+export type RankInputHandle = {
+  flush: () => string;
+};
 
 interface RankInputProps {
   value: string;
@@ -14,7 +18,8 @@ interface RankInputProps {
 }
 
 /** Keeps a local draft while focused so URL sync does not reset caret position. */
-export function RankInput({ value, onValueChange, className }: RankInputProps) {
+export const RankInput = forwardRef<RankInputHandle, RankInputProps>(
+  function RankInput({ value, onValueChange, className }, ref) {
   const [draft, setDraft] = useState(value);
   const [focused, setFocused] = useState(false);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -37,6 +42,13 @@ export function RankInput({ value, onValueChange, className }: RankInputProps) {
     }
     onValueChange(next);
   };
+
+  useImperativeHandle(ref, () => ({
+    flush: () => {
+      commit(draft);
+      return draft;
+    },
+  }));
 
   const handleChange = (raw: string) => {
     const next = raw.replace(/\D/g, "").slice(0, MAX_RANK_LENGTH);
@@ -76,4 +88,4 @@ export function RankInput({ value, onValueChange, className }: RankInputProps) {
       )}
     />
   );
-}
+});

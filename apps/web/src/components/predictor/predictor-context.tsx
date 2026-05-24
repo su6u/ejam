@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
 import {
   EMPTY_RESULTS_FILTERS,
   type ResultsFilterState,
@@ -14,6 +14,7 @@ import {
   type PredictorStateReturn,
   usePredictorState,
 } from "@/hooks/use-predictor-state";
+import type { RankInputHandle } from "@/components/predictor/rank-input";
 
 type PredictorQueryReturn = ReturnType<typeof usePredictorQuery>;
 
@@ -21,6 +22,7 @@ interface PredictorContextValue {
   state: PredictorStateReturn;
   query: PredictorQueryReturn;
   onPredict: () => void;
+  rankInputRef: React.RefObject<RankInputHandle | null>;
   filters: ResultsFilterState;
   setFilters: (next: ResultsFilterState) => void;
   sortBy: ResultsSortKey;
@@ -37,12 +39,14 @@ export function PredictorProvider({ children }: { children: React.ReactNode }) {
     rank: state.rank,
     apiSeatType: state.apiSeatType,
     apiGender: state.apiGender,
+    quota: state.quota,
     homeState: state.homeState,
     has_ews_certificate: state.has_ews_certificate,
   });
   const [filters, setFilters] =
     useState<ResultsFilterState>(EMPTY_RESULTS_FILTERS);
   const [sortBy, setSortBy] = useState<ResultsSortKey>(DEFAULT_RESULTS_SORT);
+  const rankInputRef = useRef<RankInputHandle>(null);
   const hasResults = (query.data?.programs.length ?? 0) > 0;
 
   useEffect(() => {
@@ -50,19 +54,22 @@ export function PredictorProvider({ children }: { children: React.ReactNode }) {
     setSortBy(DEFAULT_RESULTS_SORT);
   }, [state.exam]);
 
-  useEffect(() => {
-    if (query.data) {
+  const onPredict = useCallback(async () => {
+    const flushedRank = rankInputRef.current?.flush() ?? state.rank;
+    const fromCache = await query.trigger(flushedRank);
+    if (!fromCache) {
       setFilters(EMPTY_RESULTS_FILTERS);
       setSortBy(DEFAULT_RESULTS_SORT);
     }
-  }, [query.data]);
+  }, [query, state.rank]);
 
   return (
     <PredictorContext.Provider
       value={{
         state,
         query,
-        onPredict: query.trigger,
+        onPredict,
+        rankInputRef,
         filters,
         setFilters,
         sortBy,
