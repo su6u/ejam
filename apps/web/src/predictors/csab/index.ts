@@ -19,6 +19,10 @@ import {
   readParquetRows,
 } from "@ejam/data/college-predictor";
 import { z } from "zod";
+import {
+  finalizePredictionResult,
+  resultFromRankedPrograms,
+} from "@/predictors/shared/finalize-prediction";
 
 const CsabInput = z.object({
   rank: z.number().int().min(1).max(500000),
@@ -63,6 +67,7 @@ const EWS_CAVEAT =
 type RegistryMaps = {
   instituteStates: Map<string, string>;
   programNames: Map<string, string>;
+  instituteNirf: Map<string, number | null | undefined>;
 };
 
 // module-level caches — populated on first request, cleared on process restart
@@ -118,7 +123,7 @@ async function loadRegistryMaps(): Promise<RegistryMaps> {
       resolve(registryRoot, "engineering", "institutes.json"),
       "utf-8",
     ),
-  ) as Array<{ id: string; state: string }>;
+  ) as Array<{ id: string; state: string; nirf_rank?: number | null }>;
   const programs = JSON.parse(
     readFileSync(
       resolve(registryRoot, "engineering", "programs.json"),
@@ -129,6 +134,7 @@ async function loadRegistryMaps(): Promise<RegistryMaps> {
   _cachedRegistry = {
     instituteStates: new Map(institutes.map((i) => [i.id, i.state])),
     programNames: new Map(programs.map((p) => [p.id, p.name])),
+    instituteNirf: new Map(institutes.map((i) => [i.id, i.nirf_rank ?? null])),
   };
   return _cachedRegistry;
 }
@@ -194,25 +200,7 @@ function resultFromCachedPrograms(
   cachedPrograms: ProgramPrediction[],
   filters: CollegePredictorFilters | undefined,
 ): CollegePredictionResult {
-  return {
-    programs: cachedPrograms,
-    metadata: {
-      total_matching: cachedPrograms.length,
-      total_above_threshold: cachedPrograms.length,
-      threshold_used: 0.1,
-      hidden_count: 0,
-      total_matching_programs: cachedPrograms.length,
-      displayed_programs: cachedPrograms.length,
-      hidden_programs: 0,
-      active_filters: filters ?? {},
-    },
-    grouped_by_band: {
-      safe: cachedPrograms.filter((p) => p.band === "safe"),
-      target: cachedPrograms.filter((p) => p.band === "target"),
-      reach: cachedPrograms.filter((p) => p.band === "reach"),
-      "long-shot": cachedPrograms.filter((p) => p.band === "long-shot"),
-    },
-  };
+  return resultFromRankedPrograms(cachedPrograms, filters);
 }
 
 export const predictor: ExamPredictor<CsabInput, CollegePredictionResult> = {
@@ -248,7 +236,7 @@ export const predictor: ExamPredictor<CsabInput, CollegePredictionResult> = {
       registry.instituteStates,
     );
 
-    const result = predictPrograms({
+    let result = predictPrograms({
       indexRows: quotaFiltered,
       studentRank: input.rank,
       seatType: input.seat_type,
@@ -256,23 +244,36 @@ export const predictor: ExamPredictor<CsabInput, CollegePredictionResult> = {
       includeAll: input.include_all,
       filters: input.filters,
     });
+    result = finalizePredictionResult(
+      result,
+      input.filters,
+      registry.instituteNirf,
+    );
 
     if (input.has_ews_certificate) {
       const baseResult: CollegePredictionResult = {
         programs: result.programs,
         metadata: result.metadata,
         grouped_by_band: result.grouped_by_band,
+        best_picks: result.best_picks,
+        stretch_picks: result.stretch_picks,
       };
+      let ews = predictPrograms({
+        indexRows: quotaFiltered,
+        studentRank: input.rank,
+        seatType: EWS_SEAT_TYPE,
+        gender: input.gender,
+        includeAll: input.include_all,
+        filters: input.filters,
+      });
+      ews = finalizePredictionResult(
+        ews,
+        input.filters,
+        registry.instituteNirf,
+      );
       result.ews_comparison = {
         base: baseResult,
-        ews: predictPrograms({
-          indexRows: quotaFiltered,
-          studentRank: input.rank,
-          seatType: EWS_SEAT_TYPE,
-          gender: input.gender,
-          includeAll: input.include_all,
-          filters: input.filters,
-        }),
+        ews,
         caveat: EWS_CAVEAT,
       };
     }

@@ -5,7 +5,7 @@
 "use client";
 
 import type { ProgramPrediction } from "@ejam/data/college-predictor";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { usePredictor } from "@/components/predictor/predictor-context";
 import {
   applyResultsFilters,
@@ -31,6 +31,26 @@ export function Dashboard() {
     applyResultsFilters(programs, filters),
     sortBy,
   );
+
+  const sectionRows = useMemo(() => {
+    if (sortBy !== "balanced" || !query.data) {
+      return { best: filteredPrograms, stretch: [] as ProgramPrediction[] };
+    }
+
+    const filteredKeys = new Set(filteredPrograms.map(programKey));
+    const best = (query.data.best_picks ?? []).filter((row) =>
+      filteredKeys.has(programKey(row)),
+    );
+    const stretch = (query.data.stretch_picks ?? []).filter((row) =>
+      filteredKeys.has(programKey(row)),
+    );
+
+    return {
+      best: applyResultsSort(best, sortBy),
+      stretch: applyResultsSort(stretch, sortBy),
+    };
+  }, [filteredPrograms, query.data, sortBy]);
+
   const selectedId = selected ? programKey(selected) : null;
 
   useEffect(() => {
@@ -44,6 +64,7 @@ export function Dashboard() {
     hasResults,
     programs,
     filteredPrograms,
+    sectionRows,
     sortBy,
     onSortChange: setSortBy,
     hasRank: Boolean(state.rank),
@@ -65,7 +86,6 @@ export function Dashboard() {
         onOpenChange={(next) => {
           setSheetOpen(next);
           if (!next) {
-            // keep selected-row styling until the drawer finishes closing
             setTimeout(() => setSelected(null), 150);
           }
         }}
@@ -80,6 +100,7 @@ function renderMiddle({
   hasResults,
   programs,
   filteredPrograms,
+  sectionRows,
   sortBy,
   onSortChange,
   hasRank,
@@ -92,6 +113,7 @@ function renderMiddle({
   hasResults: boolean;
   programs: ProgramPrediction[];
   filteredPrograms: ProgramPrediction[];
+  sectionRows: { best: ProgramPrediction[]; stretch: ProgramPrediction[] };
   sortBy: ResultsSortKey;
   onSortChange: (next: ResultsSortKey) => void;
   hasRank: boolean;
@@ -104,6 +126,39 @@ function renderMiddle({
     if (isLoading) return <LoadingState />;
     return <EmptyState hasRank={hasRank} />;
   }
+
+  if (sortBy === "balanced") {
+    return (
+      <div className="flex h-full min-h-0 flex-col gap-px overflow-y-auto bg-border">
+        <ResultsTable
+          rows={sectionRows.best}
+          allRows={programs}
+          sortBy={sortBy}
+          onSortChange={onSortChange}
+          selectedId={selectedId}
+          onSelect={onSelect}
+          onClearFilters={onClearFilters}
+          sectionTitle="Best picks"
+          sectionHint="Target band or better — ranked by college quality, branch, and chance"
+        />
+        {sectionRows.stretch.length > 0 ? (
+          <ResultsTable
+            rows={sectionRows.stretch}
+            allRows={programs}
+            sortBy={sortBy}
+            onSortChange={onSortChange}
+            selectedId={selectedId}
+            onSelect={onSelect}
+            onClearFilters={onClearFilters}
+            sectionTitle="Stretch picks"
+            sectionHint="Reach and long-shot options worth considering"
+            hideToolbar
+          />
+        ) : null}
+      </div>
+    );
+  }
+
   return (
     <ResultsTable
       rows={filteredPrograms}

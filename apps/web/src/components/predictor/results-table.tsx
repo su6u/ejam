@@ -35,6 +35,9 @@ interface ResultsTableProps {
   selectedId: string | null;
   onSelect: (program: ProgramPrediction) => void;
   onClearFilters?: () => void;
+  sectionTitle?: string;
+  sectionHint?: string;
+  hideToolbar?: boolean;
 }
 
 export function ResultsTable({
@@ -45,6 +48,9 @@ export function ResultsTable({
   selectedId,
   onSelect,
   onClearFilters,
+  sectionTitle,
+  sectionHint,
+  hideToolbar = false,
 }: ResultsTableProps) {
   const isFiltered = rows.length !== allRows.length;
   const countLabel =
@@ -55,11 +61,27 @@ export function ResultsTable({
   return (
     <ResultsCardShell
       contentClassName="no-scrollbar overflow-y-auto [&_[data-slot=table-container]]:no-scrollbar"
-      toolbar={<ResultsSort sortBy={sortBy} onChange={onSortChange} />}
+      toolbar={
+        hideToolbar ? undefined : (
+          <ResultsSort sortBy={sortBy} onChange={onSortChange} />
+        )
+      }
       headerExtra={
-        <span className="shrink-0 text-xs tabular-nums text-muted-foreground">
-          {countLabel}
-        </span>
+        <div className="flex min-w-0 flex-col items-end gap-0.5">
+          {sectionTitle ? (
+            <span className="text-sm font-medium text-foreground">
+              {sectionTitle}
+            </span>
+          ) : null}
+          {sectionHint ? (
+            <span className="max-w-md text-right text-[11px] leading-snug text-muted-foreground">
+              {sectionHint}
+            </span>
+          ) : null}
+          <span className="shrink-0 text-xs tabular-nums text-muted-foreground">
+            {countLabel}
+          </span>
+        </div>
       }
     >
       <Table>

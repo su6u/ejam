@@ -20,6 +20,18 @@ export {
   storeCollegePredictorIndex,
   writePredictionResultCache,
 } from "./browser-cache-manager";
+export {
+  applyBalancedRanking,
+  branchFilterActive,
+  computeBalancedScore,
+  computeBranchScore,
+  computeInstituteScore,
+  isBestPick,
+  sortByBalancedScore,
+  splitBalancedSections,
+  type BalancedRankingOptions,
+  type InstituteRankingMeta,
+} from "./balanced-ranking";
 export type {
   CollegePredictionResult,
   CollegePredictorFilters,

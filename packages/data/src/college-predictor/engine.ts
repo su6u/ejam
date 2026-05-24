@@ -58,6 +58,12 @@ export interface ProgramPrediction {
   last_data_year: number;
   fill_round: number;
   round_probs: number[];
+  /** 0–100 institute quality for balanced ranking */
+  institute_score?: number;
+  /** 0–100 branch desirability for balanced ranking */
+  branch_score?: number;
+  /** composite pick score — higher is a better overall option */
+  balanced_score?: number;
 }
 
 export interface CollegePredictionResult {
@@ -73,6 +79,10 @@ export interface CollegePredictionResult {
     active_filters: CollegePredictorFilters;
   };
   grouped_by_band: Record<ProbabilityBand, ProgramPrediction[]>;
+  /** target+ programs ranked by balanced score */
+  best_picks?: ProgramPrediction[];
+  /** reach / long-shot programs ranked by balanced score */
+  stretch_picks?: ProgramPrediction[];
   ews_comparison?: {
     base: CollegePredictionResult;
     ews: CollegePredictionResult;
