@@ -355,9 +355,10 @@ export function predictPrograms(opts: {
         (program) => program.cumulative_probability >= threshold,
       );
 
+  // band first, then ascending predicted_closing_rank as a competitiveness proxy
   predictions.sort((a, b) => {
     if (a.band !== b.band) return BAND_ORDER[a.band] - BAND_ORDER[b.band];
-    return b.cumulative_probability - a.cumulative_probability;
+    return a.predicted_closing_rank - b.predicted_closing_rank;
   });
 
   return {

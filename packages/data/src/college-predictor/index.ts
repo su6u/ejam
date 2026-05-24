@@ -39,6 +39,7 @@ export {
   _resetJosaaIndexCache,
   getJosaaIndex,
 } from "./index-loader";
+export { readParquetRows } from "./duckdb-parquet";
 export {
   _resetCanonicalStatesCache,
   loadCanonicalStates,

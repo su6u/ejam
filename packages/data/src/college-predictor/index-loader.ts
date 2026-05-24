@@ -6,6 +6,7 @@
  **/
 
 import { join, resolve } from "node:path";
+import { readParquetRows } from "./duckdb-parquet";
 import type { CollegePredictorIndexRow } from "./engine";
 
 let _cachedJosaaIndex: CollegePredictorIndexRow[] | null = null;
@@ -18,17 +19,8 @@ export async function getJosaaIndex(): Promise<CollegePredictorIndexRow[]> {
     "college_predictor_index.parquet",
   );
 
-  const { DuckDBInstance } = await import("@duckdb/node-api");
-  const instance = await DuckDBInstance.create(":memory:");
-  const connection = await instance.connect();
-  const result = await connection.run(
-    `SELECT * FROM read_parquet('${indexPath}')`,
-  );
-  const rows = await result.fetchAllRows();
-  await connection.close();
-  await instance.close();
-
-  _cachedJosaaIndex = rows as unknown as CollegePredictorIndexRow[];
+  const rows = await readParquetRows<CollegePredictorIndexRow>(indexPath);
+  _cachedJosaaIndex = rows;
   return _cachedJosaaIndex;
 }
 

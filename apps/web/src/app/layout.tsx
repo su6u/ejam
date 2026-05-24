@@ -1,0 +1,47 @@
+// .dark is pinned; ejam ships dark-only and resolves shadcn tokens
+// against the dark palette declared in globals.css
+
+import type { Metadata } from "next";
+import { IBM_Plex_Sans } from "next/font/google";
+import { Toaster } from "sonner";
+import "./globals.css";
+import { AgentationDev } from "@/components/agentation-dev";
+import { cn } from "@/lib/utils";
+
+const ibmPlex = IBM_Plex_Sans({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
+  display: "swap",
+  variable: "--font-sans",
+});
+
+export const metadata: Metadata = {
+  title: "ejam",
+  description: "ejam",
+};
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <html
+      lang="en"
+      className={cn("dark antialiased", ibmPlex.variable, "font-sans")}
+    >
+      <body suppressHydrationWarning>
+        {children}
+        <Toaster
+          position="bottom-right"
+          toastOptions={{
+            style: {
+              fontFamily: "var(--font-sans)",
+            },
+          }}
+        />
+        <AgentationDev />
+      </body>
+    </html>
+  );
+}

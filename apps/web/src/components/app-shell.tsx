@@ -1,0 +1,39 @@
+"use client";
+
+import { Suspense } from "react";
+import { AppHeader } from "@/components/app-header";
+import {
+  appHeaderGutterClass,
+  appShellContentClass,
+  appShellLayoutClass,
+} from "@/components/app-layout";
+import { AppSidebar } from "@/components/app-sidebar";
+import { PredictorProvider } from "@/components/predictor/predictor-context";
+import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
+import { cn } from "@/lib/utils";
+
+export function AppShell({ children }: { children: React.ReactNode }) {
+  return (
+    <Suspense fallback={null}>
+      <PredictorProvider>
+        <SidebarProvider className={cn("[--app-wrapper-max-width:80rem]")}>
+          <AppSidebar />
+          <SidebarInset className="flex flex-col">
+            <div className={appShellLayoutClass()}>
+              <div
+                className={cn(
+                  appHeaderGutterClass,
+                  "sticky top-0 z-50 shrink-0 border-b",
+                  "bg-background/95 backdrop-blur-sm supports-backdrop-filter:bg-background/50",
+                )}
+              >
+                <AppHeader />
+              </div>
+              <div className={appShellContentClass()}>{children}</div>
+            </div>
+          </SidebarInset>
+        </SidebarProvider>
+      </PredictorProvider>
+    </Suspense>
+  );
+}
