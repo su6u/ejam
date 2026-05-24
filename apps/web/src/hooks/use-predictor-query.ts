@@ -7,7 +7,7 @@
 "use client";
 
 import type { CollegePredictionResult } from "@ejam/data/college-predictor";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 interface PredictorQueryOptions {
   exam: string;
@@ -73,6 +73,12 @@ export function usePredictorQuery(
   const [data, setData] = useState<CollegePredictionResult | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    setData(null);
+    setError(null);
+    setIsLoading(false);
+  }, [opts.exam]);
 
   const trigger = useCallback(async () => {
     if (!opts.rank || Number.isNaN(Number(opts.rank))) return;

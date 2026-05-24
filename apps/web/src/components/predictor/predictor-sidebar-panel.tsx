@@ -6,6 +6,7 @@ import { HomeStateCombobox } from "@/components/predictor/home-state-combobox";
 import { usePredictor } from "@/components/predictor/predictor-context";
 import { ProximityPicker } from "@/components/predictor/proximity-picker";
 import { RankInput } from "@/components/predictor/rank-input";
+import { SidebarFilterSection } from "@/components/predictor/sidebar-filter-section";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import {
@@ -15,6 +16,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import type { ExamType } from "@/hooks/use-predictor-state";
+import { deferAfterPress, pressableClass } from "@/lib/pressable";
 import { cn } from "@/lib/utils";
 
 /** border-only triggers — dropdown panels keep popover surface */
@@ -83,7 +85,16 @@ export function PredictorSidebarPanel() {
 }
 
 function PredictorSidebarPanelInner() {
-  const { state, query, onPredict } = usePredictor();
+  const {
+    state,
+    query,
+    onPredict,
+    filters,
+    setFilters,
+    hasResults,
+  } = usePredictor();
+
+  const programs = query.data?.programs ?? [];
 
   useEffect(() => {
     if (
@@ -102,7 +113,7 @@ function PredictorSidebarPanelInner() {
   return (
     <TooltipProvider delay={200}>
       <div className="flex flex-col">
-        <div className="grid grid-cols-2 gap-2 p-2">
+        <div className="grid grid-cols-2 gap-2 px-2 pb-2 pt-[26px]">
           {EXAM_OPTIONS.map((exam) => {
             const isActive = exam.enabled && state.exam === exam.id;
 
@@ -118,11 +129,14 @@ function PredictorSidebarPanelInner() {
                       disabled={!exam.enabled}
                       onClick={() => {
                         if (exam.enabled) {
-                          state.setExam(exam.id as ExamType);
+                          deferAfterPress(() =>
+                            state.setExam(exam.id as ExamType),
+                          );
                         }
                       }}
                       className={cn(
-                        "flex h-12 w-full items-center justify-center rounded-none border bg-transparent transition-colors outline-none",
+                        "flex h-12 w-full items-center justify-center rounded-none border bg-transparent outline-none",
+                        pressableClass,
                         "focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50",
                         isActive && "border-foreground/40",
                         exam.enabled &&
@@ -211,13 +225,22 @@ function PredictorSidebarPanelInner() {
 
           <Button
             type="button"
-            onClick={onPredict}
+            onClick={() => deferAfterPress(onPredict)}
             disabled={query.isLoading || !canPredict}
             className="mt-1 w-full rounded-none"
           >
             {query.isLoading ? "Predicting…" : "Predict colleges"}
           </Button>
         </div>
+
+        {hasResults ? (
+          <SidebarFilterSection
+            exam={state.exam}
+            programs={programs}
+            filters={filters}
+            onChange={setFilters}
+          />
+        ) : null}
       </div>
     </TooltipProvider>
   );
@@ -249,9 +272,10 @@ function OptionToggle({
             key={option.value}
             type="button"
             aria-pressed={isActive}
-            onClick={() => onChange(option.value)}
+            onClick={() => deferAfterPress(() => onChange(option.value))}
             className={cn(
-              "flex h-8 items-center justify-center rounded-none border border-border bg-transparent text-xs font-medium text-muted-foreground transition-colors outline-none",
+              "flex h-8 items-center justify-center rounded-none border border-border bg-transparent text-xs font-medium text-muted-foreground outline-none",
+              pressableClass,
               "hover:text-foreground",
               "focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50",
               isActive && "border-foreground/40 text-foreground",

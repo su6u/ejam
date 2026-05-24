@@ -5,8 +5,12 @@
 "use client";
 
 import type { ProgramPrediction } from "@ejam/data/college-predictor";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { usePredictor } from "@/components/predictor/predictor-context";
+import {
+  applyResultsFilters,
+} from "@/components/predictor/results-filters";
+import { applyResultsSort, type ResultsSortKey } from "@/components/predictor/results-sort";
 import { CollegeDetailSheet } from "./college-detail-sheet";
 import {
   EmptyState,
@@ -16,19 +20,31 @@ import {
 import { programKey, ResultsTable } from "./results-table";
 
 export function Dashboard() {
-  const { state, query } = usePredictor();
+  const { state, query, filters, sortBy, setSortBy } = usePredictor();
   const [selected, setSelected] = useState<ProgramPrediction | null>(null);
   const [sheetOpen, setSheetOpen] = useState(false);
 
   const programs = query.data?.programs ?? [];
   const hasResults = programs.length > 0;
+  const filteredPrograms = applyResultsSort(
+    applyResultsFilters(programs, filters),
+    sortBy,
+  );
   const selectedId = selected ? programKey(selected) : null;
+
+  useEffect(() => {
+    setSheetOpen(false);
+    setSelected(null);
+  }, [state.exam]);
 
   const middle = renderMiddle({
     isLoading: query.isLoading,
     error: query.error,
     hasResults,
     programs,
+    filteredPrograms,
+    sortBy,
+    onSortChange: setSortBy,
     hasRank: Boolean(state.rank),
     selectedId,
     onSelect: (p) => {
@@ -61,6 +77,9 @@ function renderMiddle({
   error,
   hasResults,
   programs,
+  filteredPrograms,
+  sortBy,
+  onSortChange,
   hasRank,
   selectedId,
   onSelect,
@@ -69,6 +88,9 @@ function renderMiddle({
   error: string | null;
   hasResults: boolean;
   programs: ProgramPrediction[];
+  filteredPrograms: ProgramPrediction[];
+  sortBy: ResultsSortKey;
+  onSortChange: (next: ResultsSortKey) => void;
   hasRank: boolean;
   selectedId: string | null;
   onSelect: (p: ProgramPrediction) => void;
@@ -79,6 +101,13 @@ function renderMiddle({
     return <EmptyState hasRank={hasRank} />;
   }
   return (
-    <ResultsTable rows={programs} selectedId={selectedId} onSelect={onSelect} />
+    <ResultsTable
+      rows={filteredPrograms}
+      allRows={programs}
+      sortBy={sortBy}
+      onSortChange={onSortChange}
+      selectedId={selectedId}
+      onSelect={onSelect}
+    />
   );
 }

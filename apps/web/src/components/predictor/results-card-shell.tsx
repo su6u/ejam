@@ -11,10 +11,12 @@ import { cn } from "@/lib/utils";
 export function ResultsCardShell({
   children,
   headerExtra,
+  toolbar,
   contentClassName,
 }: {
   children: React.ReactNode;
   headerExtra?: React.ReactNode;
+  toolbar?: React.ReactNode;
   contentClassName?: string;
 }) {
   return (
@@ -37,6 +39,9 @@ export function ResultsCardShell({
           </div>
           {headerExtra}
         </div>
+        {toolbar ? (
+          <div className="mt-3 border-t border-border pt-3">{toolbar}</div>
+        ) : null}
       </CardHeader>
       <CardContent
         className={cn(

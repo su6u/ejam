@@ -1,21 +1,11 @@
 import { BookOpenIcon } from "lucide-react";
 import Image from "next/image";
 import GitHubStars from "@/components/github-stars";
-import { cn } from "@/lib/utils";
-
-const headerPillClass = cn(
-  "inline-flex h-9 items-center gap-2 rounded-none border border-border bg-background px-3 text-xs font-medium text-foreground shadow-none",
-  "transition-[opacity,scale,background-color] hover:bg-muted hover:opacity-90 active:scale-[0.96]",
-);
+import { headerPillClass } from "@/lib/pressable";
 
 export function AppHeader() {
   return (
-    <header
-      className={cn(
-        "sticky top-0 z-50 flex h-14 shrink-0 items-center justify-end gap-2 border-b px-4 md:px-6",
-        "bg-background/95 backdrop-blur-sm supports-backdrop-filter:bg-background/50",
-      )}
-    >
+    <header className="flex h-14 items-center justify-end gap-2">
       <a
         href="https://github.com/su6u/ejam#readme"
         target="_blank"
@@ -39,7 +29,7 @@ export function AppHeader() {
           width={16}
           height={16}
           aria-hidden
-          className="shrink-0 invert"
+          className="size-4 shrink-0 invert"
         />
         <GitHubStars className="text-xs" countClassName="text-xs" />
       </a>

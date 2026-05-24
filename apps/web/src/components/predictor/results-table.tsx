@@ -9,6 +9,10 @@
 import type { ProgramPrediction } from "@ejam/data/college-predictor";
 import { ChevronRight } from "lucide-react";
 import { ResultsCardShell } from "@/components/predictor/results-card-shell";
+import {
+  ResultsSort,
+  type ResultsSortKey,
+} from "@/components/predictor/results-sort";
 import { formatInteger } from "@/components/formater";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -23,21 +27,33 @@ import { cn } from "@/lib/utils";
 
 interface ResultsTableProps {
   rows: ProgramPrediction[];
+  allRows: ProgramPrediction[];
+  sortBy: ResultsSortKey;
+  onSortChange: (next: ResultsSortKey) => void;
   selectedId: string | null;
   onSelect: (program: ProgramPrediction) => void;
 }
 
 export function ResultsTable({
   rows,
+  allRows,
+  sortBy,
+  onSortChange,
   selectedId,
   onSelect,
 }: ResultsTableProps) {
+  const countLabel =
+    rows.length === allRows.length
+      ? `${rows.length} program${rows.length === 1 ? "" : "s"}`
+      : `${rows.length} of ${allRows.length}`;
+
   return (
     <ResultsCardShell
       contentClassName="no-scrollbar overflow-y-auto [&_[data-slot=table-container]]:no-scrollbar"
+      toolbar={<ResultsSort sortBy={sortBy} onChange={onSortChange} />}
       headerExtra={
         <span className="shrink-0 text-xs tabular-nums text-muted-foreground">
-          {rows.length} program{rows.length === 1 ? "" : "s"}
+          {countLabel}
         </span>
       }
     >
@@ -56,7 +72,17 @@ export function ResultsTable({
             </TableRow>
           </TableHeader>
           <TableBody className="[&_tr:first-child]:border-t-0">
-            {rows.map((row) => {
+            {rows.length === 0 ? (
+              <TableRow className="hover:bg-transparent">
+                <TableCell
+                  colSpan={7}
+                  className="h-24 text-center text-sm text-muted-foreground"
+                >
+                  No programs match the active filters.
+                </TableCell>
+              </TableRow>
+            ) : (
+              rows.map((row) => {
               const id = programKey(row);
               const isSelected = id === selectedId;
               return (
@@ -105,7 +131,8 @@ export function ResultsTable({
                   </TableCell>
                 </TableRow>
               );
-            })}
+            })
+            )}
           </TableBody>
         </Table>
     </ResultsCardShell>

@@ -1,12 +1,14 @@
 "use client";
 
-import { motion, useReducedMotion, useSpring } from "motion/react";
+import { motion, useReducedMotion } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { cn } from "@/lib/utils";
 
 const COUNTDOWN_DURATION = 2000;
-const SPRING = { stiffness: 100, damping: 30 };
 const EASE_OUT_CUBIC = [0.215, 0.61, 0.355, 1] as const;
+const CACHE_KEY = "github-stars:su6u/ejam";
+const FALLBACK_SIZER = 99;
 
 export interface GitHubStarsProps {
   owner?: string;
@@ -16,6 +18,25 @@ export interface GitHubStarsProps {
   countClassName?: string;
 }
 
+function readCachedCount(): number | null {
+  try {
+    const raw = sessionStorage.getItem(CACHE_KEY);
+    if (!raw) return null;
+    const parsed = Number.parseInt(raw, 10);
+    return Number.isFinite(parsed) ? parsed : null;
+  } catch {
+    return null;
+  }
+}
+
+function writeCachedCount(count: number): void {
+  try {
+    sessionStorage.setItem(CACHE_KEY, String(count));
+  } catch {
+    // ignore quota errors
+  }
+}
+
 export default function GitHubStars({
   owner = "su6u",
   repo = "ejam",
@@ -23,12 +44,14 @@ export default function GitHubStars({
   className = "",
   countClassName = "",
 }: Readonly<GitHubStarsProps>) {
-  const [starCount, setStarCount] = useState(providedStarCount ?? 0);
+  const [cachedCount] = useState<number | null>(() => readCachedCount());
+  const [starCount, setStarCount] = useState(
+    providedStarCount ?? cachedCount ?? 0,
+  );
   const [displayCount, setDisplayCount] = useState(0);
-  const [isLoading, setIsLoading] = useState(!providedStarCount);
+  const [isLoading, setIsLoading] = useState(providedStarCount === undefined);
   const [error, setError] = useState(false);
   const shouldReduceMotion = useReducedMotion();
-  const countSpring = useSpring(0, SPRING);
   const rafIdRef = useRef<number | null>(null);
 
   useEffect(() => {
@@ -50,7 +73,9 @@ export default function GitHubStars({
         );
         if (res.ok) {
           const data = await res.json();
-          setStarCount(data.stargazers_count ?? 0);
+          const next = data.stargazers_count ?? 0;
+          setStarCount(next);
+          writeCachedCount(next);
         }
       } catch {
         setError(true);
@@ -63,10 +88,9 @@ export default function GitHubStars({
   }, [owner, repo, providedStarCount]);
 
   useEffect(() => {
-    if (starCount === 0 || shouldReduceMotion) {
-      if (shouldReduceMotion) {
+    if (isLoading || starCount === 0 || shouldReduceMotion) {
+      if (!isLoading && shouldReduceMotion) {
         setDisplayCount(starCount);
-        countSpring.set(starCount);
       }
       return;
     }
@@ -81,19 +105,16 @@ export default function GitHubStars({
     const animate = () => {
       const elapsed = performance.now() - startTime;
       const progress = Math.min(elapsed / COUNTDOWN_DURATION, 1);
-      // cubic ease-out
       const eased = 1 - (1 - progress) ** 3;
       const current = Math.floor(starCount * eased);
 
       setDisplayCount(current);
-      countSpring.set(current);
 
       if (progress < 1) {
         rafIdRef.current = requestAnimationFrame(animate);
       } else {
         rafIdRef.current = null;
         setDisplayCount(starCount);
-        countSpring.set(starCount);
       }
     };
 
@@ -105,51 +126,49 @@ export default function GitHubStars({
         rafIdRef.current = null;
       }
     };
-  }, [starCount, countSpring, shouldReduceMotion]);
-
-  if (isLoading) {
-    return (
-      <div className={`flex items-center ${className}`}>
-        <Skeleton className="h-3 w-12 rounded-none bg-muted-foreground/40" />
-      </div>
-    );
-  }
+  }, [isLoading, starCount, shouldReduceMotion]);
 
   if (error && starCount === 0) return null;
 
+  const sizerCount = starCount || cachedCount || FALLBACK_SIZER;
+  const sizerLabel = `${sizerCount.toLocaleString()} stars`;
+
   return (
-    <div className={`flex items-center ${className}`}>
-      <motion.div
-        animate={shouldReduceMotion ? { opacity: 1 } : { opacity: 1, scale: 1 }}
-        className={`flex items-center gap-1.5 font-medium ${countClassName}`}
-        initial={
-          shouldReduceMotion ? { opacity: 1 } : { opacity: 0, scale: 0.9 }
-        }
-        transition={
-          shouldReduceMotion
-            ? { duration: 0 }
-            : { duration: 0.3, ease: EASE_OUT_CUBIC }
-        }
+    <span className={cn("relative inline-flex items-center", className)}>
+      <span
+        className={cn(
+          "invisible whitespace-nowrap text-xs tabular-nums",
+          countClassName,
+        )}
+        aria-hidden
       >
-        {/* tabular-nums prevents layout shift as the count animates */}
+        {sizerLabel}
+      </span>
+
+      {isLoading ? (
+        <Skeleton className="absolute inset-0 rounded-none bg-muted-foreground/40" />
+      ) : (
         <motion.span
-          animate={shouldReduceMotion ? { scale: 1 } : { scale: [1, 1.1, 1] }}
-          className="tabular-nums"
+          animate={
+            shouldReduceMotion ? { opacity: 1 } : { opacity: 1, scale: 1 }
+          }
+          className={cn(
+            "absolute inset-0 flex items-center gap-1.5 whitespace-nowrap text-xs font-medium tabular-nums",
+            countClassName,
+          )}
+          initial={
+            shouldReduceMotion ? { opacity: 1 } : { opacity: 0, scale: 0.98 }
+          }
           transition={
             shouldReduceMotion
               ? { duration: 0 }
-              : { duration: 0.3, ease: EASE_OUT_CUBIC }
+              : { duration: 0.25, ease: EASE_OUT_CUBIC }
           }
         >
-          {displayCount.toLocaleString()}
+          <span>{displayCount.toLocaleString()}</span>
+          <span className="font-normal text-muted-foreground">stars</span>
         </motion.span>
-        <span
-          className="text-sm font-normal"
-          style={{ color: "oklch(55% 0.005 260)" }}
-        >
-          stars
-        </span>
-      </motion.div>
-    </div>
+      )}
+    </span>
   );
 }

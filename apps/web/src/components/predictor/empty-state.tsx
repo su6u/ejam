@@ -2,6 +2,7 @@
 
 import { CircleAlert } from "lucide-react";
 import { useReducedMotion } from "motion/react";
+import { LoadingAnimation } from "@/components/loading-animation";
 import { ResultsCardShell } from "@/components/predictor/results-card-shell";
 import {
   Empty,
@@ -71,11 +72,8 @@ export function LoadingState() {
     <ResultsCardShell>
       <Empty>
         <EmptyHeader>
-          <EmptyMedia variant="icon">
-            <div
-              className="size-4 animate-spin rounded-full border-2 border-muted-foreground/40 border-t-foreground"
-              aria-hidden
-            />
+          <EmptyMedia className="mb-0 bg-transparent">
+            <LoadingAnimation className="size-8" />
           </EmptyMedia>
           <EmptyTitle>Generating predictions…</EmptyTitle>
           <EmptyDescription>

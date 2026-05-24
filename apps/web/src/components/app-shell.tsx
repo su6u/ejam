@@ -2,6 +2,11 @@
 
 import { Suspense } from "react";
 import { AppHeader } from "@/components/app-header";
+import {
+  appHeaderGutterClass,
+  appShellContentClass,
+  appShellLayoutClass,
+} from "@/components/app-layout";
 import { AppSidebar } from "@/components/app-sidebar";
 import { PredictorProvider } from "@/components/predictor/predictor-context";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
@@ -13,15 +18,18 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       <PredictorProvider>
         <SidebarProvider className={cn("[--app-wrapper-max-width:80rem]")}>
           <AppSidebar />
-          <SidebarInset>
-            <AppHeader />
-            <div
-              className={cn(
-                "flex flex-1 flex-col p-4 md:p-6",
-                "mx-auto w-full max-w-(--app-wrapper-max-width)",
-              )}
-            >
-              {children}
+          <SidebarInset className="flex flex-col">
+            <div className={appShellLayoutClass()}>
+              <div
+                className={cn(
+                  appHeaderGutterClass,
+                  "sticky top-0 z-50 shrink-0 border-b",
+                  "bg-background/95 backdrop-blur-sm supports-backdrop-filter:bg-background/50",
+                )}
+              >
+                <AppHeader />
+              </div>
+              <div className={appShellContentClass()}>{children}</div>
             </div>
           </SidebarInset>
         </SidebarProvider>

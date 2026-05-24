@@ -205,4 +205,40 @@ input {
   .no-scrollbar::-webkit-scrollbar {
     display: none;
   }
+
+  /* Press feedback — scale on compositor, colors on main thread separately. */
+  .pressable {
+    --press-scale-dur: 100ms;
+    --press-scale-ease: cubic-bezier(0.2, 0, 0, 1);
+    touch-action: manipulation;
+    transition:
+      scale var(--press-scale-dur) var(--press-scale-ease),
+      opacity var(--press-scale-dur) var(--press-scale-ease),
+      background-color 150ms ease,
+      border-color 150ms ease,
+      color 150ms ease;
+    will-change: scale;
+  }
+
+  .pressable:active:not(:disabled) {
+    scale: 0.96;
+  }
+
+  .pressable-button[aria-haspopup]:active:not(:disabled) {
+    scale: 1;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .pressable {
+      transition:
+        background-color 150ms ease,
+        border-color 150ms ease,
+        color 150ms ease;
+      will-change: auto;
+    }
+
+    .pressable:active:not(:disabled) {
+      scale: 1;
+    }
+  }
 }

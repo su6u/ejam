@@ -80,8 +80,22 @@ export function usePredictorState(): PredictorStateReturn {
     [updateParam],
   );
   const setExam = useCallback(
-    (v: ExamType) => updateParam({ exam: v }),
-    [updateParam],
+    (v: ExamType) => {
+      if (v === exam) return;
+
+      const updates: Record<string, string | null> = {
+        exam: v,
+        rank: null,
+      };
+
+      if (v === "jee-advanced") {
+        updates.quota = null;
+        updates.state = null;
+      }
+
+      updateParam(updates);
+    },
+    [exam, updateParam],
   );
   const setCategory = useCallback(
     (v: string) => updateParam({ category: v }),

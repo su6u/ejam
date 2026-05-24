@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/popover";
 import { useProximityHover } from "@/hooks/use-proximity-hover";
 import { HOME_STATES, isHomeState } from "@/lib/home-states";
+import { deferAfterPress, pressableClass } from "@/lib/pressable";
 import { cn } from "@/lib/utils";
 
 interface HomeStateComboboxProps {
@@ -50,7 +51,8 @@ export function HomeStateCombobox({
         role="combobox"
         aria-expanded={open}
         className={cn(
-          "flex h-8 w-full items-center justify-between rounded-none border border-input bg-transparent px-2.5 text-sm outline-none transition-colors",
+          "flex h-8 w-full items-center justify-between rounded-none border border-input bg-transparent px-2.5 text-sm outline-none",
+          pressableClass,
           "focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50",
           className,
         )}
@@ -109,11 +111,14 @@ export function HomeStateCombobox({
                   ref={(element) => registerItem(index, element)}
                   type="button"
                   onClick={() => {
-                    onValueChange(stateName === value ? "" : stateName);
-                    setOpen(false);
+                    deferAfterPress(() => {
+                      onValueChange(stateName === value ? "" : stateName);
+                      setOpen(false);
+                    });
                   }}
                   className={cn(
-                    "relative z-10 flex h-8 w-full items-center rounded-none bg-transparent px-2 text-left text-sm outline-none transition-colors",
+                    "relative z-10 flex h-8 w-full items-center rounded-none bg-transparent px-2 text-left text-sm outline-none",
+                    pressableClass,
                     isSelected || isHovered
                       ? "text-foreground"
                       : "text-muted-foreground",

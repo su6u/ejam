@@ -8,6 +8,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { useProximityHover } from "@/hooks/use-proximity-hover";
+import { deferAfterPress, pressableClass } from "@/lib/pressable";
 import { cn } from "@/lib/utils";
 
 interface ProximityPickerOption {
@@ -47,7 +48,8 @@ export function ProximityPicker({
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger
         className={cn(
-          "flex h-8 w-full items-center justify-between rounded-none border border-input bg-transparent px-2.5 text-sm outline-none transition-colors",
+          "flex h-8 w-full items-center justify-between rounded-none border border-input bg-transparent px-2.5 text-sm outline-none",
+          pressableClass,
           "focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50",
           triggerClassName,
         )}
@@ -90,11 +92,14 @@ export function ProximityPicker({
                 ref={(element) => registerItem(index, element)}
                 type="button"
                 onClick={() => {
-                  onValueChange(option.value);
-                  setOpen(false);
+                  deferAfterPress(() => {
+                    onValueChange(option.value);
+                    setOpen(false);
+                  });
                 }}
                 className={cn(
-                  "relative z-10 flex h-8 w-full items-center rounded-none bg-transparent px-2 text-left text-sm outline-none transition-colors",
+                  "relative z-10 flex h-8 w-full items-center rounded-none bg-transparent px-2 text-left text-sm outline-none",
+                  pressableClass,
                   isSelected || isHovered
                     ? "text-foreground"
                     : "text-muted-foreground",
