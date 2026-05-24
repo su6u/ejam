@@ -1,22 +1,7 @@
 #!/usr/bin/env tsx
 /**
  * builds csab_predictor_index.parquet from historical CSAB cutoff parquets
- *
- * CSAB runs supplementary rounds after JoSAA closes. Candidates who appear
- * here are those who either didn't get a seat in JoSAA or forfeited one, so
- * closing ranks are systematically higher (worse) than JoSAA round 6 for the
- * same program — the stronger candidates already accepted JoSAA seats.
- *
- * algorithm: jam-csab-v2 (ensemble best-split + cap-cfi10)
- *
- *   jam-csab-v2 stack (see scripts/jam/csab-config.ts):
- *   - 2-year window [0.70, 0.30] — early CSAB years anomalous
- *   - COVID outlier guard 2.5× std
- *   - equal-weight ensemble: instype-split blends + CFI/IIIT trend caps
- *   - fill_round defaults to 2
- *
- * prediction_year is read from EJAM_PREDICTION_YEAR env var, defaults to
- * current calendar year
+ * CSAB closing ranks are worse than JoSAA round 6 — stronger candidates already took JoSAA seats
  **/
 
 import { execSync } from "node:child_process";
@@ -24,6 +9,10 @@ import * as fs from "node:fs";
 import * as path from "node:path";
 import { fileURLToPath } from "node:url";
 import { CSAB_TUNED, JAM_CSAB_V2, csabEnsemblePredictedRankSql } from "./jam/csab-config";
+import {
+  resolveManifestVersionForBuild,
+  writeIndexLineageSidecar,
+} from "./lib/index-lineage";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..");
@@ -107,11 +96,8 @@ WITH ranked AS (
 )
 SELECT * FROM ranked WHERE rn = 1;
 
--- year weights for the last 2 years: [0.65, 0.35]
--- 2-year window outperforms 4-year for CSAB because 2021–2022 were anomalous
--- early years with a different candidate pool composition; using only the
--- most recent 2 years avoids that noise dragging the weighted mean
--- COVID outlier guard still applies within the 2-year window
+-- 2-year window — 2021–2022 CSAB pool composition differs from recent years
+-- COVID outlier guard applies within the window
 CREATE TEMP TABLE year_weights AS
 WITH windowed AS (
   SELECT
@@ -270,8 +256,7 @@ GROUP BY d.institute_id, d.program_id, d.seat_type, d.quota, d.gender;
 -- final index
 -- sigma_base: relative floor (3% of weighted_mean) so uncertainty scales with
 -- the program's typical rank range rather than using a flat ±50 for everyone
--- predicted_closing_rank: equal-weight ensemble (best-split + cap-cfi10)
--- fill_round defaults to 2 (not 6) because CSAB almost always ends at round 2
+-- fill_round defaults to 2 — CSAB almost always ends at round 2
 COPY (
   SELECT
     s.institute_id, s.program_id, s.seat_type, s.quota, s.gender,
@@ -349,7 +334,15 @@ async function main(): Promise<void> {
 
   if (fs.existsSync(OUTPUT_FILE)) {
     const stat = fs.statSync(OUTPUT_FILE);
+    const manifestVersion = await resolveManifestVersionForBuild();
+    const sidecar = writeIndexLineageSidecar({
+      indexParquetPath: OUTPUT_FILE,
+      indexDataset: "predictor_index",
+      sourceCutoffPaths: parquetFiles,
+      manifestVersion,
+    });
     console.log(`Index built: ${OUTPUT_FILE} (${(stat.size / 1024).toFixed(1)} KB)`);
+    console.log(`Lineage sidecar: ${sidecar} (${parquetFiles.length} cutoffs)`);
   } else {
     console.error("Output file not created");
     process.exit(1);

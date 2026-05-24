@@ -1,17 +1,27 @@
 {
   "version": "v0.1.0",
-  "generated_at": "2026-05-24T15:04:05.776Z",
-  "git_sha": "858e723",
+  "generated_at": "2026-05-24T15:27:57.347Z",
+  "git_sha": "6ff3d8d",
   "datasets": [
     {
+      "path": "dist/college_predictor_index.lineage.json",
+      "sha256": "17a5ee3065e4bf1ffc2547441e8e7e40c20f265410b21f5fba102115e2e4d306",
+      "bytes": 10938
+    },
+    {
       "path": "dist/college_predictor_index.parquet",
-      "sha256": "1774c71a3c3dfbf06e23866ee4ee35af9fee84111033f3c8f325e4134a512246",
-      "bytes": 652923
+      "sha256": "9d1a6448f6c64307169f03de73eb4fb33c468aa10ac29ed75d39f263f5e2fe5a",
+      "bytes": 652836
+    },
+    {
+      "path": "dist/csab_predictor_index.lineage.json",
+      "sha256": "2b781ed04f22205807e7b4726ece9c60c780557facdbbb66c958410d567d4fd8",
+      "bytes": 1901
     },
     {
       "path": "dist/csab_predictor_index.parquet",
-      "sha256": "f290fcaec0ac1c335a4ef013b674caa80dafdcaad11f362800bc925250c83aa4",
-      "bytes": 230824
+      "sha256": "d334afbb2a04508fc3801b8ccd080d0e00f77df4f9d618afa46f473f1bcc4e93",
+      "bytes": 230863
     },
     {
       "path": "engineering/jee/csab/cutoffs/year=2021/round=1/cutoffs.parquet",

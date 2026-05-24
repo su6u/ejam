@@ -19,7 +19,8 @@
     "data:fetch": "tsx scripts/fetch-data.ts",
     "build:predictor-index": "tsx scripts/build-college-predictor-index.ts",
     "backtest": "tsx scripts/backtest/predictor.ts",
-    "build:csab-index": "tsx scripts/build-csab-predictor-index.ts"
+    "build:csab-index": "tsx scripts/build-csab-predictor-index.ts",
+    "verify:index-lineage": "tsx scripts/verify-index-lineage.ts"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.4.14",
