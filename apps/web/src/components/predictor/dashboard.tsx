@@ -31,6 +31,7 @@ export function Dashboard() {
     applyResultsFilters(programs, filters),
     sortBy,
   );
+
   const selectedId = selected ? programKey(selected) : null;
 
   useEffect(() => {
@@ -65,7 +66,6 @@ export function Dashboard() {
         onOpenChange={(next) => {
           setSheetOpen(next);
           if (!next) {
-            // keep selected-row styling until the drawer finishes closing
             setTimeout(() => setSelected(null), 150);
           }
         }}
@@ -104,6 +104,7 @@ function renderMiddle({
     if (isLoading) return <LoadingState />;
     return <EmptyState hasRank={hasRank} />;
   }
+
   return (
     <ResultsTable
       rows={filteredPrograms}

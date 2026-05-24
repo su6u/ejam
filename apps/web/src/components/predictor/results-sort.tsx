@@ -1,19 +1,25 @@
 "use client";
 
 import type { ProgramPrediction } from "@ejam/data/college-predictor";
-import { ArrowDownWideNarrow, Building2, Sparkles } from "lucide-react";
+import { sortByBalancedScore } from "@ejam/data/college-predictor";
+import { ArrowDownWideNarrow, Building2, Scale, Sparkles } from "lucide-react";
 import { FilterChip, FilterGroup } from "@/components/predictor/filter-chips";
 import { BAND_ORDER } from "@/lib/bands";
 
-export type ResultsSortKey = "chance" | "closing-rank" | "institute";
+export type ResultsSortKey =
+  | "balanced"
+  | "chance"
+  | "closing-rank"
+  | "institute";
 
-export const DEFAULT_RESULTS_SORT: ResultsSortKey = "chance";
+export const DEFAULT_RESULTS_SORT: ResultsSortKey = "balanced";
 
 const SORT_OPTIONS: Array<{
   id: ResultsSortKey;
   label: string;
   icon: typeof Sparkles;
 }> = [
+  { id: "balanced", label: "Balanced", icon: Scale },
   { id: "chance", label: "Best chance", icon: Sparkles },
   { id: "closing-rank", label: "Closing rank", icon: ArrowDownWideNarrow },
   { id: "institute", label: "Institute", icon: Building2 },
@@ -26,6 +32,8 @@ export function applyResultsSort(
   const sorted = [...programs];
 
   switch (sortBy) {
+    case "balanced":
+      return sortByBalancedScore(sorted);
     case "closing-rank":
       sorted.sort(
         (a, b) => a.predicted_closing_rank - b.predicted_closing_rank,

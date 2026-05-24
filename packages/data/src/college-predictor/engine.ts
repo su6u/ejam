@@ -58,6 +58,12 @@ export interface ProgramPrediction {
   last_data_year: number;
   fill_round: number;
   round_probs: number[];
+  /** 0–100 institute quality for balanced ranking */
+  institute_score?: number;
+  /** 0–100 branch desirability for balanced ranking */
+  branch_score?: number;
+  /** composite pick score — higher is a better overall option */
+  balanced_score?: number;
 }
 
 export interface CollegePredictionResult {
@@ -187,7 +193,7 @@ export function applyCollegePredictorFilters(
   });
 }
 
-function groupByBand(
+export function groupProgramsByBand(
   programs: ProgramPrediction[],
 ): Record<ProbabilityBand, ProgramPrediction[]> {
   return {
@@ -373,6 +379,6 @@ export function predictPrograms(opts: {
       hidden_programs: bandFiltered.length - predictions.length,
       active_filters: opts.filters ?? {},
     },
-    grouped_by_band: groupByBand(predictions),
+    grouped_by_band: groupProgramsByBand(predictions),
   };
 }
