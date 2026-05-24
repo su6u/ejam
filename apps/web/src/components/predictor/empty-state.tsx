@@ -1,8 +1,10 @@
 "use client";
 
+import type { PredictionProvenance } from "@ejam/data";
 import { CircleAlert } from "lucide-react";
 import { useReducedMotion } from "motion/react";
 import { LoadingAnimation } from "@/components/loading-animation";
+import { DataVersionFooter } from "@/components/predictor/data-version-footer";
 import { ResultsCardShell } from "@/components/predictor/results-card-shell";
 import {
   Empty,
@@ -32,9 +34,15 @@ function EmptyIllustration() {
   );
 }
 
-export function EmptyState({ hasRank }: { hasRank: boolean }) {
+export function EmptyState({
+  hasRank,
+  provenance,
+}: {
+  hasRank: boolean;
+  provenance?: PredictionProvenance | null;
+}) {
   return (
-    <ResultsCardShell>
+    <ResultsCardShell footer={<DataVersionFooter provenance={provenance} />}>
       <Empty>
         <EmptyHeader>
           <EmptyIllustration />
@@ -50,9 +58,15 @@ export function EmptyState({ hasRank }: { hasRank: boolean }) {
   );
 }
 
-export function ErrorState({ message }: { message: string }) {
+export function ErrorState({
+  message,
+  provenance,
+}: {
+  message: string;
+  provenance?: PredictionProvenance | null;
+}) {
   return (
-    <ResultsCardShell>
+    <ResultsCardShell footer={<DataVersionFooter provenance={provenance} />}>
       <Empty>
         <EmptyHeader>
           <EmptyMedia variant="icon">
@@ -67,9 +81,13 @@ export function ErrorState({ message }: { message: string }) {
   );
 }
 
-export function LoadingState() {
+export function LoadingState({
+  provenance,
+}: {
+  provenance?: PredictionProvenance | null;
+}) {
   return (
-    <ResultsCardShell>
+    <ResultsCardShell footer={<DataVersionFooter provenance={provenance} />}>
       <Empty>
         <EmptyHeader>
           <EmptyMedia className="mb-0 bg-transparent">

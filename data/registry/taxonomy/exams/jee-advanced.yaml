@@ -20,7 +20,7 @@ cutoff_score_type: rank
 data_dependencies:
   - dataset: cutoffs
     path_template: "data/engineering/jee/josaa/cutoffs/year={year}/round={round}/cutoffs.parquet"
-    required: true
+    required: false
   - dataset: seat_matrix
     path_template: "data/engineering/jee/seats/matrix/year={year}/seat-matrix.parquet"
     required: false

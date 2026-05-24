@@ -1,17 +1,27 @@
 {
   "version": "v0.1.0",
-  "generated_at": "2026-05-24T13:35:39.632Z",
-  "git_sha": "42d2a03",
+  "generated_at": "2026-05-24T15:27:57.347Z",
+  "git_sha": "6ff3d8d",
   "datasets": [
     {
+      "path": "dist/college_predictor_index.lineage.json",
+      "sha256": "17a5ee3065e4bf1ffc2547441e8e7e40c20f265410b21f5fba102115e2e4d306",
+      "bytes": 10938
+    },
+    {
       "path": "dist/college_predictor_index.parquet",
-      "sha256": "ae79db5ed734f539977d35299957a6437be26badfb27d59224e574f758b010fd",
-      "bytes": 652717
+      "sha256": "9d1a6448f6c64307169f03de73eb4fb33c468aa10ac29ed75d39f263f5e2fe5a",
+      "bytes": 652836
+    },
+    {
+      "path": "dist/csab_predictor_index.lineage.json",
+      "sha256": "2b781ed04f22205807e7b4726ece9c60c780557facdbbb66c958410d567d4fd8",
+      "bytes": 1901
     },
     {
       "path": "dist/csab_predictor_index.parquet",
-      "sha256": "1099e0bdb5602ce68f9d938aade31476cdd8098ce79d01160e4917bb478b2c6d",
-      "bytes": 230434
+      "sha256": "d334afbb2a04508fc3801b8ccd080d0e00f77df4f9d618afa46f473f1bcc4e93",
+      "bytes": 230863
     },
     {
       "path": "engineering/jee/csab/cutoffs/year=2021/round=1/cutoffs.parquet",
@@ -380,8 +390,8 @@
     },
     {
       "path": "engineering/jee/seats/matrix/year=2025/seat-matrix.parquet",
-      "sha256": "8d2ba5eb832c189e3dbbbd0b124ee10444f5013f19380446352ea195a5649851",
-      "bytes": 8954
+      "sha256": "ea5b429dc9c2a68b78df7758fbfc1b4f7f3dbee9b26433140b1b543fab5d9bdf",
+      "bytes": 18693
     }
   ]
 }

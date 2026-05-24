@@ -7,6 +7,7 @@ import * as crypto from "node:crypto";
 import * as fs from "node:fs/promises";
 import * as path from "node:path";
 import { fileURLToPath } from "node:url";
+import { pickLatestManifestFile } from "../../packages/data/src/semver.ts";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 export const ROOT = path.resolve(__dirname, "../..");
@@ -31,9 +32,11 @@ const PARQUET_SCAN_ROOTS = [
   path.join(DATA_DIR, "dist"),
 ];
 
-const PREDICTOR_INDEX_FILES = new Set([
+const PREDICTOR_DIST_FILES = new Set([
   "college_predictor_index.parquet",
   "csab_predictor_index.parquet",
+  "college_predictor_index.lineage.json",
+  "csab_predictor_index.lineage.json",
 ]);
 
 function isPathInside(root: string, candidate: string): boolean {
@@ -72,10 +75,12 @@ async function* walkParquetFiles(
       yield* walkParquetFiles(fullPath);
       continue;
     }
-    if (!entry.name.endsWith(".parquet")) continue;
 
-    if (dir === path.join(DATA_DIR, "dist")) {
-      if (!PREDICTOR_INDEX_FILES.has(entry.name)) continue;
+    const inDist = dir === path.join(DATA_DIR, "dist");
+    if (inDist) {
+      if (!PREDICTOR_DIST_FILES.has(entry.name)) continue;
+    } else if (!entry.name.endsWith(".parquet")) {
+      continue;
     }
 
     const manifestPath = path
@@ -143,14 +148,11 @@ export async function readManifest(version: string): Promise<CanonicalManifest> 
 
 export async function findLatestManifestVersion(): Promise<string> {
   const manifestDir = path.join(DATA_DIR, "manifest");
-  const files = (await fs.readdir(manifestDir))
-    .filter((f) => f.endsWith(".json") && f.startsWith("v"))
-    .sort()
-    .reverse();
-  if (files.length === 0) {
+  const latest = pickLatestManifestFile(await fs.readdir(manifestDir));
+  if (!latest) {
     throw new Error(`no manifest JSON files found in ${manifestDir}`);
   }
-  return files[0]!.replace(/\.json$/, "");
+  return latest.replace(/\.json$/, "");
 }
 
 export function dataRootPath(manifestRelativePath: string): string {

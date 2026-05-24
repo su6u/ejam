@@ -14,7 +14,7 @@
       "education.gov.in"
     ],
     "disallowed": "Any third-party coaching, news, or aggregator sites (testbook, vedantu, sarvgyan, shiksha, etc.). These may not be referenced as a source_id.",
-    "exceptions": "Historical marks-vs-percentile and marks-vs-rank data (2022-2026) may be sourced from highly reputable coaching institutes (MathonGo, Allen, Resonance) purely for the purpose of training prediction models."
+    "exceptions": "Historical marks-vs-percentile and marks-vs-rank data (2022-2026) may be sourced from highly reputable coaching institutes (MathonGo, Allen, Resonance) purely for the purpose of training prediction models (only if they allow)"
   },
   "sources": [
     {
@@ -141,6 +141,15 @@
       "year": 2026,
       "title": "JoSAA 2026 Business Rules",
       "url": "https://josaa.nic.in/document/business-rule/",
+      "publisher": "JoSAA"
+    },
+    {
+      "id": "josaa.2025.seat_matrix",
+      "kind": "html",
+      "exam": null,
+      "year": 2025,
+      "title": "JoSAA 2025 Seat Matrix (applicant portal)",
+      "url": "https://josaa.admissions.nic.in/applicant/seatmatrix/seatmatrixinfo.aspx",
       "publisher": "JoSAA"
     },
     {

@@ -7,17 +7,15 @@
  */
 
 import { readFileSync } from "node:fs";
-import { join, resolve } from "node:path";
+import { resolve } from "node:path";
+import { resolveRegistryRoot } from "../data-root";
 
 type Institute = { id: string; state: string };
 
 let _cachedStates: ReadonlySet<string> | null = null;
 
 function institutesPath(): string {
-  const registryRoot =
-    process.env.EJAM_REGISTRY_ROOT ??
-    join(process.cwd(), "data", "registry");
-  return resolve(registryRoot, "engineering", "institutes.json");
+  return resolve(resolveRegistryRoot(), "engineering", "institutes.json");
 }
 
 /**

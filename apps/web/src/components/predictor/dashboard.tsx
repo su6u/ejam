@@ -49,6 +49,7 @@ export function Dashboard() {
     onSortChange: setSortBy,
     hasRank: Boolean(state.rank),
     selectedId,
+    provenance: query.provenance,
     onSelect: (p) => {
       setSelected(p);
       setSheetOpen(true);
@@ -84,6 +85,7 @@ function renderMiddle({
   onSortChange,
   hasRank,
   selectedId,
+  provenance,
   onSelect,
   onClearFilters,
 }: {
@@ -96,13 +98,14 @@ function renderMiddle({
   onSortChange: (next: ResultsSortKey) => void;
   hasRank: boolean;
   selectedId: string | null;
+  provenance: import("@ejam/data").PredictionProvenance | null;
   onSelect: (p: ProgramPrediction) => void;
   onClearFilters: () => void;
 }) {
-  if (error) return <ErrorState message={error} />;
+  if (error) return <ErrorState message={error} provenance={provenance} />;
   if (!hasResults) {
-    if (isLoading) return <LoadingState />;
-    return <EmptyState hasRank={hasRank} />;
+    if (isLoading) return <LoadingState provenance={provenance} />;
+    return <EmptyState hasRank={hasRank} provenance={provenance} />;
   }
 
   return (
@@ -114,6 +117,7 @@ function renderMiddle({
       selectedId={selectedId}
       onSelect={onSelect}
       onClearFilters={onClearFilters}
+      provenance={provenance}
     />
   );
 }

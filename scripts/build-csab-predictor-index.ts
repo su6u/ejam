@@ -1,28 +1,18 @@
 #!/usr/bin/env tsx
 /**
  * builds csab_predictor_index.parquet from historical CSAB cutoff parquets
- *
- * CSAB runs supplementary rounds after JoSAA closes. Candidates who appear
- * here are those who either didn't get a seat in JoSAA or forfeited one, so
- * closing ranks are systematically higher (worse) than JoSAA round 6 for the
- * same program — the stronger candidates already accepted JoSAA seats.
- *
- * algorithm differences from the JoSAA builder (validated by backtest,
- * within-20% = 68.0% vs 63.4% baseline):
- *   - 2-year window instead of 4 — CSAB 2021–2022 are anomalous early years;
- *     using only the last 2 years avoids that noise dragging the mean
- *   - trend cap at ±5% of weighted_mean (vs ±3% for JoSAA) — CSAB programs
- *     are more volatile so a slightly wider cap captures real movement
- *   - fill_round defaults to 2 (not 6) — CSAB typically runs 2 rounds
- *
- * prediction_year is read from EJAM_PREDICTION_YEAR env var, defaults to
- * current calendar year
+ * CSAB closing ranks are worse than JoSAA round 6 — stronger candidates already took JoSAA seats
  **/
 
 import { execSync } from "node:child_process";
 import * as fs from "node:fs";
 import * as path from "node:path";
 import { fileURLToPath } from "node:url";
+import { CSAB_TUNED, JAM_CSAB_V2, csabEnsemblePredictedRankSql } from "./jam/csab-config";
+import {
+  resolveManifestVersionForBuild,
+  writeIndexLineageSidecar,
+} from "./lib/index-lineage";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..");
@@ -58,6 +48,12 @@ function findAllCutoffParquets(): string[] {
 function buildSQL(parquetFiles: string[], predictionYear: number): string {
   const unionParts = parquetFiles.map((f) => `SELECT * FROM read_parquet('${f}')`);
   const unionAll = unionParts.join("\nUNION ALL\n");
+  const [w1, w2] = CSAB_TUNED.yearWeights;
+  const og = CSAB_TUNED.outlierGuardMultiplier;
+  const sigmaPct = CSAB_TUNED.sigmaFloorPct;
+  const sigmaInfl = CSAB_TUNED.sigmaInflation;
+  const sparse = CSAB_TUNED.sparseYearsThreshold;
+  const predictedRank = csabEnsemblePredictedRankSql(predictionYear);
 
   return `
 CREATE TEMP TABLE raw_cutoffs AS
@@ -100,11 +96,8 @@ WITH ranked AS (
 )
 SELECT * FROM ranked WHERE rn = 1;
 
--- year weights for the last 2 years: [0.65, 0.35]
--- 2-year window outperforms 4-year for CSAB because 2021–2022 were anomalous
--- early years with a different candidate pool composition; using only the
--- most recent 2 years avoids that noise dragging the weighted mean
--- COVID outlier guard still applies within the 2-year window
+-- 2-year window — 2021–2022 CSAB pool composition differs from recent years
+-- COVID outlier guard applies within the window
 CREATE TEMP TABLE year_weights AS
 WITH windowed AS (
   SELECT
@@ -144,11 +137,11 @@ SELECT
     WHEN gs.inter_year_std IS NOT NULL
       AND gs.inter_year_std > 0
       AND mo.med_others IS NOT NULL
-      AND ABS(w.closing_rank - mo.med_others) > 2 * gs.inter_year_std
+      AND ABS(w.closing_rank - mo.med_others) > ${og} * gs.inter_year_std
     THEN 0.01
     ELSE CASE w.yr
-      WHEN 1 THEN 0.65
-      WHEN 2 THEN 0.35
+      WHEN 1 THEN ${w1}
+      WHEN 2 THEN ${w2}
     END
   END AS w
 FROM windowed w
@@ -226,7 +219,8 @@ JOIN year_weights yw
 CREATE TEMP TABLE wmean AS
 SELECT
   institute_id, program_id, seat_type, quota, gender,
-  SUM(closing_rank * w) / SUM(w) AS wm
+  SUM(closing_rank * w) / SUM(w) AS wm,
+  MEDIAN(closing_rank) AS mm
 FROM weighted
 GROUP BY institute_id, program_id, seat_type, quota, gender;
 
@@ -237,6 +231,7 @@ SELECT
   ANY_VALUE(d.degree) AS degree,
   ANY_VALUE(d.duration_years) AS duration_years,
   ROUND(ANY_VALUE(m.wm))::INTEGER AS weighted_mean,
+  ROUND(ANY_VALUE(m.mm))::INTEGER AS median_mean,
   ROUND(SQRT(SUM(d.w * POWER(d.closing_rank - m.wm, 2)) / SUM(d.w)))::INTEGER AS weighted_std,
   CASE
     WHEN (SUM(d.w * d.year * d.year) - POWER(SUM(d.w * d.year), 2) / SUM(d.w)) = 0 THEN 0
@@ -261,11 +256,7 @@ GROUP BY d.institute_id, d.program_id, d.seat_type, d.quota, d.gender;
 -- final index
 -- sigma_base: relative floor (3% of weighted_mean) so uncertainty scales with
 -- the program's typical rank range rather than using a flat ±50 for everyone
--- trend_capped: clamp trend_slope to ±5% of weighted_mean per year — CSAB
--- programs are more volatile than JoSAA so a wider cap captures real movement
--- (backtested: ±5% outperforms ±3% for CSAB, within-20% = 68.0%)
--- predicted_closing_rank: gap-aware projection using the capped trend
--- fill_round defaults to 2 (not 6) because CSAB almost always ends at round 2
+-- fill_round defaults to 2 — CSAB almost always ends at round 2
 COPY (
   SELECT
     s.institute_id, s.program_id, s.seat_type, s.quota, s.gender,
@@ -273,19 +264,13 @@ COPY (
     s.weighted_mean,
     s.weighted_std,
     s.trend_slope,
-    GREATEST(s.weighted_std, ROUND(s.weighted_mean * 0.03))::INTEGER AS sigma_base,
+    GREATEST(s.weighted_std, ROUND(s.weighted_mean * ${sigmaPct}))::INTEGER AS sigma_base,
     CASE
-      WHEN s.years_of_data < 3
-        THEN ROUND(GREATEST(s.weighted_std, s.weighted_mean * 0.03) * 1.5)::INTEGER
-      ELSE GREATEST(s.weighted_std, ROUND(s.weighted_mean * 0.03))::INTEGER
+      WHEN s.years_of_data < ${sparse}
+        THEN ROUND(GREATEST(s.weighted_std, s.weighted_mean * ${sigmaPct}) * ${sigmaInfl})::INTEGER
+      ELSE GREATEST(s.weighted_std, ROUND(s.weighted_mean * ${sigmaPct}))::INTEGER
     END AS sigma_effective,
-    ROUND(
-      s.weighted_mean
-      + GREATEST(
-          LEAST(COALESCE(s.trend_slope, 0), s.weighted_mean * 0.05),
-          -s.weighted_mean * 0.05
-        ) * (${predictionYear} - s.last_data_year)
-    )::INTEGER AS predicted_closing_rank,
+    ${predictedRank}::INTEGER AS predicted_closing_rank,
     CASE
       WHEN s.years_of_data = 1 THEN 'pooled'
       WHEN s.years_of_data = 2 THEN 'inferred'
@@ -323,7 +308,7 @@ COPY (
 async function main(): Promise<void> {
   const predictionYear = resolvePredictionYear();
   console.log("Building CSAB predictor index...");
-  console.log(`prediction_year=${predictionYear}`);
+  console.log(`algorithm=${JAM_CSAB_V2}  prediction_year=${predictionYear}`);
 
   const parquetFiles = findAllCutoffParquets();
   console.log(`Found ${parquetFiles.length} cutoff parquet files`);
@@ -349,7 +334,15 @@ async function main(): Promise<void> {
 
   if (fs.existsSync(OUTPUT_FILE)) {
     const stat = fs.statSync(OUTPUT_FILE);
+    const manifestVersion = await resolveManifestVersionForBuild();
+    const sidecar = writeIndexLineageSidecar({
+      indexParquetPath: OUTPUT_FILE,
+      indexDataset: "predictor_index",
+      sourceCutoffPaths: parquetFiles,
+      manifestVersion,
+    });
     console.log(`Index built: ${OUTPUT_FILE} (${(stat.size / 1024).toFixed(1)} KB)`);
+    console.log(`Lineage sidecar: ${sidecar} (${parquetFiles.length} cutoffs)`);
   } else {
     console.error("Output file not created");
     process.exit(1);

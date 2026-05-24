@@ -6,7 +6,9 @@
 import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import type { DataDependency } from "../exam-config/types";
+import { resolveManifestRoot } from "../data-root";
 import { expandPathTemplate } from "../paths";
+import { pickLatestManifestFile } from "../semver";
 import {
   type DependencyResolutionResult,
   Manifest,
@@ -16,9 +18,7 @@ import {
 } from "./types";
 
 function manifestRoot(): string {
-  return (
-    process.env.EJAM_MANIFEST_ROOT ?? join(process.cwd(), "data", "manifest")
-  );
+  return resolveManifestRoot();
 }
 
 /** load and validate the manifest JSON at the given file path */
@@ -36,14 +36,11 @@ export function loadManifest(manifestPath: string): import("./types").Manifest {
 /** load the latest manifest from EJAM_MANIFEST_ROOT — picks highest semver filename */
 export function loadLatestManifest(): import("./types").Manifest {
   const root = manifestRoot();
-  const files = readdirSync(root)
-    .filter((f: string) => f.endsWith(".json") && f.startsWith("v"))
-    .sort()
-    .reverse();
-  if (files.length === 0) {
+  const latest = pickLatestManifestFile(readdirSync(root));
+  if (!latest) {
     throw new Error(`no manifest JSON files found in ${root}`);
   }
-  return loadManifest(join(root, files[0] as string));
+  return loadManifest(join(root, latest));
 }
 
 /**

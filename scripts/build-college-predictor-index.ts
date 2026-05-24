@@ -1,20 +1,7 @@
 #!/usr/bin/env tsx
 /**
- * builds college_predictor_index.parquet from historical JoSAA cutoff parquets
- *
- * Production algorithm: jam-v2
- *
- *   jam-v2 stack:
- *   1. round-weighted anchor per year (r1=5% … r6=38%) instead of last round only
- *   2. weighted mean of last 4 anchor years — weights [0.50, 0.30, 0.15, 0.05]
- *   3. COVID outlier guard — 2.5× std collapse to weight 0.01
- *   4. trend slope capped at ±3%/yr, projected with 0.7× gap multiplier
- *   5. pool shift — ranks × (1 + pool_pct)^(prediction_year − last_data_year)
- *      pool_pct from scripts/jam/nta-pool-stats.json (override: EJAM_POOL_SHIFT_PCT)
- *   6. sigma floor 2.5% of weighted_mean; ×1.5 inflation when < 3 years of data
- *
- * prediction_year is read from EJAM_PREDICTION_YEAR env var, defaults to
- * current calendar year
+ * builds college_predictor_index.parquet from JoSAA cutoff parquets (jam-josaa-v2)
+ * prediction_year from EJAM_PREDICTION_YEAR, pool shift from nta-pool-stats or EJAM_POOL_SHIFT_PCT
  **/
 
 import { execSync } from "node:child_process";
@@ -23,10 +10,14 @@ import * as path from "node:path";
 import { fileURLToPath } from "node:url";
 import {
   JAM_TUNED,
-  JAM_V2,
+  JAM_JOSAA_V2,
   resolvePoolShiftPct,
   roundWeightCaseSql,
 } from "./jam/config";
+import {
+  resolveManifestVersionForBuild,
+  writeIndexLineageSidecar,
+} from "./lib/index-lineage";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..");
@@ -98,7 +89,7 @@ FROM normalized
 GROUP BY institute_id, program_id, seat_type, quota, gender,
          instype, degree, duration_years, year, round;
 
--- jam-v2 anchor: per-year round-weighted closing rank (r1=5% … r6=38%)
+-- jam-josaa-v2 anchor: per-year round-weighted closing rank (r1=5% … r6=38%)
 CREATE TEMP TABLE anchor_round AS
 SELECT
   institute_id, program_id, seat_type, quota, gender,
@@ -349,7 +340,7 @@ async function main(): Promise<void> {
   const predictionYear = resolvePredictionYear();
   const poolShiftPct = resolvePoolShiftPct();
   console.log("Building college predictor index...");
-  console.log(`algorithm=${JAM_V2}  prediction_year=${predictionYear}  pool_shift=${(poolShiftPct * 100).toFixed(2)}%`);
+  console.log(`algorithm=${JAM_JOSAA_V2}  prediction_year=${predictionYear}  pool_shift=${(poolShiftPct * 100).toFixed(2)}%`);
 
   const parquetFiles = findAllCutoffParquets();
   console.log(`Found ${parquetFiles.length} cutoff parquet files`);
@@ -375,7 +366,15 @@ async function main(): Promise<void> {
 
   if (fs.existsSync(OUTPUT_FILE)) {
     const stat = fs.statSync(OUTPUT_FILE);
+    const manifestVersion = await resolveManifestVersionForBuild();
+    const sidecar = writeIndexLineageSidecar({
+      indexParquetPath: OUTPUT_FILE,
+      indexDataset: "predictor_index",
+      sourceCutoffPaths: parquetFiles,
+      manifestVersion,
+    });
     console.log(`Index built: ${OUTPUT_FILE} (${(stat.size / 1024).toFixed(1)} KB)`);
+    console.log(`Lineage sidecar: ${sidecar} (${parquetFiles.length} cutoffs)`);
   } else {
     console.error("Output file not created");
     process.exit(1);
