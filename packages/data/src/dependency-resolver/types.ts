@@ -16,7 +16,9 @@ export type ManifestDataset = z.infer<typeof ManifestDataset>;
 export const Manifest = z.object({
   version: z.string().min(1),
   generated_at: z.string().min(1),
+  git_sha: z.string().optional(),
   datasets: z.array(ManifestDataset),
+  chunks: z.array(ManifestDataset).optional(),
 });
 export type Manifest = z.infer<typeof Manifest>;
 

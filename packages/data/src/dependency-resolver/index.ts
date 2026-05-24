@@ -9,6 +9,13 @@ export {
   loadManifest,
   resolveExamDependencies,
 } from "./resolver";
+export {
+  assertResolvedDataset,
+  findResolvedDataset,
+  manifestPathToDataRoot,
+  verifyDatasetSha256,
+  type ResolvedDatasetRef,
+} from "./dataset-path";
 export type {
   DependencyResolutionResult,
   Manifest,

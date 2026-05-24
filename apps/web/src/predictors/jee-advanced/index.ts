@@ -9,7 +9,7 @@ import {
   type CollegePredictorFilters,
   type CollegePredictorIndexRow,
   deriveConfidence,
-  getJosaaIndex,
+  getPredictorIndexFromDeps,
   type ProgramPrediction,
   predictPrograms,
 } from "@ejam/data/college-predictor";
@@ -150,7 +150,7 @@ export const predictor: ExamPredictor<
     }
 
     const [allRows, registry] = await Promise.all([
-      getJosaaIndex(),
+      getPredictorIndexFromDeps(deps),
       loadRegistryMaps(),
     ]);
     // filter to IIT rows in JS — shared loader returns all instype values
