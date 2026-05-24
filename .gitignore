@@ -47,6 +47,7 @@ node_modules/
 # Next.js
 .next/
 out/
+apps/web/next-env.d.ts
 
 # Turbo
 .turbo/
