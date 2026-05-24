@@ -3,6 +3,7 @@
  * asserts index lineage sidecars list the same cutoff paths the build scripts consumed
  **/
 
+import * as crypto from "node:crypto";
 import * as fs from "node:fs";
 import * as path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -41,6 +42,11 @@ function listCutoffParquets(cutoffRoot: string): string[] {
   return out.sort();
 }
 
+function sha256File(filePath: string): string {
+  const data = fs.readFileSync(filePath);
+  return crypto.createHash("sha256").update(data).digest("hex");
+}
+
 function verifySidecar(
   sidecarRel: string,
   cutoffRoot: string,
@@ -58,6 +64,16 @@ function verifySidecar(
   for (let i = 0; i < expected.length; i++) {
     if (expected[i] !== actual[i]) {
       return `${sidecarRel}: path mismatch at ${i}: ${actual[i]} vs ${expected[i]}`;
+    }
+  }
+  for (const entry of lineage.source_cutoffs) {
+    const cutoffPath = path.join(DATA_DIR, entry.path);
+    if (!fs.existsSync(cutoffPath)) {
+      return `${sidecarRel}: missing cutoff file ${entry.path}`;
+    }
+    const hash = sha256File(cutoffPath);
+    if (hash !== entry.sha256) {
+      return `${sidecarRel}: sha256 mismatch for ${entry.path}`;
     }
   }
   return null;
