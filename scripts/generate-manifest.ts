@@ -13,7 +13,7 @@ import {
 
 async function main(): Promise<void> {
   const version =
-    process.argv.find((a) => a.startsWith("--version="))?.slice(11) ??
+    process.argv.find((a) => a.startsWith("--version="))?.slice("--version=".length) ??
     (process.env.EJAM_MANIFEST_VERSION
       ? process.env.EJAM_MANIFEST_VERSION.startsWith("v")
         ? process.env.EJAM_MANIFEST_VERSION
