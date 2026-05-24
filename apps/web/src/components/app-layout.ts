@@ -10,6 +10,9 @@ export const appContentGutterClass = "px-4 md:px-6";
 export const appHeaderGutterClass =
   "pl-4 pr-[calc(1rem+1px)] md:pl-6 md:pr-[calc(1.5rem+1px)]";
 
+/** top inset below h-14 chrome — pairs sidebar exam grid with main card header */
+export const sidebarPanelTopInsetClass = "pt-[26px]";
+
 export function appShellLayoutClass(className?: string) {
   return cn(
     appWrapperClass,
@@ -19,5 +22,9 @@ export function appShellLayoutClass(className?: string) {
 }
 
 export function appShellContentClass(className?: string) {
-  return cn(appContentGutterClass, "flex flex-1 flex-col py-4 md:py-6", className);
+  return cn(
+    appContentGutterClass,
+    "flex flex-1 flex-col py-4 md:py-6",
+    className,
+  );
 }

@@ -1,8 +1,11 @@
 "use client";
 
-import { SlidersHorizontal } from "lucide-react";
-import { ResultsFilters, type ResultsFilterState } from "@/components/predictor/results-filters";
 import type { ProgramPrediction } from "@ejam/data/college-predictor";
+import { SlidersHorizontal } from "lucide-react";
+import {
+  type ResultsFilterState,
+  ResultsFilters,
+} from "@/components/predictor/results-filters";
 import type { ExamType } from "@/hooks/use-predictor-state";
 
 interface SidebarFilterSectionProps {
@@ -18,8 +21,7 @@ export function SidebarFilterSection({
   filters,
   onChange,
 }: SidebarFilterSectionProps) {
-  const activeCount =
-    filters.instituteTypes.size + filters.bands.size;
+  const activeCount = filters.instituteTypes.size + filters.bands.size;
 
   return (
     <section
@@ -52,7 +54,6 @@ export function SidebarFilterSection({
         filters={filters}
         onChange={onChange}
         enabled
-        variant="sidebar"
       />
     </section>
   );

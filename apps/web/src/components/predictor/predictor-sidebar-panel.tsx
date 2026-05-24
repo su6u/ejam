@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { type ReactNode, Suspense, useEffect } from "react";
+import { sidebarPanelTopInsetClass } from "@/components/app-layout";
 import { HomeStateCombobox } from "@/components/predictor/home-state-combobox";
 import { usePredictor } from "@/components/predictor/predictor-context";
 import { ProximityPicker } from "@/components/predictor/proximity-picker";
@@ -85,14 +86,8 @@ export function PredictorSidebarPanel() {
 }
 
 function PredictorSidebarPanelInner() {
-  const {
-    state,
-    query,
-    onPredict,
-    filters,
-    setFilters,
-    hasResults,
-  } = usePredictor();
+  const { state, query, onPredict, filters, setFilters, hasResults } =
+    usePredictor();
 
   const programs = query.data?.programs ?? [];
 
@@ -113,7 +108,12 @@ function PredictorSidebarPanelInner() {
   return (
     <TooltipProvider delay={200}>
       <div className="flex flex-col">
-        <div className="grid grid-cols-2 gap-2 px-2 pb-2 pt-[26px]">
+        <div
+          className={cn(
+            "grid grid-cols-2 gap-2 px-2 pb-2",
+            sidebarPanelTopInsetClass,
+          )}
+        >
           {EXAM_OPTIONS.map((exam) => {
             const isActive = exam.enabled && state.exam === exam.id;
 

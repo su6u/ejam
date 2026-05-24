@@ -9,18 +9,19 @@ import { useEffect, useState } from "react";
 import { usePredictor } from "@/components/predictor/predictor-context";
 import {
   applyResultsFilters,
+  EMPTY_RESULTS_FILTERS,
 } from "@/components/predictor/results-filters";
-import { applyResultsSort, type ResultsSortKey } from "@/components/predictor/results-sort";
-import { CollegeDetailSheet } from "./college-detail-sheet";
 import {
-  EmptyState,
-  ErrorState,
-  LoadingState,
-} from "./empty-state";
+  applyResultsSort,
+  type ResultsSortKey,
+} from "@/components/predictor/results-sort";
+import { CollegeDetailSheet } from "./college-detail-sheet";
+import { EmptyState, ErrorState, LoadingState } from "./empty-state";
 import { programKey, ResultsTable } from "./results-table";
 
 export function Dashboard() {
-  const { state, query, filters, sortBy, setSortBy } = usePredictor();
+  const { state, query, filters, setFilters, sortBy, setSortBy } =
+    usePredictor();
   const [selected, setSelected] = useState<ProgramPrediction | null>(null);
   const [sheetOpen, setSheetOpen] = useState(false);
 
@@ -51,6 +52,7 @@ export function Dashboard() {
       setSelected(p);
       setSheetOpen(true);
     },
+    onClearFilters: () => setFilters(EMPTY_RESULTS_FILTERS),
   });
 
   return (
@@ -83,6 +85,7 @@ function renderMiddle({
   hasRank,
   selectedId,
   onSelect,
+  onClearFilters,
 }: {
   isLoading: boolean;
   error: string | null;
@@ -94,6 +97,7 @@ function renderMiddle({
   hasRank: boolean;
   selectedId: string | null;
   onSelect: (p: ProgramPrediction) => void;
+  onClearFilters: () => void;
 }) {
   if (error) return <ErrorState message={error} />;
   if (!hasResults) {
@@ -108,6 +112,7 @@ function renderMiddle({
       onSortChange={onSortChange}
       selectedId={selectedId}
       onSelect={onSelect}
+      onClearFilters={onClearFilters}
     />
   );
 }

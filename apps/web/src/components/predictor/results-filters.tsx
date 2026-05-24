@@ -4,16 +4,10 @@ import type {
   ProbabilityBand,
   ProgramPrediction,
 } from "@ejam/data/college-predictor";
-import {
-  Shield,
-  Target,
-  TrendingUp,
-  Zap,
-  type LucideIcon,
-} from "lucide-react";
 import { FilterChip, FilterGroup } from "@/components/predictor/filter-chips";
-import type { ExamType } from "@/hooks/use-predictor-state";
 import { Separator } from "@/components/ui/separator";
+import type { ExamType } from "@/hooks/use-predictor-state";
+import { BAND_FILTER_OPTIONS } from "@/lib/bands";
 import { cn } from "@/lib/utils";
 
 export interface ResultsFilterState {
@@ -25,18 +19,6 @@ export const EMPTY_RESULTS_FILTERS: ResultsFilterState = {
   instituteTypes: new Set(),
   bands: new Set(),
 };
-
-const BAND_OPTIONS: Array<{
-  id: ProbabilityBand;
-  label: string;
-  icon: LucideIcon;
-  color: string;
-}> = [
-  { id: "safe", label: "Safe", icon: Shield, color: "#00D5BE" },
-  { id: "target", label: "Target", icon: Target, color: "#52A2FF" },
-  { id: "reach", label: "Reach", icon: TrendingUp, color: "#FEB903" },
-  { id: "long-shot", label: "Long-shot", icon: Zap, color: "#FF6467" },
-];
 
 const JEE_MAIN_INSTITUTE_ORDER = ["NIT", "IIIT", "GFTI", "IIEST"] as const;
 
@@ -68,13 +50,16 @@ export function applyResultsFilters(
   });
 }
 
+export function hasActiveFilters(filters: ResultsFilterState): boolean {
+  return filters.instituteTypes.size > 0 || filters.bands.size > 0;
+}
+
 interface ResultsFiltersProps {
   exam: ExamType;
   programs: ProgramPrediction[];
   filters: ResultsFilterState;
   onChange: (next: ResultsFilterState) => void;
   enabled: boolean;
-  variant?: "inline" | "sidebar";
 }
 
 export function ResultsFilters({
@@ -83,11 +68,9 @@ export function ResultsFilters({
   filters,
   onChange,
   enabled,
-  variant = "inline",
 }: ResultsFiltersProps) {
   const instituteTypes = availableInstituteTypes(programs, exam);
   const showInstituteGroup = exam === "jee-main" && instituteTypes.length > 0;
-  const isSidebar = variant === "sidebar";
 
   function toggleInstitute(type: string) {
     const next = new Set(filters.instituteTypes);
@@ -104,30 +87,30 @@ export function ResultsFilters({
   }
 
   const instituteGroup = showInstituteGroup ? (
-    <FilterGroup label="Institute" vertical={isSidebar} grid={isSidebar ? 2 : undefined}>
+    <FilterGroup label="Institute" vertical grid={2}>
       {instituteTypes.map((type) => (
-          <FilterChip
-            key={type}
-            label={type}
-            active={filters.instituteTypes.has(type)}
-            disabled={!enabled}
-            fullWidth={isSidebar}
-            onClick={() => toggleInstitute(type)}
-          />
-        ))}
+        <FilterChip
+          key={type}
+          label={type}
+          active={filters.instituteTypes.has(type)}
+          disabled={!enabled}
+          fullWidth
+          onClick={() => toggleInstitute(type)}
+        />
+      ))}
     </FilterGroup>
   ) : null;
 
   const chanceGroup = (
-    <FilterGroup label="Chance" vertical={isSidebar} grid={isSidebar ? 2 : undefined}>
-      {BAND_OPTIONS.map(({ id, label, icon, color }) => (
+    <FilterGroup label="Chance" vertical grid={2}>
+      {BAND_FILTER_OPTIONS.map(({ id, label, icon, color }) => (
         <FilterChip
           key={id}
           label={label}
           icon={icon}
           active={filters.bands.has(id)}
           disabled={!enabled}
-          fullWidth={isSidebar}
+          fullWidth
           accentColor={color}
           onClick={() => toggleBand(id)}
         />
@@ -135,34 +118,16 @@ export function ResultsFilters({
     </FilterGroup>
   );
 
-  if (isSidebar) {
-    return (
-      <div
-        className={cn(
-          "flex flex-col gap-4",
-          !enabled && "pointer-events-none opacity-50",
-        )}
-        aria-disabled={!enabled}
-      >
-        {instituteGroup}
-        {showInstituteGroup ? <Separator /> : null}
-        {chanceGroup}
-      </div>
-    );
-  }
-
   return (
     <div
       className={cn(
-        "flex flex-wrap items-center gap-2",
-        !enabled && "pointer-events-none opacity-40",
+        "flex flex-col gap-4",
+        !enabled && "pointer-events-none opacity-50",
       )}
       aria-disabled={!enabled}
     >
       {instituteGroup}
-      {showInstituteGroup ? (
-        <Separator orientation="vertical" className="hidden h-5 sm:block" />
-      ) : null}
+      {showInstituteGroup ? <Separator /> : null}
       {chanceGroup}
     </div>
   );

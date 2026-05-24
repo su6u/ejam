@@ -160,12 +160,6 @@ input {
   -webkit-tap-highlight-color: transparent;
 }
 
-@media (hover: none) {
-  .nav-pill:hover {
-    opacity: 1 !important;
-  }
-}
-
 @layer base {
   * {
     @apply border-border outline-ring/50;

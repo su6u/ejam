@@ -8,13 +8,14 @@
 
 import type { ProgramPrediction } from "@ejam/data/college-predictor";
 import { ChevronRight } from "lucide-react";
+import { formatInteger } from "@/components/formatter";
 import { ResultsCardShell } from "@/components/predictor/results-card-shell";
 import {
   ResultsSort,
   type ResultsSortKey,
 } from "@/components/predictor/results-sort";
-import { formatInteger } from "@/components/formater";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Table,
   TableBody,
@@ -23,6 +24,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { BAND_STYLES } from "@/lib/bands";
 import { cn } from "@/lib/utils";
 
 interface ResultsTableProps {
@@ -32,6 +34,7 @@ interface ResultsTableProps {
   onSortChange: (next: ResultsSortKey) => void;
   selectedId: string | null;
   onSelect: (program: ProgramPrediction) => void;
+  onClearFilters?: () => void;
 }
 
 export function ResultsTable({
@@ -41,7 +44,9 @@ export function ResultsTable({
   onSortChange,
   selectedId,
   onSelect,
+  onClearFilters,
 }: ResultsTableProps) {
+  const isFiltered = rows.length !== allRows.length;
   const countLabel =
     rows.length === allRows.length
       ? `${rows.length} program${rows.length === 1 ? "" : "s"}`
@@ -58,31 +63,44 @@ export function ResultsTable({
       }
     >
       <Table>
-          <TableHeader className="sticky top-0 z-10 bg-background shadow-[0_1px_0_0_var(--border)]">
-            <TableRow>
-              <TableHead className="ps-6">Institute</TableHead>
-              <TableHead>Program</TableHead>
-              <TableHead>Band</TableHead>
-              <TableHead>Chance</TableHead>
-              <TableHead className="w-0 pe-6 whitespace-nowrap tabular-nums">
-                Closing rank
-              </TableHead>
-              <TableHead>Seat pool</TableHead>
-              <TableHead className="pe-6 text-right" />
+        <TableHeader className="sticky top-0 z-10 bg-background shadow-[0_1px_0_0_var(--border)]">
+          <TableRow>
+            <TableHead className="ps-6">Institute</TableHead>
+            <TableHead>Program</TableHead>
+            <TableHead>Band</TableHead>
+            <TableHead>Chance</TableHead>
+            <TableHead className="w-0 pe-6 whitespace-nowrap tabular-nums">
+              Closing rank
+            </TableHead>
+            <TableHead>Seat pool</TableHead>
+            <TableHead className="pe-6 text-right" />
+          </TableRow>
+        </TableHeader>
+        <TableBody className="[&_tr:first-child]:border-t-0">
+          {rows.length === 0 ? (
+            <TableRow className="hover:bg-transparent">
+              <TableCell
+                colSpan={7}
+                className="h-24 text-center text-sm text-muted-foreground"
+              >
+                <div className="flex flex-col items-center gap-2">
+                  <span>No programs match the active filters.</span>
+                  {isFiltered && onClearFilters ? (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      className="rounded-none"
+                      onClick={onClearFilters}
+                    >
+                      Clear filters
+                    </Button>
+                  ) : null}
+                </div>
+              </TableCell>
             </TableRow>
-          </TableHeader>
-          <TableBody className="[&_tr:first-child]:border-t-0">
-            {rows.length === 0 ? (
-              <TableRow className="hover:bg-transparent">
-                <TableCell
-                  colSpan={7}
-                  className="h-24 text-center text-sm text-muted-foreground"
-                >
-                  No programs match the active filters.
-                </TableCell>
-              </TableRow>
-            ) : (
-              rows.map((row) => {
+          ) : (
+            rows.map((row) => {
               const id = programKey(row);
               const isSelected = id === selectedId;
               return (
@@ -132,22 +150,14 @@ export function ResultsTable({
                 </TableRow>
               );
             })
-            )}
-          </TableBody>
-        </Table>
+          )}
+        </TableBody>
+      </Table>
     </ResultsCardShell>
   );
 }
 
-const BAND_BADGE: Record<
-  ProgramPrediction["band"],
-  { label: string; color: string }
-> = {
-  safe: { label: "Safe", color: "#00D5BE" },
-  target: { label: "Target", color: "#52A2FF" },
-  reach: { label: "Reach", color: "#FEB903" },
-  "long-shot": { label: "Long-shot", color: "#FF6467" },
-};
+const BAND_BADGE = BAND_STYLES;
 
 export function InstituteTypeBadge({ type }: { type: string }) {
   return (

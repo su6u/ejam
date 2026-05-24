@@ -8,7 +8,7 @@
 import type { ProgramPrediction } from "@ejam/data/college-predictor";
 import { CartesianGrid, Line, LineChart, XAxis, YAxis } from "recharts";
 import { DashboardCard } from "@/components/dashboard-card";
-import { formatInteger } from "@/components/formater";
+import { formatInteger } from "@/components/formatter";
 import {
   CardContent,
   CardDescription,

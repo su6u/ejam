@@ -19,7 +19,6 @@ export function AppSidebar() {
         "*:data-[slot=sidebar-inner]:bg-background",
         "**:data-[slot=sidebar-menu-button]:[&>span]:text-foreground/75",
       )}
-      collapsible="icon"
       variant="sidebar"
     >
       <SidebarHeader className="h-14 justify-center border-b px-2">
@@ -28,7 +27,11 @@ export function AppSidebar() {
             <SidebarMenuButton
               className="h-9 hover:bg-transparent active:bg-transparent data-active:bg-transparent"
               render={
-                <a href="/" aria-label="Ejam home" className="flex items-center">
+                <a
+                  href="/"
+                  aria-label="Ejam home"
+                  className="flex items-center"
+                >
                   <Image
                     src="/logo.svg"
                     alt=""

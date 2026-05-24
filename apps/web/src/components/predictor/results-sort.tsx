@@ -3,17 +3,11 @@
 import type { ProgramPrediction } from "@ejam/data/college-predictor";
 import { ArrowDownWideNarrow, Building2, Sparkles } from "lucide-react";
 import { FilterChip, FilterGroup } from "@/components/predictor/filter-chips";
+import { BAND_ORDER } from "@/lib/bands";
 
 export type ResultsSortKey = "chance" | "closing-rank" | "institute";
 
 export const DEFAULT_RESULTS_SORT: ResultsSortKey = "chance";
-
-const BAND_ORDER: Record<ProgramPrediction["band"], number> = {
-  safe: 0,
-  target: 1,
-  reach: 2,
-  "long-shot": 3,
-};
 
 const SORT_OPTIONS: Array<{
   id: ResultsSortKey;

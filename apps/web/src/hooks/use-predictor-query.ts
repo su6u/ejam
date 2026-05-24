@@ -22,7 +22,7 @@ interface PredictorQueryResult {
   data: CollegePredictionResult | null;
   isLoading: boolean;
   error: string | null;
-  trigger: () => void;
+  trigger: () => Promise<void>;
 }
 
 function buildRequestBody(
@@ -44,7 +44,6 @@ function buildRequestBody(
   return body;
 }
 
-// stable string key for sessionStorage caching
 function cacheKey(opts: PredictorQueryOptions): string {
   const body = buildRequestBody(opts);
   return `predictor:${opts.exam}:${JSON.stringify(body)}`;
@@ -67,9 +66,14 @@ function writeSessionCache(key: string, data: CollegePredictionResult): void {
   }
 }
 
-export function usePredictorQuery(
-  opts: Readonly<PredictorQueryOptions>,
-): PredictorQueryResult {
+export function usePredictorQuery({
+  exam,
+  rank,
+  apiSeatType,
+  apiGender,
+  homeState,
+  has_ews_certificate,
+}: Readonly<PredictorQueryOptions>): PredictorQueryResult {
   const [data, setData] = useState<CollegePredictionResult | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -78,11 +82,19 @@ export function usePredictorQuery(
     setData(null);
     setError(null);
     setIsLoading(false);
-  }, [opts.exam]);
-
+  }, [exam]);
+  
   const trigger = useCallback(async () => {
-    if (!opts.rank || Number.isNaN(Number(opts.rank))) return;
+    if (!rank || Number.isNaN(Number(rank))) return;
 
+    const opts: PredictorQueryOptions = {
+      exam,
+      rank,
+      apiSeatType,
+      apiGender,
+      homeState,
+      has_ews_certificate,
+    };
     const key = cacheKey(opts);
     const cached = readSessionCache(key);
     if (cached) {
@@ -95,7 +107,7 @@ export function usePredictorQuery(
     setError(null);
 
     try {
-      const examId = opts.exam === "jee-advanced" ? "jee-advanced" : "jee-main";
+      const examId = exam === "jee-advanced" ? "jee-advanced" : "jee-main";
       const res = await fetch(`/api/predict/${examId}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -104,7 +116,8 @@ export function usePredictorQuery(
 
       if (!res.ok) {
         const text = await res.text().catch(() => "Unknown error");
-        setError(`Prediction failed: ${text}`);
+        const message = `Prediction failed: ${text}`;
+        setError(message);
         return;
       }
 
@@ -112,13 +125,13 @@ export function usePredictorQuery(
       setData(json.result);
       writeSessionCache(key, json.result);
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Network error — please try again",
-      );
+      const message =
+        err instanceof Error ? err.message : "Network error — please try again";
+      setError(message);
     } finally {
       setIsLoading(false);
     }
-  }, [opts]);
+  }, [exam, rank, apiSeatType, apiGender, homeState, has_ews_certificate]);
 
   return { data, isLoading, error, trigger };
 }
