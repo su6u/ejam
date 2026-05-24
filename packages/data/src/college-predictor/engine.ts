@@ -193,7 +193,7 @@ export function applyCollegePredictorFilters(
   });
 }
 
-function groupByBand(
+export function groupProgramsByBand(
   programs: ProgramPrediction[],
 ): Record<ProbabilityBand, ProgramPrediction[]> {
   return {
@@ -379,6 +379,6 @@ export function predictPrograms(opts: {
       hidden_programs: bandFiltered.length - predictions.length,
       active_filters: opts.filters ?? {},
     },
-    grouped_by_band: groupByBand(predictions),
+    grouped_by_band: groupProgramsByBand(predictions),
   };
 }

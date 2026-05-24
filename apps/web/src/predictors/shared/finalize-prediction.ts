@@ -5,6 +5,7 @@
 import {
   applyBalancedRanking,
   branchFilterActive,
+  groupProgramsByBand,
   type InstituteRankingMeta,
 } from "@ejam/data/college-predictor";
 import type {
@@ -30,6 +31,7 @@ export function finalizePredictionResult(
   return {
     ...result,
     programs,
+    grouped_by_band: groupProgramsByBand(programs),
   };
 }
 
@@ -49,11 +51,6 @@ export function resultFromRankedPrograms(
       hidden_programs: 0,
       active_filters: filters ?? {},
     },
-    grouped_by_band: {
-      safe: programs.filter((p) => p.band === "safe"),
-      target: programs.filter((p) => p.band === "target"),
-      reach: programs.filter((p) => p.band === "reach"),
-      "long-shot": programs.filter((p) => p.band === "long-shot"),
-    },
+    grouped_by_band: groupProgramsByBand(programs),
   };
 }

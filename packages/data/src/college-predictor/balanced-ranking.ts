@@ -3,7 +3,7 @@
  * See CONTEXT.md for product definitions.
  */
 
-import type { CollegePredictorFilters, ProbabilityBand, ProgramPrediction } from "./engine";
+import type { CollegePredictorFilters, ProgramPrediction } from "./engine";
 
 export interface InstituteRankingMeta {
   nirf_rank?: number | null;
@@ -110,10 +110,6 @@ export function computeBalancedScore(
   return Math.round(raw * 10000) / 10000;
 }
 
-export function isBestPick(band: ProbabilityBand): boolean {
-  return band === "safe" || band === "target";
-}
-
 export function applyBalancedRanking(
   programs: ProgramPrediction[],
   options: BalancedRankingOptions,
@@ -154,21 +150,6 @@ export function applyBalancedRanking(
 
   scored.sort((a, b) => (b.balanced_score ?? 0) - (a.balanced_score ?? 0));
   return scored;
-}
-
-export function splitBalancedSections(programs: ProgramPrediction[]): {
-  best_picks: ProgramPrediction[];
-  stretch_picks: ProgramPrediction[];
-} {
-  const best_picks: ProgramPrediction[] = [];
-  const stretch_picks: ProgramPrediction[] = [];
-
-  for (const program of programs) {
-    if (isBestPick(program.band)) best_picks.push(program);
-    else stretch_picks.push(program);
-  }
-
-  return { best_picks, stretch_picks };
 }
 
 export function sortByBalancedScore(

@@ -4,8 +4,6 @@ import {
   computeBalancedScore,
   computeBranchScore,
   computeInstituteScore,
-  isBestPick,
-  splitBalancedSections,
 } from "../college-predictor/balanced-ranking";
 import type { ProgramPrediction } from "../college-predictor/engine";
 
@@ -93,20 +91,6 @@ describe("balanced ranking", () => {
     )[0]!;
 
     expect(cse.balanced_score).toBe(civil.balanced_score);
-  });
-
-  it("splits target+ into best picks and reach into stretch", () => {
-    const programs = [
-      makeProgram({ band: "safe" }),
-      makeProgram({ band: "target", cumulative_probability: 0.5 }),
-      makeProgram({ band: "reach", cumulative_probability: 0.2 }),
-    ];
-
-    const { best_picks, stretch_picks } = splitBalancedSections(programs);
-    expect(best_picks).toHaveLength(2);
-    expect(stretch_picks).toHaveLength(1);
-    expect(isBestPick("target")).toBe(true);
-    expect(isBestPick("reach")).toBe(false);
   });
 
   it("scores branches with fixed global order", () => {

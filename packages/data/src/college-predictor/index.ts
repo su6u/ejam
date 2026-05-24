@@ -26,9 +26,7 @@ export {
   computeBalancedScore,
   computeBranchScore,
   computeInstituteScore,
-  isBestPick,
   sortByBalancedScore,
-  splitBalancedSections,
   type BalancedRankingOptions,
   type InstituteRankingMeta,
 } from "./balanced-ranking";
@@ -44,6 +42,7 @@ export {
   classifyBand,
   computeProbability,
   deriveConfidence,
+  groupProgramsByBand,
   normalCDF,
   predictPrograms,
 } from "./engine";
