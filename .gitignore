@@ -60,3 +60,7 @@ out/
 data/manifest/sources.jsonl
 data/manifest/runs.jsonl
 apps/scraper/data/cache/
+
+# backtest sandbox experiments and local calibration inputs (regenerable)
+scripts/backtest/sandbox/
+scripts/backtest/data/

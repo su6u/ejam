@@ -2,18 +2,16 @@
 /**
  * builds college_predictor_index.parquet from historical JoSAA cutoff parquets
  *
- * algorithm (validated by backtest against 2025 holdout, within-20% = 70.5%):
- *   1. weighted mean of last 4 years' final-round closing rank
- *      weights: [0.50, 0.30, 0.15, 0.05] (most recent first)
- *   2. COVID outlier guard — collapses a year's weight to 0.01 when its
- *      closing rank deviates from the median of the other years by > 2× std
- *   3. trend slope — weighted linear regression of (year, closing_rank)
- *      capped at ±3% of weighted_mean per year to prevent overshoot on
- *      volatile programs (backtested: uncapped trend hurts accuracy)
- *      projected gap-aware: slope × (prediction_year − last_data_year)
- *   4. sigma floor — relative: max(weighted_std, weighted_mean × 0.03)
- *      so uncertainty scales with the program's typical rank range
- *   5. sigma inflation — ×1.5 for programs with < 3 years of data
+ * Production algorithm: jam-v2
+ *
+ *   jam-v2 stack:
+ *   1. round-weighted anchor per year (r1=5% … r6=38%) instead of last round only
+ *   2. weighted mean of last 4 anchor years — weights [0.50, 0.30, 0.15, 0.05]
+ *   3. COVID outlier guard — 2.5× std collapse to weight 0.01
+ *   4. trend slope capped at ±3%/yr, projected with 0.7× gap multiplier
+ *   5. pool shift — ranks × (1 + pool_pct)^(prediction_year − last_data_year)
+ *      pool_pct from scripts/jam/nta-pool-stats.json (override: EJAM_POOL_SHIFT_PCT)
+ *   6. sigma floor 2.5% of weighted_mean; ×1.5 inflation when < 3 years of data
  *
  * prediction_year is read from EJAM_PREDICTION_YEAR env var, defaults to
  * current calendar year
@@ -23,6 +21,12 @@ import { execSync } from "node:child_process";
 import * as fs from "node:fs";
 import * as path from "node:path";
 import { fileURLToPath } from "node:url";
+import {
+  JAM_TUNED,
+  JAM_V2,
+  resolvePoolShiftPct,
+  roundWeightCaseSql,
+} from "./jam/config";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..");
@@ -55,9 +59,15 @@ function findAllCutoffParquets(): string[] {
   return files;
 }
 
-function buildSQL(parquetFiles: string[], predictionYear: number): string {
+function buildSQL(
+  parquetFiles: string[],
+  predictionYear: number,
+  poolShiftPct: number,
+): string {
   const unionParts = parquetFiles.map((f) => `SELECT * FROM read_parquet('${f}')`);
   const unionAll = unionParts.join("\nUNION ALL\n");
+  const roundW = roundWeightCaseSql();
+  const { outlierGuardMultiplier, trendGapMultiplier, sigmaFloorPct } = JAM_TUNED;
 
   return `
 CREATE TEMP TABLE raw_cutoffs AS
@@ -87,7 +97,22 @@ FROM normalized
 GROUP BY institute_id, program_id, seat_type, quota, gender,
          instype, degree, duration_years, year, round;
 
--- last-round closing rank per year — used for overall stats and outlier guard
+-- jam-v2 anchor: per-year round-weighted closing rank (r1=5% … r6=38%)
+CREATE TEMP TABLE anchor_round AS
+SELECT
+  institute_id, program_id, seat_type, quota, gender,
+  ANY_VALUE(instype) AS instype,
+  ANY_VALUE(degree) AS degree,
+  ANY_VALUE(duration_years) AS duration_years,
+  year,
+  MAX(round) AS round,
+  ROUND(
+    SUM(closing_rank * ${roundW}) / SUM(${roundW})
+  )::INTEGER AS closing_rank
+FROM deduped
+GROUP BY institute_id, program_id, seat_type, quota, gender, year;
+
+-- last-round closing rank per year — used only for per-round trajectory columns
 CREATE TEMP TABLE last_round AS
 WITH ranked AS (
   SELECT *,
@@ -111,7 +136,7 @@ WITH windowed AS (
       PARTITION BY institute_id, program_id, seat_type, quota, gender
       ORDER BY year DESC
     ) AS yr
-  FROM last_round
+  FROM anchor_round
   QUALIFY yr <= 4
 ),
 group_std AS (
@@ -142,7 +167,7 @@ SELECT
     WHEN gs.inter_year_std IS NOT NULL
       AND gs.inter_year_std > 0
       AND mo.med_others IS NOT NULL
-      AND ABS(w.closing_rank - mo.med_others) > 2 * gs.inter_year_std
+      AND ABS(w.closing_rank - mo.med_others) > ${outlierGuardMultiplier} * gs.inter_year_std
     THEN 0.01
     ELSE CASE w.yr
       WHEN 1 THEN 0.50
@@ -206,21 +231,21 @@ JOIN year_weights yw
   AND lr.year = yw.year
 GROUP BY lr.institute_id, lr.program_id, lr.seat_type, lr.quota, lr.gender;
 
--- weighted overall stats using last-round data
+-- weighted overall stats using round-weighted anchor data
 CREATE TEMP TABLE weighted AS
 SELECT
-  lr.institute_id, lr.program_id, lr.seat_type, lr.quota, lr.gender,
-  lr.instype, lr.degree, lr.duration_years,
-  lr.year, lr.closing_rank,
+  ar.institute_id, ar.program_id, ar.seat_type, ar.quota, ar.gender,
+  ar.instype, ar.degree, ar.duration_years,
+  ar.year, ar.closing_rank,
   yw.w, yw.yr
-FROM last_round lr
+FROM anchor_round ar
 JOIN year_weights yw
-  ON lr.institute_id = yw.institute_id
-  AND lr.program_id = yw.program_id
-  AND lr.seat_type = yw.seat_type
-  AND lr.quota = yw.quota
-  AND lr.gender = yw.gender
-  AND lr.year = yw.year;
+  ON ar.institute_id = yw.institute_id
+  AND ar.program_id = yw.program_id
+  AND ar.seat_type = yw.seat_type
+  AND ar.quota = yw.quota
+  AND ar.gender = yw.gender
+  AND ar.year = yw.year;
 
 CREATE TEMP TABLE wmean AS
 SELECT
@@ -270,18 +295,20 @@ COPY (
     s.weighted_mean,
     s.weighted_std,
     s.trend_slope,
-    GREATEST(s.weighted_std, ROUND(s.weighted_mean * 0.03))::INTEGER AS sigma_base,
+    GREATEST(s.weighted_std, ROUND(s.weighted_mean * ${sigmaFloorPct}))::INTEGER AS sigma_base,
     CASE
       WHEN s.years_of_data < 3
-        THEN ROUND(GREATEST(s.weighted_std, s.weighted_mean * 0.03) * 1.5)::INTEGER
-      ELSE GREATEST(s.weighted_std, ROUND(s.weighted_mean * 0.03))::INTEGER
+        THEN ROUND(GREATEST(s.weighted_std, s.weighted_mean * ${sigmaFloorPct}) * 1.5)::INTEGER
+      ELSE GREATEST(s.weighted_std, ROUND(s.weighted_mean * ${sigmaFloorPct}))::INTEGER
     END AS sigma_effective,
     ROUND(
-      s.weighted_mean
-      + GREATEST(
-          LEAST(COALESCE(s.trend_slope, 0), s.weighted_mean * 0.03),
-          -s.weighted_mean * 0.03
-        ) * (${predictionYear} - s.last_data_year)
+      (
+        s.weighted_mean
+        + GREATEST(
+            LEAST(COALESCE(s.trend_slope, 0), s.weighted_mean * 0.03),
+            -s.weighted_mean * 0.03
+          ) * ${trendGapMultiplier} * (${predictionYear} - s.last_data_year)
+      ) * POWER(1 + ${poolShiftPct}, ${predictionYear} - s.last_data_year)
     )::INTEGER AS predicted_closing_rank,
     CASE
       WHEN s.years_of_data = 1 THEN 'pooled'
@@ -319,8 +346,9 @@ COPY (
 
 async function main(): Promise<void> {
   const predictionYear = resolvePredictionYear();
+  const poolShiftPct = resolvePoolShiftPct();
   console.log("Building college predictor index...");
-  console.log(`prediction_year=${predictionYear}`);
+  console.log(`algorithm=${JAM_V2}  prediction_year=${predictionYear}  pool_shift=${(poolShiftPct * 100).toFixed(2)}%`);
 
   const parquetFiles = findAllCutoffParquets();
   console.log(`Found ${parquetFiles.length} cutoff parquet files`);
@@ -332,7 +360,7 @@ async function main(): Promise<void> {
 
   fs.mkdirSync(OUTPUT_DIR, { recursive: true });
 
-  const sql = buildSQL(parquetFiles, predictionYear);
+  const sql = buildSQL(parquetFiles, predictionYear, poolShiftPct);
   const sqlFile = path.join(OUTPUT_DIR, "_build_index.sql");
   fs.writeFileSync(sqlFile, sql, "utf-8");
 

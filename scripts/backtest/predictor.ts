@@ -6,7 +6,7 @@
  * outputs results to data/dist/backtest-results.json and prints a summary.
  *
  * each authority uses independently tuned parameters:
- *   JoSAA — 4-year window, ±3% trend cap
+ *   JoSAA — jam-v2 (round-weighted anchor + NTA pool shift)
  *   CSAB  — 2-year window, ±5% trend cap (early CSAB years are anomalous)
  *
  * exits with code 1 if within-20% accuracy falls below 30% — CI gate.
@@ -16,6 +16,12 @@ import * as fs from "node:fs";
 import * as path from "node:path";
 import { fileURLToPath } from "node:url";
 import { computeProbability } from "../../packages/data/src/college-predictor/engine";
+import {
+  JAM_TUNED,
+  JAM_V2,
+  resolvePoolShiftPct,
+  roundWeightCaseSql,
+} from "../jam/config";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "../..");
@@ -58,10 +64,143 @@ interface BacktestResult {
 }
 
 /**
- * builds the training SQL for a given cutoff glob
- * windowSize and trendCapPct are tuned per authority — see file docstring
+ * jam-v2 training SQL for JoSAA — mirrors build-college-predictor-index.ts
  */
-function buildTrainingSQL(
+function buildJoSAATrainingSQL(
+  globPattern: string,
+  holdoutYear: number,
+  poolShiftPct: number,
+): string {
+  const roundW = roundWeightCaseSql();
+  const {
+    outlierGuardMultiplier,
+    trendGapMultiplier,
+    sigmaFloorPct,
+    windowSize,
+    yearWeights,
+    sparseYearsThreshold,
+    sigmaInflation,
+    trendCapPct,
+  } = JAM_TUNED;
+  const weightCase = yearWeights
+    .map((wt, i) => `WHEN ${i + 1} THEN ${wt}`)
+    .join(" ");
+  const trainMaxYear = holdoutYear - 1;
+
+  return `
+CREATE OR REPLACE TEMP TABLE raw_cutoffs AS
+SELECT * FROM read_parquet('${globPattern}') WHERE year <= ${trainMaxYear};
+
+CREATE OR REPLACE TEMP TABLE normalized AS
+SELECT institute_id, program_id, seat_type, quota, gender,
+  CASE WHEN instype = '3IT' THEN 'IIIT' ELSE instype END AS instype,
+  degree, duration_years, year, LEAST(round, 6) AS round, closing_rank
+FROM raw_cutoffs;
+
+CREATE OR REPLACE TEMP TABLE deduped AS
+SELECT institute_id, program_id, seat_type, quota, gender, instype,
+  degree, duration_years, year, round, MAX(closing_rank) AS closing_rank
+FROM normalized
+GROUP BY institute_id, program_id, seat_type, quota, gender, instype,
+         degree, duration_years, year, round;
+
+CREATE OR REPLACE TEMP TABLE anchor_round AS
+SELECT institute_id, program_id, seat_type, quota, gender, year,
+  ROUND(SUM(closing_rank * ${roundW}) / SUM(${roundW}))::INTEGER AS closing_rank
+FROM deduped
+GROUP BY institute_id, program_id, seat_type, quota, gender, year;
+
+CREATE OR REPLACE TEMP TABLE year_weights AS
+WITH windowed AS (
+  SELECT institute_id, program_id, seat_type, quota, gender, year, closing_rank,
+    ROW_NUMBER() OVER (
+      PARTITION BY institute_id, program_id, seat_type, quota, gender
+      ORDER BY year DESC
+    ) AS yr
+  FROM anchor_round QUALIFY yr <= ${windowSize}
+),
+group_std AS (
+  SELECT institute_id, program_id, seat_type, quota, gender,
+    STDDEV_POP(closing_rank) AS inter_year_std
+  FROM windowed GROUP BY institute_id, program_id, seat_type, quota, gender
+),
+median_others AS (
+  SELECT a.institute_id, a.program_id, a.seat_type, a.quota, a.gender, a.year,
+    MEDIAN(b.closing_rank) AS med_others
+  FROM windowed a JOIN windowed b
+    ON a.institute_id = b.institute_id AND a.program_id = b.program_id
+    AND a.seat_type = b.seat_type AND a.quota = b.quota AND a.gender = b.gender
+    AND a.year != b.year
+  GROUP BY a.institute_id, a.program_id, a.seat_type, a.quota, a.gender, a.year
+)
+SELECT w.institute_id, w.program_id, w.seat_type, w.quota, w.gender, w.year, w.yr,
+  CASE
+    WHEN gs.inter_year_std IS NOT NULL AND gs.inter_year_std > 0
+      AND mo.med_others IS NOT NULL
+      AND ABS(w.closing_rank - mo.med_others) > ${outlierGuardMultiplier} * gs.inter_year_std
+    THEN 0.01
+    ELSE CASE w.yr ${weightCase} END
+  END AS w
+FROM windowed w
+LEFT JOIN group_std gs USING (institute_id, program_id, seat_type, quota, gender)
+LEFT JOIN median_others mo USING (institute_id, program_id, seat_type, quota, gender, year);
+
+CREATE OR REPLACE TEMP TABLE weighted AS
+SELECT ar.institute_id, ar.program_id, ar.seat_type, ar.quota, ar.gender,
+  ar.year, ar.closing_rank, yw.w
+FROM anchor_round ar JOIN year_weights yw
+  ON ar.institute_id = yw.institute_id AND ar.program_id = yw.program_id
+  AND ar.seat_type = yw.seat_type AND ar.quota = yw.quota AND ar.gender = yw.gender
+  AND ar.year = yw.year;
+
+CREATE OR REPLACE TEMP TABLE wmean AS
+SELECT institute_id, program_id, seat_type, quota, gender,
+  SUM(closing_rank * w) / SUM(w) AS wm
+FROM weighted GROUP BY institute_id, program_id, seat_type, quota, gender;
+
+CREATE OR REPLACE TEMP TABLE stats AS
+SELECT d.institute_id, d.program_id, d.seat_type, d.quota, d.gender,
+  ROUND(ANY_VALUE(m.wm))::INTEGER AS weighted_mean,
+  ROUND(SQRT(SUM(d.w * POWER(d.closing_rank - m.wm, 2)) / SUM(d.w)))::INTEGER AS weighted_std,
+  CASE
+    WHEN (SUM(d.w * d.year * d.year) - POWER(SUM(d.w * d.year), 2) / SUM(d.w)) = 0 THEN 0
+    ELSE ROUND(
+      (SUM(d.w * d.year * d.closing_rank) - SUM(d.w * d.year) * SUM(d.w * d.closing_rank) / SUM(d.w))
+      / (SUM(d.w * d.year * d.year) - POWER(SUM(d.w * d.year), 2) / SUM(d.w))
+    )::INTEGER
+  END AS trend_slope,
+  COUNT(*)::INTEGER AS years_of_data,
+  MAX(d.year)::INTEGER AS last_data_year
+FROM weighted d JOIN wmean m
+  ON d.institute_id = m.institute_id AND d.program_id = m.program_id
+  AND d.seat_type = m.seat_type AND d.quota = m.quota AND d.gender = m.gender
+GROUP BY d.institute_id, d.program_id, d.seat_type, d.quota, d.gender;
+
+SELECT
+  s.institute_id, s.program_id, s.seat_type, s.quota, s.gender,
+  CASE
+    WHEN s.years_of_data < ${sparseYearsThreshold}
+      THEN ROUND(GREATEST(s.weighted_std, s.weighted_mean * ${sigmaFloorPct}) * ${sigmaInflation})::INTEGER
+    ELSE GREATEST(s.weighted_std, ROUND(s.weighted_mean * ${sigmaFloorPct}))::INTEGER
+  END AS sigma_effective,
+  ROUND(
+    (
+      s.weighted_mean
+      + GREATEST(
+          LEAST(COALESCE(s.trend_slope, 0), s.weighted_mean * ${trendCapPct}),
+          -s.weighted_mean * ${trendCapPct}
+        ) * ${trendGapMultiplier} * (${holdoutYear} - s.last_data_year)
+    ) * POWER(1 + ${poolShiftPct}, ${holdoutYear} - s.last_data_year)
+  )::INTEGER AS predicted_closing_rank
+FROM stats s
+ORDER BY s.institute_id, s.program_id, s.seat_type, s.quota, s.gender;
+  `;
+}
+
+/**
+ * CSAB training SQL — 2-year window, last-round anchor
+ */
+function buildCSABTrainingSQL(
   globPattern: string,
   windowSize: number,
   trendCapPct: number,
@@ -126,7 +265,7 @@ SELECT w.institute_id, w.program_id, w.seat_type, w.quota, w.gender, w.year, w.y
   CASE
     WHEN gs.inter_year_std IS NOT NULL AND gs.inter_year_std > 0
       AND mo.med_others IS NOT NULL
-      AND ABS(w.closing_rank - mo.med_others) > 2 * gs.inter_year_std
+      AND ABS(w.closing_rank - mo.med_others) > 2.5 * gs.inter_year_std
     -- COVID outlier guard: collapse anomalous years to near-zero weight
     THEN 0.01
     ELSE CASE w.yr ${weightCase} END
@@ -170,15 +309,15 @@ SELECT
   s.institute_id, s.program_id, s.seat_type, s.quota, s.gender,
   CASE
     WHEN s.years_of_data < 3
-      THEN ROUND(GREATEST(s.weighted_std, s.weighted_mean * 0.03) * 1.5)::INTEGER
-    ELSE GREATEST(s.weighted_std, ROUND(s.weighted_mean * 0.03))::INTEGER
+      THEN ROUND(GREATEST(s.weighted_std, s.weighted_mean * 0.025) * 1.5)::INTEGER
+    ELSE GREATEST(s.weighted_std, ROUND(s.weighted_mean * 0.025))::INTEGER
   END AS sigma_effective,
   ROUND(
     s.weighted_mean
     + GREATEST(
         LEAST(COALESCE(s.trend_slope, 0), s.weighted_mean * ${trendCapPct}),
         -s.weighted_mean * ${trendCapPct}
-      ) * (2025 - s.last_data_year)
+      ) * 0.7 * (2025 - s.last_data_year)
   )::INTEGER AS predicted_closing_rank
 FROM stats s
 ORDER BY s.institute_id, s.program_id, s.seat_type, s.quota, s.gender;
@@ -208,6 +347,31 @@ type DuckConn = {
   ) => Promise<{ getRowObjectsJS: () => Record<string, unknown>[] }>;
 };
 
+async function loadJoSAATraining(
+  conn: DuckConn,
+  glob: string,
+  holdoutYear: number,
+): Promise<Map<string, TrainingRow>> {
+  const poolShiftPct = resolvePoolShiftPct();
+  const reader = await conn.runAndReadAll(
+    buildJoSAATrainingSQL(glob, holdoutYear, poolShiftPct),
+  );
+  const idx = new Map<string, TrainingRow>();
+  for (const r of reader.getRowObjectsJS()) {
+    const key = `${r.institute_id}|${r.program_id}|${r.seat_type}|${r.quota}|${r.gender}`;
+    idx.set(key, {
+      institute_id: String(r.institute_id),
+      program_id: String(r.program_id),
+      seat_type: String(r.seat_type),
+      quota: String(r.quota),
+      gender: String(r.gender),
+      predicted_closing_rank: Number(r.predicted_closing_rank),
+      sigma_effective: Number(r.sigma_effective),
+    });
+  }
+  return idx;
+}
+
 async function loadTraining(
   conn: DuckConn,
   glob: string,
@@ -215,7 +379,7 @@ async function loadTraining(
   trendCapPct: number,
 ): Promise<Map<string, TrainingRow>> {
   const reader = await conn.runAndReadAll(
-    buildTrainingSQL(glob, windowSize, trendCapPct),
+    buildCSABTrainingSQL(glob, windowSize, trendCapPct),
   );
   const idx = new Map<string, TrainingRow>();
   for (const r of reader.getRowObjectsJS()) {
@@ -346,6 +510,29 @@ function computeMetrics(
   };
 }
 
+async function runJoSAABacktest(
+  conn: DuckConn,
+  cutoffsGlob: string,
+): Promise<BacktestResult> {
+  const holdoutYear = 2025;
+  const poolShiftPct = resolvePoolShiftPct();
+  console.log(`\n[JoSAA/${JAM_V2}] pool_shift=${(poolShiftPct * 100).toFixed(2)}%`);
+  console.log(`[JoSAA/${JAM_V2}] Loading training data (2021–2024)...`);
+  const trainingIndex = await loadJoSAATraining(conn, cutoffsGlob, holdoutYear);
+  console.log(`[JoSAA/${JAM_V2}] Training index: ${trainingIndex.size} rows`);
+
+  console.log(`[JoSAA/${JAM_V2}] Loading 2025 holdout...`);
+  const holdout = await loadHoldout(conn, cutoffsGlob);
+  console.log(`[JoSAA/${JAM_V2}] Holdout: ${holdout.length} rows`);
+
+  console.log(`[JoSAA/${JAM_V2}] Computing metrics...`);
+  return {
+    train_years: [2021, 2022, 2023, 2024],
+    holdout_year: holdoutYear,
+    ...computeMetrics(trainingIndex, holdout),
+  };
+}
+
 async function runBacktest(
   conn: DuckConn,
   label: string,
@@ -409,13 +596,13 @@ async function main(): Promise<void> {
   const instance = await DuckDBInstance.create(":memory:");
   const conn = await instance.connect();
 
-  const josaa = await runBacktest(conn, "JoSAA", josaaGlob, 4, 0.03);
+  const josaa = await runJoSAABacktest(conn, josaaGlob);
   const csab = await runBacktest(conn, "CSAB", csabGlob, 2, 0.05);
 
   conn.closeSync();
   instance.closeSync();
 
-  printSummary("JoSAA", josaa);
+  printSummary(`JoSAA/${JAM_V2}`, josaa);
   printSummary("CSAB", csab);
 
   fs.mkdirSync(path.dirname(OUTPUT_FILE), { recursive: true });

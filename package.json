@@ -15,7 +15,8 @@
     "check:write": "biome check --write .",
     "validate:data": "tsx scripts/validate-jee-data.ts",
     "build:data": "tsx scripts/build-data.ts",
-    "build:predictor-index": "tsx scripts/build-college-predictor-index.ts"
+    "build:predictor-index": "tsx scripts/build-college-predictor-index.ts",
+    "backtest": "tsx scripts/backtest/predictor.ts"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.4.14",
