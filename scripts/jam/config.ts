@@ -36,11 +36,18 @@ export const JAM_ROUND_WEIGHTS = {
 } as const;
 
 export function loadNtaPoolShiftPct(): number {
-  if (!fs.existsSync(POOL_STATS_PATH)) return 0.0429;
+  if (!fs.existsSync(POOL_STATS_PATH)) return 0.01;
   const j = JSON.parse(fs.readFileSync(POOL_STATS_PATH, "utf8")) as {
-    pool_calibration?: { unique_appeared_yoy?: { implied_pool_shift_if_literal?: number } };
+    pool_calibration?: {
+      sandbox_p7_super_a_default?: number;
+      unique_appeared_yoy?: { implied_pool_shift_if_literal?: number };
+    };
   };
-  return j.pool_calibration?.unique_appeared_yoy?.implied_pool_shift_if_literal ?? 0.0429;
+  return (
+    j.pool_calibration?.sandbox_p7_super_a_default ??
+    j.pool_calibration?.unique_appeared_yoy?.implied_pool_shift_if_literal ??
+    0.01
+  );
 }
 
 /** EJAM_POOL_SHIFT_PCT overrides NTA-derived pool shift when set. */
