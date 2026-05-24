@@ -47,7 +47,7 @@ const EXAM_OPTIONS: Array<{
   {
     id: "bitsat",
     label: "BITSAT",
-    logo: "/assets/exam/bitsat.svg",
+    logo: "/assets/exam/bitsat.webp",
     enabled: false,
   },
   {
