@@ -1,11 +1,10 @@
 /**
- * Applies balanced ranking and best/stretch sections to a prediction result.
+ * Applies balanced ranking scores to a prediction result.
  */
 
 import {
   applyBalancedRanking,
   branchFilterActive,
-  splitBalancedSections,
   type InstituteRankingMeta,
 } from "@ejam/data/college-predictor";
 import type {
@@ -28,13 +27,9 @@ export function finalizePredictionResult(
     instituteMeta,
     branchFilterActive: branchFilterActive(filters),
   });
-  const { best_picks, stretch_picks } = splitBalancedSections(programs);
-
   return {
     ...result,
     programs,
-    best_picks,
-    stretch_picks,
   };
 }
 
@@ -42,12 +37,8 @@ export function resultFromRankedPrograms(
   programs: ProgramPrediction[],
   filters: CollegePredictorFilters | undefined,
 ): CollegePredictionResult {
-  const { best_picks, stretch_picks } = splitBalancedSections(programs);
-
   return {
     programs,
-    best_picks,
-    stretch_picks,
     metadata: {
       total_matching: programs.length,
       total_above_threshold: programs.length,

@@ -212,8 +212,6 @@ export const predictor: ExamPredictor<JeeMainInput, CollegePredictionResult> = {
         programs: result.programs,
         metadata: result.metadata,
         grouped_by_band: result.grouped_by_band,
-        best_picks: result.best_picks,
-        stretch_picks: result.stretch_picks,
       };
       let ews = predictPrograms({
         indexRows: quotaFiltered,

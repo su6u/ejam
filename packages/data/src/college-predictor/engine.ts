@@ -79,10 +79,6 @@ export interface CollegePredictionResult {
     active_filters: CollegePredictorFilters;
   };
   grouped_by_band: Record<ProbabilityBand, ProgramPrediction[]>;
-  /** target+ programs ranked by balanced score */
-  best_picks?: ProgramPrediction[];
-  /** reach / long-shot programs ranked by balanced score */
-  stretch_picks?: ProgramPrediction[];
   ews_comparison?: {
     base: CollegePredictionResult;
     ews: CollegePredictionResult;
