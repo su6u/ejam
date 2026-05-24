@@ -12,11 +12,13 @@ export function ResultsCardShell({
   children,
   headerExtra,
   toolbar,
+  footer,
   contentClassName,
 }: {
   children: React.ReactNode;
   headerExtra?: React.ReactNode;
   toolbar?: React.ReactNode;
+  footer?: React.ReactNode;
   contentClassName?: string;
 }) {
   return (
@@ -51,6 +53,7 @@ export function ResultsCardShell({
       >
         {children}
       </CardContent>
+      {footer}
     </DashboardCard>
   );
 }

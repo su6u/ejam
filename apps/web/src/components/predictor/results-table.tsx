@@ -6,8 +6,10 @@
 
 "use client";
 
+import type { PredictionProvenance } from "@ejam/data";
 import type { ProgramPrediction } from "@ejam/data/college-predictor";
 import { ChevronRight } from "lucide-react";
+import { DataVersionFooter } from "@/components/predictor/data-version-footer";
 import { formatInteger } from "@/components/formatter";
 import { ResultsCardShell } from "@/components/predictor/results-card-shell";
 import {
@@ -35,6 +37,7 @@ interface ResultsTableProps {
   selectedId: string | null;
   onSelect: (program: ProgramPrediction) => void;
   onClearFilters?: () => void;
+  provenance?: PredictionProvenance | null;
 }
 
 export function ResultsTable({
@@ -45,6 +48,7 @@ export function ResultsTable({
   selectedId,
   onSelect,
   onClearFilters,
+  provenance,
 }: ResultsTableProps) {
   const isFiltered = rows.length !== allRows.length;
   const countLabel =
@@ -56,6 +60,7 @@ export function ResultsTable({
     <ResultsCardShell
       contentClassName="no-scrollbar overflow-y-auto [&_[data-slot=table-container]]:no-scrollbar"
       toolbar={<ResultsSort sortBy={sortBy} onChange={onSortChange} />}
+      footer={<DataVersionFooter provenance={provenance} />}
       headerExtra={
         <span className="shrink-0 text-xs tabular-nums text-muted-foreground">
           {countLabel}
