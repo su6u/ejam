@@ -1,6 +1,6 @@
 /**
- * Jam predictor algorithm config — shared by production build and backtests.
- */
+ * jam-josaa-v2 hyperparams for index build and backtest
+ **/
 
 import * as fs from "node:fs";
 import * as path from "node:path";
@@ -15,7 +15,6 @@ export const POOL_STATS_PATH = path.join(
   "scripts/jam/nta-pool-stats.json",
 );
 
-/** Shared hyperparams for jam-josaa predictors. */
 export const JAM_TUNED = {
   outlierGuardMultiplier: 2.5,
   sigmaFloorPct: 0.025,
@@ -27,7 +26,6 @@ export const JAM_TUNED = {
   sparseYearsThreshold: 3,
 };
 
-/** Round weights for jam-josaa-v2 round_weighted anchor (r1 … r6). */
 export const JAM_ROUND_WEIGHTS = {
   1: 0.05,
   2: 0.08,

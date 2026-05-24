@@ -1,15 +1,6 @@
 #!/usr/bin/env tsx
 /**
- * measures prediction accuracy of the college predictor algorithm
- *
- * trains on JoSAA and CSAB cutoffs from 2021–2024, tests against 2025 actuals.
- * outputs results to data/dist/backtest-results.json and prints a summary.
- *
- * each authority uses independently tuned parameters:
- *   JoSAA — jam-josaa-v2 (round-weighted anchor + NTA pool shift)
- *   CSAB  — jam-csab-v2 (2yr window, instype ensemble, ±6% trend)
- *
- * exits with code 1 if within-20% accuracy falls below 30% — CI gate.
+ * backtest jam-josaa-v2 and jam-csab-v2 on 2025 holdout — exits 1 if w20 < 30%
  **/
 
 import * as fs from "node:fs";

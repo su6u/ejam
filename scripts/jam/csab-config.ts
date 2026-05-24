@@ -1,11 +1,11 @@
 /**
- * CSAB predictor algorithm config — shared by sandbox, backtests, and production build.
- * Tune via sandbox (experiment-csab*.ts); promote winner here.
- */
+ * jam-csab-v2 hyperparams and DuckDB SQL for index build and backtest
+ * CFI uses higher median blend and wider trend caps — CSAB CFI cutoffs are noisier than NIT/IIIT
+ * production rank is an equal-weight average of best-split and cap-cfi10 instype profiles
+ **/
 
 export const JAM_CSAB_V2 = "jam-csab-v2";
 
-/** Production baseline before sandbox tuning (2yr 65/35, ±5% trend). */
 export const CSAB_BASE = {
   windowSize: 2 as const,
   yearWeights: [0.65, 0.35, 0, 0, 0] as const,
@@ -17,7 +17,6 @@ export const CSAB_BASE = {
   sparseYearsThreshold: 3,
 };
 
-/** Shared hyperparams for tuned / ensemble variants. */
 export const CSAB_TUNED = {
   windowSize: 2 as const,
   yearWeights: [0.7, 0.3, 0, 0, 0] as const,
@@ -26,7 +25,6 @@ export const CSAB_TUNED = {
   sigmaFloorPct: 0.03,
   sigmaInflation: 1.5,
   outlierGuardMultiplier: 2.5,
-  /** Default median blend when no instype override applies. */
   medianBlend: 0.35,
   sparseYearsThreshold: 3,
 };
@@ -37,21 +35,18 @@ export type CsabInstypeProfile = Partial<
   Record<CsabInstype, { medianBlend?: number; trendCapPct?: number }>
 >;
 
-/** Phase-5 candidate: instype-split median blends. */
 export const CSAB_PROFILE_BEST_SPLIT: CsabInstypeProfile = {
   NIT: { medianBlend: 0.35 },
   CFI: { medianBlend: 0.6 },
   IIIT: { medianBlend: 0.4 },
 };
 
-/** Phase-5 candidate: CFI/IIIT trend caps + blends. */
 export const CSAB_PROFILE_CAP_CFI10: CsabInstypeProfile = {
   NIT: { medianBlend: 0.35 },
   CFI: { medianBlend: 0.55, trendCapPct: 0.1 },
   IIIT: { medianBlend: 0.45, trendCapPct: 0.06 },
 };
 
-/** Production ensemble for jam-csab-v2 (ens-best-split + cap-cfi10). */
 export const CSAB_PRODUCTION = {
   ensemble: [
     { label: "best-split", profile: CSAB_PROFILE_BEST_SPLIT, weight: 0.5 },
@@ -106,7 +101,6 @@ export function csabPredictedRankForProfileSql(
   return `ROUND(${mean} + ${trend})`;
 }
 
-/** Equal-weight ensemble of best-split + cap-cfi10 (production). */
 export function csabEnsemblePredictedRankSql(
   predictionYear: number,
   alias = "s",
@@ -117,7 +111,6 @@ export function csabEnsemblePredictedRankSql(
   return `ROUND((${parts.join(" + ")}) / ${parts.length}.0)`;
 }
 
-/** Uniform 35% median blend — legacy helper for sandbox baseline SQL. */
 export function csabBlendedMeanSql(tableAlias = "s"): string {
   const b = CSAB_TUNED.medianBlend;
   if (b === 0) return `${tableAlias}.weighted_mean`;
