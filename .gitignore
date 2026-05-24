@@ -60,3 +60,9 @@ out/
 data/manifest/sources.jsonl
 data/manifest/runs.jsonl
 apps/scraper/data/cache/
+
+# backtesting — sandbox, local data, search tuning (CI: predictor.ts only)
+scripts/backtest/*
+!scripts/backtest/predictor.ts
+data/dist/backtest-results.json
+data/dist/sandbox/
