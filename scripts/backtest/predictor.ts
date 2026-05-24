@@ -6,8 +6,8 @@
  * outputs results to data/dist/backtest-results.json and prints a summary.
  *
  * each authority uses independently tuned parameters:
- *   JoSAA — jam-v2 (round-weighted anchor + NTA pool shift)
- *   CSAB  — 2-year window, ±5% trend cap (early CSAB years are anomalous)
+ *   JoSAA — jam-josaa-v2 (round-weighted anchor + NTA pool shift)
+ *   CSAB  — jam-csab-v2 (2yr window, instype ensemble, ±6% trend)
  *
  * exits with code 1 if within-20% accuracy falls below 30% — CI gate.
  **/
@@ -18,10 +18,11 @@ import { fileURLToPath } from "node:url";
 import { computeProbability } from "../../packages/data/src/college-predictor/engine";
 import {
   JAM_TUNED,
-  JAM_V2,
+  JAM_JOSAA_V2,
   resolvePoolShiftPct,
   roundWeightCaseSql,
 } from "../jam/config";
+import { CSAB_TUNED, JAM_CSAB_V2, csabEnsemblePredictedRankSql } from "../jam/csab-config";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "../..");
@@ -64,7 +65,7 @@ interface BacktestResult {
 }
 
 /**
- * jam-v2 training SQL for JoSAA — mirrors build-college-predictor-index.ts
+ * jam-josaa-v2 training SQL for JoSAA — mirrors build-college-predictor-index.ts
  */
 function buildJoSAATrainingSQL(
   globPattern: string,
@@ -198,24 +199,29 @@ ORDER BY s.institute_id, s.program_id, s.seat_type, s.quota, s.gender;
 }
 
 /**
- * CSAB training SQL — 2-year window, last-round anchor
+ * CSAB training SQL — mirrors build-csab-predictor-index.ts (jam-csab-v2)
  */
 function buildCSABTrainingSQL(
   globPattern: string,
-  windowSize: number,
-  trendCapPct: number,
+  holdoutYear: number,
 ): string {
-  const weightsByWindow: Record<number, number[]> = {
-    2: [0.65, 0.35],
-    3: [0.55, 0.3, 0.15],
-    4: [0.5, 0.3, 0.15, 0.05],
-  };
-  const w = weightsByWindow[windowSize] ?? weightsByWindow[4]!;
-  const weightCase = w.map((wt, i) => `WHEN ${i + 1} THEN ${wt}`).join(" ");
+  const {
+    windowSize,
+    yearWeights,
+    outlierGuardMultiplier,
+    sigmaFloorPct,
+    sigmaInflation,
+    sparseYearsThreshold,
+  } = CSAB_TUNED;
+  const weightCase = yearWeights
+    .map((wt, i) => `WHEN ${i + 1} THEN ${wt}`)
+    .join(" ");
+  const trainMaxYear = holdoutYear - 1;
+  const predictedRank = csabEnsemblePredictedRankSql(holdoutYear);
 
   return `
 CREATE OR REPLACE TEMP TABLE raw_cutoffs AS
-SELECT * FROM read_parquet('${globPattern}') WHERE year <= 2024;
+SELECT * FROM read_parquet('${globPattern}') WHERE year <= ${trainMaxYear};
 
 CREATE OR REPLACE TEMP TABLE normalized AS
 SELECT institute_id, program_id, seat_type, quota, gender,
@@ -265,7 +271,7 @@ SELECT w.institute_id, w.program_id, w.seat_type, w.quota, w.gender, w.year, w.y
   CASE
     WHEN gs.inter_year_std IS NOT NULL AND gs.inter_year_std > 0
       AND mo.med_others IS NOT NULL
-      AND ABS(w.closing_rank - mo.med_others) > 2.5 * gs.inter_year_std
+      AND ABS(w.closing_rank - mo.med_others) > ${outlierGuardMultiplier} * gs.inter_year_std
     -- COVID outlier guard: collapse anomalous years to near-zero weight
     THEN 0.01
     ELSE CASE w.yr ${weightCase} END
@@ -276,7 +282,7 @@ LEFT JOIN median_others mo USING (institute_id, program_id, seat_type, quota, ge
 
 CREATE OR REPLACE TEMP TABLE weighted AS
 SELECT lr.institute_id, lr.program_id, lr.seat_type, lr.quota, lr.gender,
-  lr.year, lr.closing_rank, yw.w
+  lr.instype, lr.year, lr.closing_rank, yw.w
 FROM last_round lr JOIN year_weights yw
   ON lr.institute_id = yw.institute_id AND lr.program_id = yw.program_id
   AND lr.seat_type = yw.seat_type AND lr.quota = yw.quota AND lr.gender = yw.gender
@@ -284,12 +290,15 @@ FROM last_round lr JOIN year_weights yw
 
 CREATE OR REPLACE TEMP TABLE wmean AS
 SELECT institute_id, program_id, seat_type, quota, gender,
-  SUM(closing_rank * w) / SUM(w) AS wm
+  SUM(closing_rank * w) / SUM(w) AS wm,
+  MEDIAN(closing_rank) AS mm
 FROM weighted GROUP BY institute_id, program_id, seat_type, quota, gender;
 
 CREATE OR REPLACE TEMP TABLE stats AS
 SELECT d.institute_id, d.program_id, d.seat_type, d.quota, d.gender,
+  ANY_VALUE(d.instype) AS instype,
   ROUND(ANY_VALUE(m.wm))::INTEGER AS weighted_mean,
+  ROUND(ANY_VALUE(m.mm))::INTEGER AS median_mean,
   ROUND(SQRT(SUM(d.w * POWER(d.closing_rank - m.wm, 2)) / SUM(d.w)))::INTEGER AS weighted_std,
   CASE
     WHEN (SUM(d.w * d.year * d.year) - POWER(SUM(d.w * d.year), 2) / SUM(d.w)) = 0 THEN 0
@@ -308,17 +317,11 @@ GROUP BY d.institute_id, d.program_id, d.seat_type, d.quota, d.gender;
 SELECT
   s.institute_id, s.program_id, s.seat_type, s.quota, s.gender,
   CASE
-    WHEN s.years_of_data < 3
-      THEN ROUND(GREATEST(s.weighted_std, s.weighted_mean * 0.025) * 1.5)::INTEGER
-    ELSE GREATEST(s.weighted_std, ROUND(s.weighted_mean * 0.025))::INTEGER
+    WHEN s.years_of_data < ${sparseYearsThreshold}
+      THEN ROUND(GREATEST(s.weighted_std, s.weighted_mean * ${sigmaFloorPct}) * ${sigmaInflation})::INTEGER
+    ELSE GREATEST(s.weighted_std, ROUND(s.weighted_mean * ${sigmaFloorPct}))::INTEGER
   END AS sigma_effective,
-  ROUND(
-    s.weighted_mean
-    + GREATEST(
-        LEAST(COALESCE(s.trend_slope, 0), s.weighted_mean * ${trendCapPct}),
-        -s.weighted_mean * ${trendCapPct}
-      ) * 0.7 * (2025 - s.last_data_year)
-  )::INTEGER AS predicted_closing_rank
+  ${predictedRank}::INTEGER AS predicted_closing_rank
 FROM stats s
 ORDER BY s.institute_id, s.program_id, s.seat_type, s.quota, s.gender;
   `;
@@ -372,14 +375,13 @@ async function loadJoSAATraining(
   return idx;
 }
 
-async function loadTraining(
+async function loadCSABTraining(
   conn: DuckConn,
   glob: string,
-  windowSize: number,
-  trendCapPct: number,
+  holdoutYear: number,
 ): Promise<Map<string, TrainingRow>> {
   const reader = await conn.runAndReadAll(
-    buildCSABTrainingSQL(glob, windowSize, trendCapPct),
+    buildCSABTrainingSQL(glob, holdoutYear),
   );
   const idx = new Map<string, TrainingRow>();
   for (const r of reader.getRowObjectsJS()) {
@@ -516,16 +518,16 @@ async function runJoSAABacktest(
 ): Promise<BacktestResult> {
   const holdoutYear = 2025;
   const poolShiftPct = resolvePoolShiftPct();
-  console.log(`\n[JoSAA/${JAM_V2}] pool_shift=${(poolShiftPct * 100).toFixed(2)}%`);
-  console.log(`[JoSAA/${JAM_V2}] Loading training data (2021–2024)...`);
+  console.log(`\n[JoSAA/${JAM_JOSAA_V2}] pool_shift=${(poolShiftPct * 100).toFixed(2)}%`);
+  console.log(`[JoSAA/${JAM_JOSAA_V2}] Loading training data (2021–2024)...`);
   const trainingIndex = await loadJoSAATraining(conn, cutoffsGlob, holdoutYear);
-  console.log(`[JoSAA/${JAM_V2}] Training index: ${trainingIndex.size} rows`);
+  console.log(`[JoSAA/${JAM_JOSAA_V2}] Training index: ${trainingIndex.size} rows`);
 
-  console.log(`[JoSAA/${JAM_V2}] Loading 2025 holdout...`);
+  console.log(`[JoSAA/${JAM_JOSAA_V2}] Loading 2025 holdout...`);
   const holdout = await loadHoldout(conn, cutoffsGlob);
-  console.log(`[JoSAA/${JAM_V2}] Holdout: ${holdout.length} rows`);
+  console.log(`[JoSAA/${JAM_JOSAA_V2}] Holdout: ${holdout.length} rows`);
 
-  console.log(`[JoSAA/${JAM_V2}] Computing metrics...`);
+  console.log(`[JoSAA/${JAM_JOSAA_V2}] Computing metrics...`);
   return {
     train_years: [2021, 2022, 2023, 2024],
     holdout_year: holdoutYear,
@@ -533,30 +535,23 @@ async function runJoSAABacktest(
   };
 }
 
-async function runBacktest(
+async function runCSABBacktest(
   conn: DuckConn,
-  label: string,
   cutoffsGlob: string,
-  windowSize: number,
-  trendCapPct: number,
 ): Promise<BacktestResult> {
-  console.log(`\n[${label}] Loading training data (2021–2024)...`);
-  const trainingIndex = await loadTraining(
-    conn,
-    cutoffsGlob,
-    windowSize,
-    trendCapPct,
-  );
-  console.log(`[${label}] Training index: ${trainingIndex.size} rows`);
+  const holdoutYear = 2025;
+  console.log(`\n[CSAB/${JAM_CSAB_V2}] Loading training data (2021–2024)...`);
+  const trainingIndex = await loadCSABTraining(conn, cutoffsGlob, holdoutYear);
+  console.log(`[CSAB/${JAM_CSAB_V2}] Training index: ${trainingIndex.size} rows`);
 
-  console.log(`[${label}] Loading 2025 holdout...`);
+  console.log(`[CSAB/${JAM_CSAB_V2}] Loading 2025 holdout...`);
   const holdout = await loadHoldout(conn, cutoffsGlob);
-  console.log(`[${label}] Holdout: ${holdout.length} rows`);
+  console.log(`[CSAB/${JAM_CSAB_V2}] Holdout: ${holdout.length} rows`);
 
-  console.log(`[${label}] Computing metrics...`);
+  console.log(`[CSAB/${JAM_CSAB_V2}] Computing metrics...`);
   return {
     train_years: [2021, 2022, 2023, 2024],
-    holdout_year: 2025,
+    holdout_year: holdoutYear,
     ...computeMetrics(trainingIndex, holdout),
   };
 }
@@ -597,13 +592,13 @@ async function main(): Promise<void> {
   const conn = await instance.connect();
 
   const josaa = await runJoSAABacktest(conn, josaaGlob);
-  const csab = await runBacktest(conn, "CSAB", csabGlob, 2, 0.05);
+  const csab = await runCSABBacktest(conn, csabGlob);
 
   conn.closeSync();
   instance.closeSync();
 
-  printSummary(`JoSAA/${JAM_V2}`, josaa);
-  printSummary("CSAB", csab);
+  printSummary(`JoSAA/${JAM_JOSAA_V2}`, josaa);
+  printSummary(`CSAB/${JAM_CSAB_V2}`, csab);
 
   fs.mkdirSync(path.dirname(OUTPUT_FILE), { recursive: true });
   fs.writeFileSync(

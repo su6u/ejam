@@ -2,9 +2,9 @@
 /**
  * builds college_predictor_index.parquet from historical JoSAA cutoff parquets
  *
- * Production algorithm: jam-v2
+ * Production algorithm: jam-josaa-v2
  *
- *   jam-v2 stack:
+ *   jam-josaa-v2 stack:
  *   1. round-weighted anchor per year (r1=5% … r6=38%) instead of last round only
  *   2. weighted mean of last 4 anchor years — weights [0.50, 0.30, 0.15, 0.05]
  *   3. COVID outlier guard — 2.5× std collapse to weight 0.01
@@ -23,7 +23,7 @@ import * as path from "node:path";
 import { fileURLToPath } from "node:url";
 import {
   JAM_TUNED,
-  JAM_V2,
+  JAM_JOSAA_V2,
   resolvePoolShiftPct,
   roundWeightCaseSql,
 } from "./jam/config";
@@ -98,7 +98,7 @@ FROM normalized
 GROUP BY institute_id, program_id, seat_type, quota, gender,
          instype, degree, duration_years, year, round;
 
--- jam-v2 anchor: per-year round-weighted closing rank (r1=5% … r6=38%)
+-- jam-josaa-v2 anchor: per-year round-weighted closing rank (r1=5% … r6=38%)
 CREATE TEMP TABLE anchor_round AS
 SELECT
   institute_id, program_id, seat_type, quota, gender,
@@ -349,7 +349,7 @@ async function main(): Promise<void> {
   const predictionYear = resolvePredictionYear();
   const poolShiftPct = resolvePoolShiftPct();
   console.log("Building college predictor index...");
-  console.log(`algorithm=${JAM_V2}  prediction_year=${predictionYear}  pool_shift=${(poolShiftPct * 100).toFixed(2)}%`);
+  console.log(`algorithm=${JAM_JOSAA_V2}  prediction_year=${predictionYear}  pool_shift=${(poolShiftPct * 100).toFixed(2)}%`);
 
   const parquetFiles = findAllCutoffParquets();
   console.log(`Found ${parquetFiles.length} cutoff parquet files`);

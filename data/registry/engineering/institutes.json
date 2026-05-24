@@ -1512,6 +1512,19 @@
     "nirf_rank": null
   },
   {
+    "id": "nielit-patna",
+    "name": "National Institute of Electronics and Information Technology Patna",
+    "aliases": [
+      "National Institute of Electronics and Information Technology, Patna (Bihar)",
+      "NIELIT Patna"
+    ],
+    "type": "GFTI",
+    "state": "Bihar",
+    "city": "Patna",
+    "established": 1974,
+    "nirf_rank": null
+  },
+  {
     "id": "nielit-ropar",
     "name": "National Institute of Electronics and Information Technology Ropar",
     "aliases": [
