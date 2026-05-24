@@ -67,7 +67,8 @@ function buildSQL(
   const unionParts = parquetFiles.map((f) => `SELECT * FROM read_parquet('${f}')`);
   const unionAll = unionParts.join("\nUNION ALL\n");
   const roundW = roundWeightCaseSql();
-  const { outlierGuardMultiplier, trendGapMultiplier, sigmaFloorPct } = JAM_TUNED;
+  const { outlierGuardMultiplier, trendGapMultiplier, sigmaFloorPct, trendCapPct } =
+    JAM_TUNED;
 
   return `
 CREATE TEMP TABLE raw_cutoffs AS
@@ -305,8 +306,8 @@ COPY (
       (
         s.weighted_mean
         + GREATEST(
-            LEAST(COALESCE(s.trend_slope, 0), s.weighted_mean * 0.03),
-            -s.weighted_mean * 0.03
+            LEAST(COALESCE(s.trend_slope, 0), s.weighted_mean * ${trendCapPct}),
+            -s.weighted_mean * ${trendCapPct}
           ) * ${trendGapMultiplier} * (${predictionYear} - s.last_data_year)
       ) * POWER(1 + ${poolShiftPct}, ${predictionYear} - s.last_data_year)
     )::INTEGER AS predicted_closing_rank,
