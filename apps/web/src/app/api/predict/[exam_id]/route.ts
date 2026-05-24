@@ -10,6 +10,7 @@ import type {
 } from "@ejam/data";
 import { decodeCollegePredictorUrlParams } from "@ejam/data/college-predictor";
 import {
+  buildPredictionProvenance,
   loadLatestManifest,
   resolveExamDependencies,
 } from "@ejam/data/dependency-resolver";
@@ -95,11 +96,7 @@ function resolveDatasets(
   | {
       ok: true;
       manifestVersion: string;
-      resolvedDatasets: Array<{
-        dataset: string;
-        path: string;
-        sha256: string;
-      }>;
+      predictorIndex: { path: string; sha256: string };
     }
   | { ok: false; response: NextResponse<PredictionErrorResponse> } {
   const manifest = loadLatestManifest();
@@ -127,14 +124,27 @@ function resolveDatasets(
     };
   }
 
+  const predictorIndex = resolution.resolved.find(
+    (r) => r.dataset === "predictor_index",
+  );
+  if (!predictorIndex) {
+    return {
+      ok: false,
+      response: errResponse(
+        503,
+        "DEPENDENCY_UNAVAILABLE",
+        `predictor index unavailable for "${examId}"`,
+      ),
+    };
+  }
+
   return {
     ok: true,
     manifestVersion: manifest.version,
-    resolvedDatasets: resolution.resolved.map((r) => ({
-      dataset: r.dataset,
-      path: r.path,
-      sha256: r.sha256,
-    })),
+    predictorIndex: {
+      path: predictorIndex.path,
+      sha256: predictorIndex.sha256,
+    },
   };
 }
 
@@ -243,7 +253,9 @@ async function handlePrediction(
     const { result, confidence } = await predictor.predict(
       validationResult.data,
       {
-        resolvedDatasets: dependencyResult.resolvedDatasets,
+        resolvedDatasets: [
+          { dataset: "predictor_index", ...dependencyResult.predictorIndex },
+        ],
         examId: exam_id,
       },
     );
@@ -253,12 +265,11 @@ async function handlePrediction(
       exam_id,
       result,
       ...(confidence ? { confidence } : {}),
-      provenance: {
-        exam_id,
-        manifest_version: dependencyResult.manifestVersion,
-        datasets_used: dependencyResult.resolvedDatasets,
-        generated_at: new Date().toISOString(),
-      },
+      provenance: buildPredictionProvenance({
+        examId: exam_id,
+        manifestVersion: dependencyResult.manifestVersion,
+        predictorIndex: dependencyResult.predictorIndex,
+      }),
     };
     return NextResponse.json(body, { status: 200 });
   } catch (err) {

@@ -16,7 +16,7 @@ export const PredictionError = z.object({
   ]),
   message: z.string(),
   // field-level detail for INVALID_INPUT — maps field path to issue message
-  field_errors: z.record(z.string()).optional(),
+  field_errors: z.record(z.string(), z.string()).optional(),
 });
 export type PredictionError = z.infer<typeof PredictionError>;
 
@@ -29,8 +29,12 @@ export const PredictionProvenance = z.object({
       dataset: z.string(),
       path: z.string(),
       sha256: z.string(),
+      role: z.enum(["loaded", "linked"]),
     }),
   ),
+  index_lineage: z
+    .array(z.object({ path: z.string(), sha256: z.string() }))
+    .optional(),
   generated_at: z.string(),
 });
 export type PredictionProvenance = z.infer<typeof PredictionProvenance>;

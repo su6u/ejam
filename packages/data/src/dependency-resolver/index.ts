@@ -9,6 +9,8 @@ export {
   loadManifest,
   resolveExamDependencies,
 } from "./resolver";
+export { readIndexLineageSidecar } from "./index-lineage";
+export { buildPredictionProvenance } from "./provenance";
 export {
   assertResolvedDataset,
   findResolvedDataset,
