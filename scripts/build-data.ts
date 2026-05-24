@@ -1,7 +1,9 @@
 #!/usr/bin/env tsx
 /**
- * builds dist-data artifacts from data/engineering/jee
- * emits parquet snapshots markdown chunks and manifest with checksums and data_version
+ * builds dist-data RAG artifacts from data/engineering/jee JSON sources
+ * parquet datasets and the canonical manifest are managed separately:
+ *   pnpm generate:manifest  — writes data/manifest/v*.json
+ *   pnpm data:fetch         — verifies local files match manifest
  */
 
 import * as crypto from "node:crypto";
@@ -19,14 +21,6 @@ type FileEntry = {
   path: string;
   hash: string;
   size: number;
-};
-
-type Manifest = {
-  data_version: string;
-  built_at: string;
-  git_sha: string;
-  files: FileEntry[];
-  chunks: FileEntry[];
 };
 
 async function sha256File(filePath: string): Promise<string> {
@@ -79,26 +73,6 @@ function assertSafeChunkId(id: string): void {
   if (!CHUNK_ID_PATTERN.test(id)) {
     throw new Error(`unsafe chunk id: ${id}`);
   }
-}
-
-async function getGitSha(): Promise<string> {
-  try {
-    const { execSync } = await import("node:child_process");
-    const sha = execSync("git rev-parse --short HEAD", {
-      cwd: ROOT,
-      encoding: "utf-8",
-    }).trim();
-    return sha;
-  } catch {
-    return "unknown";
-  }
-}
-
-async function getDataVersion(): Promise<string> {
-  const now = new Date();
-  const datePart = `${now.getFullYear()}.${String(now.getMonth() + 1).padStart(2, "0")}.${String(now.getDate()).padStart(2, "0")}`;
-  const sha = await getGitSha();
-  return `${datePart}-${sha}`;
 }
 
 async function* walkDir(dir: string, basePath = ""): AsyncGenerator<string> {
@@ -472,12 +446,6 @@ async function main(): Promise<number> {
   await fs.rm(DIST_DIR, { recursive: true, force: true });
   await fs.mkdir(DIST_DIR, { recursive: true });
 
-  const dataVersion = await getDataVersion();
-  const gitSha = await getGitSha();
-
-  console.log(`Data version: ${dataVersion}`);
-  console.log();
-
   console.log("Copying parquet snapshots...");
   const parquetFiles = await copyParquetFiles();
   console.log(`  → ${parquetFiles.length} parquet files`);
@@ -487,22 +455,8 @@ async function main(): Promise<number> {
   const chunkFiles = await generateMarkdownChunks();
   console.log(`  → ${chunkFiles.length} chunks`);
   console.log();
-
-  const manifest: Manifest = {
-    data_version: dataVersion,
-    built_at: new Date().toISOString(),
-    git_sha: gitSha,
-    files: parquetFiles,
-    chunks: chunkFiles,
-  };
-
-  const manifestPath = path.join(DIST_DIR, "manifest.json");
-  await fs.writeFile(manifestPath, JSON.stringify(manifest, null, 2), "utf-8");
-
-  console.log("Manifest written:");
-  console.log(`  ${manifestPath}`);
-  console.log();
   console.log("Build complete!");
+  console.log("Run pnpm generate:manifest to update data/manifest/v*.json");
 
   return 0;
 }

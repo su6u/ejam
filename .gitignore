@@ -4,7 +4,7 @@ node_modules
 
 # build outputs
 .next
-dist
+/dist
 dist-data
 build
 out
@@ -36,9 +36,9 @@ coverage
 # raw scraped sources (regenerable from ejam-ingest)
 data/**/_raw/
 
-# data lake
-/data/manifest/
-!/data/registry/
+# data lake — versioned manifests are tracked; runtime ingest logs are not
+data/manifest/sources.jsonl
+data/manifest/runs.jsonl
 
 # pnpm
 node_modules/

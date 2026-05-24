@@ -18,8 +18,6 @@ export type CutoffPathArgs = {
 
 export type SeatMatrixPathArgs = {
   stream: Stream;
-  exam_id: string;
-  counselling_id: string;
   year: number;
 };
 
@@ -28,9 +26,8 @@ export function cutoffPath(args: CutoffPathArgs): string {
   return `${DATA_ROOT}/${args.stream}/${args.exam_id}/${args.counselling_id}/cutoffs/year=${args.year}/round=${args.round}/cutoffs.parquet`;
 }
 
-/** canonical seat matrix parquet path */
 export function seatMatrixPath(args: SeatMatrixPathArgs): string {
-  return `${DATA_ROOT}/${args.stream}/${args.exam_id}/${args.counselling_id}/seats/matrix/year=${args.year}/seat-matrix.parquet`;
+  return `${DATA_ROOT}/${args.stream}/jee/seats/matrix/year=${args.year}/seat-matrix.parquet`;
 }
 
 export function registryPath(

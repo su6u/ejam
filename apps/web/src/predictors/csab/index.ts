@@ -13,10 +13,10 @@ import {
   type CollegePredictionResult,
   type CollegePredictorFilters,
   type CollegePredictorIndexRow,
+  getPredictorIndexFromDeps,
   loadCanonicalStates,
   type ProgramPrediction,
   predictPrograms,
-  readParquetRows,
 } from "@ejam/data/college-predictor";
 import { z } from "zod";
 import {
@@ -71,7 +71,6 @@ type RegistryMaps = {
 };
 
 // module-level caches — populated on first request, cleared on process restart
-let _cachedIndex: CollegePredictorIndexRow[] | null = null;
 let _cachedRegistry: RegistryMaps | null = null;
 
 // in-memory prediction result cache — keyed by FNV1a hash of canonical input
@@ -89,26 +88,6 @@ function fnv1a(value: string): string {
 
 function cacheKey(input: unknown): string {
   return fnv1a(JSON.stringify(input));
-}
-
-async function loadIndex(): Promise<CollegePredictorIndexRow[]> {
-  if (_cachedIndex) return _cachedIndex;
-
-  const { join, resolve } = await import("node:path");
-  const indexPath = resolve(
-    process.env.EJAM_DIST_DATA_ROOT ?? join(process.cwd(), "data", "dist"),
-    "csab_predictor_index.parquet",
-  );
-
-  // graceful degradation: if the CSAB index hasn't been built yet, return empty
-  const { existsSync } = await import("node:fs");
-  if (!existsSync(indexPath)) {
-    _cachedIndex = [];
-    return _cachedIndex;
-  }
-
-  _cachedIndex = await readParquetRows<CollegePredictorIndexRow>(indexPath);
-  return _cachedIndex;
 }
 
 async function loadRegistryMaps(): Promise<RegistryMaps> {
@@ -216,18 +195,17 @@ export const predictor: ExamPredictor<CsabInput, CollegePredictionResult> = {
       };
     }
 
-    const [allRows, registry] = await Promise.all([
-      loadIndex(),
-      loadRegistryMaps(),
-    ]);
-
-    // graceful degradation: CSAB index not built yet
-    if (allRows.length === 0) {
+    let allRows: CollegePredictorIndexRow[];
+    try {
+      allRows = await getPredictorIndexFromDeps(deps);
+    } catch {
       return {
         result: resultFromCachedPrograms([], input.filters),
         confidence: { level: "low", caveat: "CSAB index is not yet available" },
       };
     }
+
+    const registry = await loadRegistryMaps();
 
     const enrichedRows = enrichRows(allRows, registry);
     const quotaFiltered = filterByQuota(

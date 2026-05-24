@@ -11,7 +11,7 @@ import {
   type CollegePredictorFilters,
   type CollegePredictorIndexRow,
   deriveConfidence,
-  getJosaaIndex,
+  getPredictorIndexFromDeps,
   loadCanonicalStates,
   type ProgramPrediction,
   predictPrograms,
@@ -169,8 +169,8 @@ function resultFromCachedPrograms(
 export const predictor: ExamPredictor<JeeMainInput, CollegePredictionResult> = {
   inputSchema: JeeMainInput,
 
-  async predict(input, _deps) {
-    const cacheInput = { exam_id: _deps.examId, ...input };
+  async predict(input, deps) {
+    const cacheInput = { exam_id: deps.examId, ...input };
     const cacheKey = fnv1a(stableStringify(cacheInput));
     const cachedPrograms = _serverCache.get(cacheKey);
     if (cachedPrograms) {
@@ -181,7 +181,7 @@ export const predictor: ExamPredictor<JeeMainInput, CollegePredictionResult> = {
     }
 
     const [allRows, registry] = await Promise.all([
-      getJosaaIndex(),
+      getPredictorIndexFromDeps(deps),
       loadRegistryMaps(),
     ]);
     // filter to non-IIT rows in JS — shared loader returns all instype values

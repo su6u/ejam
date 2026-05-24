@@ -25,3 +25,6 @@ data_dependencies:
   - dataset: seat_matrix
     path_template: "data/engineering/jee/seats/matrix/year={year}/seat-matrix.parquet"
     required: false
+  - dataset: predictor_index
+    path_template: "data/dist/college_predictor_index.parquet"
+    required: true
