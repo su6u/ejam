@@ -1,11 +1,21 @@
 "use client";
 
-import { Agentation } from "agentation";
+import dynamic from "next/dynamic";
+
+const AgentationOverlay =
+  process.env.NODE_ENV === "development"
+    ? dynamic(
+        () =>
+          import("agentation").then(({ Agentation }) => {
+            function DevAgentation() {
+              return <Agentation endpoint="http://localhost:4747" />;
+            }
+            return DevAgentation;
+          }),
+        { ssr: false },
+      )
+    : () => null;
 
 export function AgentationDev() {
-  if (process.env.NODE_ENV !== "development") {
-    return null;
-  }
-
-  return <Agentation endpoint="http://localhost:4747" />;
+  return <AgentationOverlay />;
 }
