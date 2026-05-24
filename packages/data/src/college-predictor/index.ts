@@ -47,9 +47,7 @@ export {
   predictPrograms,
 } from "./engine";
 export {
-  _resetJosaaIndexCache,
   _resetPredictorIndexCache,
-  getJosaaIndex,
   getPredictorIndexFromDeps,
   type PredictorIndexDeps,
 } from "./index-loader";

@@ -1,15 +1,16 @@
 # Data release guide
 
-ejam publishes counselling datasets as versioned parquet files pinned by a manifest. Every prediction response includes `provenance.manifest_version` and `provenance.datasets_used` with sha256 checksums.
+ejam publishes counselling datasets as versioned parquet files pinned by a manifest. Every prediction response includes `provenance.manifest_version`, `provenance.datasets_used` (with `role: loaded | linked`), and optional `index_lineage` from the predictor index sidecar.
 
 ## What's included
 
 | Dataset | Path pattern | Used by |
 |---------|--------------|---------|
-| Cutoffs | `data/engineering/jee/{josaa\|csab}/cutoffs/year=YYYY/round=R/cutoffs.parquet` | Dependency gating, backtests |
-| Seat matrix | `data/engineering/jee/seats/matrix/year=YYYY/seat-matrix.parquet` | Optional transparency |
+| Cutoffs | `data/engineering/jee/{josaa\|csab}/cutoffs/year=YYYY/round=R/cutoffs.parquet` | Index build (linked in provenance via sidecar) |
+| Seat matrix | `data/engineering/jee/seats/matrix/year=YYYY/seat-matrix.parquet` | Optional seat transparency |
 | Predictor index | `data/dist/college_predictor_index.parquet` | JEE Main, JEE Advanced |
 | CSAB index | `data/dist/csab_predictor_index.parquet` | CSAB |
+| Index lineage | `data/dist/*.lineage.json` | Maps each index to cutoff files consumed at build time |
 
 Schemas live in `packages/data/src/schema.ts` (`CutoffRow`, `SeatMatrixRow`).
 
@@ -25,21 +26,32 @@ Verify your checkout matches the pinned manifest:
 pnpm data:fetch
 ```
 
-If files are missing (sparse clone or future release-only distribution):
+If files are missing (sparse clone or release-only distribution):
 
 ```bash
 pnpm data:fetch --download
 ```
 
-Set `EJAM_DATA_RELEASE_URL` to override the default GitHub release tarball URL.
+`--download` fetches the pinned manifest tarball from the GitHub Release tagged `data-{version}` (override with `EJAM_DATA_RELEASE_URL`).
 
 ## Build derived artifacts
 
 ```bash
-pnpm build:predictor-index   # JoSAA index → data/dist/college_predictor_index.parquet
-pnpm generate:manifest         # refresh data/manifest/v*.json with sha256 checksums
+pnpm build:predictor-index   # JoSAA index → data/dist/college_predictor_index.parquet + .lineage.json
+pnpm build:csab-index        # CSAB index → data/dist/csab_predictor_index.parquet + .lineage.json
+pnpm generate:manifest       # refresh data/manifest/v*.json with sha256 checksums
 pnpm data:fetch                # verify integrity
+pnpm verify:index-lineage    # assert sidecars match on-disk cutoffs
 ```
+
+## Post-ingest checklist
+
+1. Ingest new cutoffs or seat matrix from official sources.
+2. Rebuild predictor indices when cutoff history changed.
+3. Run `pnpm generate:manifest --version=vX.Y.Z`.
+4. Run `pnpm data:fetch` and `pnpm verify:index-lineage`.
+5. Commit parquet files, sidecars, and updated manifest.
+6. Tag a GitHub Release (`data-X.Y.Z`) with a tarball for `--download`.
 
 ## Manifest format
 
@@ -60,13 +72,8 @@ Canonical manifest: `data/manifest/v*.json`
 }
 ```
 
-Paths omit the `data/` prefix. The dependency resolver maps exam config `path_template` values to manifest entries and gates the predict API when required datasets are missing.
+Paths omit the `data/` prefix. Publish gating requires `predictor_index`; cutoffs are validated in the manifest and linked at runtime via index lineage sidecars.
 
 ## Release cadence
 
-1. Ingest new cutoffs or seat matrix from official sources.
-2. Rebuild predictor indices if cutoff history changed.
-3. Run `pnpm generate:manifest --version=vX.Y.Z`.
-4. Run `pnpm data:fetch` to verify.
-5. Commit parquet files + updated manifest.
-6. Optionally tag a GitHub Release (`data-X.Y.Z`) with a tarball for `--download`.
+Follow the post-ingest checklist above when new counselling rounds land. Bump manifest semver with `generate:manifest --version=vX.Y.Z`.
