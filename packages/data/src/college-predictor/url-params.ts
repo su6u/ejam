@@ -22,6 +22,7 @@ const CATEGORY_TO_SEAT_TYPE: Record<string, string> = {
   gen: "OPEN",
   "gen-ews": "Gen-EWS",
   obc: "OBC-NCL",
+  "obc-ncl": "OBC-NCL",
   sc: "SC",
   st: "ST",
 };
@@ -68,10 +69,14 @@ function parseFilters(
   value: string | null,
 ): CollegePredictorFilters | undefined {
   if (!value) return undefined;
-  const parsed = JSON.parse(value) as unknown;
-  return parsed && typeof parsed === "object"
-    ? (parsed as CollegePredictorFilters)
-    : undefined;
+  try {
+    const parsed = JSON.parse(value) as unknown;
+    return parsed && typeof parsed === "object"
+      ? (parsed as CollegePredictorFilters)
+      : undefined;
+  } catch {
+    return undefined;
+  }
 }
 
 export function decodeCollegePredictorUrlParams(
@@ -79,13 +84,16 @@ export function decodeCollegePredictorUrlParams(
 ): CollegePredictorUrlInput {
   const rankValue = params.get("rank");
   const rank = rankValue ? Number.parseInt(rankValue, 10) : Number.NaN;
-  const category = params.get("category_id");
+  const category =
+    params.get("category") ?? params.get("category_id");
   const gender = params.get("gender") ?? params.get("gender_id");
   const state = params.get("state") ?? params.get("state_of_domicile");
   const rawFilters = parseFilters(params.get("filters"));
   const band = params.get("band") as ProbabilityBand | null;
   const filterWithBand = band ? { ...rawFilters, band: [band] } : rawFilters;
-  const ewsToggle = parseBoolean(params.get("ews_toggle"));
+  const ewsToggle =
+    parseBoolean(params.get("ews_toggle")) ??
+    parseBoolean(params.get("ews"));
   const includeAll = parseBoolean(params.get("include_all"));
 
   return {

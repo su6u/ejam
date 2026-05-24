@@ -31,8 +31,12 @@ export function readIndexLineageSidecar(
   const sidecarPath = indexManifestPath.replace(/\.parquet$/, ".lineage.json");
   const absolute = join(dataRoot(), sidecarPath);
   if (!existsSync(absolute)) return null;
-  const parsed = IndexLineage.safeParse(
-    JSON.parse(readFileSync(absolute, "utf-8")),
-  );
+  let raw: unknown;
+  try {
+    raw = JSON.parse(readFileSync(absolute, "utf-8"));
+  } catch {
+    return null;
+  }
+  const parsed = IndexLineage.safeParse(raw);
   return parsed.success ? parsed.data : null;
 }
