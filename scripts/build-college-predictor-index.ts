@@ -13,6 +13,7 @@ import {
   JAM_JOSAA_V2,
   resolvePoolShiftPct,
   roundWeightCaseSql,
+  yearWeightsCaseSql,
 } from "./jam/config";
 import {
   resolveManifestVersionForBuild,
@@ -58,8 +59,16 @@ function buildSQL(
   const unionParts = parquetFiles.map((f) => `SELECT * FROM read_parquet('${f}')`);
   const unionAll = unionParts.join("\nUNION ALL\n");
   const roundW = roundWeightCaseSql();
-  const { outlierGuardMultiplier, trendGapMultiplier, sigmaFloorPct, trendCapPct } =
-    JAM_TUNED;
+  const yearWeightCase = yearWeightsCaseSql();
+  const {
+    outlierGuardMultiplier,
+    trendGapMultiplier,
+    sigmaFloorPct,
+    trendCapPct,
+    windowSize,
+    sparseYearsThreshold,
+    sigmaInflation,
+  } = JAM_TUNED;
 
   return `
 CREATE TEMP TABLE raw_cutoffs AS
@@ -116,10 +125,7 @@ WITH ranked AS (
 )
 SELECT * FROM ranked WHERE rn = 1;
 
--- year weights for the last 4 years: [0.50, 0.30, 0.15, 0.05]
--- COVID outlier guard: if a year's final-round closing rank deviates from the
--- median of the other years in the window by more than 2× the inter-year std,
--- collapse its weight to 0.01 so the anomalous year barely influences the mean
+-- year weights from JAM_TUNED — COVID outlier guard collapses anomalous years to 0.01 weight
 CREATE TEMP TABLE year_weights AS
 WITH windowed AS (
   SELECT
@@ -129,7 +135,7 @@ WITH windowed AS (
       ORDER BY year DESC
     ) AS yr
   FROM anchor_round
-  QUALIFY yr <= 4
+  QUALIFY yr <= ${windowSize}
 ),
 group_std AS (
   SELECT
@@ -161,12 +167,7 @@ SELECT
       AND mo.med_others IS NOT NULL
       AND ABS(w.closing_rank - mo.med_others) > ${outlierGuardMultiplier} * gs.inter_year_std
     THEN 0.01
-    ELSE CASE w.yr
-      WHEN 1 THEN 0.50
-      WHEN 2 THEN 0.30
-      WHEN 3 THEN 0.15
-      WHEN 4 THEN 0.05
-    END
+    ELSE CASE w.yr ${yearWeightCase} END
   END AS w
 FROM windowed w
 LEFT JOIN group_std gs USING (institute_id, program_id, seat_type, quota, gender)
@@ -289,8 +290,8 @@ COPY (
     s.trend_slope,
     GREATEST(s.weighted_std, ROUND(s.weighted_mean * ${sigmaFloorPct}))::INTEGER AS sigma_base,
     CASE
-      WHEN s.years_of_data < 3
-        THEN ROUND(GREATEST(s.weighted_std, s.weighted_mean * ${sigmaFloorPct}) * 1.5)::INTEGER
+      WHEN s.years_of_data < ${sparseYearsThreshold}
+        THEN ROUND(GREATEST(s.weighted_std, s.weighted_mean * ${sigmaFloorPct}) * ${sigmaInflation})::INTEGER
       ELSE GREATEST(s.weighted_std, ROUND(s.weighted_mean * ${sigmaFloorPct}))::INTEGER
     END AS sigma_effective,
     ROUND(
@@ -305,7 +306,7 @@ COPY (
     CASE
       WHEN s.years_of_data = 1 THEN 'pooled'
       WHEN s.years_of_data = 2 THEN 'inferred'
-      WHEN s.years_of_data >= 3 THEN 'sufficient'
+      WHEN s.years_of_data >= ${sparseYearsThreshold} THEN 'sufficient'
     END AS data_quality,
     s.years_of_data,
     s.last_data_year,

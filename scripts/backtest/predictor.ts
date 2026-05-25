@@ -12,6 +12,7 @@ import {
   JAM_JOSAA_V2,
   resolvePoolShiftPct,
   roundWeightCaseSql,
+  yearWeightsCaseSql,
 } from "../jam/config";
 import { CSAB_TUNED, JAM_CSAB_V2, csabEnsemblePredictedRankSql } from "../jam/csab-config";
 
@@ -69,14 +70,11 @@ function buildJoSAATrainingSQL(
     trendGapMultiplier,
     sigmaFloorPct,
     windowSize,
-    yearWeights,
     sparseYearsThreshold,
     sigmaInflation,
     trendCapPct,
   } = JAM_TUNED;
-  const weightCase = yearWeights
-    .map((wt, i) => `WHEN ${i + 1} THEN ${wt}`)
-    .join(" ");
+  const yearWeightCase = yearWeightsCaseSql();
   const trainMaxYear = holdoutYear - 1;
 
   return `
@@ -131,7 +129,7 @@ SELECT w.institute_id, w.program_id, w.seat_type, w.quota, w.gender, w.year, w.y
       AND mo.med_others IS NOT NULL
       AND ABS(w.closing_rank - mo.med_others) > ${outlierGuardMultiplier} * gs.inter_year_std
     THEN 0.01
-    ELSE CASE w.yr ${weightCase} END
+    ELSE CASE w.yr ${yearWeightCase} END
   END AS w
 FROM windowed w
 LEFT JOIN group_std gs USING (institute_id, program_id, seat_type, quota, gender)

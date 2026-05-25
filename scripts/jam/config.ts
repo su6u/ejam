@@ -73,3 +73,10 @@ export function roundWeightCaseSql(): string {
     ELSE 0.1
   END`;
 }
+
+/** SQL CASE mapping recency rank (yr=1 is latest year) to JAM_TUNED.yearWeights. */
+export function yearWeightsCaseSql(): string {
+  return JAM_TUNED.yearWeights
+    .map((weight, index) => `WHEN ${index + 1} THEN ${weight}`)
+    .join(" ");
+}
