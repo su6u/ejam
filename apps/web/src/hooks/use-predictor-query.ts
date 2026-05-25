@@ -111,6 +111,22 @@ function writeKnownIndexSha(exam: string, sha: string): void {
   }
 }
 
+function clearExamPredictorCache(exam: string): void {
+  const examId = examToApiId(exam);
+  try {
+    const prefix = `predictor:${examId}:`;
+    const keysToRemove: string[] = [];
+    for (let i = 0; i < sessionStorage.length; i++) {
+      const key = sessionStorage.key(i);
+      if (key?.startsWith(prefix)) keysToRemove.push(key);
+    }
+    for (const key of keysToRemove) sessionStorage.removeItem(key);
+    sessionStorage.removeItem(`predictor:index-sha:${examId}`);
+  } catch {
+    // ignore quota errors
+  }
+}
+
 export function usePredictorQuery({
   exam,
   rank,
@@ -131,6 +147,8 @@ export function usePredictorQuery({
   const [error, setError] = useState<string | null>(null);
   const requestGenerationRef = useRef(0);
   const abortControllerRef = useRef<AbortController | null>(null);
+  // first predict per exam per page load hits the API so a deploy cannot serve stale sessionStorage
+  const sessionCacheReadyRef = useRef<Record<string, boolean>>({});
 
   useEffect(() => {
     requestGenerationRef.current += 1;
@@ -179,16 +197,21 @@ export function usePredictorQuery({
       has_ews_certificate,
     };
     const indexSha = readKnownIndexSha(exam);
-    const key = cacheKey(opts, indexSha);
-    const cached = readSessionCache(key);
-    if (cached) {
-      if (!isCurrent()) return false;
-      setData(cached.result);
-      setProvenance(cached.provenance);
-      setConfidence(cached.confidence ?? null);
-      setError(null);
-      abortControllerRef.current = null;
-      return true;
+    const examId = examToApiId(exam);
+    const canUseSessionCache = sessionCacheReadyRef.current[examId] === true;
+
+    if (canUseSessionCache && indexSha) {
+      const key = cacheKey(opts, indexSha);
+      const cached = readSessionCache(key);
+      if (cached) {
+        if (!isCurrent()) return false;
+        setData(cached.result);
+        setProvenance(cached.provenance);
+        setConfidence(cached.confidence ?? null);
+        setError(null);
+        abortControllerRef.current = null;
+        return true;
+      }
     }
 
     if (!isCurrent()) return false;
@@ -221,6 +244,10 @@ export function usePredictorQuery({
       }
 
       const responseSha = indexShaFromProvenance(json.provenance);
+      const previousSha = readKnownIndexSha(exam);
+      if (responseSha && previousSha && responseSha !== previousSha) {
+        clearExamPredictorCache(exam);
+      }
       setData(json.result as CollegePredictionResult);
       setProvenance(json.provenance);
       setConfidence(json.confidence ?? null);
@@ -231,6 +258,7 @@ export function usePredictorQuery({
           provenance: json.provenance,
           confidence: json.confidence,
         });
+        sessionCacheReadyRef.current[examId] = true;
       }
       return false;
     } catch (err) {
