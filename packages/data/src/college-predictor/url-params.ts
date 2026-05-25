@@ -10,8 +10,9 @@ export interface CollegePredictorUrlInput {
   seat_type?: string;
   gender?: string;
   state?: string;
+  quota?: string;
   filters?: CollegePredictorFilters;
-  ews_toggle?: boolean;
+  has_ews_certificate?: boolean;
   include_all?: boolean;
   band?: ProbabilityBand;
 }
@@ -20,8 +21,9 @@ const DEFAULT_SEAT_TYPE = "OPEN";
 const DEFAULT_GENDER = "Gender-Neutral";
 const CATEGORY_TO_SEAT_TYPE: Record<string, string> = {
   gen: "OPEN",
-  "gen-ews": "Gen-EWS",
+  "gen-ews": "EWS",
   obc: "OBC-NCL",
+  "obc-ncl": "OBC-NCL",
   sc: "SC",
   st: "ST",
 };
@@ -29,12 +31,21 @@ const GENDER_TO_SEAT_GENDER: Record<string, string> = {
   neutral: "Gender-Neutral",
   female: "Female-only (including Supernumerary)",
 };
+const QUOTA_TO_API: Record<string, string> = {
+  ai: "AI",
+  hs: "HS",
+  os: "OS",
+  AI: "AI",
+  HS: "HS",
+  OS: "OS",
+};
 const QUERY_KEYS = [
   "band",
-  "ews_toggle",
+  "ews",
   "filters",
   "gender",
   "include_all",
+  "quota",
   "rank",
   "seat_type",
   "state",
@@ -64,14 +75,23 @@ function parseBoolean(value: string | null): boolean | undefined {
   return undefined;
 }
 
+function parseQuota(value: string | null): string | undefined {
+  if (!value) return undefined;
+  return QUOTA_TO_API[value] ?? QUOTA_TO_API[value.toLowerCase()];
+}
+
 function parseFilters(
   value: string | null,
 ): CollegePredictorFilters | undefined {
   if (!value) return undefined;
-  const parsed = JSON.parse(value) as unknown;
-  return parsed && typeof parsed === "object"
-    ? (parsed as CollegePredictorFilters)
-    : undefined;
+  try {
+    const parsed = JSON.parse(value) as unknown;
+    return parsed && typeof parsed === "object"
+      ? (parsed as CollegePredictorFilters)
+      : undefined;
+  } catch {
+    return undefined;
+  }
 }
 
 export function decodeCollegePredictorUrlParams(
@@ -79,14 +99,19 @@ export function decodeCollegePredictorUrlParams(
 ): CollegePredictorUrlInput {
   const rankValue = params.get("rank");
   const rank = rankValue ? Number.parseInt(rankValue, 10) : Number.NaN;
-  const category = params.get("category_id");
+  const category =
+    params.get("category") ?? params.get("category_id");
   const gender = params.get("gender") ?? params.get("gender_id");
   const state = params.get("state") ?? params.get("state_of_domicile");
   const rawFilters = parseFilters(params.get("filters"));
   const band = params.get("band") as ProbabilityBand | null;
   const filterWithBand = band ? { ...rawFilters, band: [band] } : rawFilters;
-  const ewsToggle = parseBoolean(params.get("ews_toggle"));
+  const hasEwsCertificate =
+    parseBoolean(params.get("has_ews_certificate")) ??
+    parseBoolean(params.get("ews_toggle")) ??
+    parseBoolean(params.get("ews"));
   const includeAll = parseBoolean(params.get("include_all"));
+  const quota = parseQuota(params.get("quota"));
 
   return {
     rank,
@@ -99,8 +124,11 @@ export function decodeCollegePredictorUrlParams(
       gender ??
       DEFAULT_GENDER,
     ...(state ? { state } : {}),
+    ...(quota ? { quota } : {}),
     ...(filterWithBand ? { filters: filterWithBand } : {}),
-    ...(ewsToggle === undefined ? {} : { ews_toggle: ewsToggle }),
+    ...(hasEwsCertificate === undefined
+      ? {}
+      : { has_ews_certificate: hasEwsCertificate }),
     ...(includeAll === undefined ? {} : { include_all: includeAll }),
     ...(band ? { band } : {}),
   };
@@ -112,12 +140,15 @@ export function encodeCollegePredictorUrlParams(
   const params = new URLSearchParams();
   const values: Record<(typeof QUERY_KEYS)[number], string | undefined> = {
     band: input.band,
-    ews_toggle:
-      input.ews_toggle === undefined ? undefined : String(input.ews_toggle),
+    ews:
+      input.has_ews_certificate === undefined
+        ? undefined
+        : String(input.has_ews_certificate),
     filters: input.filters ? stableStringify(input.filters) : undefined,
     gender: input.gender,
     include_all:
       input.include_all === undefined ? undefined : String(input.include_all),
+    quota: input.quota?.toLowerCase(),
     rank: Number.isFinite(input.rank) ? String(input.rank) : undefined,
     seat_type: input.seat_type,
     state: input.state,

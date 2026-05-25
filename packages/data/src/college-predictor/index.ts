@@ -41,10 +41,11 @@ export {
   applyCollegePredictorFilters,
   classifyBand,
   computeProbability,
-  deriveConfidence,
+  DEFAULT_PROBABILITY_DISPLAY_THRESHOLD,
   groupProgramsByBand,
   normalCDF,
   predictPrograms,
+  REACH_BAND_MIN_PROBABILITY,
 } from "./engine";
 export {
   _resetPredictorIndexCache,

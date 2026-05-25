@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { type ReactNode, Suspense, useEffect } from "react";
+import { type ReactNode, Suspense } from "react";
 import { sidebarPanelTopInsetClass } from "@/components/app-layout";
 import { HomeStateCombobox } from "@/components/predictor/home-state-combobox";
 import { usePredictor } from "@/components/predictor/predictor-context";
@@ -86,24 +86,17 @@ export function PredictorSidebarPanel() {
 }
 
 function PredictorSidebarPanelInner() {
-  const { state, query, onPredict, filters, setFilters, hasResults } =
+  const { state, query, onPredict, rankInputRef, filters, setFilters, hasResults } =
     usePredictor();
 
   const programs = query.data?.programs ?? [];
 
-  useEffect(() => {
-    if (
-      !(state.exam === "jee-main" && state.quota === "hs") &&
-      state.homeState
-    ) {
-      state.setHomeState("");
-    }
-  }, [state.exam, state.quota, state.homeState, state.setHomeState]);
-
   const showQuota = state.exam === "jee-main";
-  const showHomeState = state.exam === "jee-main" && state.quota === "hs";
+  const needsHomeState =
+    state.exam === "jee-main" &&
+    (state.quota === "hs" || state.quota === "os");
   const canPredict =
-    Boolean(state.rank) && !(showHomeState && !state.homeState.trim());
+    Boolean(state.rank) && !(needsHomeState && !state.homeState.trim());
 
   return (
     <TooltipProvider delay={200}>
@@ -179,7 +172,11 @@ function PredictorSidebarPanelInner() {
 
         <div className="flex flex-col gap-3 border-t border-border px-2 py-3">
           <SetupField label="Rank" required>
-            <RankInput value={state.rank} onValueChange={state.setRank} />
+            <RankInput
+              ref={rankInputRef}
+              value={state.rank}
+              onValueChange={state.setRank}
+            />
           </SetupField>
 
           <div className="grid grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)] gap-2">
@@ -214,7 +211,7 @@ function PredictorSidebarPanelInner() {
             </SetupField>
           ) : null}
 
-          {showHomeState ? (
+          {needsHomeState ? (
             <SetupField label="Home state" required>
               <HomeStateCombobox
                 value={state.homeState}

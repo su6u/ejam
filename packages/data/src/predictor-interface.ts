@@ -43,13 +43,6 @@ export const PredictionSuccessResponse = z.object({
   ok: z.literal(true),
   exam_id: z.string(),
   result: z.unknown(),
-  confidence: z
-    .object({
-      level: z.enum(["high", "medium", "low"]),
-      // human-readable caveat shown to the student (user story 5)
-      caveat: z.string().optional(),
-    })
-    .optional(),
   provenance: PredictionProvenance,
 });
 export type PredictionSuccessResponse = z.infer<
@@ -83,8 +76,5 @@ export interface ExamPredictor<TInput = unknown, TResult = unknown> {
       }>;
       examId: string;
     },
-  ): Promise<{
-    result: TResult;
-    confidence?: PredictionSuccessResponse["confidence"];
-  }>;
+  ): Promise<{ result: TResult }>;
 }

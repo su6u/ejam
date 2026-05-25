@@ -43,6 +43,7 @@ export function Dashboard() {
     isLoading: query.isLoading,
     error: query.error,
     hasResults,
+    hasPredicted: query.data !== null,
     programs,
     filteredPrograms,
     sortBy,
@@ -79,6 +80,7 @@ function renderMiddle({
   isLoading,
   error,
   hasResults,
+  hasPredicted,
   programs,
   filteredPrograms,
   sortBy,
@@ -92,6 +94,7 @@ function renderMiddle({
   isLoading: boolean;
   error: string | null;
   hasResults: boolean;
+  hasPredicted: boolean;
   programs: ProgramPrediction[];
   filteredPrograms: ProgramPrediction[];
   sortBy: ResultsSortKey;
@@ -105,7 +108,13 @@ function renderMiddle({
   if (error) return <ErrorState message={error} provenance={provenance} />;
   if (!hasResults) {
     if (isLoading) return <LoadingState provenance={provenance} />;
-    return <EmptyState hasRank={hasRank} provenance={provenance} />;
+    return (
+      <EmptyState
+        hasRank={hasRank}
+        hasPredicted={hasPredicted}
+        provenance={provenance}
+      />
+    );
   }
 
   return (

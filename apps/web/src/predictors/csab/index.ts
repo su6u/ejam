@@ -15,19 +15,31 @@ import {
   type CollegePredictorIndexRow,
   getPredictorIndexFromDeps,
   loadCanonicalStates,
-  type ProgramPrediction,
   predictPrograms,
 } from "@ejam/data/college-predictor";
 import { z } from "zod";
 import {
   finalizePredictionResult,
+  resultFromCacheEntry,
   resultFromRankedPrograms,
 } from "@/predictors/shared/finalize-prediction";
+import {
+  fnv1a,
+  indexShaFromDeps,
+  stableStringify,
+  type ServerCacheEntry,
+} from "@/predictors/shared/predictor-cache";
+import {
+  QuotaApi,
+  refineQuotaRequiresState,
+} from "@/predictors/shared/quota-input";
 
-const CsabInput = z.object({
+const CsabInput = z
+  .object({
   rank: z.number().int().min(1).max(500000),
   seat_type: z.string().regex(/^[A-Za-z0-9 ()-]+$/),
   gender: z.string().regex(/^[A-Za-z0-9 ()-]+$/),
+  quota: QuotaApi.default("OS"),
   state: z
     .string()
     .optional()
@@ -48,7 +60,8 @@ const CsabInput = z.object({
     .optional(),
   has_ews_certificate: z.boolean().optional(),
   include_all: z.boolean().optional(),
-});
+})
+  .superRefine(refineQuotaRequiresState);
 type CsabInput = z.infer<typeof CsabInput>;
 
 // values must match the corresponding state strings in data/registry/engineering/institutes.json
@@ -60,7 +73,7 @@ const SPECIAL_STATE_QUOTAS: Record<string, string> = {
   AP: "Andhra Pradesh",
 };
 
-const EWS_SEAT_TYPE = "Gen-EWS";
+const EWS_SEAT_TYPE = "EWS";
 const EWS_CAVEAT =
   "EWS seats are only available to candidates holding a valid EWS certificate issued by a competent authority. These results assume you are EWS-eligible.";
 
@@ -75,19 +88,10 @@ let _cachedRegistry: RegistryMaps | null = null;
 
 // in-memory prediction result cache — keyed by FNV1a hash of canonical input
 // avoids re-running the probability computation for identical requests
-const _resultCache = new Map<string, ProgramPrediction[]>();
-
-function fnv1a(value: string): string {
-  let hash = 0x811c9dc5;
-  for (const char of value) {
-    hash ^= char.codePointAt(0) ?? 0;
-    hash = Math.imul(hash, 0x01000193);
-  }
-  return (hash >>> 0).toString(16).padStart(8, "0");
-}
+const _resultCache = new Map<string, ServerCacheEntry>();
 
 function cacheKey(input: unknown): string {
-  return fnv1a(JSON.stringify(input));
+  return fnv1a(stableStringify(input));
 }
 
 async function loadRegistryMaps(): Promise<RegistryMaps> {
@@ -147,63 +151,30 @@ function filterByQuota(
   });
 }
 
-function deriveConfidence(programs: ProgramPrediction[]): {
-  level: "high" | "medium" | "low";
-  caveat: string;
-} {
-  if (programs.length === 0) {
-    return {
-      level: "low",
-      caveat: "no programs found above the probability threshold for this rank",
-    };
-  }
-  // worst data_quality among returned programs drives the confidence level
-  // high is reserved until backtesting proves calibration
-  const hasPooled = programs.some((p) => p.data_quality === "pooled");
-  const hasInferred = programs.some((p) => p.data_quality === "inferred");
-  if (hasPooled || hasInferred) {
-    return {
-      level: "low",
-      caveat: hasPooled
-        ? "some programs are based on a single year of CSAB data — treat with caution"
-        : "some programs are based on only 2 years of CSAB data — treat with caution",
-    };
-  }
-  return {
-    level: "medium",
-    caveat: "probabilities are based on historical CSAB closing rank data",
-  };
-}
-
 function resultFromCachedPrograms(
-  cachedPrograms: ProgramPrediction[],
+  cached: ServerCacheEntry,
   filters: CollegePredictorFilters | undefined,
 ): CollegePredictionResult {
-  return resultFromRankedPrograms(cachedPrograms, filters);
+  return resultFromCacheEntry(cached, filters);
 }
 
 export const predictor: ExamPredictor<CsabInput, CollegePredictionResult> = {
   inputSchema: CsabInput,
 
   async predict(input, deps) {
-    const key = cacheKey({ exam_id: deps.examId, ...input });
+    const key = cacheKey({
+      index_sha: indexShaFromDeps(deps),
+      exam_id: deps.examId,
+      ...input,
+    });
     const cached = _resultCache.get(key);
     if (cached) {
-      return {
-        result: resultFromCachedPrograms(cached, input.filters),
-        confidence: deriveConfidence(cached),
-      };
+      return { result: resultFromCachedPrograms(cached, input.filters) };
     }
 
     const allRows = await getPredictorIndexFromDeps(deps);
     if (allRows.length === 0) {
-      return {
-        result: resultFromCachedPrograms([], input.filters),
-        confidence: {
-          level: "low",
-          caveat: "CSAB predictor index is empty — rebuild csab_predictor_index.parquet",
-        },
-      };
+      return { result: resultFromRankedPrograms([], input.filters) };
     }
 
     const registry = await loadRegistryMaps();
@@ -219,6 +190,7 @@ export const predictor: ExamPredictor<CsabInput, CollegePredictionResult> = {
       indexRows: quotaFiltered,
       studentRank: input.rank,
       seatType: input.seat_type,
+      quota: input.quota,
       gender: input.gender,
       includeAll: input.include_all,
       filters: input.filters,
@@ -239,6 +211,7 @@ export const predictor: ExamPredictor<CsabInput, CollegePredictionResult> = {
         indexRows: quotaFiltered,
         studentRank: input.rank,
         seatType: EWS_SEAT_TYPE,
+        quota: input.quota,
         gender: input.gender,
         includeAll: input.include_all,
         filters: input.filters,
@@ -255,7 +228,11 @@ export const predictor: ExamPredictor<CsabInput, CollegePredictionResult> = {
       };
     }
 
-    _resultCache.set(key, result.programs);
-    return { result, confidence: deriveConfidence(result.programs) };
+    _resultCache.set(key, {
+      programs: result.programs,
+      metadata: result.metadata,
+      ews_comparison: result.ews_comparison,
+    });
+    return { result };
   },
 };

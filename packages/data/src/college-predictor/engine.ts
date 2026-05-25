@@ -37,6 +37,11 @@ export interface CollegePredictorIndexRow {
 
 export type ProbabilityBand = "safe" | "target" | "reach" | "long-shot";
 
+/** reach band floor — long-shots are below this; default display hides long-shots */
+export const REACH_BAND_MIN_PROBABILITY = 0.1;
+
+export const DEFAULT_PROBABILITY_DISPLAY_THRESHOLD = REACH_BAND_MIN_PROBABILITY;
+
 export interface ProgramPrediction {
   institute_id: string;
   program_id: string;
@@ -119,7 +124,7 @@ export function computeProbability(
 export function classifyBand(probability: number): ProbabilityBand {
   if (probability >= 0.85) return "safe";
   if (probability >= 0.4) return "target";
-  if (probability >= 0.1) return "reach";
+  if (probability >= REACH_BAND_MIN_PROBABILITY) return "reach";
   return "long-shot";
 }
 
@@ -250,54 +255,9 @@ export function computeRoundProbs(
   return result;
 }
 
-// quality rank: pooled is worst, sufficient is best — used to find the floor across a result set
-const DATA_QUALITY_RANK: Record<CollegePredictorIndexRow["data_quality"], number> = {
-  sufficient: 0,
-  inferred: 1,
-  pooled: 2,
-};
-
-/**
- * derives response-level confidence from the worst data_quality present in the result set
- * "high" is never returned — reserved until backtesting proves the model is well-calibrated
- */
-export function deriveConfidence(
-  programs: ProgramPrediction[],
-): { level: "medium" | "low"; caveat: string } {
-  if (programs.length === 0) {
-    return {
-      level: "low",
-      caveat: "no programs found above the probability threshold for this rank",
-    };
-  }
-
-  let worstRank = 0;
-  let worstQuality: CollegePredictorIndexRow["data_quality"] = "sufficient";
-  for (const p of programs) {
-    const rank = DATA_QUALITY_RANK[p.data_quality];
-    if (rank > worstRank) {
-      worstRank = rank;
-      worstQuality = p.data_quality;
-    }
-  }
-
-  if (worstQuality === "sufficient") {
-    return {
-      level: "medium",
-      caveat: "probabilities are based on 3+ years of historical closing rank data",
-    };
-  }
-  if (worstQuality === "inferred") {
-    return {
-      level: "low",
-      caveat: "based on only 2 years of data — treat this prediction with caution",
-    };
-  }
-  // pooled
-  return {
-    level: "low",
-    caveat: "based on a single year of data — this prediction is highly uncertain",
-  };
+// index parquet uses JoSAA label "EWS"; callers may still send taxonomy alias "Gen-EWS"
+function normalizeSeatTypeForIndex(seatType: string): string {
+  return seatType === "Gen-EWS" ? "EWS" : seatType;
 }
 
 export function predictPrograms(opts: {
@@ -310,11 +270,13 @@ export function predictPrograms(opts: {
   includeAll?: boolean;
   filters?: CollegePredictorFilters;
 }): CollegePredictionResult {
-  const threshold = opts.probabilityThreshold ?? 0.1;
+  const threshold =
+    opts.probabilityThreshold ?? DEFAULT_PROBABILITY_DISPLAY_THRESHOLD;
+  const seatType = normalizeSeatTypeForIndex(opts.seatType);
 
   const matching = opts.indexRows.filter(
     (row) =>
-      row.seat_type === opts.seatType &&
+      row.seat_type === seatType &&
       (opts.quota === undefined || row.quota === opts.quota) &&
       row.gender === opts.gender,
   );

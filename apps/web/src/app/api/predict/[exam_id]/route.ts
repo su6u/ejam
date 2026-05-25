@@ -250,21 +250,17 @@ async function handlePrediction(
   if (!dependencyResult.ok) return dependencyResult.response;
 
   try {
-    const { result, confidence } = await predictor.predict(
-      validationResult.data,
-      {
-        resolvedDatasets: [
-          { dataset: "predictor_index", ...dependencyResult.predictorIndex },
-        ],
-        examId: exam_id,
-      },
-    );
+    const { result } = await predictor.predict(validationResult.data, {
+      resolvedDatasets: [
+        { dataset: "predictor_index", ...dependencyResult.predictorIndex },
+      ],
+      examId: exam_id,
+    });
 
     const body: PredictionSuccessResponse = {
       ok: true,
       exam_id,
       result,
-      ...(confidence ? { confidence } : {}),
       provenance: buildPredictionProvenance({
         examId: exam_id,
         manifestVersion: dependencyResult.manifestVersion,

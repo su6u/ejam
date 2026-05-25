@@ -15,7 +15,7 @@ export type ExamType = "jee-advanced" | "jee-main";
 
 const CATEGORY_TO_SEAT_TYPE: Record<string, string> = {
   gen: "OPEN",
-  "gen-ews": "Gen-EWS",
+  "gen-ews": "EWS",
   "obc-ncl": "OBC-NCL",
   sc: "SC",
   st: "ST",
@@ -115,14 +115,8 @@ export function usePredictorState(): PredictorStateReturn {
   );
 
   const setHomeState = useCallback(
-    (v: string) => {
-      if (exam === "jee-main" && quota === "hs") {
-        updateParam({ state: v });
-      } else {
-        updateParam({ state: null });
-      }
-    },
-    [exam, quota, updateParam],
+    (v: string) => updateParam({ state: v }),
+    [updateParam],
   );
 
   return {
