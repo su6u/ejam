@@ -1,6 +1,18 @@
 "use client";
 
-import { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
+import {
+  examUsesQuotaHomeState,
+  quotaRequiresHomeState,
+} from "@ejam/predictors/shared/quota-input";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
+import type { RankInputHandle } from "@/components/predictor/rank-input";
 import {
   EMPTY_RESULTS_FILTERS,
   type ResultsFilterState,
@@ -14,11 +26,6 @@ import {
   type PredictorStateReturn,
   usePredictorState,
 } from "@/hooks/use-predictor-state";
-import {
-  examUsesQuotaHomeState,
-  quotaRequiresHomeState,
-} from "@/predictors/shared/quota-input";
-import type { RankInputHandle } from "@/components/predictor/rank-input";
 
 type PredictorQueryReturn = ReturnType<typeof usePredictorQuery>;
 
@@ -66,8 +73,9 @@ export function PredictorProvider({ children }: { children: React.ReactNode }) {
     homeState: state.homeState,
     has_ews_certificate: state.has_ews_certificate,
   });
-  const [filters, setFilters] =
-    useState<ResultsFilterState>(EMPTY_RESULTS_FILTERS);
+  const [filters, setFilters] = useState<ResultsFilterState>(
+    EMPTY_RESULTS_FILTERS,
+  );
   const [sortBy, setSortBy] = useState<ResultsSortKey>(DEFAULT_RESULTS_SORT);
   const rankInputRef = useRef<RankInputHandle>(null);
   const initialUrlParamsRef = useRef<URLSearchParams | null | undefined>(
@@ -79,6 +87,7 @@ export function PredictorProvider({ children }: { children: React.ReactNode }) {
   const shareLinkAutoPredictDone = useRef(false);
   const hasResults = (query.data?.programs.length ?? 0) > 0;
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: reset filters when exam changes
   useEffect(() => {
     setFilters(EMPTY_RESULTS_FILTERS);
     setSortBy(DEFAULT_RESULTS_SORT);

@@ -2,7 +2,7 @@
 
 import type { PredictionProvenance } from "@ejam/data";
 
-const DATA_DOC_URL = "https://github.com/su6u/ejam/blob/main/DATA.md";
+const DATA_DOC_URL = "https://github.com/su6u/ejam/blob/main/docs/DATA.md";
 
 export function DataVersionFooter({
   provenance,

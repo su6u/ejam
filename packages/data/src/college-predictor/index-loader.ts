@@ -24,11 +24,8 @@ export async function getPredictorIndexFromDeps(
   deps: PredictorIndexDeps,
   dataset = "predictor_index",
 ): Promise<CollegePredictorIndexRow[]> {
-  const {
-    assertResolvedDataset,
-    manifestPathToDataRoot,
-    verifyDatasetSha256,
-  } = await import("../dependency-resolver/dataset-path");
+  const { assertResolvedDataset, manifestPathToDataRoot, verifyDatasetSha256 } =
+    await import("../dependency-resolver/dataset-path");
 
   const entry = assertResolvedDataset(deps.resolvedDatasets, dataset);
   const key = cacheKeyForDataset(entry.path, entry.sha256);

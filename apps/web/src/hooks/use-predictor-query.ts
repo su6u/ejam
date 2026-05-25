@@ -8,12 +8,12 @@
 
 import {
   PredictionErrorResponse,
-  PredictionProvenance,
+  type PredictionProvenance,
   PredictionSuccessResponse,
 } from "@ejam/data";
 import type { CollegePredictionResult } from "@ejam/data/college-predictor";
+import { uiQuotaToApi } from "@ejam/predictors/shared/quota-input";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { uiQuotaToApi } from "@/predictors/shared/quota-input";
 
 interface PredictorQueryOptions {
   exam: string;
@@ -95,7 +95,9 @@ function writeSessionCache(key: string, data: CachedPrediction): void {
 
 function readKnownIndexSha(exam: string): string {
   try {
-    return sessionStorage.getItem(`predictor:index-sha:${examToApiId(exam)}`) ?? "";
+    return (
+      sessionStorage.getItem(`predictor:index-sha:${examToApiId(exam)}`) ?? ""
+    );
   } catch {
     return "";
   }
@@ -130,9 +132,7 @@ function readErrorMessage(body: unknown): string {
   return parsed.success ? parsed.data.error.message : "Prediction failed";
 }
 
-function readSuccessResponse(
-  body: unknown,
-): PredictionSuccessResponse | null {
+function readSuccessResponse(body: unknown): PredictionSuccessResponse | null {
   const parsed = PredictionSuccessResponse.safeParse(body);
   return parsed.success ? parsed.data : null;
 }
@@ -158,6 +158,7 @@ export function usePredictorQuery({
   // first predict per exam per page load hits the API so a deploy cannot serve stale sessionStorage
   const sessionCacheReadyRef = useRef<Record<string, boolean>>({});
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: flush stale results when inputs change
   useEffect(() => {
     if (
       predictInFlightRankRef.current !== null &&
@@ -189,122 +190,125 @@ export function usePredictorQuery({
     [],
   );
 
-  const trigger = useCallback(async (rankOverride?: string): Promise<boolean> => {
-    const effectiveRank = rankOverride ?? rank;
-    if (!effectiveRank || Number.isNaN(Number(effectiveRank))) return false;
+  const trigger = useCallback(
+    async (rankOverride?: string): Promise<boolean> => {
+      const effectiveRank = rankOverride ?? rank;
+      if (!effectiveRank || Number.isNaN(Number(effectiveRank))) return false;
 
-    predictInFlightRankRef.current = effectiveRank;
-    const generation = ++requestGenerationRef.current;
-    const isCurrent = () => generation === requestGenerationRef.current;
+      predictInFlightRankRef.current = effectiveRank;
+      const generation = ++requestGenerationRef.current;
+      const isCurrent = () => generation === requestGenerationRef.current;
 
-    abortControllerRef.current?.abort();
-    const controller = new AbortController();
-    abortControllerRef.current = controller;
+      abortControllerRef.current?.abort();
+      const controller = new AbortController();
+      abortControllerRef.current = controller;
 
-    const opts: PredictorQueryOptions = {
-      exam,
-      rank: effectiveRank,
-      apiSeatType,
-      apiGender,
-      quota,
-      homeState,
-      has_ews_certificate,
-    };
-    const indexSha = readKnownIndexSha(exam);
-    const examId = examToApiId(exam);
-    const canUseSessionCache = sessionCacheReadyRef.current[examId] === true;
-
-    if (canUseSessionCache && indexSha) {
-      const key = cacheKey(opts, indexSha);
-      const cached = readSessionCache(key);
-      if (cached) {
-        if (!isCurrent()) return false;
-        setData(cached.result);
-        setProvenance(cached.provenance);
-        setError(null);
-        abortControllerRef.current = null;
-        return true;
-      }
-    }
-
-    if (!isCurrent()) return false;
-    setIsLoading(true);
-    setError(null);
-
-    try {
+      const opts: PredictorQueryOptions = {
+        exam,
+        rank: effectiveRank,
+        apiSeatType,
+        apiGender,
+        quota,
+        homeState,
+        has_ews_certificate,
+      };
+      const indexSha = readKnownIndexSha(exam);
       const examId = examToApiId(exam);
-      const res = await fetch(`/api/predict/${examId}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(buildRequestBody(opts)),
-        signal: controller.signal,
-      });
+      const canUseSessionCache = sessionCacheReadyRef.current[examId] === true;
+
+      if (canUseSessionCache && indexSha) {
+        const key = cacheKey(opts, indexSha);
+        const cached = readSessionCache(key);
+        if (cached) {
+          if (!isCurrent()) return false;
+          setData(cached.result);
+          setProvenance(cached.provenance);
+          setError(null);
+          abortControllerRef.current = null;
+          return true;
+        }
+      }
 
       if (!isCurrent()) return false;
+      setIsLoading(true);
+      setError(null);
 
-      let body: unknown;
       try {
-        body = await res.json();
-      } catch {
-        if (!isCurrent()) return false;
-        setError("Network error — please try again");
-        return false;
-      }
-
-      if (!isCurrent()) return false;
-
-      if (!res.ok || (body !== null && typeof body === "object" && "ok" in body && body.ok === false)) {
-        setError(readErrorMessage(body));
-        return false;
-      }
-
-      const json = readSuccessResponse(body);
-      if (!json) {
-        setError("Prediction failed");
-        return false;
-      }
-
-      const responseSha = indexShaFromProvenance(json.provenance);
-      const previousSha = readKnownIndexSha(exam);
-      if (responseSha && previousSha && responseSha !== previousSha) {
-        clearExamPredictorCache(exam);
-      }
-      setData(json.result as CollegePredictionResult);
-      setProvenance(json.provenance);
-      if (responseSha) {
-        writeKnownIndexSha(exam, responseSha);
-        writeSessionCache(cacheKey(opts, responseSha), {
-          result: json.result as CollegePredictionResult,
-          provenance: json.provenance,
+        const examId = examToApiId(exam);
+        const res = await fetch(`/api/predict/${examId}`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(buildRequestBody(opts)),
+          signal: controller.signal,
         });
-        sessionCacheReadyRef.current[examId] = true;
+
+        if (!isCurrent()) return false;
+
+        let body: unknown;
+        try {
+          body = await res.json();
+        } catch {
+          if (!isCurrent()) return false;
+          setError("Network error — please try again");
+          return false;
+        }
+
+        if (!isCurrent()) return false;
+
+        if (
+          !res.ok ||
+          (body !== null &&
+            typeof body === "object" &&
+            "ok" in body &&
+            body.ok === false)
+        ) {
+          setError(readErrorMessage(body));
+          return false;
+        }
+
+        const json = readSuccessResponse(body);
+        if (!json) {
+          setError("Prediction failed");
+          return false;
+        }
+
+        const responseSha = indexShaFromProvenance(json.provenance);
+        const previousSha = readKnownIndexSha(exam);
+        if (responseSha && previousSha && responseSha !== previousSha) {
+          clearExamPredictorCache(exam);
+        }
+        setData(json.result as CollegePredictionResult);
+        setProvenance(json.provenance);
+        if (responseSha) {
+          writeKnownIndexSha(exam, responseSha);
+          writeSessionCache(cacheKey(opts, responseSha), {
+            result: json.result as CollegePredictionResult,
+            provenance: json.provenance,
+          });
+          sessionCacheReadyRef.current[examId] = true;
+        }
+        return false;
+      } catch (err) {
+        if (err instanceof Error && err.name === "AbortError") return false;
+        if (!isCurrent()) return false;
+        const message =
+          err instanceof Error
+            ? err.message
+            : "Network error — please try again";
+        setError(message);
+        return false;
+      } finally {
+        if (predictInFlightRankRef.current === effectiveRank) {
+          predictInFlightRankRef.current = null;
+        }
+        if (isCurrent()) {
+          setIsLoading(false);
+          abortControllerRef.current = null;
+        }
       }
-      return false;
-    } catch (err) {
-      if (err instanceof Error && err.name === "AbortError") return false;
-      if (!isCurrent()) return false;
-      const message =
-        err instanceof Error ? err.message : "Network error — please try again";
-      setError(message);
-      return false;
-    } finally {
-      if (predictInFlightRankRef.current === effectiveRank) {
-        predictInFlightRankRef.current = null;
-      }
-      if (isCurrent()) {
-        setIsLoading(false);
-        abortControllerRef.current = null;
-      }
-    }
-  }, [
-    exam,
-    rank,
-    apiSeatType,
-    apiGender,
-    quota,
-    homeState,
-    has_ews_certificate,
-  ]);
+    },
+    [exam, rank, apiSeatType, apiGender, quota, homeState, has_ews_certificate],
+  );
 
   return { data, provenance, isLoading, error, trigger };
 }

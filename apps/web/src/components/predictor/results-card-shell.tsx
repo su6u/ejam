@@ -1,5 +1,5 @@
-import { DecorIcon } from "@/components/decor-icon";
 import { DashboardCard } from "@/components/dashboard-card";
+import { DecorIcon } from "@/components/decor-icon";
 import {
   CardContent,
   CardDescription,

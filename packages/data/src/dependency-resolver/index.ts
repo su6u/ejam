@@ -4,20 +4,23 @@
  */
 
 export {
+  assertResolvedDataset,
+  findResolvedDataset,
+  manifestPathToDataRoot,
+  type ResolvedDatasetRef,
+  verifyDatasetSha256,
+} from "./dataset-path";
+export {
+  type IndexLineage,
+  readIndexLineageSidecar,
+} from "./index-lineage";
+export { buildPredictionProvenance } from "./provenance";
+export {
   assertPublishable,
   loadLatestManifest,
   loadManifest,
   resolveExamDependencies,
 } from "./resolver";
-export { readIndexLineageSidecar } from "./index-lineage";
-export { buildPredictionProvenance } from "./provenance";
-export {
-  assertResolvedDataset,
-  findResolvedDataset,
-  manifestPathToDataRoot,
-  verifyDatasetSha256,
-  type ResolvedDatasetRef,
-} from "./dataset-path";
 export type {
   DependencyResolutionResult,
   Manifest,

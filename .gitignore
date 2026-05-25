@@ -32,13 +32,12 @@ logs
 # misc
 .turbo
 coverage
+.venv
+__pycache__/
 
-# raw scraped sources (regenerable from ejam-ingest)
-data/**/_raw/
-
-# data lake — versioned manifests are tracked; runtime ingest logs are not
-data/manifest/sources.jsonl
-data/manifest/runs.jsonl
+# data lake — see data/.gitignore (parquet policy, sandbox, ingest logs)
+data-*.tar.gz
+.data-release.tar.gz
 
 # pnpm
 node_modules/
@@ -57,13 +56,9 @@ apps/web/next-env.d.ts
 .env.local
 .env.*.local
 
-# scraper runtime logs
-data/manifest/sources.jsonl
-data/manifest/runs.jsonl
+# scraper runtime cache
 apps/scraper/data/cache/
 
-# backtesting — sandbox, local data, search tuning (CI: predictor.ts only)
-scripts/backtest/*
-!scripts/backtest/predictor.ts
-data/dist/backtest-results.json
-data/dist/sandbox/
+# backtesting — local tuning scripts (CI: predictor.ts only)
+packages/data-cli/src/backtest/*
+!packages/data-cli/src/backtest/predictor.ts

@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  bumpPatchVersion,
   compareManifestVersions,
   pickLatestManifestFile,
   sortManifestVersionsDesc,
@@ -28,8 +29,20 @@ describe("pickLatestManifestFile", () => {
 
 describe("sortManifestVersionsDesc", () => {
   it("sorts descending", () => {
-    expect(
-      sortManifestVersionsDesc(["v0.1.0", "v0.10.0", "v0.9.0"]),
-    ).toEqual(["v0.10.0", "v0.9.0", "v0.1.0"]);
+    expect(sortManifestVersionsDesc(["v0.1.0", "v0.10.0", "v0.9.0"])).toEqual([
+      "v0.10.0",
+      "v0.9.0",
+      "v0.1.0",
+    ]);
+  });
+});
+
+describe("bumpPatchVersion", () => {
+  it("increments patch segment", () => {
+    expect(bumpPatchVersion("v0.1.0")).toBe("v0.1.1");
+  });
+
+  it("handles double-digit patch releases", () => {
+    expect(bumpPatchVersion("v0.10.0")).toBe("v0.10.1");
   });
 });

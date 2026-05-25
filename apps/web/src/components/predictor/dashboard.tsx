@@ -34,6 +34,7 @@ export function Dashboard() {
 
   const selectedId = selected ? programKey(selected) : null;
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: reset drawer when exam changes
   useEffect(() => {
     setSheetOpen(false);
     setSelected(null);

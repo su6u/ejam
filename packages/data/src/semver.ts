@@ -20,12 +20,17 @@ export function sortManifestVersionsDesc(versions: string[]): string[] {
   return [...versions].sort((a, b) => compareManifestVersions(b, a));
 }
 
-export function pickLatestManifestFile(
-  files: string[],
-): string | undefined {
+export function pickLatestManifestFile(files: string[]): string | undefined {
   const versions = files
     .filter((f) => f.endsWith(".json") && f.startsWith("v"))
     .map((f) => f.replace(/\.json$/, ""));
   const latest = sortManifestVersionsDesc(versions)[0];
   return latest ? `${latest}.json` : undefined;
+}
+
+export function bumpPatchVersion(version: string): string {
+  const parts = parseManifestVersion(version);
+  while (parts.length < 3) parts.push(0);
+  parts[parts.length - 1] += 1;
+  return `v${parts.join(".")}`;
 }

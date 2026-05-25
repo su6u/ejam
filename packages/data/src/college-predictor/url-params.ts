@@ -99,8 +99,7 @@ export function decodeCollegePredictorUrlParams(
 ): CollegePredictorUrlInput {
   const rankValue = params.get("rank");
   const rank = rankValue ? Number.parseInt(rankValue, 10) : Number.NaN;
-  const category =
-    params.get("category") ?? params.get("category_id");
+  const category = params.get("category") ?? params.get("category_id");
   const gender = params.get("gender") ?? params.get("gender_id");
   const state = params.get("state") ?? params.get("state_of_domicile");
   const rawFilters = parseFilters(params.get("filters"));
