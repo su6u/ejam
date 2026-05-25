@@ -11,7 +11,7 @@ export interface CollegePredictorUrlInput {
   gender?: string;
   state?: string;
   filters?: CollegePredictorFilters;
-  ews_toggle?: boolean;
+  has_ews_certificate?: boolean;
   include_all?: boolean;
   band?: ProbabilityBand;
 }
@@ -32,7 +32,7 @@ const GENDER_TO_SEAT_GENDER: Record<string, string> = {
 };
 const QUERY_KEYS = [
   "band",
-  "ews_toggle",
+  "ews",
   "filters",
   "gender",
   "include_all",
@@ -91,7 +91,8 @@ export function decodeCollegePredictorUrlParams(
   const rawFilters = parseFilters(params.get("filters"));
   const band = params.get("band") as ProbabilityBand | null;
   const filterWithBand = band ? { ...rawFilters, band: [band] } : rawFilters;
-  const ewsToggle =
+  const hasEwsCertificate =
+    parseBoolean(params.get("has_ews_certificate")) ??
     parseBoolean(params.get("ews_toggle")) ??
     parseBoolean(params.get("ews"));
   const includeAll = parseBoolean(params.get("include_all"));
@@ -108,7 +109,9 @@ export function decodeCollegePredictorUrlParams(
       DEFAULT_GENDER,
     ...(state ? { state } : {}),
     ...(filterWithBand ? { filters: filterWithBand } : {}),
-    ...(ewsToggle === undefined ? {} : { ews_toggle: ewsToggle }),
+    ...(hasEwsCertificate === undefined
+      ? {}
+      : { has_ews_certificate: hasEwsCertificate }),
     ...(includeAll === undefined ? {} : { include_all: includeAll }),
     ...(band ? { band } : {}),
   };
@@ -120,8 +123,10 @@ export function encodeCollegePredictorUrlParams(
   const params = new URLSearchParams();
   const values: Record<(typeof QUERY_KEYS)[number], string | undefined> = {
     band: input.band,
-    ews_toggle:
-      input.ews_toggle === undefined ? undefined : String(input.ews_toggle),
+    ews:
+      input.has_ews_certificate === undefined
+        ? undefined
+        : String(input.has_ews_certificate),
     filters: input.filters ? stableStringify(input.filters) : undefined,
     gender: input.gender,
     include_all:
