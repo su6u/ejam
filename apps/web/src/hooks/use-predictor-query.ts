@@ -136,7 +136,15 @@ export function usePredictorQuery({
     setConfidence(null);
     setError(null);
     setIsLoading(false);
-  }, [exam]);
+  }, [
+    exam,
+    rank,
+    apiSeatType,
+    apiGender,
+    quota,
+    homeState,
+    has_ews_certificate,
+  ]);
 
   const trigger = useCallback(async (rankOverride?: string): Promise<boolean> => {
     const effectiveRank = rankOverride ?? rank;

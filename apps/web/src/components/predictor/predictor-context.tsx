@@ -47,7 +47,6 @@ export function PredictorProvider({ children }: { children: React.ReactNode }) {
     useState<ResultsFilterState>(EMPTY_RESULTS_FILTERS);
   const [sortBy, setSortBy] = useState<ResultsSortKey>(DEFAULT_RESULTS_SORT);
   const rankInputRef = useRef<RankInputHandle>(null);
-  const initialPredictStarted = useRef(false);
   const hasResults = (query.data?.programs.length ?? 0) > 0;
 
   useEffect(() => {
@@ -63,24 +62,6 @@ export function PredictorProvider({ children }: { children: React.ReactNode }) {
       setSortBy(DEFAULT_RESULTS_SORT);
     }
   }, [query, state.rank]);
-
-  useEffect(() => {
-    if (initialPredictStarted.current || !state.rank.trim()) return;
-
-    const needsHomeState =
-      state.exam === "jee-main" &&
-      (state.quota === "hs" || state.quota === "os");
-    if (needsHomeState && !state.homeState.trim()) return;
-
-    initialPredictStarted.current = true;
-    void onPredict();
-  }, [
-    state.rank,
-    state.exam,
-    state.quota,
-    state.homeState,
-    onPredict,
-  ]);
 
   return (
     <PredictorContext.Provider
