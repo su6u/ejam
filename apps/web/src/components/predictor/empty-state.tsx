@@ -34,11 +34,36 @@ function EmptyIllustration() {
   );
 }
 
+function emptyDescription({
+  hasRank,
+  hasPredicted,
+  confidenceCaveat,
+}: {
+  hasRank: boolean;
+  hasPredicted: boolean;
+  confidenceCaveat?: string;
+}): string {
+  if (hasPredicted) {
+    return (
+      confidenceCaveat ??
+      "No colleges met the minimum chance threshold for this rank — try a lower rank"
+    );
+  }
+  if (hasRank) {
+    return "Hit Predict on the left to see the colleges and programs ranked by chance, strongest options first within each band.";
+  }
+  return "Enter your rank and pick a category on the left, then run a prediction to see colleges ranked by your admission chance.";
+}
+
 export function EmptyState({
   hasRank,
+  hasPredicted = false,
+  confidenceCaveat,
   provenance,
 }: {
   hasRank: boolean;
+  hasPredicted?: boolean;
+  confidenceCaveat?: string;
   provenance?: PredictionProvenance | null;
 }) {
   return (
@@ -47,9 +72,7 @@ export function EmptyState({
         <EmptyHeader>
           <EmptyIllustration />
           <EmptyDescription>
-            {hasRank
-              ? "Hit Predict on the left to see the colleges and programs ranked by chance, strongest options first within each band."
-              : "Enter your rank and pick a category on the left, then run a prediction to see colleges ranked by your admission chance."}
+            {emptyDescription({ hasRank, hasPredicted, confidenceCaveat })}
           </EmptyDescription>
         </EmptyHeader>
         <EmptyContent />
