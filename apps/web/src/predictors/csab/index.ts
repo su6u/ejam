@@ -26,8 +26,8 @@ import {
 import {
   fnv1a,
   indexShaFromDeps,
-  stableStringify,
   type ServerCacheEntry,
+  stableStringify,
 } from "@/predictors/shared/predictor-cache";
 import {
   QuotaApi,
@@ -36,31 +36,31 @@ import {
 
 const CsabInput = z
   .object({
-  rank: z.number().int().min(1).max(500000),
-  seat_type: z.string().regex(/^[A-Za-z0-9 ()-]+$/),
-  gender: z.string().regex(/^[A-Za-z0-9 ()-]+$/),
-  quota: QuotaApi.default("OS"),
-  state: z
-    .string()
-    .optional()
-    .default("")
-    .refine(
-      (value) => value === "" || loadCanonicalStates().has(value),
-      "state must be a canonical value from the institute registry",
-    ),
-  filters: z
-    .object({
-      institute_type: z.array(z.string()).optional(),
-      state: z.array(z.string()).optional(),
-      branch_name: z.union([z.string(), z.array(z.string())]).optional(),
-      band: z
-        .array(z.enum(["safe", "target", "reach", "long-shot"]))
-        .optional(),
-    })
-    .optional(),
-  has_ews_certificate: z.boolean().optional(),
-  include_all: z.boolean().optional(),
-})
+    rank: z.number().int().min(1).max(500000),
+    seat_type: z.string().regex(/^[A-Za-z0-9 ()-]+$/),
+    gender: z.string().regex(/^[A-Za-z0-9 ()-]+$/),
+    quota: QuotaApi.default("OS"),
+    state: z
+      .string()
+      .optional()
+      .default("")
+      .refine(
+        (value) => value === "" || loadCanonicalStates().has(value),
+        "state must be a canonical value from the institute registry",
+      ),
+    filters: z
+      .object({
+        institute_type: z.array(z.string()).optional(),
+        state: z.array(z.string()).optional(),
+        branch_name: z.union([z.string(), z.array(z.string())]).optional(),
+        band: z
+          .array(z.enum(["safe", "target", "reach", "long-shot"]))
+          .optional(),
+      })
+      .optional(),
+    has_ews_certificate: z.boolean().optional(),
+    include_all: z.boolean().optional(),
+  })
   .superRefine(refineQuotaRequiresState);
 type CsabInput = z.infer<typeof CsabInput>;
 

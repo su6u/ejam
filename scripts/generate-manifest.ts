@@ -38,7 +38,9 @@ async function main(): Promise<void> {
   console.log(`Generating manifest ${version}...`);
   const datasets = await collectParquetDatasets();
   if (datasets.length === 0) {
-    console.error("No parquet datasets found under data/engineering or data/dist");
+    console.error(
+      "No parquet datasets found under data/engineering or data/dist",
+    );
     process.exit(1);
   }
 

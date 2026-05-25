@@ -8,7 +8,11 @@ import { execSync } from "node:child_process";
 import * as fs from "node:fs";
 import * as path from "node:path";
 import { fileURLToPath } from "node:url";
-import { CSAB_TUNED, JAM_CSAB_V2, csabEnsemblePredictedRankSql } from "./jam/csab-config";
+import {
+  CSAB_TUNED,
+  csabEnsemblePredictedRankSql,
+  JAM_CSAB_V2,
+} from "./jam/csab-config";
 import {
   resolveManifestVersionForBuild,
   writeIndexLineageSidecar,
@@ -16,7 +20,14 @@ import {
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..");
-const CSAB_CUTOFFS = path.join(ROOT, "data", "engineering", "jee", "csab", "cutoffs");
+const CSAB_CUTOFFS = path.join(
+  ROOT,
+  "data",
+  "engineering",
+  "jee",
+  "csab",
+  "cutoffs",
+);
 const OUTPUT_DIR = path.join(ROOT, "data", "dist");
 const OUTPUT_FILE = path.join(OUTPUT_DIR, "csab_predictor_index.parquet");
 
@@ -32,13 +43,20 @@ function resolvePredictionYear(): number {
 
 function findAllCutoffParquets(): string[] {
   const files: string[] = [];
-  const years = fs.readdirSync(CSAB_CUTOFFS).filter((d) => d.startsWith("year="));
+  const years = fs
+    .readdirSync(CSAB_CUTOFFS)
+    .filter((d) => d.startsWith("year="));
   for (const yearDir of years) {
     const rounds = fs
       .readdirSync(path.join(CSAB_CUTOFFS, yearDir))
       .filter((d) => d.startsWith("round="));
     for (const roundDir of rounds) {
-      const parquetPath = path.join(CSAB_CUTOFFS, yearDir, roundDir, "cutoffs.parquet");
+      const parquetPath = path.join(
+        CSAB_CUTOFFS,
+        yearDir,
+        roundDir,
+        "cutoffs.parquet",
+      );
       if (fs.existsSync(parquetPath)) files.push(parquetPath);
     }
   }
@@ -46,7 +64,9 @@ function findAllCutoffParquets(): string[] {
 }
 
 function buildSQL(parquetFiles: string[], predictionYear: number): string {
-  const unionParts = parquetFiles.map((f) => `SELECT * FROM read_parquet('${f}')`);
+  const unionParts = parquetFiles.map(
+    (f) => `SELECT * FROM read_parquet('${f}')`,
+  );
   const unionAll = unionParts.join("\nUNION ALL\n");
   const [w1, w2] = CSAB_TUNED.yearWeights;
   const og = CSAB_TUNED.outlierGuardMultiplier;
@@ -342,7 +362,9 @@ async function main(): Promise<void> {
       sourceCutoffPaths: parquetFiles,
       manifestVersion,
     });
-    console.log(`Index built: ${OUTPUT_FILE} (${(stat.size / 1024).toFixed(1)} KB)`);
+    console.log(
+      `Index built: ${OUTPUT_FILE} (${(stat.size / 1024).toFixed(1)} KB)`,
+    );
     console.log(`Lineage sidecar: ${sidecar} (${parquetFiles.length} cutoffs)`);
   } else {
     console.error("Output file not created");

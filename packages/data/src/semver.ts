@@ -20,9 +20,7 @@ export function sortManifestVersionsDesc(versions: string[]): string[] {
   return [...versions].sort((a, b) => compareManifestVersions(b, a));
 }
 
-export function pickLatestManifestFile(
-  files: string[],
-): string | undefined {
+export function pickLatestManifestFile(files: string[]): string | undefined {
   const versions = files
     .filter((f) => f.endsWith(".json") && f.startsWith("v"))
     .map((f) => f.replace(/\.json$/, ""));

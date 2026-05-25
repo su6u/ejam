@@ -2,17 +2,17 @@
  * Applies balanced ranking scores to a prediction result.
  */
 
+import type {
+  CollegePredictionResult,
+  CollegePredictorFilters,
+  ProgramPrediction,
+} from "@ejam/data/college-predictor";
 import {
   applyBalancedRanking,
   branchFilterActive,
   DEFAULT_PROBABILITY_DISPLAY_THRESHOLD,
   groupProgramsByBand,
   type InstituteRankingMeta,
-} from "@ejam/data/college-predictor";
-import type {
-  CollegePredictionResult,
-  CollegePredictorFilters,
-  ProgramPrediction,
 } from "@ejam/data/college-predictor";
 import type { ServerCacheEntry } from "@/predictors/shared/predictor-cache";
 

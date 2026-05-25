@@ -9,8 +9,8 @@ import * as fs from "node:fs";
 import * as path from "node:path";
 import { fileURLToPath } from "node:url";
 import {
-  JAM_TUNED,
   JAM_JOSAA_V2,
+  JAM_TUNED,
   resolvePoolShiftPct,
   roundWeightCaseSql,
   yearWeightsCaseSql,
@@ -22,7 +22,14 @@ import {
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..");
-const JOSAA_CUTOFFS = path.join(ROOT, "data", "engineering", "jee", "josaa", "cutoffs");
+const JOSAA_CUTOFFS = path.join(
+  ROOT,
+  "data",
+  "engineering",
+  "jee",
+  "josaa",
+  "cutoffs",
+);
 const OUTPUT_DIR = path.join(ROOT, "data", "dist");
 const OUTPUT_FILE = path.join(OUTPUT_DIR, "college_predictor_index.parquet");
 
@@ -38,13 +45,20 @@ function resolvePredictionYear(): number {
 
 function findAllCutoffParquets(): string[] {
   const files: string[] = [];
-  const years = fs.readdirSync(JOSAA_CUTOFFS).filter((d) => d.startsWith("year="));
+  const years = fs
+    .readdirSync(JOSAA_CUTOFFS)
+    .filter((d) => d.startsWith("year="));
   for (const yearDir of years) {
     const rounds = fs
       .readdirSync(path.join(JOSAA_CUTOFFS, yearDir))
       .filter((d) => d.startsWith("round="));
     for (const roundDir of rounds) {
-      const parquetPath = path.join(JOSAA_CUTOFFS, yearDir, roundDir, "cutoffs.parquet");
+      const parquetPath = path.join(
+        JOSAA_CUTOFFS,
+        yearDir,
+        roundDir,
+        "cutoffs.parquet",
+      );
       if (fs.existsSync(parquetPath)) files.push(parquetPath);
     }
   }
@@ -56,7 +70,9 @@ function buildSQL(
   predictionYear: number,
   poolShiftPct: number,
 ): string {
-  const unionParts = parquetFiles.map((f) => `SELECT * FROM read_parquet('${f}')`);
+  const unionParts = parquetFiles.map(
+    (f) => `SELECT * FROM read_parquet('${f}')`,
+  );
   const unionAll = unionParts.join("\nUNION ALL\n");
   const roundW = roundWeightCaseSql();
   const yearWeightCase = yearWeightsCaseSql();
@@ -341,7 +357,9 @@ async function main(): Promise<void> {
   const predictionYear = resolvePredictionYear();
   const poolShiftPct = resolvePoolShiftPct();
   console.log("Building college predictor index...");
-  console.log(`algorithm=${JAM_JOSAA_V2}  prediction_year=${predictionYear}  pool_shift=${(poolShiftPct * 100).toFixed(2)}%`);
+  console.log(
+    `algorithm=${JAM_JOSAA_V2}  prediction_year=${predictionYear}  pool_shift=${(poolShiftPct * 100).toFixed(2)}%`,
+  );
 
   const parquetFiles = findAllCutoffParquets();
   console.log(`Found ${parquetFiles.length} cutoff parquet files`);
@@ -374,7 +392,9 @@ async function main(): Promise<void> {
       sourceCutoffPaths: parquetFiles,
       manifestVersion,
     });
-    console.log(`Index built: ${OUTPUT_FILE} (${(stat.size / 1024).toFixed(1)} KB)`);
+    console.log(
+      `Index built: ${OUTPUT_FILE} (${(stat.size / 1024).toFixed(1)} KB)`,
+    );
     console.log(`Lineage sidecar: ${sidecar} (${parquetFiles.length} cutoffs)`);
   } else {
     console.error("Output file not created");

@@ -4,6 +4,16 @@
  * and Turbopack cannot resolve .js to .ts for uncompiled workspace packages
  **/
 
+export {
+  applyBalancedRanking,
+  type BalancedRankingOptions,
+  branchFilterActive,
+  computeBalancedScore,
+  computeBranchScore,
+  computeInstituteScore,
+  type InstituteRankingMeta,
+  sortByBalancedScore,
+} from "./balanced-ranking";
 export type {
   BrowserCacheEnvironment,
   IndexBufferCacheSource,
@@ -20,16 +30,7 @@ export {
   storeCollegePredictorIndex,
   writePredictionResultCache,
 } from "./browser-cache-manager";
-export {
-  applyBalancedRanking,
-  branchFilterActive,
-  computeBalancedScore,
-  computeBranchScore,
-  computeInstituteScore,
-  sortByBalancedScore,
-  type BalancedRankingOptions,
-  type InstituteRankingMeta,
-} from "./balanced-ranking";
+export { readParquetRows } from "./duckdb-parquet";
 export type {
   CollegePredictionResult,
   CollegePredictorFilters,
@@ -52,7 +53,6 @@ export {
   getPredictorIndexFromDeps,
   type PredictorIndexDeps,
 } from "./index-loader";
-export { readParquetRows } from "./duckdb-parquet";
 export {
   _resetCanonicalStatesCache,
   loadCanonicalStates,

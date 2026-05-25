@@ -19,8 +19,8 @@ import {
 import {
   fnv1a,
   indexShaFromDeps,
-  stableStringify,
   type ServerCacheEntry,
+  stableStringify,
 } from "@/predictors/shared/predictor-cache";
 
 const JeeAdvancedInput = z.object({

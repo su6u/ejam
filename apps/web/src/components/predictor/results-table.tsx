@@ -9,8 +9,8 @@
 import type { PredictionProvenance } from "@ejam/data";
 import type { ProgramPrediction } from "@ejam/data/college-predictor";
 import { ChevronRight } from "lucide-react";
-import { DataVersionFooter } from "@/components/predictor/data-version-footer";
 import { formatInteger } from "@/components/formatter";
+import { DataVersionFooter } from "@/components/predictor/data-version-footer";
 import { ResultsCardShell } from "@/components/predictor/results-card-shell";
 import {
   ResultsSort,

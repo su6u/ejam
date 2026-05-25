@@ -103,7 +103,9 @@ export async function getGitSha(cwd = ROOT): Promise<string> {
   }
 }
 
-export async function collectParquetDatasets(): Promise<ManifestDatasetEntry[]> {
+export async function collectParquetDatasets(): Promise<
+  ManifestDatasetEntry[]
+> {
   const datasets: ManifestDatasetEntry[] = [];
 
   for (const scanRoot of PARQUET_SCAN_ROOTS) {
@@ -127,7 +129,9 @@ export async function collectParquetDatasets(): Promise<ManifestDatasetEntry[]> 
 }
 
 export function manifestFilePath(version: string): string {
-  const fileName = version.startsWith("v") ? `${version}.json` : `v${version}.json`;
+  const fileName = version.startsWith("v")
+    ? `${version}.json`
+    : `v${version}.json`;
   return resolveContainedPath(path.join(DATA_DIR, "manifest"), fileName);
 }
 
@@ -140,7 +144,9 @@ export async function writeManifest(
   return manifestPath;
 }
 
-export async function readManifest(version: string): Promise<CanonicalManifest> {
+export async function readManifest(
+  version: string,
+): Promise<CanonicalManifest> {
   const manifestPath = manifestFilePath(version);
   const raw = await fs.readFile(manifestPath, "utf-8");
   return JSON.parse(raw) as CanonicalManifest;

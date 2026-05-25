@@ -15,7 +15,9 @@ import { DATA_DIR, readManifest } from "./lib/manifest";
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
 function resolveVersion(): string {
-  const arg = process.argv.find((a) => a.startsWith("--version="))?.slice("--version=".length);
+  const arg = process.argv
+    .find((a) => a.startsWith("--version="))
+    ?.slice("--version=".length);
   const raw = arg ?? process.env.EJAM_MANIFEST_VERSION;
   if (!raw) {
     throw new Error("pass --version=vX.Y.Z or set EJAM_MANIFEST_VERSION");
@@ -23,7 +25,10 @@ function resolveVersion(): string {
   return raw.startsWith("v") ? raw : `v${raw}`;
 }
 
-async function assertPathsExist(manifestVersion: string, paths: string[]): Promise<void> {
+async function assertPathsExist(
+  manifestVersion: string,
+  paths: string[],
+): Promise<void> {
   const missing: string[] = [];
   for (const rel of paths) {
     try {
@@ -52,12 +57,17 @@ async function main(): Promise<void> {
   const archivePath = path.join(ROOT, archiveName);
 
   const quotedPaths = archivePaths.map((p) => JSON.stringify(p)).join(" ");
-  execSync(`tar -czf ${JSON.stringify(archivePath)} -C ${JSON.stringify(DATA_DIR)} ${quotedPaths}`, {
-    stdio: "inherit",
-  });
+  execSync(
+    `tar -czf ${JSON.stringify(archivePath)} -C ${JSON.stringify(DATA_DIR)} ${quotedPaths}`,
+    {
+      stdio: "inherit",
+    },
+  );
 
   const stat = await fs.stat(archivePath);
-  console.log(`Wrote ${archiveName} (${(stat.size / 1024 / 1024).toFixed(2)} MB, ${archivePaths.length} paths)`);
+  console.log(
+    `Wrote ${archiveName} (${(stat.size / 1024 / 1024).toFixed(2)} MB, ${archivePaths.length} paths)`,
+  );
 }
 
 main().catch((err) => {

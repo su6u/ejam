@@ -6,7 +6,10 @@ import * as fs from "node:fs";
 import * as path from "node:path";
 import { fileURLToPath } from "node:url";
 
-const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
+const ROOT = path.resolve(
+  path.dirname(fileURLToPath(import.meta.url)),
+  "../..",
+);
 
 export const JAM_JOSAA_V2 = "jam-josaa-v2";
 
@@ -56,7 +59,9 @@ export function resolvePoolShiftPct(): number {
   if (raw !== undefined && raw !== "") {
     const n = Number.parseFloat(raw);
     if (Number.isFinite(n) && n >= 0) return n;
-    throw new Error(`EJAM_POOL_SHIFT_PCT must be a non-negative number, got: ${raw}`);
+    throw new Error(
+      `EJAM_POOL_SHIFT_PCT must be a non-negative number, got: ${raw}`,
+    );
   }
   return loadNtaPoolShiftPct();
 }

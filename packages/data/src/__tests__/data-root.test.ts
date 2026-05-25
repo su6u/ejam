@@ -1,5 +1,5 @@
-import { chdir } from "node:process";
 import { join } from "node:path";
+import { chdir } from "node:process";
 import { afterEach, describe, expect, it } from "vitest";
 import { _resetDataRootCache, resolveDataRoot } from "../data-root";
 

@@ -2,8 +2,8 @@
 
 import Lottie from "lottie-react";
 import { useReducedMotion } from "motion/react";
-import loadAnimation from "@/public/assets/load.json";
 import { cn } from "@/lib/utils";
+import loadAnimation from "@/public/assets/load.json";
 
 interface LoadingAnimationProps {
   className?: string;
@@ -32,10 +32,7 @@ export function LoadingAnimation({
       animationData={loadAnimation}
       loop
       aria-hidden
-      className={cn(
-        "size-6 shrink-0 invert dark:invert-0",
-        className,
-      )}
+      className={cn("size-6 shrink-0 invert dark:invert-0", className)}
     />
   );
 }

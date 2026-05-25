@@ -36,7 +36,9 @@ export async function query<T = Record<string, unknown>>(
   const conn = await db.connect();
   try {
     const result = await conn.query(sql);
-    return result.toArray().map((r: { toJSON: () => T }) => r.toJSON()) as QueryResult<T>;
+    return result
+      .toArray()
+      .map((r: { toJSON: () => T }) => r.toJSON()) as QueryResult<T>;
   } finally {
     await conn.close();
   }

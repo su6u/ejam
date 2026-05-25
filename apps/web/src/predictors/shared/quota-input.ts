@@ -30,10 +30,7 @@ export function refineQuotaRequiresState(
   data: { quota: QuotaApi; state?: string },
   ctx: z.RefinementCtx,
 ): void {
-  if (
-    (data.quota === "OS" || data.quota === "HS") &&
-    !data.state?.trim()
-  ) {
+  if ((data.quota === "OS" || data.quota === "HS") && !data.state?.trim()) {
     ctx.addIssue({
       code: "custom",
       path: ["state"],

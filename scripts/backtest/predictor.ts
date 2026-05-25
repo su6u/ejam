@@ -8,13 +8,17 @@ import * as path from "node:path";
 import { fileURLToPath } from "node:url";
 import { computeProbability } from "../../packages/data/src/college-predictor/engine";
 import {
-  JAM_TUNED,
   JAM_JOSAA_V2,
+  JAM_TUNED,
   resolvePoolShiftPct,
   roundWeightCaseSql,
   yearWeightsCaseSql,
 } from "../jam/config";
-import { CSAB_TUNED, JAM_CSAB_V2, csabEnsemblePredictedRankSql } from "../jam/csab-config";
+import {
+  CSAB_TUNED,
+  csabEnsemblePredictedRankSql,
+  JAM_CSAB_V2,
+} from "../jam/csab-config";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "../..");
@@ -526,10 +530,14 @@ async function runJoSAABacktest(
 ): Promise<BacktestResult> {
   const holdoutYear = 2025;
   const poolShiftPct = resolvePoolShiftPct();
-  console.log(`\n[JoSAA/${JAM_JOSAA_V2}] pool_shift=${(poolShiftPct * 100).toFixed(2)}%`);
+  console.log(
+    `\n[JoSAA/${JAM_JOSAA_V2}] pool_shift=${(poolShiftPct * 100).toFixed(2)}%`,
+  );
   console.log(`[JoSAA/${JAM_JOSAA_V2}] Loading training data (2021–2024)...`);
   const trainingIndex = await loadJoSAATraining(conn, cutoffsGlob, holdoutYear);
-  console.log(`[JoSAA/${JAM_JOSAA_V2}] Training index: ${trainingIndex.size} rows`);
+  console.log(
+    `[JoSAA/${JAM_JOSAA_V2}] Training index: ${trainingIndex.size} rows`,
+  );
 
   console.log(`[JoSAA/${JAM_JOSAA_V2}] Loading 2025 holdout...`);
   const holdout = await loadHoldout(conn, cutoffsGlob);
@@ -550,7 +558,9 @@ async function runCSABBacktest(
   const holdoutYear = 2025;
   console.log(`\n[CSAB/${JAM_CSAB_V2}] Loading training data (2021–2024)...`);
   const trainingIndex = await loadCSABTraining(conn, cutoffsGlob, holdoutYear);
-  console.log(`[CSAB/${JAM_CSAB_V2}] Training index: ${trainingIndex.size} rows`);
+  console.log(
+    `[CSAB/${JAM_CSAB_V2}] Training index: ${trainingIndex.size} rows`,
+  );
 
   console.log(`[CSAB/${JAM_CSAB_V2}] Loading 2025 holdout...`);
   const holdout = await loadHoldout(conn, cutoffsGlob);

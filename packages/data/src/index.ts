@@ -1,9 +1,9 @@
 // ejam data layer — typed reader for /data parquet lake
 
 export * as collegePredictor from "./college-predictor/index";
+export * from "./data-root";
 export * as dependencyResolver from "./dependency-resolver/index";
 export * as examConfig from "./exam-config/index";
-export * from "./data-root";
 export * from "./paths";
 export * from "./predictor-interface";
 export * from "./reader";

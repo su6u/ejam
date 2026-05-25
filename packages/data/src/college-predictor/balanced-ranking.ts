@@ -22,41 +22,41 @@ const INSTYPE_BASE: Record<string, number> = {
   CFI: 55,
 };
 
-const BRANCH_TIERS: Array<{ test: (value: string) => boolean; score: number }> = [
-  {
-    test: (v) =>
-      /\b(cse|cs|computer-science|computer science|computer)\b/i.test(v),
-    score: 100,
-  },
-  {
-    test: (v) =>
-      /\b(ai|aiml|artificial intelligence|data-science|data science|machine-learning|machine learning)\b/i.test(
-        v,
-      ),
-    score: 92,
-  },
-  {
-    test: (v) =>
-      /\b(ece|electronics|electronic|communication)\b/i.test(v),
-    score: 85,
-  },
-  {
-    test: (v) => /\b(ee|electrical)\b/i.test(v),
-    score: 80,
-  },
-  {
-    test: (v) => /\b(me|mech|mechanical)\b/i.test(v),
-    score: 72,
-  },
-  {
-    test: (v) => /\b(ce|civil)\b/i.test(v),
-    score: 68,
-  },
-  {
-    test: (v) => /\b(chemical|chem)\b/i.test(v),
-    score: 65,
-  },
-];
+const BRANCH_TIERS: Array<{ test: (value: string) => boolean; score: number }> =
+  [
+    {
+      test: (v) =>
+        /\b(cse|cs|computer-science|computer science|computer)\b/i.test(v),
+      score: 100,
+    },
+    {
+      test: (v) =>
+        /\b(ai|aiml|artificial intelligence|data-science|data science|machine-learning|machine learning)\b/i.test(
+          v,
+        ),
+      score: 92,
+    },
+    {
+      test: (v) => /\b(ece|electronics|electronic|communication)\b/i.test(v),
+      score: 85,
+    },
+    {
+      test: (v) => /\b(ee|electrical)\b/i.test(v),
+      score: 80,
+    },
+    {
+      test: (v) => /\b(me|mech|mechanical)\b/i.test(v),
+      score: 72,
+    },
+    {
+      test: (v) => /\b(ce|civil)\b/i.test(v),
+      score: 68,
+    },
+    {
+      test: (v) => /\b(chemical|chem)\b/i.test(v),
+      score: 65,
+    },
+  ];
 
 export function branchFilterActive(
   filters: CollegePredictorFilters | undefined,
@@ -93,7 +93,10 @@ export function computeInstituteScore(
   } else if (closingRankCeiling > 0) {
     // tighter cutoffs (lower rank) imply stronger demand
     const competitiveness = 1 - predictedClosingRank / closingRankCeiling;
-    score = Math.min(100, score * 0.7 + Math.max(0, competitiveness) * 100 * 0.3);
+    score = Math.min(
+      100,
+      score * 0.7 + Math.max(0, competitiveness) * 100 * 0.3,
+    );
   }
 
   return Math.round(score * 100) / 100;

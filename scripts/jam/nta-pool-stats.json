@@ -38,12 +38,36 @@
       },
       "hundred_percentile_scorers": 26,
       "jee_advanced_eligibility_cutoffs": {
-        "UR-ALL": { "percentile_from": 100, "percentile_to": 93.4123549, "candidates": 96873 },
-        "UR-PwBD": { "percentile_from": 93.3244144, "percentile_to": 0.0023186, "candidates": 4391 },
-        "EWS-ALL": { "percentile_from": 93.4105172, "percentile_to": 82.4164528, "candidates": 25009 },
-        "OBC-ALL": { "percentile_from": 93.4105172, "percentile_to": 80.9232583, "candidates": 67597 },
-        "SC-ALL": { "percentile_from": 93.4105172, "percentile_to": 63.9172792, "candidates": 37522 },
-        "ST-ALL": { "percentile_from": 93.4041748, "percentile_to": 52.0174712, "candidates": 18790 }
+        "UR-ALL": {
+          "percentile_from": 100,
+          "percentile_to": 93.4123549,
+          "candidates": 96873
+        },
+        "UR-PwBD": {
+          "percentile_from": 93.3244144,
+          "percentile_to": 0.0023186,
+          "candidates": 4391
+        },
+        "EWS-ALL": {
+          "percentile_from": 93.4105172,
+          "percentile_to": 82.4164528,
+          "candidates": 25009
+        },
+        "OBC-ALL": {
+          "percentile_from": 93.4105172,
+          "percentile_to": 80.9232583,
+          "candidates": 67597
+        },
+        "SC-ALL": {
+          "percentile_from": 93.4105172,
+          "percentile_to": 63.9172792,
+          "candidates": 37522
+        },
+        "ST-ALL": {
+          "percentile_from": 93.4041748,
+          "percentile_to": 52.0174712,
+          "candidates": 18790
+        }
       }
     }
   },

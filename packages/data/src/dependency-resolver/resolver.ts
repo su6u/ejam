@@ -5,8 +5,8 @@
 
 import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
-import type { DataDependency } from "../exam-config/types";
 import { resolveManifestRoot } from "../data-root";
+import type { DataDependency } from "../exam-config/types";
 import { expandPathTemplate } from "../paths";
 import { pickLatestManifestFile } from "../semver";
 import {

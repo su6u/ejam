@@ -1,4 +1,7 @@
 {
+  "files": {
+    "includes": ["**", "!raw", "!**/raw"]
+  },
   "assist": {
     "actions": {
       "source": {
@@ -19,6 +22,16 @@
     }
   },
   "overrides": [
+    {
+      "includes": ["**/components/ui/chart.tsx"],
+      "linter": {
+        "rules": {
+          "security": {
+            "noDangerouslySetInnerHtml": "off"
+          }
+        }
+      }
+    },
     {
       "includes": ["**/components/ui/**"],
       "linter": {

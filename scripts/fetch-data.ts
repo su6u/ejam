@@ -13,8 +13,8 @@ import { fileURLToPath } from "node:url";
 import {
   dataRootPath,
   findLatestManifestVersion,
-  readManifest,
   type ManifestDatasetEntry,
+  readManifest,
 } from "./lib/manifest";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -25,7 +25,9 @@ async function sha256File(filePath: string): Promise<string> {
   return crypto.createHash("sha256").update(data).digest("hex");
 }
 
-async function verifyDataset(entry: ManifestDatasetEntry): Promise<string | null> {
+async function verifyDataset(
+  entry: ManifestDatasetEntry,
+): Promise<string | null> {
   const absolutePath = dataRootPath(entry.path);
   try {
     await fs.access(absolutePath);
@@ -42,7 +44,8 @@ async function verifyDataset(entry: ManifestDatasetEntry): Promise<string | null
 
 async function downloadRelease(version: string): Promise<void> {
   const repo = process.env.EJAM_DATA_REPO ?? "ejam/ejam";
-  const tag = process.env.EJAM_DATA_RELEASE_TAG ?? `data-${version.replace(/^v/, "")}`;
+  const tag =
+    process.env.EJAM_DATA_RELEASE_TAG ?? `data-${version.replace(/^v/, "")}`;
   const url =
     process.env.EJAM_DATA_RELEASE_URL ??
     `https://github.com/${repo}/releases/download/${tag}/${tag}.tar.gz`;
@@ -115,7 +118,9 @@ async function main(): Promise<void> {
     }
     process.exit(1);
   }
-  console.log(`✓ all ${manifest.datasets.length} datasets verified after download`);
+  console.log(
+    `✓ all ${manifest.datasets.length} datasets verified after download`,
+  );
 }
 
 main().catch((err) => {

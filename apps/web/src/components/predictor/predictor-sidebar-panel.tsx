@@ -86,15 +86,21 @@ export function PredictorSidebarPanel() {
 }
 
 function PredictorSidebarPanelInner() {
-  const { state, query, onPredict, rankInputRef, filters, setFilters, hasResults } =
-    usePredictor();
+  const {
+    state,
+    query,
+    onPredict,
+    rankInputRef,
+    filters,
+    setFilters,
+    hasResults,
+  } = usePredictor();
 
   const programs = query.data?.programs ?? [];
 
   const showQuota = state.exam === "jee-main";
   const needsHomeState =
-    state.exam === "jee-main" &&
-    (state.quota === "hs" || state.quota === "os");
+    state.exam === "jee-main" && (state.quota === "hs" || state.quota === "os");
   const canPredict =
     Boolean(state.rank) && !(needsHomeState && !state.homeState.trim());
 

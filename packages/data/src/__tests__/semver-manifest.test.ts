@@ -29,9 +29,11 @@ describe("pickLatestManifestFile", () => {
 
 describe("sortManifestVersionsDesc", () => {
   it("sorts descending", () => {
-    expect(
-      sortManifestVersionsDesc(["v0.1.0", "v0.10.0", "v0.9.0"]),
-    ).toEqual(["v0.10.0", "v0.9.0", "v0.1.0"]);
+    expect(sortManifestVersionsDesc(["v0.1.0", "v0.10.0", "v0.9.0"])).toEqual([
+      "v0.10.0",
+      "v0.9.0",
+      "v0.1.0",
+    ]);
   });
 });
 
