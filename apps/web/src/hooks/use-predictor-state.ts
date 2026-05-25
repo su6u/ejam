@@ -13,6 +13,39 @@ import { useCallback } from "react";
 
 export type ExamType = "jee-advanced" | "jee-main";
 
+/** JoSAA / CSAB counselling body — only applies when exam is jee-main */
+export type CounsellingBody = "josaa" | "csab";
+
+export type PredictorExamId = "jee-main" | "jee-advanced" | "csab";
+
+const COUNSELLING_BODIES = new Set<CounsellingBody>(["josaa", "csab"]);
+
+export function parseCounsellingBody(raw: string | null): CounsellingBody {
+  if (raw && COUNSELLING_BODIES.has(raw as CounsellingBody)) {
+    return raw as CounsellingBody;
+  }
+  return "josaa";
+}
+
+export function counsellingToPredictorExam(
+  exam: ExamType,
+  counselling: CounsellingBody,
+): PredictorExamId {
+  if (exam === "jee-advanced") return "jee-advanced";
+  if (counselling === "csab") return "csab";
+  return "jee-main";
+}
+
+export function isJeeMainCounselling(exam: ExamType): boolean {
+  return exam === "jee-main";
+}
+
+export function predictorUsesQuotaHomeState(
+  predictorExamId: PredictorExamId,
+): boolean {
+  return predictorExamId === "jee-main" || predictorExamId === "csab";
+}
+
 const CATEGORY_TO_SEAT_TYPE: Record<string, string> = {
   gen: "OPEN",
   "gen-ews": "EWS",
@@ -29,6 +62,7 @@ const GENDER_TO_API: Record<string, string> = {
 export interface PredictorInputState {
   rank: string;
   exam: ExamType;
+  counselling: CounsellingBody;
   category: string;
   gender: string;
   quota: string;
@@ -39,6 +73,7 @@ export interface PredictorInputState {
 export interface PredictorStateReturn extends PredictorInputState {
   setRank: (v: string) => void;
   setExam: (v: ExamType) => void;
+  setCounselling: (v: CounsellingBody) => void;
   setCategory: (v: string) => void;
   setGender: (v: string) => void;
   setQuota: (v: string) => void;
@@ -46,6 +81,7 @@ export interface PredictorStateReturn extends PredictorInputState {
   setHasEwsCertificate: (v: boolean) => void;
   apiSeatType: string;
   apiGender: string;
+  predictorExamId: PredictorExamId;
 }
 
 export function usePredictorState(): PredictorStateReturn {
@@ -54,6 +90,7 @@ export function usePredictorState(): PredictorStateReturn {
 
   const rank = params.get("rank") ?? "";
   const exam = (params.get("exam") as ExamType | null) ?? "jee-main";
+  const counselling = parseCounsellingBody(params.get("counselling"));
   const category = params.get("category") ?? "gen";
   const gender = params.get("gender") ?? "neutral";
   const quota = params.get("quota") ?? "os";
@@ -91,11 +128,16 @@ export function usePredictorState(): PredictorStateReturn {
       if (v === "jee-advanced") {
         updates.quota = null;
         updates.state = null;
+        updates.counselling = null;
       }
 
       updateParam(updates);
     },
     [exam, updateParam],
+  );
+  const setCounselling = useCallback(
+    (v: CounsellingBody) => updateParam({ counselling: v }),
+    [updateParam],
   );
   const setCategory = useCallback(
     (v: string) => updateParam({ category: v }),
@@ -122,6 +164,7 @@ export function usePredictorState(): PredictorStateReturn {
   return {
     rank,
     exam,
+    counselling,
     category,
     gender,
     quota,
@@ -129,6 +172,7 @@ export function usePredictorState(): PredictorStateReturn {
     has_ews_certificate,
     setRank,
     setExam,
+    setCounselling,
     setCategory,
     setGender,
     setQuota,
@@ -136,5 +180,6 @@ export function usePredictorState(): PredictorStateReturn {
     setHasEwsCertificate,
     apiSeatType: CATEGORY_TO_SEAT_TYPE[category] ?? "OPEN",
     apiGender: GENDER_TO_API[gender] ?? "Gender-Neutral",
+    predictorExamId: counsellingToPredictorExam(exam, counselling),
   };
 }

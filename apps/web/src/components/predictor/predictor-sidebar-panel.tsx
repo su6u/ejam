@@ -16,7 +16,9 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import type { ExamType } from "@/hooks/use-predictor-state";
+import { quotaRequiresHomeState } from "@ejam/predictors/shared/quota-input";
+import type { CounsellingBody, ExamType } from "@/hooks/use-predictor-state";
+import { isJeeMainCounselling } from "@/hooks/use-predictor-state";
 import { deferAfterPress, pressableClass } from "@/lib/pressable";
 import { cn } from "@/lib/utils";
 
@@ -77,6 +79,11 @@ const QUOTA_OPTIONS = [
   { value: "ai", label: "AI" },
 ];
 
+const COUNSELLING_OPTIONS = [
+  { value: "josaa", label: "JoSAA" },
+  { value: "csab", label: "CSAB" },
+];
+
 export function PredictorSidebarPanel() {
   return (
     <Suspense fallback={null}>
@@ -98,9 +105,8 @@ function PredictorSidebarPanelInner() {
 
   const programs = query.data?.programs ?? [];
 
-  const showQuota = state.exam === "jee-main";
-  const needsHomeState =
-    state.exam === "jee-main" && (state.quota === "hs" || state.quota === "os");
+  const showQuota = isJeeMainCounselling(state.exam);
+  const needsHomeState = showQuota && quotaRequiresHomeState(state.quota);
   const canPredict =
     Boolean(state.rank) && !(needsHomeState && !state.homeState.trim());
   const hasPredictedForInputs = query.data !== null;
@@ -219,10 +225,27 @@ function PredictorSidebarPanelInner() {
           ) : null}
 
           {needsHomeState ? (
-            <SetupField label="Home state" required>
+            <SetupField
+              label="Home state"
+              required
+              hint="required for OS and HS seat pools"
+            >
               <HomeStateCombobox
                 value={state.homeState}
                 onValueChange={state.setHomeState}
+              />
+            </SetupField>
+          ) : null}
+
+          {showQuota ? (
+            <SetupField label="Counselling" required>
+              <OptionToggle
+                value={state.counselling}
+                onChange={(value) =>
+                  state.setCounselling(value as CounsellingBody)
+                }
+                options={COUNSELLING_OPTIONS}
+                columns={2}
               />
             </SetupField>
           ) : null}
@@ -258,7 +281,11 @@ function OptionToggle({
 }: {
   value: string;
   onChange: (value: string) => void;
-  options: ReadonlyArray<{ value: string; label: string }>;
+  options: ReadonlyArray<{
+    value: string;
+    label: string;
+    enabled?: boolean;
+  }>;
   columns: 2 | 3;
 }) {
   return (
@@ -270,19 +297,25 @@ function OptionToggle({
     >
       {options.map((option) => {
         const isActive = option.value === value;
+        const isEnabled = option.enabled !== false;
 
         return (
           <button
             key={option.value}
             type="button"
             aria-pressed={isActive}
-            onClick={() => deferAfterPress(() => onChange(option.value))}
+            disabled={!isEnabled}
+            onClick={() => {
+              if (isEnabled) deferAfterPress(() => onChange(option.value));
+            }}
             className={cn(
               "flex h-8 items-center justify-center rounded-none border border-border bg-transparent text-xs font-medium text-muted-foreground outline-none",
               pressableClass,
-              "hover:text-foreground",
+              isEnabled && "hover:text-foreground",
               "focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50",
               isActive && "border-foreground/40 text-foreground",
+              !isEnabled &&
+                "cursor-not-allowed border-border/70 opacity-40 grayscale",
             )}
           >
             {option.label}
@@ -296,10 +329,12 @@ function OptionToggle({
 function SetupField({
   label,
   required,
+  hint,
   children,
 }: {
   label: string;
   required?: boolean;
+  hint?: string;
   children: ReactNode;
 }) {
   return (
@@ -314,6 +349,11 @@ function SetupField({
         ) : null}
       </Label>
       {children}
+      {hint ? (
+        <p className="text-[10px] leading-snug text-muted-foreground/50">
+          {hint}
+        </p>
+      ) : null}
     </div>
   );
 }

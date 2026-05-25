@@ -13,10 +13,12 @@ import {
 } from "@ejam/data";
 import type { CollegePredictionResult } from "@ejam/data/college-predictor";
 import { uiQuotaToApi } from "@ejam/predictors/shared/quota-input";
+import type { PredictorExamId } from "@/hooks/use-predictor-state";
+import { predictorUsesQuotaHomeState } from "@/hooks/use-predictor-state";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 interface PredictorQueryOptions {
-  exam: string;
+  predictorExamId: PredictorExamId;
   rank: string;
   apiSeatType: string;
   apiGender: string;
@@ -38,10 +40,8 @@ interface PredictorQueryResult {
   trigger: (rankOverride?: string) => Promise<boolean>;
 }
 
-function examToApiId(exam: string): string {
-  if (exam === "jee-advanced") return "jee-advanced";
-  if (exam === "csab") return "csab";
-  return "jee-main";
+function examToApiId(exam: PredictorExamId): string {
+  return exam;
 }
 
 function indexShaFromProvenance(
@@ -63,7 +63,7 @@ function buildRequestBody(
     has_ews_certificate: opts.has_ews_certificate,
   };
 
-  if (opts.exam === "jee-main" || opts.exam === "csab") {
+  if (predictorUsesQuotaHomeState(opts.predictorExamId)) {
     body.quota = uiQuotaToApi(opts.quota);
     body.state = opts.homeState;
   }
@@ -73,7 +73,7 @@ function buildRequestBody(
 
 function cacheKey(opts: PredictorQueryOptions, indexSha: string): string {
   const body = buildRequestBody(opts);
-  return `predictor:${examToApiId(opts.exam)}:${indexSha}:${JSON.stringify(body)}`;
+  return `predictor:${examToApiId(opts.predictorExamId)}:${indexSha}:${JSON.stringify(body)}`;
 }
 
 function readSessionCache(key: string): CachedPrediction | null {
@@ -93,26 +93,31 @@ function writeSessionCache(key: string, data: CachedPrediction): void {
   }
 }
 
-function readKnownIndexSha(exam: string): string {
+function readKnownIndexSha(predictorExamId: PredictorExamId): string {
   try {
     return (
-      sessionStorage.getItem(`predictor:index-sha:${examToApiId(exam)}`) ?? ""
+      sessionStorage.getItem(
+        `predictor:index-sha:${examToApiId(predictorExamId)}`,
+      ) ?? ""
     );
   } catch {
     return "";
   }
 }
 
-function writeKnownIndexSha(exam: string, sha: string): void {
+function writeKnownIndexSha(predictorExamId: PredictorExamId, sha: string): void {
   try {
-    sessionStorage.setItem(`predictor:index-sha:${examToApiId(exam)}`, sha);
+    sessionStorage.setItem(
+      `predictor:index-sha:${examToApiId(predictorExamId)}`,
+      sha,
+    );
   } catch {
     // ignore quota errors
   }
 }
 
-function clearExamPredictorCache(exam: string): void {
-  const examId = examToApiId(exam);
+function clearExamPredictorCache(predictorExamId: PredictorExamId): void {
+  const examId = examToApiId(predictorExamId);
   try {
     const prefix = `predictor:${examId}:`;
     const keysToRemove: string[] = [];
@@ -138,7 +143,7 @@ function readSuccessResponse(body: unknown): PredictionSuccessResponse | null {
 }
 
 export function usePredictorQuery({
-  exam,
+  predictorExamId,
   rank,
   apiSeatType,
   apiGender,
@@ -154,15 +159,20 @@ export function usePredictorQuery({
   const [error, setError] = useState<string | null>(null);
   const requestGenerationRef = useRef(0);
   const abortControllerRef = useRef<AbortController | null>(null);
-  const predictInFlightRankRef = useRef<string | null>(null);
+  const predictInFlightRef = useRef<{
+    rank: string;
+    predictorExamId: PredictorExamId;
+  } | null>(null);
   // first predict per exam per page load hits the API so a deploy cannot serve stale sessionStorage
   const sessionCacheReadyRef = useRef<Record<string, boolean>>({});
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: flush stale results when inputs change
   useEffect(() => {
+    const inFlight = predictInFlightRef.current;
     if (
-      predictInFlightRankRef.current !== null &&
-      predictInFlightRankRef.current === rank
+      inFlight !== null &&
+      inFlight.rank === rank &&
+      inFlight.predictorExamId === predictorExamId
     ) {
       return;
     }
@@ -174,7 +184,7 @@ export function usePredictorQuery({
     setError(null);
     setIsLoading(false);
   }, [
-    exam,
+    predictorExamId,
     rank,
     apiSeatType,
     apiGender,
@@ -195,7 +205,10 @@ export function usePredictorQuery({
       const effectiveRank = rankOverride ?? rank;
       if (!effectiveRank || Number.isNaN(Number(effectiveRank))) return false;
 
-      predictInFlightRankRef.current = effectiveRank;
+      predictInFlightRef.current = {
+        rank: effectiveRank,
+        predictorExamId,
+      };
       const generation = ++requestGenerationRef.current;
       const isCurrent = () => generation === requestGenerationRef.current;
 
@@ -204,7 +217,7 @@ export function usePredictorQuery({
       abortControllerRef.current = controller;
 
       const opts: PredictorQueryOptions = {
-        exam,
+        predictorExamId,
         rank: effectiveRank,
         apiSeatType,
         apiGender,
@@ -212,8 +225,8 @@ export function usePredictorQuery({
         homeState,
         has_ews_certificate,
       };
-      const indexSha = readKnownIndexSha(exam);
-      const examId = examToApiId(exam);
+      const indexSha = readKnownIndexSha(predictorExamId);
+      const examId = examToApiId(predictorExamId);
       const canUseSessionCache = sessionCacheReadyRef.current[examId] === true;
 
       if (canUseSessionCache && indexSha) {
@@ -234,7 +247,7 @@ export function usePredictorQuery({
       setError(null);
 
       try {
-        const examId = examToApiId(exam);
+        const examId = examToApiId(predictorExamId);
         const res = await fetch(`/api/predict/${examId}`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -273,14 +286,14 @@ export function usePredictorQuery({
         }
 
         const responseSha = indexShaFromProvenance(json.provenance);
-        const previousSha = readKnownIndexSha(exam);
+        const previousSha = readKnownIndexSha(predictorExamId);
         if (responseSha && previousSha && responseSha !== previousSha) {
-          clearExamPredictorCache(exam);
+          clearExamPredictorCache(predictorExamId);
         }
         setData(json.result as CollegePredictionResult);
         setProvenance(json.provenance);
         if (responseSha) {
-          writeKnownIndexSha(exam, responseSha);
+          writeKnownIndexSha(predictorExamId, responseSha);
           writeSessionCache(cacheKey(opts, responseSha), {
             result: json.result as CollegePredictionResult,
             provenance: json.provenance,
@@ -298,8 +311,8 @@ export function usePredictorQuery({
         setError(message);
         return false;
       } finally {
-        if (predictInFlightRankRef.current === effectiveRank) {
-          predictInFlightRankRef.current = null;
+        if (predictInFlightRef.current?.rank === effectiveRank) {
+          predictInFlightRef.current = null;
         }
         if (isCurrent()) {
           setIsLoading(false);
@@ -307,7 +320,7 @@ export function usePredictorQuery({
         }
       }
     },
-    [exam, rank, apiSeatType, apiGender, quota, homeState, has_ews_certificate],
+    [predictorExamId, rank, apiSeatType, apiGender, quota, homeState, has_ews_certificate],
   );
 
   return { data, provenance, isLoading, error, trigger };

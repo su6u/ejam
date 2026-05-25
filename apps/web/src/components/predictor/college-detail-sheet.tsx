@@ -184,11 +184,11 @@ function ProgramMetricCard({
   return (
     <DashboardCard className="gap-2 border-0 bg-background px-4 py-3" size="sm">
       <CardHeader className="px-0">
-        <CardTitle className="text-[10px] font-medium uppercase tracking-[0.08em] text-muted-foreground">
+        <CardTitle className="min-h-[2lh] text-[10px] font-medium uppercase tracking-[0.08em] text-muted-foreground">
           {label}
         </CardTitle>
       </CardHeader>
-      <CardContent className="px-0">
+      <CardContent className="mt-auto px-0">
         <div className="text-lg font-semibold tabular-nums text-foreground">
           {value}
         </div>

@@ -34,11 +34,11 @@ export function Dashboard() {
 
   const selectedId = selected ? programKey(selected) : null;
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: reset drawer when exam changes
+  // biome-ignore lint/correctness/useExhaustiveDependencies: reset drawer when exam or counselling changes
   useEffect(() => {
     setSheetOpen(false);
     setSelected(null);
-  }, [state.exam]);
+  }, [state.exam, state.counselling]);
 
   const middle = renderMiddle({
     isLoading: query.isLoading,

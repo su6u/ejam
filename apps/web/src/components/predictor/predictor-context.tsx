@@ -1,9 +1,11 @@
 "use client";
 
+import { quotaRequiresHomeState } from "@ejam/predictors/shared/quota-input";
 import {
-  examUsesQuotaHomeState,
-  quotaRequiresHomeState,
-} from "@ejam/predictors/shared/quota-input";
+  counsellingToPredictorExam,
+  parseCounsellingBody,
+  predictorUsesQuotaHomeState,
+} from "@/hooks/use-predictor-state";
 import {
   createContext,
   useCallback,
@@ -51,9 +53,14 @@ function captureInitialUrlParams(): URLSearchParams | null {
 function shareLinkReadyToPredict(params: URLSearchParams): boolean {
   if (!params.get("rank")?.trim()) return false;
   const exam = params.get("exam") ?? "jee-main";
+  const counselling = parseCounsellingBody(params.get("counselling"));
+  const predictorExamId = counsellingToPredictorExam(
+    exam as "jee-main" | "jee-advanced",
+    counselling,
+  );
   const quota = params.get("quota") ?? "os";
   if (
-    examUsesQuotaHomeState(exam) &&
+    predictorUsesQuotaHomeState(predictorExamId) &&
     quotaRequiresHomeState(quota) &&
     !params.get("state")?.trim()
   ) {
@@ -65,7 +72,7 @@ function shareLinkReadyToPredict(params: URLSearchParams): boolean {
 export function PredictorProvider({ children }: { children: React.ReactNode }) {
   const state = usePredictorState();
   const query = usePredictorQuery({
-    exam: state.exam,
+    predictorExamId: state.predictorExamId,
     rank: state.rank,
     apiSeatType: state.apiSeatType,
     apiGender: state.apiGender,
@@ -87,11 +94,11 @@ export function PredictorProvider({ children }: { children: React.ReactNode }) {
   const shareLinkAutoPredictDone = useRef(false);
   const hasResults = (query.data?.programs.length ?? 0) > 0;
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: reset filters when exam changes
+  // biome-ignore lint/correctness/useExhaustiveDependencies: reset filters when exam or counselling changes
   useEffect(() => {
     setFilters(EMPTY_RESULTS_FILTERS);
     setSortBy(DEFAULT_RESULTS_SORT);
-  }, [state.exam]);
+  }, [state.exam, state.counselling]);
 
   const onPredict = useCallback(async () => {
     const flushedRank = rankInputRef.current?.flush() ?? state.rank;
