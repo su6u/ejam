@@ -42,7 +42,6 @@ export {
   classifyBand,
   computeProbability,
   DEFAULT_PROBABILITY_DISPLAY_THRESHOLD,
-  deriveConfidence,
   groupProgramsByBand,
   normalCDF,
   predictPrograms,

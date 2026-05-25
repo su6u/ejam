@@ -15,7 +15,6 @@ import {
   type CollegePredictorIndexRow,
   getPredictorIndexFromDeps,
   loadCanonicalStates,
-  type ProgramPrediction,
   predictPrograms,
 } from "@ejam/data/college-predictor";
 import { z } from "zod";
@@ -175,34 +174,6 @@ function filterByQuota(
   });
 }
 
-function deriveConfidence(programs: ProgramPrediction[]): {
-  level: "high" | "medium" | "low";
-  caveat: string;
-} {
-  if (programs.length === 0) {
-    return {
-      level: "low",
-      caveat: "no programs at reach or better for this rank — long-shots are hidden by default",
-    };
-  }
-  // worst data_quality among returned programs drives the confidence level
-  // high is reserved until backtesting proves calibration
-  const hasPooled = programs.some((p) => p.data_quality === "pooled");
-  const hasInferred = programs.some((p) => p.data_quality === "inferred");
-  if (hasPooled || hasInferred) {
-    return {
-      level: "low",
-      caveat: hasPooled
-        ? "some programs are based on a single year of CSAB data — treat with caution"
-        : "some programs are based on only 2 years of CSAB data — treat with caution",
-    };
-  }
-  return {
-    level: "medium",
-    caveat: "probabilities are based on historical CSAB closing rank data",
-  };
-}
-
 function resultFromCachedPrograms(
   cached: ServerCacheEntry,
   filters: CollegePredictorFilters | undefined,
@@ -224,21 +195,12 @@ export const predictor: ExamPredictor<CsabInput, CollegePredictionResult> = {
     });
     const cached = _resultCache.get(key);
     if (cached) {
-      return {
-        result: resultFromCachedPrograms(cached, input.filters),
-        confidence: deriveConfidence(cached.programs),
-      };
+      return { result: resultFromCachedPrograms(cached, input.filters) };
     }
 
     const allRows = await getPredictorIndexFromDeps(deps);
     if (allRows.length === 0) {
-      return {
-        result: resultFromRankedPrograms([], input.filters),
-        confidence: {
-          level: "low",
-          caveat: "CSAB predictor index is empty — rebuild csab_predictor_index.parquet",
-        },
-      };
+      return { result: resultFromRankedPrograms([], input.filters) };
     }
 
     const registry = await loadRegistryMaps();
@@ -296,6 +258,6 @@ export const predictor: ExamPredictor<CsabInput, CollegePredictionResult> = {
       programs: result.programs,
       ews_comparison: result.ews_comparison,
     });
-    return { result, confidence: deriveConfidence(result.programs) };
+    return { result };
   },
 };

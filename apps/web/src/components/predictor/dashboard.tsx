@@ -44,7 +44,6 @@ export function Dashboard() {
     error: query.error,
     hasResults,
     hasPredicted: query.data !== null,
-    confidenceCaveat: query.confidence?.caveat,
     programs,
     filteredPrograms,
     sortBy,
@@ -82,7 +81,6 @@ function renderMiddle({
   error,
   hasResults,
   hasPredicted,
-  confidenceCaveat,
   programs,
   filteredPrograms,
   sortBy,
@@ -97,7 +95,6 @@ function renderMiddle({
   error: string | null;
   hasResults: boolean;
   hasPredicted: boolean;
-  confidenceCaveat?: string;
   programs: ProgramPrediction[];
   filteredPrograms: ProgramPrediction[];
   sortBy: ResultsSortKey;
@@ -115,7 +112,6 @@ function renderMiddle({
       <EmptyState
         hasRank={hasRank}
         hasPredicted={hasPredicted}
-        confidenceCaveat={confidenceCaveat}
         provenance={provenance}
       />
     );

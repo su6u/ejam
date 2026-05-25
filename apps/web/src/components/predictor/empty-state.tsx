@@ -37,17 +37,12 @@ function EmptyIllustration() {
 function emptyDescription({
   hasRank,
   hasPredicted,
-  confidenceCaveat,
 }: {
   hasRank: boolean;
   hasPredicted: boolean;
-  confidenceCaveat?: string;
 }): string {
   if (hasPredicted) {
-    return (
-      confidenceCaveat ??
-      "No colleges at reach or better for this rank — try a lower rank or use include-all"
-    );
+    return "No colleges at reach or better for this rank — try a lower rank or use include-all";
   }
   if (hasRank) {
     return "Hit Predict on the left to see the colleges and programs ranked by chance, strongest options first within each band.";
@@ -58,12 +53,10 @@ function emptyDescription({
 export function EmptyState({
   hasRank,
   hasPredicted = false,
-  confidenceCaveat,
   provenance,
 }: {
   hasRank: boolean;
   hasPredicted?: boolean;
-  confidenceCaveat?: string;
   provenance?: PredictionProvenance | null;
 }) {
   return (
@@ -72,7 +65,7 @@ export function EmptyState({
         <EmptyHeader>
           <EmptyIllustration />
           <EmptyDescription>
-            {emptyDescription({ hasRank, hasPredicted, confidenceCaveat })}
+            {emptyDescription({ hasRank, hasPredicted })}
           </EmptyDescription>
         </EmptyHeader>
         <EmptyContent />

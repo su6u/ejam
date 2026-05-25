@@ -8,7 +8,6 @@ import {
   type CollegePredictionResult,
   type CollegePredictorFilters,
   type CollegePredictorIndexRow,
-  deriveConfidence,
   getPredictorIndexFromDeps,
   predictPrograms,
 } from "@ejam/data/college-predictor";
@@ -154,10 +153,7 @@ export const predictor: ExamPredictor<
     );
     const cached = _serverCache.get(cacheKey);
     if (cached) {
-      return {
-        result: resultFromCachedPrograms(cached, input.filters),
-        confidence: deriveConfidence(cached.programs),
-      };
+      return { result: resultFromCachedPrograms(cached, input.filters) };
     }
 
     const [allRows, registry] = await Promise.all([
@@ -210,12 +206,10 @@ export const predictor: ExamPredictor<
       };
     }
 
-    const confidence = deriveConfidence(result.programs);
-
     _serverCache.set(cacheKey, {
       programs: result.programs,
       ews_comparison: result.ews_comparison,
     });
-    return { result, confidence };
+    return { result };
   },
 };

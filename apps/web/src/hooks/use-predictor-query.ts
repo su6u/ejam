@@ -28,13 +28,11 @@ interface PredictorQueryOptions {
 type CachedPrediction = {
   result: CollegePredictionResult;
   provenance: PredictionProvenance;
-  confidence?: PredictionSuccessResponse["confidence"];
 };
 
 interface PredictorQueryResult {
   data: CollegePredictionResult | null;
   provenance: PredictionProvenance | null;
-  confidence: PredictionSuccessResponse["confidence"] | null;
   isLoading: boolean;
   error: string | null;
   trigger: (rankOverride?: string) => Promise<boolean>;
@@ -140,9 +138,6 @@ export function usePredictorQuery({
   const [provenance, setProvenance] = useState<PredictionProvenance | null>(
     null,
   );
-  const [confidence, setConfidence] = useState<
-    PredictionSuccessResponse["confidence"] | null
-  >(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const requestGenerationRef = useRef(0);
@@ -156,7 +151,6 @@ export function usePredictorQuery({
     abortControllerRef.current = null;
     setData(null);
     setProvenance(null);
-    setConfidence(null);
     setError(null);
     setIsLoading(false);
   }, [
@@ -207,7 +201,6 @@ export function usePredictorQuery({
         if (!isCurrent()) return false;
         setData(cached.result);
         setProvenance(cached.provenance);
-        setConfidence(cached.confidence ?? null);
         setError(null);
         abortControllerRef.current = null;
         return true;
@@ -250,13 +243,11 @@ export function usePredictorQuery({
       }
       setData(json.result as CollegePredictionResult);
       setProvenance(json.provenance);
-      setConfidence(json.confidence ?? null);
       if (responseSha) {
         writeKnownIndexSha(exam, responseSha);
         writeSessionCache(cacheKey(opts, responseSha), {
           result: json.result as CollegePredictionResult,
           provenance: json.provenance,
-          confidence: json.confidence,
         });
         sessionCacheReadyRef.current[examId] = true;
       }
@@ -284,5 +275,5 @@ export function usePredictorQuery({
     has_ews_certificate,
   ]);
 
-  return { data, provenance, confidence, isLoading, error, trigger };
+  return { data, provenance, isLoading, error, trigger };
 }
