@@ -33,6 +33,7 @@ logs
 .turbo
 coverage
 .venv
+__pycache__/
 
 # raw scraped sources (regenerable from ejam-ingest)
 data/**/_raw/

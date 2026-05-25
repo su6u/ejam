@@ -1,5 +1,6 @@
 #!/usr/bin/env -S node --experimental-strip-types --no-warnings
 /**
+ * @deprecated use `pnpm validate:data` (Python: scripts/validate_data.py)
  * validates jee json files against zod schemas and source id integrity checks
  */
 

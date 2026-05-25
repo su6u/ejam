@@ -1,5 +1,5 @@
 """
-validates published parquet files under data/engineering and data/dist
+validates jee json and published parquet files under data/
 
 usage: uv run python scripts/validate_data.py
 exit 0 = clean, 1 = issues found
@@ -10,6 +10,8 @@ import json
 import sys
 from collections import defaultdict
 from pathlib import Path
+
+from validate_jee_json import main as validate_json_main
 
 try:
     import polars as pl
@@ -281,7 +283,7 @@ def validate_file(
             slug_instype_map[row["institute_id"]].add(normalize_instype(row["instype"]))
 
 
-def main() -> int:
+def validate_parquet_files() -> int:
     rep = Report()
     files = discover_parquet_files()
     if not files:
@@ -302,6 +304,25 @@ def main() -> int:
     print("\n" + "=" * 60)
     if rep.issues:
         print(f"FAIL — {len(rep.issues)} issue(s)")
+        return 1
+    print("ALL CHECKS PASSED")
+    return 0
+
+
+def main() -> int:
+    print("=" * 60)
+    print("JEE JSON")
+    print("=" * 60)
+    json_failed = validate_json_main() != 0
+
+    print("\n" + "=" * 60)
+    print("PARQUET")
+    print("=" * 60)
+    parquet_failed = validate_parquet_files() != 0
+
+    print("\n" + "=" * 60)
+    if json_failed or parquet_failed:
+        print("FAIL")
         return 1
     print("ALL CHECKS PASSED")
     return 0

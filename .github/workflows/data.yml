@@ -29,13 +29,10 @@ jobs:
       - name: Verify index lineage sidecars
         run: pnpm verify:index-lineage
 
-      - name: Validate JEE JSON schemas
-        run: pnpm validate:data
-
       - uses: astral-sh/setup-uv@v5
 
-      - name: Validate parquet schemas
-        run: uv sync --frozen && pnpm validate:data:parquet
+      - name: Validate data (json + parquet)
+        run: uv sync --frozen && pnpm validate:data
 
       - name: Run @ejam/data tests
         run: pnpm --filter @ejam/data test
