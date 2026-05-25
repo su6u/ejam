@@ -1,6 +1,7 @@
 {
   "name": "ejam",
   "private": true,
+  "license": "AGPL-3.0-or-later",
   "packageManager": "pnpm@11.1.3",
   "engines": {
     "node": ">=22.0.0"

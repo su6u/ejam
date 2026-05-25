@@ -16,6 +16,13 @@ Schemas live in `packages/data/src/schema.ts` (`CutoffRow`, `SeatMatrixRow`).
 
 Official source URLs are listed in `data/engineering/jee/_sources.json`.
 
+## Data attribution
+
+This is a personal hobby project — not a company or official service. I don't
+own the counselling or exam data; it's compiled from public NTA, JoSAA, and
+CSAB releases. See [NOTICE](NOTICE) for the full disclaimer. Always verify
+on official portals before making decisions.
+
 ## Get data locally
 
 After cloning the repo, parquet files under `data/` are included in git (~4 MB total).
