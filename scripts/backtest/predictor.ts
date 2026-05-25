@@ -319,19 +319,38 @@ ORDER BY s.institute_id, s.program_id, s.seat_type, s.quota, s.gender;
 }
 
 function buildHoldoutSQL(globPattern: string): string {
+  // mirror training dedup — multiple degree/duration rows can share the same seat key at final round
   return `
 WITH all_2025 AS (
-  SELECT * FROM read_parquet('${globPattern}') WHERE year = 2025
+  SELECT institute_id, program_id, seat_type, quota, gender,
+    CASE WHEN instype = '3IT' THEN 'IIIT' ELSE instype END AS instype,
+    degree, duration_years, year, LEAST(round, 6) AS round, closing_rank
+  FROM read_parquet('${globPattern}') WHERE year = 2025
+),
+deduped AS (
+  SELECT institute_id, program_id, seat_type, quota, gender, instype,
+    degree, duration_years, year, round, MAX(closing_rank) AS closing_rank
+  FROM all_2025
+  GROUP BY institute_id, program_id, seat_type, quota, gender, instype,
+           degree, duration_years, year, round
 ),
 max_rounds AS (
   SELECT institute_id, program_id, seat_type, quota, gender, MAX(round) AS max_round
-  FROM all_2025 GROUP BY institute_id, program_id, seat_type, quota, gender
+  FROM deduped
+  GROUP BY institute_id, program_id, seat_type, quota, gender
+),
+final_round AS (
+  SELECT d.institute_id, d.program_id, d.seat_type, d.quota, d.gender, d.closing_rank
+  FROM deduped d
+  JOIN max_rounds mr
+    ON d.institute_id = mr.institute_id AND d.program_id = mr.program_id
+    AND d.seat_type = mr.seat_type AND d.quota = mr.quota AND d.gender = mr.gender
+    AND d.round = mr.max_round
 )
-SELECT a.institute_id, a.program_id, a.seat_type, a.quota, a.gender, a.closing_rank
-FROM all_2025 a JOIN max_rounds mr
-  ON a.institute_id = mr.institute_id AND a.program_id = mr.program_id
-  AND a.seat_type = mr.seat_type AND a.quota = mr.quota AND a.gender = mr.gender
-  AND a.round = mr.max_round;
+SELECT institute_id, program_id, seat_type, quota, gender,
+  MAX(closing_rank)::INTEGER AS closing_rank
+FROM final_round
+GROUP BY institute_id, program_id, seat_type, quota, gender;
   `;
 }
 
