@@ -32,6 +32,25 @@ interface PredictorContextValue {
 
 const PredictorContext = createContext<PredictorContextValue | null>(null);
 
+function captureInitialUrlParams(): URLSearchParams | null {
+  if (typeof window === "undefined") return null;
+  return new URLSearchParams(window.location.search);
+}
+
+function shareLinkReadyToPredict(params: URLSearchParams): boolean {
+  if (!params.get("rank")?.trim()) return false;
+  const exam = params.get("exam") ?? "jee-main";
+  const quota = (params.get("quota") ?? "os").toLowerCase();
+  if (
+    exam === "jee-main" &&
+    (quota === "hs" || quota === "os") &&
+    !params.get("state")?.trim()
+  ) {
+    return false;
+  }
+  return true;
+}
+
 export function PredictorProvider({ children }: { children: React.ReactNode }) {
   const state = usePredictorState();
   const query = usePredictorQuery({
@@ -47,6 +66,13 @@ export function PredictorProvider({ children }: { children: React.ReactNode }) {
     useState<ResultsFilterState>(EMPTY_RESULTS_FILTERS);
   const [sortBy, setSortBy] = useState<ResultsSortKey>(DEFAULT_RESULTS_SORT);
   const rankInputRef = useRef<RankInputHandle>(null);
+  const initialUrlParamsRef = useRef<URLSearchParams | null | undefined>(
+    undefined,
+  );
+  if (initialUrlParamsRef.current === undefined) {
+    initialUrlParamsRef.current = captureInitialUrlParams();
+  }
+  const shareLinkAutoPredictDone = useRef(false);
   const hasResults = (query.data?.programs.length ?? 0) > 0;
 
   useEffect(() => {
@@ -62,6 +88,15 @@ export function PredictorProvider({ children }: { children: React.ReactNode }) {
       setSortBy(DEFAULT_RESULTS_SORT);
     }
   }, [query, state.rank]);
+
+  useEffect(() => {
+    if (shareLinkAutoPredictDone.current) return;
+    const initialParams = initialUrlParamsRef.current;
+    if (!initialParams || !shareLinkReadyToPredict(initialParams)) return;
+
+    shareLinkAutoPredictDone.current = true;
+    void onPredict();
+  }, [onPredict]);
 
   return (
     <PredictorContext.Provider
