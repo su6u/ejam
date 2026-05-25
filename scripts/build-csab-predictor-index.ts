@@ -53,6 +53,7 @@ function buildSQL(parquetFiles: string[], predictionYear: number): string {
   const sigmaPct = CSAB_TUNED.sigmaFloorPct;
   const sigmaInfl = CSAB_TUNED.sigmaInflation;
   const sparse = CSAB_TUNED.sparseYearsThreshold;
+  const windowSize = CSAB_TUNED.windowSize;
   const predictedRank = csabEnsemblePredictedRankSql(predictionYear);
 
   return `
@@ -107,7 +108,7 @@ WITH windowed AS (
       ORDER BY year DESC
     ) AS yr
   FROM last_round
-  QUALIFY yr <= 2
+  QUALIFY yr <= ${windowSize}
 ),
 group_std AS (
   SELECT
@@ -273,8 +274,8 @@ COPY (
     ${predictedRank}::INTEGER AS predicted_closing_rank,
     CASE
       WHEN s.years_of_data = 1 THEN 'pooled'
-      WHEN s.years_of_data = 2 THEN 'inferred'
-      WHEN s.years_of_data >= 3 THEN 'sufficient'
+      WHEN s.years_of_data >= ${windowSize} THEN 'sufficient'
+      ELSE 'inferred'
     END AS data_quality,
     s.years_of_data,
     s.last_data_year,
