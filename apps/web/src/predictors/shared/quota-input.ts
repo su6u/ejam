@@ -17,6 +17,15 @@ export function uiQuotaToApi(quota: string): QuotaApi {
   return mapped[quota.toLowerCase()] ?? "OS";
 }
 
+export function quotaRequiresHomeState(quota: string): boolean {
+  const apiQuota = uiQuotaToApi(quota);
+  return apiQuota === "OS" || apiQuota === "HS";
+}
+
+export function examUsesQuotaHomeState(exam: string): boolean {
+  return exam === "jee-main" || exam === "csab";
+}
+
 export function refineQuotaRequiresState(
   data: { quota: QuotaApi; state?: string },
   ctx: z.RefinementCtx,

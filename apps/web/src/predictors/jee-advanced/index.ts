@@ -17,7 +17,9 @@ import {
   resultFromCacheEntry,
 } from "@/predictors/shared/finalize-prediction";
 import {
+  fnv1a,
   indexShaFromDeps,
+  stableStringify,
   type ServerCacheEntry,
 } from "@/predictors/shared/predictor-cache";
 
@@ -57,32 +59,6 @@ type RegistryMaps = {
 const _serverCache = new Map<string, ServerCacheEntry>();
 
 let _cachedRegistry: RegistryMaps | null = null;
-
-function stableNormalize(value: unknown): unknown {
-  if (Array.isArray(value)) return value.map(stableNormalize);
-  if (value && typeof value === "object") {
-    return Object.fromEntries(
-      Object.entries(value)
-        .filter(([, entry]) => entry !== undefined)
-        .sort(([a], [b]) => a.localeCompare(b))
-        .map(([key, entry]) => [key, stableNormalize(entry)]),
-    );
-  }
-  return value;
-}
-
-function stableStringify(value: unknown): string {
-  return JSON.stringify(stableNormalize(value));
-}
-
-function fnv1a(value: string): string {
-  let hash = 0x811c9dc5;
-  for (const char of value) {
-    hash ^= char.codePointAt(0) ?? 0;
-    hash = Math.imul(hash, 0x01000193);
-  }
-  return (hash >>> 0).toString(16).padStart(8, "0");
-}
 
 async function loadRegistryMaps(): Promise<RegistryMaps> {
   if (_cachedRegistry) return _cachedRegistry;

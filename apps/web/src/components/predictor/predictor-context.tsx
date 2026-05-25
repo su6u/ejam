@@ -14,6 +14,10 @@ import {
   type PredictorStateReturn,
   usePredictorState,
 } from "@/hooks/use-predictor-state";
+import {
+  examUsesQuotaHomeState,
+  quotaRequiresHomeState,
+} from "@/predictors/shared/quota-input";
 import type { RankInputHandle } from "@/components/predictor/rank-input";
 
 type PredictorQueryReturn = ReturnType<typeof usePredictorQuery>;
@@ -40,10 +44,10 @@ function captureInitialUrlParams(): URLSearchParams | null {
 function shareLinkReadyToPredict(params: URLSearchParams): boolean {
   if (!params.get("rank")?.trim()) return false;
   const exam = params.get("exam") ?? "jee-main";
-  const quota = (params.get("quota") ?? "os").toLowerCase();
+  const quota = params.get("quota") ?? "os";
   if (
-    exam === "jee-main" &&
-    (quota === "hs" || quota === "os") &&
+    examUsesQuotaHomeState(exam) &&
+    quotaRequiresHomeState(quota) &&
     !params.get("state")?.trim()
   ) {
     return false;

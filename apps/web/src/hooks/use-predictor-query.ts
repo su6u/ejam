@@ -154,10 +154,17 @@ export function usePredictorQuery({
   const [error, setError] = useState<string | null>(null);
   const requestGenerationRef = useRef(0);
   const abortControllerRef = useRef<AbortController | null>(null);
+  const predictInFlightRankRef = useRef<string | null>(null);
   // first predict per exam per page load hits the API so a deploy cannot serve stale sessionStorage
   const sessionCacheReadyRef = useRef<Record<string, boolean>>({});
 
   useEffect(() => {
+    if (
+      predictInFlightRankRef.current !== null &&
+      predictInFlightRankRef.current === rank
+    ) {
+      return;
+    }
     requestGenerationRef.current += 1;
     abortControllerRef.current?.abort();
     abortControllerRef.current = null;
@@ -186,6 +193,7 @@ export function usePredictorQuery({
     const effectiveRank = rankOverride ?? rank;
     if (!effectiveRank || Number.isNaN(Number(effectiveRank))) return false;
 
+    predictInFlightRankRef.current = effectiveRank;
     const generation = ++requestGenerationRef.current;
     const isCurrent = () => generation === requestGenerationRef.current;
 
@@ -280,6 +288,9 @@ export function usePredictorQuery({
       setError(message);
       return false;
     } finally {
+      if (predictInFlightRankRef.current === effectiveRank) {
+        predictInFlightRankRef.current = null;
+      }
       if (isCurrent()) {
         setIsLoading(false);
         abortControllerRef.current = null;
