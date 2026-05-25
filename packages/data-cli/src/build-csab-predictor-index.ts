@@ -292,8 +292,8 @@ COPY (
     ${predictedRank}::INTEGER AS predicted_closing_rank,
     CASE
       WHEN s.years_of_data = 1 THEN 'pooled'
-      WHEN s.years_of_data >= ${windowSize} THEN 'sufficient'
-      ELSE 'inferred'
+      WHEN s.years_of_data = 2 THEN 'inferred'
+      WHEN s.years_of_data >= ${sparse} THEN 'sufficient'
     END AS data_quality,
     s.years_of_data,
     s.last_data_year,
