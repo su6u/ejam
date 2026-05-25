@@ -17,6 +17,7 @@
     "build:data": "tsx scripts/build-data.ts",
     "generate:manifest": "tsx scripts/generate-manifest.ts",
     "data:fetch": "tsx scripts/fetch-data.ts",
+    "package:data-release": "tsx scripts/package-data-release.ts",
     "build:predictor-index": "tsx scripts/build-college-predictor-index.ts",
     "backtest": "tsx scripts/backtest/predictor.ts",
     "build:csab-index": "tsx scripts/build-csab-predictor-index.ts",

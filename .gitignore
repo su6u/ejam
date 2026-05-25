@@ -41,6 +41,7 @@ data/**/_raw/
 # data lake — versioned manifests are tracked; runtime ingest logs are not
 data/manifest/sources.jsonl
 data/manifest/runs.jsonl
+data-*.tar.gz
 
 # pnpm
 node_modules/
