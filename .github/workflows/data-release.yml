@@ -39,7 +39,7 @@ jobs:
         run: |
           pnpm data:fetch --version=${{ steps.meta.outputs.manifest }}
           pnpm verify:index-lineage
-          uv sync --frozen
+          uv sync --directory packages/data-validation --frozen
           pnpm validate:data
 
       - name: Package release tarball

@@ -9,3 +9,4 @@ export * from "./predictor-interface";
 export * from "./reader";
 export * from "./schema";
 export * as jeeSchemas from "./schemas/jee";
+export * from "./semver";

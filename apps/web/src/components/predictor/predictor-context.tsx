@@ -1,6 +1,10 @@
 "use client";
 
 import {
+  examUsesQuotaHomeState,
+  quotaRequiresHomeState,
+} from "@ejam/predictors/shared/quota-input";
+import {
   createContext,
   useCallback,
   useContext,
@@ -22,10 +26,6 @@ import {
   type PredictorStateReturn,
   usePredictorState,
 } from "@/hooks/use-predictor-state";
-import {
-  examUsesQuotaHomeState,
-  quotaRequiresHomeState,
-} from "@/predictors/shared/quota-input";
 
 type PredictorQueryReturn = ReturnType<typeof usePredictorQuery>;
 

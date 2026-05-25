@@ -15,8 +15,8 @@ import {
   resolveExamDependencies,
 } from "@ejam/data/dependency-resolver";
 import { loadExamConfig } from "@ejam/data/exam-config";
+import { getPredictor } from "@ejam/predictors/registry";
 import { type NextRequest, NextResponse } from "next/server";
-import { getPredictor } from "../registry";
 
 type RouteParams = { params: Promise<{ exam_id: string }> };
 

@@ -10,7 +10,10 @@ export {
   type ResolvedDatasetRef,
   verifyDatasetSha256,
 } from "./dataset-path";
-export { readIndexLineageSidecar } from "./index-lineage";
+export {
+  type IndexLineage,
+  readIndexLineageSidecar,
+} from "./index-lineage";
 export { buildPredictionProvenance } from "./provenance";
 export {
   assertPublishable,

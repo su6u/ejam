@@ -32,6 +32,10 @@
     "./college-predictor": {
       "import": "./src/college-predictor/index.ts",
       "types": "./src/college-predictor/index.ts"
+    },
+    "./semver": {
+      "import": "./src/semver.ts",
+      "types": "./src/semver.ts"
     }
   },
   "scripts": {

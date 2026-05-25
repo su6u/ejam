@@ -11,9 +11,6 @@ importers:
       '@biomejs/biome':
         specifier: ^2.4.14
         version: 2.4.15
-      '@duckdb/node-api':
-        specifier: ^1.5.2-r.1
-        version: 1.5.2-r.1
       tsx:
         specifier: ^4.21.0
         version: 4.22.0
@@ -23,9 +20,6 @@ importers:
       typescript:
         specifier: ^6.0.3
         version: 6.0.3
-      zod:
-        specifier: ^4.4.2
-        version: 4.4.3
 
   apps/web:
     dependencies:
@@ -35,6 +29,9 @@ importers:
       '@ejam/data':
         specifier: workspace:*
         version: link:../../packages/data
+      '@ejam/predictors':
+        specifier: workspace:*
+        version: link:../../packages/predictors
       '@tailwindcss/postcss':
         specifier: ^4.2.4
         version: 4.3.0
@@ -128,6 +125,41 @@ importers:
       vitest:
         specifier: ^3.2.4
         version: 3.2.4(@types/node@25.7.0)(jiti@2.7.0)(lightningcss@1.32.0)(msw@2.14.6(@types/node@25.7.0)(typescript@6.0.3))(tsx@4.22.0)
+
+  packages/data-cli:
+    dependencies:
+      '@duckdb/node-api':
+        specifier: ^1.5.2-r.1
+        version: 1.5.2-r.1
+      '@ejam/data':
+        specifier: workspace:*
+        version: link:../data
+      zod:
+        specifier: ^4.4.2
+        version: 4.4.3
+    devDependencies:
+      '@types/node':
+        specifier: ^25.6.0
+        version: 25.7.0
+      tsx:
+        specifier: ^4.21.0
+        version: 4.22.0
+      typescript:
+        specifier: ^6.0.3
+        version: 6.0.3
+
+  packages/predictors:
+    dependencies:
+      '@ejam/data':
+        specifier: workspace:*
+        version: link:../data
+      zod:
+        specifier: ^4.4.2
+        version: 4.4.3
+    devDependencies:
+      typescript:
+        specifier: ^6.0.3
+        version: 6.0.3
 
 packages:
 

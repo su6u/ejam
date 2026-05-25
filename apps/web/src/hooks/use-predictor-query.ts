@@ -12,8 +12,8 @@ import {
   PredictionSuccessResponse,
 } from "@ejam/data";
 import type { CollegePredictionResult } from "@ejam/data/college-predictor";
+import { uiQuotaToApi } from "@ejam/predictors/shared/quota-input";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { uiQuotaToApi } from "@/predictors/shared/quota-input";
 
 interface PredictorQueryOptions {
   exam: string;

@@ -1,0 +1,26 @@
+{
+  "name": "@ejam/data-cli",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "fetch": "tsx src/fetch-data.ts",
+    "generate-manifest": "tsx src/generate-manifest.ts",
+    "package-data-release": "tsx src/package-data-release.ts",
+    "build-predictor-index": "tsx src/build-college-predictor-index.ts",
+    "build-csab-index": "tsx src/build-csab-predictor-index.ts",
+    "verify-index-lineage": "tsx src/verify-index-lineage.ts",
+    "backtest": "tsx src/backtest/predictor.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@duckdb/node-api": "^1.5.2-r.1",
+    "@ejam/data": "workspace:*",
+    "zod": "^4.4.2"
+  },
+  "devDependencies": {
+    "@types/node": "^25.6.0",
+    "tsx": "^4.21.0",
+    "typescript": "^6.0.3"
+  }
+}

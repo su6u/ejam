@@ -2,6 +2,11 @@ version = 1
 revision = 3
 requires-python = ">=3.11"
 
+[manifest]
+members = [
+    "ejam-data-validation",
+]
+
 [[package]]
 name = "annotated-types"
 version = "0.7.0"
@@ -12,9 +17,9 @@ wheels = [
 ]
 
 [[package]]
-name = "ejam-data-tools"
+name = "ejam-data-validation"
 version = "0.0.0"
-source = { virtual = "." }
+source = { editable = "packages/data-validation" }
 dependencies = [
     { name = "polars" },
     { name = "pydantic" },

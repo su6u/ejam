@@ -1,0 +1,21 @@
+# ejam data lake — ignore rules (see docs/DATA.md)
+
+# Raw scraped sources (regenerable from ejam-ingest)
+**/_raw/
+
+# Ingest runtime logs (versioned manifest pins v*.json stay tracked)
+manifest/sources.jsonl
+manifest/runs.jsonl
+
+# Local / experimental outputs
+dist/sandbox/
+dist/backtest-results.json
+
+# --- Parquet staged policy ---
+# Tracked today: engineering/**/cutoffs.parquet, engineering/**/seat-matrix.parquet,
+# dist/college_predictor_index.parquet, dist/csab_predictor_index.parquet (+ .lineage.json).
+# Pinned by data/manifest/v*.json; verify with `pnpm data:fetch`.
+#
+# engineering/**/*.parquet
+# dist/*.parquet
+# dist/*.lineage.json

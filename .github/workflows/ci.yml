@@ -7,7 +7,40 @@ on:
     branches: [main]
 
 jobs:
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      app: ${{ steps.filter.outputs.app }}
+      data: ${{ steps.filter.outputs.data }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            app:
+              - 'apps/**'
+              - 'packages/data/**'
+              - 'packages/predictors/**'
+              - 'package.json'
+              - 'pnpm-lock.yaml'
+              - 'pnpm-workspace.yaml'
+              - 'turbo.json'
+              - 'biome.json'
+              - 'tsconfig.json'
+            data:
+              - 'packages/data/**'
+              - 'packages/data-cli/**'
+              - 'packages/data-validation/**'
+              - 'package.json'
+              - 'pnpm-lock.yaml'
+              - 'pnpm-workspace.yaml'
+              - 'pyproject.toml'
+              - 'uv.lock'
+
   app:
+    needs: changes
+    if: needs.changes.outputs.app == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -33,6 +66,8 @@ jobs:
         run: pnpm build
 
   data:
+    needs: changes
+    if: needs.changes.outputs.data == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -50,6 +85,9 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
+      - name: Typecheck data-cli
+        run: pnpm --filter @ejam/data-cli typecheck
+
       - name: Verify manifest checksums
         run: pnpm data:fetch
 
@@ -57,7 +95,7 @@ jobs:
         run: pnpm verify:index-lineage
 
       - name: Validate data (json + parquet)
-        run: uv sync --frozen && pnpm validate:data
+        run: uv sync --directory packages/data-validation --frozen && pnpm validate:data
 
       - name: Run @ejam/data tests
         run: pnpm --filter @ejam/data test
