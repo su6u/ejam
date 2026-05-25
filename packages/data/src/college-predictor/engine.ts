@@ -300,6 +300,11 @@ export function deriveConfidence(
   };
 }
 
+// index parquet uses JoSAA label "EWS"; callers may still send taxonomy alias "Gen-EWS"
+function normalizeSeatTypeForIndex(seatType: string): string {
+  return seatType === "Gen-EWS" ? "EWS" : seatType;
+}
+
 export function predictPrograms(opts: {
   indexRows: CollegePredictorIndexRow[];
   studentRank: number;
@@ -311,10 +316,11 @@ export function predictPrograms(opts: {
   filters?: CollegePredictorFilters;
 }): CollegePredictionResult {
   const threshold = opts.probabilityThreshold ?? 0.1;
+  const seatType = normalizeSeatTypeForIndex(opts.seatType);
 
   const matching = opts.indexRows.filter(
     (row) =>
-      row.seat_type === opts.seatType &&
+      row.seat_type === seatType &&
       (opts.quota === undefined || row.quota === opts.quota) &&
       row.gender === opts.gender,
   );

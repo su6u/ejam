@@ -15,7 +15,7 @@ export type ExamType = "jee-advanced" | "jee-main";
 
 const CATEGORY_TO_SEAT_TYPE: Record<string, string> = {
   gen: "OPEN",
-  "gen-ews": "Gen-EWS",
+  "gen-ews": "EWS",
   "obc-ncl": "OBC-NCL",
   sc: "SC",
   st: "ST",

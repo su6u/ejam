@@ -69,7 +69,7 @@ const SPECIAL_STATE_QUOTAS: Record<string, string> = {
   LA: "Ladakh",
   AP: "Andhra Pradesh",
 };
-const EWS_SEAT_TYPE = "Gen-EWS";
+const EWS_SEAT_TYPE = "EWS";
 const EWS_CAVEAT =
   "EWS seats are only available to candidates holding a valid EWS certificate issued by a competent authority. These results assume you are EWS-eligible.";
 

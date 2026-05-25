@@ -20,7 +20,7 @@ const DEFAULT_SEAT_TYPE = "OPEN";
 const DEFAULT_GENDER = "Gender-Neutral";
 const CATEGORY_TO_SEAT_TYPE: Record<string, string> = {
   gen: "OPEN",
-  "gen-ews": "Gen-EWS",
+  "gen-ews": "EWS",
   obc: "OBC-NCL",
   "obc-ncl": "OBC-NCL",
   sc: "SC",

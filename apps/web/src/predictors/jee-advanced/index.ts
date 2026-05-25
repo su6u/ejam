@@ -42,7 +42,7 @@ const JeeAdvancedInput = z.object({
 type JeeAdvancedInput = z.infer<typeof JeeAdvancedInput>;
 
 const JEE_ADVANCED_QUOTA = "AI";
-const EWS_SEAT_TYPE = "Gen-EWS";
+const EWS_SEAT_TYPE = "EWS";
 const EWS_CAVEAT =
   "EWS seats are only available to candidates holding a valid EWS certificate issued by a competent authority. These results assume you are EWS-eligible.";
 
