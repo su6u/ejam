@@ -14,6 +14,7 @@ import {
   computeRoundProbs,
   normalCDF,
   predictPrograms,
+  REACH_BAND_MIN_PROBABILITY,
 } from "../college-predictor/engine";
 
 describe("normalCDF", () => {
@@ -239,16 +240,19 @@ describe("predictPrograms", () => {
     }
   });
 
-  it("includes long-shot programs by default", () => {
+  it("hides long-shot programs below reach band by default", () => {
     const result = predictPrograms({
       indexRows: makeIndexRows(),
       studentRank: 50000,
       seatType: "OPEN",
       gender: "Gender-Neutral",
     });
-    expect(result.metadata.threshold_used).toBe(0.09);
+    expect(result.metadata.threshold_used).toBe(REACH_BAND_MIN_PROBABILITY);
     for (const p of result.programs) {
-      expect(p.cumulative_probability).toBeGreaterThanOrEqual(0.09);
+      expect(p.cumulative_probability).toBeGreaterThanOrEqual(
+        REACH_BAND_MIN_PROBABILITY,
+      );
+      expect(p.band).not.toBe("long-shot");
     }
   });
 

@@ -37,11 +37,10 @@ export interface CollegePredictorIndexRow {
 
 export type ProbabilityBand = "safe" | "target" | "reach" | "long-shot";
 
-/** reach band starts here; long-shots are strictly below */
+/** reach band floor — long-shots are below this; default display hides long-shots */
 export const REACH_BAND_MIN_PROBABILITY = 0.1;
 
-/** default UI display floor — slightly below reach band so near-threshold long-shots appear */
-export const DEFAULT_PROBABILITY_DISPLAY_THRESHOLD = 0.09;
+export const DEFAULT_PROBABILITY_DISPLAY_THRESHOLD = REACH_BAND_MIN_PROBABILITY;
 
 export interface ProgramPrediction {
   institute_id: string;
@@ -273,7 +272,7 @@ export function deriveConfidence(
   if (programs.length === 0) {
     return {
       level: "low",
-      caveat: "no matching programs for this category, quota, and rank",
+      caveat: "no programs at reach or better for this rank — long-shots are hidden by default",
     };
   }
 

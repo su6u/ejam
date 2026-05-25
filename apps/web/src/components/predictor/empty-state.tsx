@@ -46,7 +46,7 @@ function emptyDescription({
   if (hasPredicted) {
     return (
       confidenceCaveat ??
-      "No matching colleges for this category, quota, and rank"
+      "No colleges at reach or better for this rank — try a lower rank or use include-all"
     );
   }
   if (hasRank) {

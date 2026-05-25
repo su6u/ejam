@@ -182,7 +182,7 @@ function deriveConfidence(programs: ProgramPrediction[]): {
   if (programs.length === 0) {
     return {
       level: "low",
-      caveat: "no matching programs for this category, quota, and rank",
+      caveat: "no programs at reach or better for this rank — long-shots are hidden by default",
     };
   }
   // worst data_quality among returned programs drives the confidence level
