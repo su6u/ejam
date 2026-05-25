@@ -32,6 +32,7 @@ logs
 # misc
 .turbo
 coverage
+.venv
 
 # raw scraped sources (regenerable from ejam-ingest)
 data/**/_raw/

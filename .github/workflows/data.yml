@@ -32,5 +32,10 @@ jobs:
       - name: Validate JEE JSON schemas
         run: pnpm validate:data
 
+      - uses: astral-sh/setup-uv@v5
+
+      - name: Validate parquet schemas
+        run: uv sync --frozen && pnpm validate:data:parquet
+
       - name: Run @ejam/data tests
         run: pnpm --filter @ejam/data test

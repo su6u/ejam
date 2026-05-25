@@ -1,6 +1,5 @@
 """
-data integrity validator — walks every domain under data/<domain>/ and verifies
-all published Parquet files against the contract in docs/data/contract.md
+validates published parquet files under data/engineering and data/dist
 
 usage: uv run python scripts/validate_data.py
 exit 0 = clean, 1 = issues found
@@ -15,23 +14,80 @@ from pathlib import Path
 try:
     import polars as pl
 except ModuleNotFoundError:
-    print("ERROR: polars required — install with: uv pip install polars")
+    print("ERROR: polars required — install with: uv sync")
     sys.exit(1)
 
 ROOT = Path(__file__).resolve().parents[1]
 REGISTRY_ROOT = ROOT / "data" / "registry"
+ENGINEERING_ROOT = ROOT / "data" / "engineering"
+DIST_ROOT = ROOT / "data" / "dist"
 
-# slugs that legitimately appear under multiple instype values across sources
 DUAL_CLASS_OK = {"iiest-shibpur"}
 
-# domain-specific instype prefix rules — slug prefix → expected instype set
-INSTYPE_PREFIX_RULES: dict[str, dict[str, set[str]]] = {
-    "engineering": {
-        "iit-": {"IIT"},
-        "iiit-": {"IIIT"},
-        "nit-": {"NIT"},
-    },
+INSTYPE_PREFIX_RULES: dict[str, set[str]] = {
+    "iit-": {"IIT"},
+    # raw cutoffs use 3IT; some IIIT slugs are classified CFI in JoSAA/CSAB
+    "iiit-": {"IIIT", "3IT", "CFI"},
+    "nit-": {"NIT"},
 }
+
+INSTYPE_ALIASES = {"3IT": "IIIT"}
+
+CUTOFF_COLUMNS = (
+    "year",
+    "round",
+    "institute_id",
+    "program_id",
+    "quota",
+    "seat_type",
+    "gender",
+    "opening_rank",
+    "closing_rank",
+    "rank_exam",
+    "instype",
+    "degree",
+    "duration_years",
+    "source",
+    "source_id",
+    "run_id",
+    "source_locator",
+)
+
+SEAT_MATRIX_COLUMNS = (
+    "year",
+    "institute_id",
+    "program_id",
+    "quota",
+    "seat_type",
+    "gender",
+    "seats",
+    "source",
+)
+
+PREDICTOR_INDEX_COLUMNS = (
+    "institute_id",
+    "program_id",
+    "seat_type",
+    "quota",
+    "gender",
+    "instype",
+    "degree",
+    "duration_years",
+    "weighted_mean",
+    "weighted_std",
+    "trend_slope",
+    "sigma_base",
+    "sigma_effective",
+    "predicted_closing_rank",
+    "data_quality",
+    "years_of_data",
+    "last_data_year",
+    "min_closing_rank",
+    "max_closing_rank",
+    "fill_round",
+)
+
+DATA_QUALITY_VALUES = {"pooled", "inferred", "sufficient"}
 
 
 class Report:
@@ -43,132 +99,205 @@ class Report:
         print(f"  ✗ {msg}")
 
 
-def load_registry_ids(domain_dir: Path) -> tuple[set[str], set[str]]:
-    """return (institute_ids, program_ids) for a domain, empty if registry missing"""
+def load_registry_ids() -> set[str]:
+    domain_dir = REGISTRY_ROOT / "engineering"
     inst_path = domain_dir / "institutes.json"
-    prog_path = domain_dir / "programs.json"
-    inst_ids = {i["id"] for i in json.loads(inst_path.read_text())} if inst_path.exists() else set()
-    prog_ids = {p["id"] for p in json.loads(prog_path.read_text())} if prog_path.exists() else set()
-    return inst_ids, prog_ids
+    if not inst_path.exists():
+        return set()
+    return {i["id"] for i in json.loads(inst_path.read_text())}
 
 
-def check_registry_validity(df: pl.DataFrame, inst_ids: set[str], prog_ids: set[str], rep: Report, fname: str) -> None:
+def discover_parquet_files() -> list[Path]:
+    files: list[Path] = []
+    if ENGINEERING_ROOT.exists():
+        files.extend(sorted(ENGINEERING_ROOT.rglob("*.parquet")))
+    for name in ("college_predictor_index.parquet", "csab_predictor_index.parquet"):
+        path = DIST_ROOT / name
+        if path.exists():
+            files.append(path)
+    return files
+
+
+def classify_file(path: Path) -> str:
+    rel = path.relative_to(ROOT).as_posix()
+    if rel.endswith("/cutoffs.parquet"):
+        return "cutoff"
+    if "seats/matrix" in rel and path.name == "seat-matrix.parquet":
+        return "seat_matrix"
+    if path.parent.name == "dist" and path.name.endswith("_predictor_index.parquet"):
+        return "predictor_index"
+    return "unknown"
+
+
+def check_required_columns(
+    df: pl.DataFrame,
+    required: tuple[str, ...],
+    rep: Report,
+    label: str,
+) -> None:
+    missing = [col for col in required if col not in df.columns]
+    if missing:
+        rep.add(f"{label}: missing columns {missing}")
+
+
+def check_registry_validity(
+    df: pl.DataFrame,
+    inst_ids: set[str],
+    rep: Report,
+    label: str,
+) -> None:
     if inst_ids and "institute_id" in df.columns:
         bad = df.filter(~pl.col("institute_id").is_in(list(inst_ids)))
         if len(bad) > 0:
-            rep.add(f"{fname}: {len(bad)} rows with unknown institute_id")
-    if prog_ids and "program_id" in df.columns:
-        bad = df.filter(~pl.col("program_id").is_in(list(prog_ids)))
-        if len(bad) > 0:
-            rep.add(f"{fname}: {len(bad)} rows with unknown program_id")
+            rep.add(f"{label}: {len(bad)} rows with unknown institute_id")
 
 
-def check_instype_collisions(df: pl.DataFrame, rules: dict[str, set[str]], rep: Report, fname: str) -> None:
-    """slug-prefix → instype consistency — e.g. iit-* must have instype IIT"""
-    if "instype" not in df.columns:
+def check_instype_collisions(df: pl.DataFrame, rep: Report, label: str) -> None:
+    if "instype" not in df.columns or "institute_id" not in df.columns:
         return
-    for prefix, allowed in rules.items():
-        # iit- prefix overlaps iiit- so guard explicitly
+    for prefix, allowed in INSTYPE_PREFIX_RULES.items():
         cond = pl.col("institute_id").str.starts_with(prefix)
         if prefix == "iit-":
             cond = cond & ~pl.col("institute_id").str.starts_with("iiit-")
         bad = df.filter(cond & ~pl.col("instype").is_in(list(allowed)))
         if len(bad) > 0:
             sample = bad.select(["institute_id", "instype"]).unique().to_dicts()[:3]
-            rep.add(f"{fname}: {prefix}* slug under wrong instype (allowed={allowed}): {sample}")
+            rep.add(f"{label}: {prefix}* slug under wrong instype (allowed={allowed}): {sample}")
 
 
-def check_exam_id(df: pl.DataFrame, rep: Report, fname: str) -> None:
-    # exam_id replaced rank_exam — verify it is present and non-empty on cutoff rows
-    if "exam_id" not in df.columns:
-        return
-    bad = df.filter(pl.col("exam_id").is_null() | (pl.col("exam_id") == ""))
-    if len(bad) > 0:
-        rep.add(f"{fname}: {len(bad)} rows with missing exam_id")
-
-
-def check_duplicates(df: pl.DataFrame, rep: Report, fname: str) -> None:
-    # generic key cols — quota_id/category_id/gender_id replaced old enum columns
-    key_cols = ["year", "round", "institute_id", "program_id", "quota_id", "category_id", "gender_id"]
+def check_duplicates(df: pl.DataFrame, key_cols: list[str], rep: Report, label: str) -> None:
     available = [c for c in key_cols if c in df.columns]
-    if len(available) < 5:
+    if len(available) != len(key_cols):
         return
     dupes = df.group_by(available).len().filter(pl.col("len") > 1)
     if len(dupes) > 0:
-        rep.add(f"{fname}: {len(dupes)} duplicate row groups")
+        rep.add(f"{label}: {len(dupes)} duplicate row groups on {available}")
 
 
-def check_value_sanity(df: pl.DataFrame, rep: Report, fname: str) -> None:
-    # opening_value/closing_value are generic; only enforce ordering on rank score_type
-    if "opening_value" not in df.columns or "closing_value" not in df.columns:
+def check_cutoff_rows(df: pl.DataFrame, rep: Report, label: str) -> None:
+    if "rank_exam" in df.columns:
+        bad = df.filter(pl.col("rank_exam").is_null() | (pl.col("rank_exam") == ""))
+        if len(bad) > 0:
+            rep.add(f"{label}: {len(bad)} rows with missing rank_exam")
+    if "opening_rank" in df.columns and "closing_rank" in df.columns:
+        negative = df.filter((pl.col("opening_rank") < 0) | (pl.col("closing_rank") < 0))
+        if len(negative) > 0:
+            rep.add(f"{label}: {len(negative)} rows with negative ranks")
+        bad_order = df.filter(pl.col("opening_rank") > pl.col("closing_rank"))
+        if len(bad_order) > 0:
+            rep.add(f"{label}: {len(bad_order)} rows where opening_rank > closing_rank")
+
+
+def check_seat_matrix_rows(df: pl.DataFrame, rep: Report, label: str) -> None:
+    if "seats" not in df.columns:
         return
-    base = df.filter((pl.col("opening_value") < 0) | (pl.col("closing_value") < 0))
-    if len(base) > 0:
-        rep.add(f"{fname}: {len(base)} rows with negative values")
-    if "score_type" in df.columns:
-        rank_rows = df.filter(pl.col("score_type") == "rank")
-        bad_rank = rank_rows.filter(pl.col("opening_value") > pl.col("closing_value"))
-        if len(bad_rank) > 0:
-            rep.add(f"{fname}: {len(bad_rank)} rank rows where opening_value > closing_value")
+    bad = df.filter(pl.col("seats") < 0)
+    if len(bad) > 0:
+        rep.add(f"{label}: {len(bad)} rows with negative seats")
+
+
+def check_predictor_index_rows(df: pl.DataFrame, rep: Report, label: str) -> None:
+    if "data_quality" in df.columns:
+        bad = df.filter(~pl.col("data_quality").is_in(list(DATA_QUALITY_VALUES)))
+        if len(bad) > 0:
+            rep.add(f"{label}: {len(bad)} rows with invalid data_quality")
+    if "predicted_closing_rank" in df.columns:
+        bad = df.filter(pl.col("predicted_closing_rank") <= 0)
+        if len(bad) > 0:
+            rep.add(f"{label}: {len(bad)} rows with non-positive predicted_closing_rank")
 
 
 def cast_string_cols(df: pl.DataFrame) -> pl.DataFrame:
-    """polars Categorical columns need String cast before string ops"""
-    target = ("institute_id", "exam_id", "score_type", "quota_id", "category_id", "gender_id")
+    target = (
+        "institute_id",
+        "program_id",
+        "quota",
+        "seat_type",
+        "gender",
+        "rank_exam",
+        "instype",
+        "data_quality",
+    )
     casts = [pl.col(col).cast(pl.String) for col in target if col in df.columns]
     return df.with_columns(casts) if casts else df
 
 
+def normalize_instype(instype: str) -> str:
+    return INSTYPE_ALIASES.get(instype, instype)
+
+
 def validate_file(
-    f: Path,
+    path: Path,
+    kind: str,
     inst_ids: set[str],
-    prog_ids: set[str],
-    rules: dict[str, set[str]],
     slug_instype_map: dict[str, set[str]],
     rep: Report,
 ) -> None:
-    print(f"\n{f.relative_to(ROOT)}")
-    df = cast_string_cols(pl.read_parquet(f))
-    check_registry_validity(df, inst_ids, prog_ids, rep, f.name)
-    check_instype_collisions(df, rules, rep, f.name)
-    check_exam_id(df, rep, f.name)
-    check_duplicates(df, rep, f.name)
-    check_value_sanity(df, rep, f.name)
+    label = path.relative_to(ROOT).as_posix()
+    print(f"\n{label} [{kind}]")
+    df = cast_string_cols(pl.read_parquet(path))
+
+    if kind == "cutoff":
+        check_required_columns(df, CUTOFF_COLUMNS, rep, label)
+        check_registry_validity(df, inst_ids, rep, label)
+        check_instype_collisions(df, rep, label)
+        check_duplicates(
+            df,
+            [
+                "year",
+                "round",
+                "institute_id",
+                "program_id",
+                "quota",
+                "seat_type",
+                "gender",
+                "degree",
+                "duration_years",
+            ],
+            rep,
+            label,
+        )
+        check_cutoff_rows(df, rep, label)
+    elif kind == "seat_matrix":
+        check_required_columns(df, SEAT_MATRIX_COLUMNS, rep, label)
+        check_registry_validity(df, inst_ids, rep, label)
+        check_seat_matrix_rows(df, rep, label)
+    elif kind == "predictor_index":
+        check_required_columns(df, PREDICTOR_INDEX_COLUMNS, rep, label)
+        check_registry_validity(df, inst_ids, rep, label)
+        check_instype_collisions(df, rep, label)
+        check_duplicates(
+            df,
+            ["institute_id", "program_id", "quota", "seat_type", "gender"],
+            rep,
+            label,
+        )
+        check_predictor_index_rows(df, rep, label)
+    else:
+        rep.add(f"{label}: unknown parquet kind")
+
     if "instype" in df.columns and "institute_id" in df.columns:
         for row in df.select(["institute_id", "instype"]).unique().to_dicts():
-            slug_instype_map[row["institute_id"]].add(row["instype"])
-
-
-def discover_domains() -> list[str]:
-    if not REGISTRY_ROOT.exists():
-        return []
-    return sorted(d.name for d in REGISTRY_ROOT.iterdir() if d.is_dir())
+            slug_instype_map[row["institute_id"]].add(normalize_instype(row["instype"]))
 
 
 def main() -> int:
     rep = Report()
-    domains = discover_domains()
-    if not domains:
-        print("no registry domains found under data/registry/")
+    files = discover_parquet_files()
+    if not files:
+        print("no parquet files found under data/engineering or data/dist")
         return 0
 
+    inst_ids = load_registry_ids()
     slug_instype_map: dict[str, set[str]] = defaultdict(set)
 
-    for domain in domains:
-        print(f"\n{'=' * 60}\ndomain: {domain}\n{'=' * 60}")
-        inst_ids, prog_ids = load_registry_ids(REGISTRY_ROOT / domain)
-        rules = INSTYPE_PREFIX_RULES.get(domain, {})
-        data_dir = ROOT / "data" / domain
-        files = sorted(data_dir.rglob("*.parquet")) if data_dir.exists() else []
-        if not files:
-            print(f"  no parquet files in data/{domain}/")
-            continue
-        for f in files:
-            validate_file(f, inst_ids, prog_ids, rules, slug_instype_map, rep)
+    print(f"validating {len(files)} parquet files")
+    for path in files:
+        validate_file(path, classify_file(path), inst_ids, slug_instype_map, rep)
 
     inconsistent = {s: t for s, t in slug_instype_map.items() if len(t) > 1 and s not in DUAL_CLASS_OK}
     if inconsistent:
-        rep.add(f"cross-year instype inconsistency: {inconsistent}")
+        rep.add(f"cross-file instype inconsistency: {inconsistent}")
 
     print("\n" + "=" * 60)
     if rep.issues:
