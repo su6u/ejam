@@ -10,6 +10,7 @@ export interface CollegePredictorUrlInput {
   seat_type?: string;
   gender?: string;
   state?: string;
+  quota?: string;
   filters?: CollegePredictorFilters;
   has_ews_certificate?: boolean;
   include_all?: boolean;
@@ -30,12 +31,21 @@ const GENDER_TO_SEAT_GENDER: Record<string, string> = {
   neutral: "Gender-Neutral",
   female: "Female-only (including Supernumerary)",
 };
+const QUOTA_TO_API: Record<string, string> = {
+  ai: "AI",
+  hs: "HS",
+  os: "OS",
+  AI: "AI",
+  HS: "HS",
+  OS: "OS",
+};
 const QUERY_KEYS = [
   "band",
   "ews",
   "filters",
   "gender",
   "include_all",
+  "quota",
   "rank",
   "seat_type",
   "state",
@@ -63,6 +73,11 @@ function parseBoolean(value: string | null): boolean | undefined {
   if (value === "true") return true;
   if (value === "false") return false;
   return undefined;
+}
+
+function parseQuota(value: string | null): string | undefined {
+  if (!value) return undefined;
+  return QUOTA_TO_API[value] ?? QUOTA_TO_API[value.toLowerCase()];
 }
 
 function parseFilters(
@@ -96,6 +111,7 @@ export function decodeCollegePredictorUrlParams(
     parseBoolean(params.get("ews_toggle")) ??
     parseBoolean(params.get("ews"));
   const includeAll = parseBoolean(params.get("include_all"));
+  const quota = parseQuota(params.get("quota"));
 
   return {
     rank,
@@ -108,6 +124,7 @@ export function decodeCollegePredictorUrlParams(
       gender ??
       DEFAULT_GENDER,
     ...(state ? { state } : {}),
+    ...(quota ? { quota } : {}),
     ...(filterWithBand ? { filters: filterWithBand } : {}),
     ...(hasEwsCertificate === undefined
       ? {}
@@ -131,6 +148,7 @@ export function encodeCollegePredictorUrlParams(
     gender: input.gender,
     include_all:
       input.include_all === undefined ? undefined : String(input.include_all),
+    quota: input.quota?.toLowerCase(),
     rank: Number.isFinite(input.rank) ? String(input.rank) : undefined,
     seat_type: input.seat_type,
     state: input.state,
