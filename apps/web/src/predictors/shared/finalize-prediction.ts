@@ -5,6 +5,7 @@
 import {
   applyBalancedRanking,
   branchFilterActive,
+  DEFAULT_PROBABILITY_DISPLAY_THRESHOLD,
   groupProgramsByBand,
   type InstituteRankingMeta,
 } from "@ejam/data/college-predictor";
@@ -44,7 +45,7 @@ export function resultFromRankedPrograms(
     metadata: {
       total_matching: programs.length,
       total_above_threshold: programs.length,
-      threshold_used: 0.1,
+      threshold_used: DEFAULT_PROBABILITY_DISPLAY_THRESHOLD,
       hidden_count: 0,
       total_matching_programs: programs.length,
       displayed_programs: programs.length,

@@ -46,7 +46,7 @@ function emptyDescription({
   if (hasPredicted) {
     return (
       confidenceCaveat ??
-      "No colleges met the minimum chance threshold for this rank — try a lower rank"
+      "No matching colleges for this category, quota, and rank"
     );
   }
   if (hasRank) {

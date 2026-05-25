@@ -37,6 +37,12 @@ export interface CollegePredictorIndexRow {
 
 export type ProbabilityBand = "safe" | "target" | "reach" | "long-shot";
 
+/** reach band starts here; long-shots are strictly below */
+export const REACH_BAND_MIN_PROBABILITY = 0.1;
+
+/** default UI display includes long-shots — only exact zero-chance rows are hidden */
+export const DEFAULT_PROBABILITY_DISPLAY_THRESHOLD = 0;
+
 export interface ProgramPrediction {
   institute_id: string;
   program_id: string;
@@ -119,7 +125,7 @@ export function computeProbability(
 export function classifyBand(probability: number): ProbabilityBand {
   if (probability >= 0.85) return "safe";
   if (probability >= 0.4) return "target";
-  if (probability >= 0.1) return "reach";
+  if (probability >= REACH_BAND_MIN_PROBABILITY) return "reach";
   return "long-shot";
 }
 
@@ -267,7 +273,7 @@ export function deriveConfidence(
   if (programs.length === 0) {
     return {
       level: "low",
-      caveat: "no programs found above the probability threshold for this rank",
+      caveat: "no matching programs for this category, quota, and rank",
     };
   }
 
@@ -315,7 +321,8 @@ export function predictPrograms(opts: {
   includeAll?: boolean;
   filters?: CollegePredictorFilters;
 }): CollegePredictionResult {
-  const threshold = opts.probabilityThreshold ?? 0.1;
+  const threshold =
+    opts.probabilityThreshold ?? DEFAULT_PROBABILITY_DISPLAY_THRESHOLD;
   const seatType = normalizeSeatTypeForIndex(opts.seatType);
 
   const matching = opts.indexRows.filter(

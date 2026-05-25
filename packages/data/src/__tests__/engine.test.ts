@@ -239,15 +239,18 @@ describe("predictPrograms", () => {
     }
   });
 
-  it("filters out programs below probability threshold by default", () => {
+  it("includes long-shot programs by default", () => {
     const result = predictPrograms({
       indexRows: makeIndexRows(),
       studentRank: 50000,
       seatType: "OPEN",
       gender: "Gender-Neutral",
     });
-    for (const p of result.programs) {
-      expect(p.cumulative_probability).toBeGreaterThanOrEqual(0.1);
+    expect(result.metadata.threshold_used).toBe(0);
+    if (result.programs.some((p) => p.band === "long-shot")) {
+      expect(result.programs.some((p) => p.cumulative_probability < 0.1)).toBe(
+        true,
+      );
     }
   });
 
