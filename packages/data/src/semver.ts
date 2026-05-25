@@ -29,3 +29,10 @@ export function pickLatestManifestFile(
   const latest = sortManifestVersionsDesc(versions)[0];
   return latest ? `${latest}.json` : undefined;
 }
+
+export function bumpPatchVersion(version: string): string {
+  const parts = parseManifestVersion(version);
+  while (parts.length < 3) parts.push(0);
+  parts[parts.length - 1] += 1;
+  return `v${parts.join(".")}`;
+}

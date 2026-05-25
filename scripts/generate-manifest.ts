@@ -2,8 +2,10 @@
 /**
  * generates data/manifest/v*.json from parquet files under data/engineering and data/dist
  * run after ingest or index build: pnpm generate:manifest
+ * auto-bumps patch semver when --version is omitted; pass --version=vX.Y.Z to pin
  */
 
+import { bumpPatchVersion } from "../packages/data/src/semver";
 import {
   collectParquetDatasets,
   findLatestManifestVersion,
@@ -11,14 +13,27 @@ import {
   writeManifest,
 } from "./lib/manifest";
 
+function normalizeVersion(raw: string): string {
+  return raw.startsWith("v") ? raw : `v${raw}`;
+}
+
+async function resolveManifestVersion(): Promise<string> {
+  const explicitArg = process.argv
+    .find((a) => a.startsWith("--version="))
+    ?.slice("--version=".length);
+  if (explicitArg) return normalizeVersion(explicitArg);
+
+  if (process.env.EJAM_MANIFEST_VERSION) {
+    return normalizeVersion(process.env.EJAM_MANIFEST_VERSION);
+  }
+
+  const latest = await findLatestManifestVersion().catch(() => null);
+  if (!latest) return "v0.1.0";
+  return bumpPatchVersion(latest);
+}
+
 async function main(): Promise<void> {
-  const version =
-    process.argv.find((a) => a.startsWith("--version="))?.slice("--version=".length) ??
-    (process.env.EJAM_MANIFEST_VERSION
-      ? process.env.EJAM_MANIFEST_VERSION.startsWith("v")
-        ? process.env.EJAM_MANIFEST_VERSION
-        : `v${process.env.EJAM_MANIFEST_VERSION}`
-      : await findLatestManifestVersion().catch(() => "v0.1.0"));
+  const version = await resolveManifestVersion();
 
   console.log(`Generating manifest ${version}...`);
   const datasets = await collectParquetDatasets();

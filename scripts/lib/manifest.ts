@@ -7,7 +7,7 @@ import * as crypto from "node:crypto";
 import * as fs from "node:fs/promises";
 import * as path from "node:path";
 import { fileURLToPath } from "node:url";
-import { pickLatestManifestFile } from "../../packages/data/src/semver.ts";
+import { pickLatestManifestFile } from "../../packages/data/src/semver";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 export const ROOT = path.resolve(__dirname, "../..");
