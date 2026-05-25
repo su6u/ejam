@@ -14,6 +14,7 @@ import type {
   CollegePredictorFilters,
   ProgramPrediction,
 } from "@ejam/data/college-predictor";
+import type { ServerCacheEntry } from "@/predictors/shared/predictor-cache";
 
 export function finalizePredictionResult(
   result: CollegePredictionResult,
@@ -53,5 +54,20 @@ export function resultFromRankedPrograms(
       active_filters: filters ?? {},
     },
     grouped_by_band: groupProgramsByBand(programs),
+  };
+}
+
+export function resultFromCacheEntry(
+  cached: ServerCacheEntry,
+  filters: CollegePredictorFilters | undefined,
+): CollegePredictionResult {
+  return {
+    programs: cached.programs,
+    metadata: {
+      ...cached.metadata,
+      active_filters: filters ?? cached.metadata.active_filters,
+    },
+    grouped_by_band: groupProgramsByBand(cached.programs),
+    ...(cached.ews_comparison ? { ews_comparison: cached.ews_comparison } : {}),
   };
 }

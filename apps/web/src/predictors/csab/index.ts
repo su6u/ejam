@@ -20,6 +20,7 @@ import {
 import { z } from "zod";
 import {
   finalizePredictionResult,
+  resultFromCacheEntry,
   resultFromRankedPrograms,
 } from "@/predictors/shared/finalize-prediction";
 import {
@@ -178,10 +179,7 @@ function resultFromCachedPrograms(
   cached: ServerCacheEntry,
   filters: CollegePredictorFilters | undefined,
 ): CollegePredictionResult {
-  const result = resultFromRankedPrograms(cached.programs, filters);
-  return cached.ews_comparison
-    ? { ...result, ews_comparison: cached.ews_comparison }
-    : result;
+  return resultFromCacheEntry(cached, filters);
 }
 
 export const predictor: ExamPredictor<CsabInput, CollegePredictionResult> = {
@@ -256,6 +254,7 @@ export const predictor: ExamPredictor<CsabInput, CollegePredictionResult> = {
 
     _resultCache.set(key, {
       programs: result.programs,
+      metadata: result.metadata,
       ews_comparison: result.ews_comparison,
     });
     return { result };

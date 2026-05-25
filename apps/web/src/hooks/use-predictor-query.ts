@@ -6,7 +6,7 @@
 
 "use client";
 
-import type {
+import {
   PredictionErrorResponse,
   PredictionProvenance,
   PredictionSuccessResponse,
@@ -125,6 +125,18 @@ function clearExamPredictorCache(exam: string): void {
   }
 }
 
+function readErrorMessage(body: unknown): string {
+  const parsed = PredictionErrorResponse.safeParse(body);
+  return parsed.success ? parsed.data.error.message : "Prediction failed";
+}
+
+function readSuccessResponse(
+  body: unknown,
+): PredictionSuccessResponse | null {
+  const parsed = PredictionSuccessResponse.safeParse(body);
+  return parsed.success ? parsed.data : null;
+}
+
 export function usePredictorQuery({
   exam,
   rank,
@@ -222,17 +234,25 @@ export function usePredictorQuery({
 
       if (!isCurrent()) return false;
 
-      const json = (await res.json()) as
-        | PredictionSuccessResponse
-        | PredictionErrorResponse;
+      let body: unknown;
+      try {
+        body = await res.json();
+      } catch {
+        if (!isCurrent()) return false;
+        setError("Network error — please try again");
+        return false;
+      }
 
       if (!isCurrent()) return false;
 
-      if (!res.ok || !json.ok) {
-        const message = json.ok
-          ? "Prediction failed"
-          : json.error.message;
-        setError(message);
+      if (!res.ok || (body !== null && typeof body === "object" && "ok" in body && body.ok === false)) {
+        setError(readErrorMessage(body));
+        return false;
+      }
+
+      const json = readSuccessResponse(body);
+      if (!json) {
+        setError("Prediction failed");
         return false;
       }
 

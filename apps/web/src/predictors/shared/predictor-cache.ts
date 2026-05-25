@@ -10,6 +10,7 @@ import type {
 
 export type ServerCacheEntry = {
   programs: ProgramPrediction[];
+  metadata: CollegePredictionResult["metadata"];
   ews_comparison?: CollegePredictionResult["ews_comparison"];
 };
 

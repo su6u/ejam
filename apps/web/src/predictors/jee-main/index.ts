@@ -17,7 +17,7 @@ import {
 import { z } from "zod";
 import {
   finalizePredictionResult,
-  resultFromRankedPrograms,
+  resultFromCacheEntry,
 } from "@/predictors/shared/finalize-prediction";
 import {
   indexShaFromDeps,
@@ -172,10 +172,7 @@ function resultFromCachedPrograms(
   cached: ServerCacheEntry,
   filters: CollegePredictorFilters | undefined,
 ): CollegePredictionResult {
-  const result = resultFromRankedPrograms(cached.programs, filters);
-  return cached.ews_comparison
-    ? { ...result, ews_comparison: cached.ews_comparison }
-    : result;
+  return resultFromCacheEntry(cached, filters);
 }
 
 export const predictor: ExamPredictor<JeeMainInput, CollegePredictionResult> = {
@@ -251,6 +248,7 @@ export const predictor: ExamPredictor<JeeMainInput, CollegePredictionResult> = {
 
     _serverCache.set(cacheKey, {
       programs: result.programs,
+      metadata: result.metadata,
       ews_comparison: result.ews_comparison,
     });
     return { result };
