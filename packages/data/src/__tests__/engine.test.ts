@@ -246,11 +246,9 @@ describe("predictPrograms", () => {
       seatType: "OPEN",
       gender: "Gender-Neutral",
     });
-    expect(result.metadata.threshold_used).toBe(0);
-    if (result.programs.some((p) => p.band === "long-shot")) {
-      expect(result.programs.some((p) => p.cumulative_probability < 0.1)).toBe(
-        true,
-      );
+    expect(result.metadata.threshold_used).toBe(0.09);
+    for (const p of result.programs) {
+      expect(p.cumulative_probability).toBeGreaterThanOrEqual(0.09);
     }
   });
 
