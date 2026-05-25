@@ -44,6 +44,14 @@
   --z-modal: 400;
   --z-toast: 500;
   --z-tooltip: 600;
+
+  /* Sheet / drawer — iOS open curve, snappy close (Emil asymmetric timing) */
+  --sheet-open-dur: 380ms;
+  --sheet-close-dur: 260ms;
+  --sheet-ease-open: cubic-bezier(0.32, 0.72, 0, 1);
+  --sheet-ease-close: cubic-bezier(0.23, 1, 0.32, 1);
+  --sheet-backdrop-open-dur: 380ms;
+  --sheet-backdrop-close-dur: 220ms;
 }
 
 .dark {
@@ -237,6 +245,141 @@ input {
 
     .pressable:active:not(:disabled) {
       scale: 1;
+    }
+  }
+
+  /* Sheet overlay — blur stays constant; scrim fades so blur never repaints */
+  .sheet-overlay {
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+  }
+
+  @supports not (backdrop-filter: blur(1px)) {
+    .sheet-overlay {
+      background: rgb(0 0 0 / 0.45);
+    }
+  }
+
+  .sheet-overlay::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgb(0 0 0 / 0.2);
+    opacity: 1;
+    transition: opacity var(--sheet-backdrop-open-dur) var(--sheet-ease-open);
+  }
+
+  .sheet-overlay[data-starting-style]::before {
+    opacity: 0;
+  }
+
+  .sheet-overlay[data-ending-style]::before {
+    opacity: 0;
+    transition-duration: var(--sheet-backdrop-close-dur);
+    transition-timing-function: var(--sheet-ease-close);
+  }
+
+  .sheet-popup {
+    backface-visibility: hidden;
+    will-change: transform;
+    transition: transform var(--sheet-open-dur) var(--sheet-ease-open);
+    box-shadow:
+      0 0 0 1px rgb(255 255 255 / 0.06),
+      -10px 0 32px rgb(0 0 0 / 0.14),
+      -28px 0 56px rgb(0 0 0 / 0.08);
+  }
+
+  .sheet-popup[data-side="right"] {
+    transform-origin: right center;
+  }
+
+  .sheet-popup[data-side="left"] {
+    transform-origin: left center;
+  }
+
+  .sheet-popup[data-side="bottom"] {
+    transform-origin: bottom center;
+  }
+
+  .sheet-popup[data-side="top"] {
+    transform-origin: top center;
+  }
+
+  .sheet-popup[data-ending-style] {
+    transition: transform var(--sheet-close-dur) var(--sheet-ease-close);
+  }
+
+  /* 40×40 hit area — visible control can stay smaller */
+  .sheet-close-hit {
+    position: relative;
+  }
+
+  .sheet-close-hit::after {
+    content: "";
+    position: absolute;
+    inset: -6px;
+  }
+
+  /* Stagger content enter — semantic sections, 50ms apart */
+  @keyframes sheet-section-in {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .sheet-body > * {
+    opacity: 0;
+    animation: sheet-section-in 280ms var(--sheet-ease-open) forwards;
+  }
+
+  .sheet-body > *:nth-child(1) {
+    animation-delay: 50ms;
+  }
+
+  .sheet-body > *:nth-child(2) {
+    animation-delay: 100ms;
+  }
+
+  .sheet-body > *:nth-child(3) {
+    animation-delay: 150ms;
+  }
+
+  .sheet-body > *:nth-child(4) {
+    animation-delay: 200ms;
+  }
+
+  .sheet-body > *:nth-child(5) {
+    animation-delay: 250ms;
+  }
+
+  .sheet-body > *:nth-child(6) {
+    animation-delay: 300ms;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .sheet-overlay::before {
+      transition: opacity 150ms ease !important;
+    }
+
+    .sheet-popup {
+      transition: none !important;
+    }
+
+    .sheet-popup[data-starting-style],
+    .sheet-popup[data-ending-style] {
+      transform: none !important;
+    }
+
+    .sheet-body > * {
+      animation: none !important;
+      opacity: 1 !important;
+      transform: none !important;
     }
   }
 }

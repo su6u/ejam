@@ -12,14 +12,14 @@ export function DataVersionFooter({
   if (!provenance?.manifest_version) return null;
 
   return (
-    <p className="border-t border-border px-4 py-2 text-xs text-muted-foreground">
+    <p className="border-t border-border/60 px-4 py-2 text-[10px] text-muted-foreground/60">
       Data {provenance.manifest_version}
       {" · "}
       <a
         href={DATA_DOC_URL}
         target="_blank"
         rel="noopener noreferrer"
-        className="underline underline-offset-2 hover:text-foreground"
+        className="underline underline-offset-2 hover:text-muted-foreground/80"
       >
         how we source data
       </a>

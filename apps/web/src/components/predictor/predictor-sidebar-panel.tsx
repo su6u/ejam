@@ -103,6 +103,7 @@ function PredictorSidebarPanelInner() {
     state.exam === "jee-main" && (state.quota === "hs" || state.quota === "os");
   const canPredict =
     Boolean(state.rank) && !(needsHomeState && !state.homeState.trim());
+  const hasPredictedForInputs = query.data !== null;
 
   return (
     <TooltipProvider delay={200}>
@@ -154,7 +155,7 @@ function PredictorSidebarPanelInner() {
                     height={36}
                     aria-hidden
                     className={cn(
-                      "image-outline size-9 shrink-0 object-contain transition-opacity",
+                      "size-9 shrink-0 object-contain transition-opacity",
                       exam.enabled &&
                         !isActive &&
                         "opacity-55 group-hover/exam:opacity-80",
@@ -229,7 +230,7 @@ function PredictorSidebarPanelInner() {
           <Button
             type="button"
             onClick={() => deferAfterPress(onPredict)}
-            disabled={query.isLoading || !canPredict}
+            disabled={query.isLoading || !canPredict || hasPredictedForInputs}
             className="mt-1 w-full rounded-none"
           >
             {query.isLoading ? "Predicting…" : "Predict colleges"}
