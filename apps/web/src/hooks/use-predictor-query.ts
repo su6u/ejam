@@ -12,7 +12,7 @@ import type {
   PredictionSuccessResponse,
 } from "@ejam/data";
 import type { CollegePredictionResult } from "@ejam/data/college-predictor";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { uiQuotaToApi } from "@/predictors/shared/quota-input";
 
 interface PredictorQueryOptions {
@@ -129,8 +129,13 @@ export function usePredictorQuery({
   >(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const requestGenerationRef = useRef(0);
+  const abortControllerRef = useRef<AbortController | null>(null);
 
   useEffect(() => {
+    requestGenerationRef.current += 1;
+    abortControllerRef.current?.abort();
+    abortControllerRef.current = null;
     setData(null);
     setProvenance(null);
     setConfidence(null);
@@ -146,9 +151,23 @@ export function usePredictorQuery({
     has_ews_certificate,
   ]);
 
+  useEffect(
+    () => () => {
+      abortControllerRef.current?.abort();
+    },
+    [],
+  );
+
   const trigger = useCallback(async (rankOverride?: string): Promise<boolean> => {
     const effectiveRank = rankOverride ?? rank;
     if (!effectiveRank || Number.isNaN(Number(effectiveRank))) return false;
+
+    const generation = ++requestGenerationRef.current;
+    const isCurrent = () => generation === requestGenerationRef.current;
+
+    abortControllerRef.current?.abort();
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
 
     const opts: PredictorQueryOptions = {
       exam,
@@ -163,13 +182,16 @@ export function usePredictorQuery({
     const key = cacheKey(opts, indexSha);
     const cached = readSessionCache(key);
     if (cached) {
+      if (!isCurrent()) return false;
       setData(cached.result);
       setProvenance(cached.provenance);
       setConfidence(cached.confidence ?? null);
       setError(null);
+      abortControllerRef.current = null;
       return true;
     }
 
+    if (!isCurrent()) return false;
     setIsLoading(true);
     setError(null);
 
@@ -179,11 +201,16 @@ export function usePredictorQuery({
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(buildRequestBody(opts)),
+        signal: controller.signal,
       });
+
+      if (!isCurrent()) return false;
 
       const json = (await res.json()) as
         | PredictionSuccessResponse
         | PredictionErrorResponse;
+
+      if (!isCurrent()) return false;
 
       if (!res.ok || !json.ok) {
         const message = json.ok
@@ -207,12 +234,17 @@ export function usePredictorQuery({
       }
       return false;
     } catch (err) {
+      if (err instanceof Error && err.name === "AbortError") return false;
+      if (!isCurrent()) return false;
       const message =
         err instanceof Error ? err.message : "Network error — please try again";
       setError(message);
       return false;
     } finally {
-      setIsLoading(false);
+      if (isCurrent()) {
+        setIsLoading(false);
+        abortControllerRef.current = null;
+      }
     }
   }, [
     exam,
