@@ -362,6 +362,87 @@ input {
     animation-delay: 300ms;
   }
 
+  /* Round probability mini-bars — equalizer sparkline in results table */
+  .t-round-bars {
+    --round-bar-ease: cubic-bezier(0.23, 1, 0.32, 1);
+    --round-bar-dur: 200ms;
+    --round-bar-stagger: 35ms;
+  }
+
+  @keyframes round-bar-rise {
+    from {
+      opacity: 0;
+      transform: scaleY(0.12);
+    }
+
+    to {
+      opacity: 0.92;
+      transform: scaleY(var(--bar-scale, 1));
+    }
+  }
+
+  .t-round-bar {
+    transform: scaleY(var(--bar-scale, 1));
+    transform-origin: bottom center;
+    opacity: 0.92;
+    animation: round-bar-rise 240ms var(--round-bar-ease) backwards;
+    transition: transform var(--round-bar-dur) var(--round-bar-ease);
+  }
+
+  .t-round-bar:nth-child(1) {
+    animation-delay: 0ms;
+  }
+  .t-round-bar:nth-child(2) {
+    animation-delay: calc(var(--round-bar-stagger) * 1);
+  }
+  .t-round-bar:nth-child(3) {
+    animation-delay: calc(var(--round-bar-stagger) * 2);
+  }
+  .t-round-bar:nth-child(4) {
+    animation-delay: calc(var(--round-bar-stagger) * 3);
+  }
+  .t-round-bar:nth-child(5) {
+    animation-delay: calc(var(--round-bar-stagger) * 4);
+  }
+  .t-round-bar:nth-child(6) {
+    animation-delay: calc(var(--round-bar-stagger) * 5);
+  }
+
+  .t-round-bar[data-fill-round] {
+    opacity: 1;
+    box-shadow: 0 0 0 1px rgb(255 255 255 / 0.18);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .t-round-bars:hover .t-round-bar {
+      opacity: 0.45;
+    }
+
+    .t-round-bars .t-round-bar:hover {
+      opacity: 1;
+      transform: scaleY(calc(var(--bar-scale, 1) * 1.1));
+    }
+
+    .t-round-bars .t-round-bar[data-fill-round]:hover {
+      box-shadow: 0 0 0 1px rgb(255 255 255 / 0.35);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .t-round-bar {
+      animation: none !important;
+      transition: transform 150ms ease !important;
+    }
+
+    @media (hover: hover) and (pointer: fine) {
+      .t-round-bars:hover .t-round-bar,
+      .t-round-bars .t-round-bar:hover {
+        transform: scaleY(var(--bar-scale, 1)) !important;
+        opacity: 0.92 !important;
+      }
+    }
+  }
+
   @media (prefers-reduced-motion: reduce) {
     .sheet-overlay::before {
       transition: opacity 150ms ease !important;

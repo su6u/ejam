@@ -5,7 +5,6 @@ import type {
   ProgramPrediction,
 } from "@ejam/data/college-predictor";
 import { FilterChip, FilterGroup } from "@/components/predictor/filter-chips";
-import { Separator } from "@/components/ui/separator";
 import type { ExamType } from "@/hooks/use-predictor-state";
 import { isJeeMainCounselling } from "@/hooks/use-predictor-state";
 import { BAND_FILTER_OPTIONS } from "@/lib/bands";
@@ -104,11 +103,10 @@ export function ResultsFilters({
 
   const chanceGroup = (
     <FilterGroup label="Chance" vertical grid={2}>
-      {BAND_FILTER_OPTIONS.map(({ id, label, icon, color }) => (
+      {BAND_FILTER_OPTIONS.map(({ id, label, color }) => (
         <FilterChip
           key={id}
           label={label}
-          icon={icon}
           active={filters.bands.has(id)}
           disabled={!enabled}
           fullWidth
@@ -128,7 +126,6 @@ export function ResultsFilters({
       aria-disabled={!enabled}
     >
       {instituteGroup}
-      {showInstituteGroup ? <Separator /> : null}
       {chanceGroup}
     </div>
   );
