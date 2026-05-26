@@ -97,7 +97,6 @@ export function usePredictorQuery({
   const abortControllerRef = useRef<AbortController | null>(null);
   const predictInFlightInputKeyRef = useRef<string | null>(null);
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: flush stale results when inputs change
   useEffect(() => {
     const currentInputKey = requestInputKey({
       exam,
