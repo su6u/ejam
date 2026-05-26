@@ -36,9 +36,12 @@ jobs:
               - 'biome.json'
               - 'tsconfig.json'
             data:
+              - 'data/**'
               - 'packages/data/**'
               - 'packages/data-cli/**'
               - 'packages/data-validation/**'
+              - '.github/workflows/ci.yml'
+              - '.github/workflows/data-release.yml'
               - 'package.json'
               - 'pnpm-lock.yaml'
               - 'pnpm-workspace.yaml'
