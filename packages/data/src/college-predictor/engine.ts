@@ -64,6 +64,8 @@ export interface ProgramPrediction {
   last_data_year: number;
   fill_round: number;
   round_probs: number[];
+  /** NIRF rank when known — used to recompute balanced scores on filtered subsets */
+  nirf_rank?: number | null;
   /** 0–100 institute quality for balanced ranking */
   institute_score?: number;
   /** 0–100 branch desirability for balanced ranking */
@@ -210,6 +212,39 @@ export function groupProgramsByBand(
   };
 }
 
+/** Highest average round chance first; closing rank breaks ties. */
+export function sortByChance(programs: ProgramPrediction[]): ProgramPrediction[] {
+  return [...programs].sort((a, b) => {
+    const probDiff = b.cumulative_probability - a.cumulative_probability;
+    if (probDiff !== 0) return probDiff;
+    return compareClosingRank(a, b);
+  });
+}
+
+/** Most competitive programs first (lower predicted closing rank is better). */
+export function sortByClosingRank(
+  programs: ProgramPrediction[],
+): ProgramPrediction[] {
+  return [...programs].sort(compareClosingRank);
+}
+
+function compareClosingRank(
+  a: ProgramPrediction,
+  b: ProgramPrediction,
+): number {
+  const rankDiff = a.predicted_closing_rank - b.predicted_closing_rank;
+  if (rankDiff !== 0) return rankDiff;
+  const instituteDiff = a.institute_id.localeCompare(b.institute_id);
+  if (instituteDiff !== 0) return instituteDiff;
+  const programDiff = a.program_id.localeCompare(b.program_id);
+  if (programDiff !== 0) return programDiff;
+  const seatDiff = a.seat_type.localeCompare(b.seat_type);
+  if (seatDiff !== 0) return seatDiff;
+  const quotaDiff = a.quota.localeCompare(b.quota);
+  if (quotaDiff !== 0) return quotaDiff;
+  return a.gender.localeCompare(b.gender);
+}
+
 function getRoundMeans(row: CollegePredictorIndexRow): (number | null)[] {
   return [
     row.round1_mean,
@@ -342,7 +377,7 @@ export function predictPrograms(opts: {
   // band first, then ascending predicted_closing_rank as a competitiveness proxy
   predictions.sort((a, b) => {
     if (a.band !== b.band) return BAND_ORDER[a.band] - BAND_ORDER[b.band];
-    return a.predicted_closing_rank - b.predicted_closing_rank;
+    return compareClosingRank(a, b);
   });
 
   return {

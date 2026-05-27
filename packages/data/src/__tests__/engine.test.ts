@@ -16,6 +16,9 @@ import {
   normalCDF,
   predictPrograms,
   REACH_BAND_MIN_PROBABILITY,
+  sortByChance,
+  sortByClosingRank,
+  type ProgramPrediction,
 } from "../college-predictor/engine";
 
 describe("normalCDF", () => {
@@ -196,6 +199,151 @@ describe("computeAverageRoundProbability", () => {
 
   it("returns 0 for empty round probs", () => {
     expect(computeAverageRoundProbability([], 3)).toBe(0);
+  });
+});
+
+function makePrediction(
+  overrides: Partial<ProgramPrediction> = {},
+): ProgramPrediction {
+  return {
+    institute_id: "nit-a",
+    program_id: "cse",
+    seat_type: "OPEN",
+    quota: "AI",
+    gender: "Gender-Neutral",
+    instype: "NIT",
+    degree: "B.Tech",
+    duration_years: 4,
+    weighted_mean: 2000,
+    predicted_closing_rank: 2000,
+    sigma_effective: 200,
+    cumulative_probability: 0.5,
+    band: "target",
+    data_quality: "sufficient",
+    years_of_data: 4,
+    last_data_year: 2024,
+    fill_round: 6,
+    round_probs: [0.4, 0.5, 0.6],
+    ...overrides,
+  };
+}
+
+describe("sortByChance", () => {
+  it("orders by cumulative_probability descending within the same band", () => {
+    const sorted = sortByChance([
+      makePrediction({
+        institute_id: "nit-a",
+        cumulative_probability: 0.45,
+        band: "target",
+        predicted_closing_rank: 1000,
+      }),
+      makePrediction({
+        institute_id: "nit-b",
+        cumulative_probability: 0.8,
+        band: "target",
+        predicted_closing_rank: 9000,
+      }),
+    ]);
+
+    expect(sorted.map((p) => p.institute_id)).toEqual(["nit-b", "nit-a"]);
+  });
+
+  it("puts higher-chance bands before lower-chance bands", () => {
+    const sorted = sortByChance([
+      makePrediction({
+        institute_id: "reach",
+        cumulative_probability: 0.15,
+        band: "reach",
+      }),
+      makePrediction({
+        institute_id: "safe",
+        cumulative_probability: 0.9,
+        band: "safe",
+      }),
+    ]);
+
+    expect(sorted.map((p) => p.institute_id)).toEqual(["safe", "reach"]);
+  });
+
+  it("breaks equal probabilities by ascending closing rank", () => {
+    const sorted = sortByChance([
+      makePrediction({
+        institute_id: "later",
+        cumulative_probability: 0.6,
+        predicted_closing_rank: 5000,
+      }),
+      makePrediction({
+        institute_id: "earlier",
+        cumulative_probability: 0.6,
+        predicted_closing_rank: 3000,
+      }),
+    ]);
+
+    expect(sorted.map((p) => p.institute_id)).toEqual(["earlier", "later"]);
+  });
+});
+
+describe("sortByClosingRank", () => {
+  it("orders by predicted_closing_rank ascending (lower rank is better)", () => {
+    const sorted = sortByClosingRank([
+      makePrediction({
+        institute_id: "nit-b",
+        predicted_closing_rank: 5000,
+      }),
+      makePrediction({
+        institute_id: "iit-a",
+        predicted_closing_rank: 300,
+      }),
+      makePrediction({
+        institute_id: "nit-a",
+        predicted_closing_rank: 2000,
+      }),
+    ]);
+
+    expect(sorted.map((p) => p.institute_id)).toEqual([
+      "iit-a",
+      "nit-a",
+      "nit-b",
+    ]);
+  });
+
+  it("ignores band and cumulative_probability", () => {
+    const sorted = sortByClosingRank([
+      makePrediction({
+        institute_id: "safe-far",
+        band: "safe",
+        cumulative_probability: 0.95,
+        predicted_closing_rank: 8000,
+      }),
+      makePrediction({
+        institute_id: "reach-close",
+        band: "reach",
+        cumulative_probability: 0.15,
+        predicted_closing_rank: 500,
+      }),
+    ]);
+
+    expect(sorted.map((p) => p.institute_id)).toEqual([
+      "reach-close",
+      "safe-far",
+    ]);
+  });
+
+  it("breaks equal closing ranks by institute then program", () => {
+    const sorted = sortByClosingRank([
+      makePrediction({
+        institute_id: "nit-b",
+        program_id: "cse",
+        predicted_closing_rank: 2000,
+      }),
+      makePrediction({
+        institute_id: "nit-a",
+        program_id: "ece",
+        predicted_closing_rank: 2000,
+      }),
+    ]);
+
+    expect(sorted.map((p) => p.institute_id)).toEqual(["nit-a", "nit-b"]);
   });
 });
 
