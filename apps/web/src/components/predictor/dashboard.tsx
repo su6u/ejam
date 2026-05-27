@@ -30,6 +30,7 @@ export function Dashboard() {
   const filteredPrograms = applyResultsSort(
     applyResultsFilters(programs, filters),
     sortBy,
+    query.data?.metadata.active_filters,
   );
 
   const selectedId = selected ? programKey(selected) : null;

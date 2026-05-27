@@ -11,6 +11,7 @@ export {
   computeBalancedScore,
   computeBranchScore,
   computeInstituteScore,
+  instituteMetaFromPrograms,
   type InstituteRankingMeta,
   sortByBalancedScore,
 } from "./balanced-ranking";
@@ -47,6 +48,8 @@ export {
   normalCDF,
   predictPrograms,
   REACH_BAND_MIN_PROBABILITY,
+  sortByChance,
+  sortByClosingRank,
 } from "./engine";
 export {
   _resetPredictorIndexCache,
