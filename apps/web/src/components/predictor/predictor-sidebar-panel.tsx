@@ -34,12 +34,12 @@ const EXAM_OPTIONS: Array<{
   {
     id: "jee-main",
     label: "JEE Main",
-    logo: "/assets/exam/jee_main.svg",
+    logo: "/exams/jee_main.svg",
   },
   {
     id: "jee-advanced",
     label: "JEE Advanced",
-    logo: "/assets/exam/jee_adv.svg",
+    logo: "/exams/jee_adv.svg",
   },
 ];
 

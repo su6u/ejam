@@ -3,7 +3,7 @@
 import Lottie from "lottie-react";
 import { useReducedMotion } from "motion/react";
 import { cn } from "@/lib/utils";
-import loadAnimation from "@/public/assets/load.json";
+import loadAnimation from "@/public/lottie/load.json";
 
 interface LoadingAnimationProps {
   className?: string;

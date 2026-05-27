@@ -24,7 +24,7 @@ export function AppHeader() {
         aria-label="GitHub repository"
       >
         <Image
-          src="/icons/GitHub.svg"
+          src="/icons/github.svg"
           alt=""
           width={16}
           height={16}

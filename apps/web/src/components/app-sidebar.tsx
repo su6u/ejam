@@ -33,7 +33,7 @@ export function AppSidebar() {
                   className="flex items-center"
                 >
                   <Image
-                    src="/logo.svg"
+                    src="/brand/logo.svg"
                     alt=""
                     width={118}
                     height={89}

@@ -28,7 +28,7 @@ function EmptyIllustration() {
         aria-hidden
         className="h-auto w-full object-contain"
       >
-        <source src="/assets/eye.webm" type="video/webm" />
+        <source src="/media/eye.webm" type="video/webm" />
       </video>
     </EmptyMedia>
   );
