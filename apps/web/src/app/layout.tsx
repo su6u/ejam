@@ -18,6 +18,14 @@ const ibmPlex = IBM_Plex_Sans({
 export const metadata: Metadata = {
   title: "ejam",
   description: "ejam",
+  icons: {
+    icon: [
+      { url: "/brand/favicon.ico", sizes: "any" },
+      { url: "/brand/icon.svg", type: "image/svg+xml" },
+      { url: "/brand/icon.png", type: "image/png", sizes: "32x32" },
+    ],
+    apple: "/brand/apple-icon.png",
+  },
 };
 
 export default function RootLayout({

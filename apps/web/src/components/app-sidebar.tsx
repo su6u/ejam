@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { appChromeStripClass } from "@/components/app-layout";
 import { PredictorSidebarPanel } from "@/components/predictor/predictor-sidebar-panel";
 import {
   Sidebar,
@@ -21,7 +22,9 @@ export function AppSidebar() {
       )}
       variant="sidebar"
     >
-      <SidebarHeader className="h-14 justify-center border-b px-2">
+      <SidebarHeader
+        className={cn(appChromeStripClass, "gap-0 p-0 px-2 flex-row")}
+      >
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton
@@ -33,13 +36,13 @@ export function AppSidebar() {
                   className="flex items-center"
                 >
                   <Image
-                    src="/logo.svg"
+                    src="/brand/logo.svg"
                     alt=""
-                    width={118}
-                    height={89}
+                    width={116}
+                    height={92}
                     priority
                     aria-hidden
-                    className="image-outline size-6 shrink-0 rounded-[5px]"
+                    className="h-6 w-auto shrink-0"
                   />
                 </a>
               }

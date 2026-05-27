@@ -13,9 +13,11 @@ import {
 import type { CollegePredictionResult } from "@ejam/data/college-predictor";
 import { uiQuotaToApi } from "@ejam/predictors/shared/quota-input";
 import { useCallback, useEffect, useRef, useState } from "react";
+import type { PredictorExamId } from "@/hooks/use-predictor-state";
+import { predictorUsesQuotaHomeState } from "@/hooks/use-predictor-state";
 
 interface PredictorQueryOptions {
-  exam: string;
+  predictorExamId: PredictorExamId;
   rank: string;
   apiSeatType: string;
   apiGender: string;
@@ -32,10 +34,8 @@ interface PredictorQueryResult {
   trigger: (rankOverride?: string) => Promise<boolean>;
 }
 
-function examToApiId(exam: string): string {
-  if (exam === "jee-advanced") return "jee-advanced";
-  if (exam === "csab") return "csab";
-  return "jee-main";
+function examToApiId(predictorExamId: PredictorExamId): string {
+  return predictorExamId;
 }
 
 function buildRequestBody(
@@ -48,7 +48,7 @@ function buildRequestBody(
     has_ews_certificate: opts.has_ews_certificate,
   };
 
-  if (opts.exam === "jee-main" || opts.exam === "csab") {
+  if (predictorUsesQuotaHomeState(opts.predictorExamId)) {
     body.quota = uiQuotaToApi(opts.quota);
     body.state = opts.homeState;
   }
@@ -58,7 +58,7 @@ function buildRequestBody(
 
 function requestInputKey(opts: PredictorQueryOptions): string {
   return JSON.stringify([
-    examToApiId(opts.exam),
+    examToApiId(opts.predictorExamId),
     opts.rank,
     opts.apiSeatType,
     opts.apiGender,
@@ -79,7 +79,7 @@ function readSuccessResponse(body: unknown): PredictionSuccessResponse | null {
 }
 
 export function usePredictorQuery({
-  exam,
+  predictorExamId,
   rank,
   apiSeatType,
   apiGender,
@@ -99,7 +99,7 @@ export function usePredictorQuery({
 
   useEffect(() => {
     const currentInputKey = requestInputKey({
-      exam,
+      predictorExamId,
       rank,
       apiSeatType,
       apiGender,
@@ -122,7 +122,7 @@ export function usePredictorQuery({
     setError(null);
     setIsLoading(false);
   }, [
-    exam,
+    predictorExamId,
     rank,
     apiSeatType,
     apiGender,
@@ -151,7 +151,7 @@ export function usePredictorQuery({
       abortControllerRef.current = controller;
 
       const opts: PredictorQueryOptions = {
-        exam,
+        predictorExamId,
         rank: effectiveRank,
         apiSeatType,
         apiGender,
@@ -167,7 +167,7 @@ export function usePredictorQuery({
       setError(null);
 
       try {
-        const examId = examToApiId(exam);
+        const examId = examToApiId(predictorExamId);
         const res = await fetch(`/api/predict/${examId}`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -227,7 +227,15 @@ export function usePredictorQuery({
         }
       }
     },
-    [exam, rank, apiSeatType, apiGender, quota, homeState, has_ews_certificate],
+    [
+      predictorExamId,
+      rank,
+      apiSeatType,
+      apiGender,
+      quota,
+      homeState,
+      has_ews_certificate,
+    ],
   );
 
   return { data, provenance, isLoading, error, trigger };

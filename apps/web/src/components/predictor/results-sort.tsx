@@ -1,10 +1,18 @@
 "use client";
 
-import type { ProgramPrediction } from "@ejam/data/college-predictor";
-import { sortByBalancedScore } from "@ejam/data/college-predictor";
-import { ArrowDownWideNarrow, Building2, Scale, Sparkles } from "lucide-react";
+import type {
+  CollegePredictorFilters,
+  ProgramPrediction,
+} from "@ejam/data/college-predictor";
+import {
+  applyBalancedRanking,
+  branchFilterActive,
+  instituteMetaFromPrograms,
+  sortByChance,
+  sortByClosingRank,
+} from "@ejam/data/college-predictor";
+import { ArrowUpWideNarrow, Building2, Scale, Sparkles } from "lucide-react";
 import { FilterChip, FilterGroup } from "@/components/predictor/filter-chips";
-import { BAND_ORDER } from "@/lib/bands";
 
 export type ResultsSortKey =
   | "balanced"
@@ -21,34 +29,40 @@ const SORT_OPTIONS: Array<{
 }> = [
   { id: "balanced", label: "Balanced", icon: Scale },
   { id: "chance", label: "Best chance", icon: Sparkles },
-  { id: "closing-rank", label: "Closing rank", icon: ArrowDownWideNarrow },
+  { id: "closing-rank", label: "Closing rank", icon: ArrowUpWideNarrow },
   { id: "institute", label: "Institute", icon: Building2 },
 ];
 
 export function applyResultsSort(
   programs: ProgramPrediction[],
   sortBy: ResultsSortKey,
+  apiFilters?: CollegePredictorFilters,
 ): ProgramPrediction[] {
   const sorted = [...programs];
 
   switch (sortBy) {
     case "balanced":
-      return sortByBalancedScore(sorted);
-    case "closing-rank":
-      sorted.sort(
-        (a, b) => a.predicted_closing_rank - b.predicted_closing_rank,
-      );
-      break;
-    case "institute":
-      sorted.sort((a, b) => a.institute_id.localeCompare(b.institute_id));
-      break;
-    default:
-      sorted.sort((a, b) => {
-        if (a.band !== b.band) {
-          return BAND_ORDER[a.band] - BAND_ORDER[b.band];
-        }
-        return a.predicted_closing_rank - b.predicted_closing_rank;
+      return applyBalancedRanking(sorted, {
+        instituteMeta: instituteMetaFromPrograms(sorted),
+        branchFilterActive: branchFilterActive(apiFilters),
       });
+    case "closing-rank":
+      return sortByClosingRank(sorted);
+    case "institute":
+      sorted.sort((a, b) => {
+        let cmp = a.institute_id.localeCompare(b.institute_id);
+        if (cmp !== 0) return cmp;
+        cmp = a.program_id.localeCompare(b.program_id);
+        if (cmp !== 0) return cmp;
+        cmp = a.seat_type.localeCompare(b.seat_type);
+        if (cmp !== 0) return cmp;
+        cmp = a.quota.localeCompare(b.quota);
+        if (cmp !== 0) return cmp;
+        return a.gender.localeCompare(b.gender);
+      });
+      break;
+    case "chance":
+      return sortByChance(sorted);
   }
 
   return sorted;
@@ -61,7 +75,7 @@ interface ResultsSortProps {
 
 export function ResultsSort({ sortBy, onChange }: ResultsSortProps) {
   return (
-    <FilterGroup label="Sort">
+    <FilterGroup label="Sort by">
       {SORT_OPTIONS.map(({ id, label, icon }) => (
         <FilterChip
           key={id}

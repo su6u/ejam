@@ -1,8 +1,12 @@
 "use client";
 
+import { quotaRequiresHomeState } from "@ejam/predictors/shared/quota-input";
 import Image from "next/image";
 import { type ReactNode, Suspense } from "react";
-import { sidebarPanelTopInsetClass } from "@/components/app-layout";
+import {
+  predictorHeaderStripClass,
+  sidebarPanelTopInsetClass,
+} from "@/components/app-layout";
 import { HomeStateCombobox } from "@/components/predictor/home-state-combobox";
 import { usePredictor } from "@/components/predictor/predictor-context";
 import { ProximityPicker } from "@/components/predictor/proximity-picker";
@@ -16,7 +20,8 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import type { ExamType } from "@/hooks/use-predictor-state";
+import type { CounsellingBody, ExamType } from "@/hooks/use-predictor-state";
+import { isJeeMainCounselling } from "@/hooks/use-predictor-state";
 import { deferAfterPress, pressableClass } from "@/lib/pressable";
 import { cn } from "@/lib/utils";
 
@@ -24,37 +29,20 @@ import { cn } from "@/lib/utils";
 const sidebarControlClass =
   "bg-transparent shadow-none dark:bg-transparent dark:hover:bg-transparent";
 
-type ExamPickerId = ExamType | "bitsat" | "met";
-
 const EXAM_OPTIONS: Array<{
-  id: ExamPickerId;
+  id: ExamType;
   label: string;
   logo: string;
-  enabled: boolean;
 }> = [
   {
     id: "jee-main",
     label: "JEE Main",
-    logo: "/assets/exam/jee_main.svg",
-    enabled: true,
+    logo: "/exams/jee_main.svg",
   },
   {
     id: "jee-advanced",
     label: "JEE Advanced",
-    logo: "/assets/exam/jee_adv.svg",
-    enabled: true,
-  },
-  {
-    id: "bitsat",
-    label: "BITSAT",
-    logo: "/assets/exam/bitsat.webp",
-    enabled: false,
-  },
-  {
-    id: "met",
-    label: "MET",
-    logo: "/assets/exam/met.svg",
-    enabled: false,
+    logo: "/exams/jee_adv.svg",
   },
 ];
 
@@ -75,6 +63,11 @@ const QUOTA_OPTIONS = [
   { value: "os", label: "OS" },
   { value: "hs", label: "HS" },
   { value: "ai", label: "AI" },
+];
+
+const COUNSELLING_OPTIONS = [
+  { value: "josaa", label: "JoSAA" },
+  { value: "csab", label: "CSAB" },
 ];
 
 export function PredictorSidebarPanel() {
@@ -98,11 +91,11 @@ function PredictorSidebarPanelInner() {
 
   const programs = query.data?.programs ?? [];
 
-  const showQuota = state.exam === "jee-main";
-  const needsHomeState =
-    state.exam === "jee-main" && (state.quota === "hs" || state.quota === "os");
+  const showQuota = isJeeMainCounselling(state.exam);
+  const needsHomeState = showQuota && quotaRequiresHomeState(state.quota);
   const canPredict =
     Boolean(state.rank) && !(needsHomeState && !state.homeState.trim());
+  const hasPredictedForInputs = query.data !== null;
 
   return (
     <TooltipProvider delay={200}>
@@ -114,35 +107,27 @@ function PredictorSidebarPanelInner() {
           )}
         >
           {EXAM_OPTIONS.map((exam) => {
-            const isActive = exam.enabled && state.exam === exam.id;
+            const isActive = state.exam === exam.id;
 
             return (
               <Tooltip key={exam.id}>
                 <TooltipTrigger
-                  disabled={!exam.enabled}
                   render={
                     <button
                       type="button"
                       aria-label={exam.label}
                       aria-pressed={isActive}
-                      disabled={!exam.enabled}
                       onClick={() => {
-                        if (exam.enabled) {
-                          deferAfterPress(() =>
-                            state.setExam(exam.id as ExamType),
-                          );
-                        }
+                        deferAfterPress(() => state.setExam(exam.id));
                       }}
                       className={cn(
-                        "flex h-12 w-full items-center justify-center rounded-none border bg-transparent outline-none",
+                        "flex w-full items-center justify-center rounded-none border bg-transparent outline-none",
+                        predictorHeaderStripClass,
                         pressableClass,
                         "focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50",
                         isActive && "border-foreground/40",
-                        exam.enabled &&
-                          !isActive &&
+                        !isActive &&
                           "group/exam border-border/70 hover:border-border",
-                        !exam.enabled &&
-                          "cursor-not-allowed border-border opacity-40 grayscale",
                       )}
                     />
                   }
@@ -154,10 +139,8 @@ function PredictorSidebarPanelInner() {
                     height={36}
                     aria-hidden
                     className={cn(
-                      "image-outline size-9 shrink-0 object-contain transition-opacity",
-                      exam.enabled &&
-                        !isActive &&
-                        "opacity-55 group-hover/exam:opacity-80",
+                      "size-9 shrink-0 object-contain transition-opacity",
+                      !isActive && "opacity-55 group-hover/exam:opacity-80",
                       isActive && "opacity-100",
                     )}
                   />
@@ -169,7 +152,6 @@ function PredictorSidebarPanelInner() {
                   className="rounded-none"
                 >
                   {exam.label}
-                  {!exam.enabled ? " (coming soon)" : null}
                 </TooltipContent>
               </Tooltip>
             );
@@ -218,7 +200,11 @@ function PredictorSidebarPanelInner() {
           ) : null}
 
           {needsHomeState ? (
-            <SetupField label="Home state" required>
+            <SetupField
+              label="Home state"
+              required
+              hint="required for OS and HS seat pools"
+            >
               <HomeStateCombobox
                 value={state.homeState}
                 onValueChange={state.setHomeState}
@@ -226,10 +212,23 @@ function PredictorSidebarPanelInner() {
             </SetupField>
           ) : null}
 
+          {showQuota ? (
+            <SetupField label="Counselling" required>
+              <OptionToggle
+                value={state.counselling}
+                onChange={(value) =>
+                  state.setCounselling(value as CounsellingBody)
+                }
+                options={COUNSELLING_OPTIONS}
+                columns={2}
+              />
+            </SetupField>
+          ) : null}
+
           <Button
             type="button"
             onClick={() => deferAfterPress(onPredict)}
-            disabled={query.isLoading || !canPredict}
+            disabled={query.isLoading || !canPredict || hasPredictedForInputs}
             className="mt-1 w-full rounded-none"
           >
             {query.isLoading ? "Predicting…" : "Predict colleges"}
@@ -257,7 +256,11 @@ function OptionToggle({
 }: {
   value: string;
   onChange: (value: string) => void;
-  options: ReadonlyArray<{ value: string; label: string }>;
+  options: ReadonlyArray<{
+    value: string;
+    label: string;
+    enabled?: boolean;
+  }>;
   columns: 2 | 3;
 }) {
   return (
@@ -269,19 +272,25 @@ function OptionToggle({
     >
       {options.map((option) => {
         const isActive = option.value === value;
+        const isEnabled = option.enabled !== false;
 
         return (
           <button
             key={option.value}
             type="button"
             aria-pressed={isActive}
-            onClick={() => deferAfterPress(() => onChange(option.value))}
+            disabled={!isEnabled}
+            onClick={() => {
+              if (isEnabled) deferAfterPress(() => onChange(option.value));
+            }}
             className={cn(
               "flex h-8 items-center justify-center rounded-none border border-border bg-transparent text-xs font-medium text-muted-foreground outline-none",
               pressableClass,
-              "hover:text-foreground",
+              isEnabled && "hover:text-foreground",
               "focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50",
               isActive && "border-foreground/40 text-foreground",
+              !isEnabled &&
+                "cursor-not-allowed border-border/70 opacity-40 grayscale",
             )}
           >
             {option.label}
@@ -295,10 +304,12 @@ function OptionToggle({
 function SetupField({
   label,
   required,
+  hint,
   children,
 }: {
   label: string;
   required?: boolean;
+  hint?: string;
   children: ReactNode;
 }) {
   return (
@@ -313,6 +324,11 @@ function SetupField({
         ) : null}
       </Label>
       {children}
+      {hint ? (
+        <p className="text-[10px] leading-snug text-muted-foreground/50">
+          {hint}
+        </p>
+      ) : null}
     </div>
   );
 }

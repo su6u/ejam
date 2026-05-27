@@ -30,15 +30,16 @@ export function Dashboard() {
   const filteredPrograms = applyResultsSort(
     applyResultsFilters(programs, filters),
     sortBy,
+    query.data?.metadata.active_filters,
   );
 
   const selectedId = selected ? programKey(selected) : null;
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: reset drawer when exam changes
+  // biome-ignore lint/correctness/useExhaustiveDependencies: reset drawer when exam or counselling changes
   useEffect(() => {
     setSheetOpen(false);
     setSelected(null);
-  }, [state.exam]);
+  }, [state.exam, state.counselling]);
 
   const middle = renderMiddle({
     isLoading: query.isLoading,
@@ -49,7 +50,6 @@ export function Dashboard() {
     filteredPrograms,
     sortBy,
     onSortChange: setSortBy,
-    hasRank: Boolean(state.rank),
     selectedId,
     provenance: query.provenance,
     onSelect: (p) => {
@@ -60,8 +60,8 @@ export function Dashboard() {
   });
 
   return (
-    <div className="h-[calc(100dvh-7rem)] overflow-visible bg-border p-px">
-      <div className="h-full min-h-0 min-w-0 overflow-visible">{middle}</div>
+    <div className="h-[calc(100dvh-7rem)] min-h-0 w-full min-w-0 bg-border p-px">
+      <div className="h-full min-h-0 min-w-0">{middle}</div>
 
       <CollegeDetailSheet
         program={selected}
@@ -86,7 +86,6 @@ function renderMiddle({
   filteredPrograms,
   sortBy,
   onSortChange,
-  hasRank,
   selectedId,
   provenance,
   onSelect,
@@ -100,7 +99,6 @@ function renderMiddle({
   filteredPrograms: ProgramPrediction[];
   sortBy: ResultsSortKey;
   onSortChange: (next: ResultsSortKey) => void;
-  hasRank: boolean;
   selectedId: string | null;
   provenance: import("@ejam/data").PredictionProvenance | null;
   onSelect: (p: ProgramPrediction) => void;
@@ -109,13 +107,7 @@ function renderMiddle({
   if (error) return <ErrorState message={error} provenance={provenance} />;
   if (!hasResults) {
     if (isLoading) return <LoadingState provenance={provenance} />;
-    return (
-      <EmptyState
-        hasRank={hasRank}
-        hasPredicted={hasPredicted}
-        provenance={provenance}
-      />
-    );
+    return <EmptyState hasPredicted={hasPredicted} provenance={provenance} />;
   }
 
   return (

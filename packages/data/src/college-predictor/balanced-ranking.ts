@@ -58,6 +58,39 @@ const BRANCH_TIERS: Array<{ test: (value: string) => boolean; score: number }> =
     },
   ];
 
+export function instituteMetaFromPrograms(
+  programs: ProgramPrediction[],
+): Map<string, InstituteRankingMeta> {
+  const meta = new Map<string, InstituteRankingMeta>();
+  for (const program of programs) {
+    if (!meta.has(program.institute_id)) {
+      meta.set(program.institute_id, {
+        nirf_rank: program.nirf_rank ?? null,
+      });
+    }
+  }
+  return meta;
+}
+
+function compareBalancedRank(
+  a: ProgramPrediction,
+  b: ProgramPrediction,
+): number {
+  const scoreDiff = (b.balanced_score ?? 0) - (a.balanced_score ?? 0);
+  if (scoreDiff !== 0) return scoreDiff;
+
+  const instituteDiff = (b.institute_score ?? 0) - (a.institute_score ?? 0);
+  if (instituteDiff !== 0) return instituteDiff;
+
+  const branchDiff = (b.branch_score ?? 0) - (a.branch_score ?? 0);
+  if (branchDiff !== 0) return branchDiff;
+
+  const probDiff = b.cumulative_probability - a.cumulative_probability;
+  if (probDiff !== 0) return probDiff;
+
+  return a.predicted_closing_rank - b.predicted_closing_rank;
+}
+
 export function branchFilterActive(
   filters: CollegePredictorFilters | undefined,
 ): boolean {
@@ -145,20 +178,19 @@ export function applyBalancedRanking(
 
     return {
       ...program,
+      nirf_rank: nirf ?? program.nirf_rank ?? null,
       institute_score: instituteScore,
       branch_score: branchScore,
       balanced_score: balancedScore,
     };
   });
 
-  scored.sort((a, b) => (b.balanced_score ?? 0) - (a.balanced_score ?? 0));
+  scored.sort(compareBalancedRank);
   return scored;
 }
 
 export function sortByBalancedScore(
   programs: ProgramPrediction[],
 ): ProgramPrediction[] {
-  return [...programs].sort(
-    (a, b) => (b.balanced_score ?? 0) - (a.balanced_score ?? 0),
-  );
+  return [...programs].sort(compareBalancedRank);
 }
