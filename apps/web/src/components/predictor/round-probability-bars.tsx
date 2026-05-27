@@ -12,7 +12,7 @@ const BAR_STAGGER_MS = 35;
 
 interface RoundProbabilityBarsProps {
   roundProbs: number[];
-  /** Cumulative chance through fill round — not a single-round incremental value */
+  /** Mean cumulative chance across rounds 1..fill_round */
   overallProbability: number;
   fillRound?: number;
   className?: string;
@@ -89,7 +89,7 @@ export function RoundProbabilityBars({
     <div
       className={cn("flex items-center gap-2", className)}
       role="img"
-      aria-label={`${overallPct}% overall chance across ${BAR_COUNT} rounds`}
+      aria-label={`${overallPct}% average chance across ${fillRound ?? BAR_COUNT} rounds`}
     >
       <div
         ref={barsRef}

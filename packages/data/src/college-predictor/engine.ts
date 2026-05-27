@@ -56,6 +56,7 @@ export interface ProgramPrediction {
   weighted_mean: number;
   predicted_closing_rank: number;
   sigma_effective: number;
+  /** Mean cumulative chance across rounds 1..fill_round — drives band and display */
   cumulative_probability: number;
   band: ProbabilityBand;
   data_quality: "sufficient" | "inferred" | "pooled";
@@ -255,6 +256,18 @@ export function computeRoundProbs(
   return result;
 }
 
+/** Mean cumulative chance across counselling rounds 1..fill_round (excludes frozen tail). */
+export function computeAverageRoundProbability(
+  roundProbs: number[],
+  fillRound: number,
+): number {
+  const activeRoundCount = Math.min(Math.max(fillRound, 1), roundProbs.length);
+  const activeProbs = roundProbs.slice(0, activeRoundCount);
+  if (activeProbs.length === 0) return 0;
+  const sum = activeProbs.reduce((acc, prob) => acc + prob, 0);
+  return Math.round((sum / activeProbs.length) * 10000) / 10000;
+}
+
 // index parquet uses JoSAA label "EWS"; callers may still send taxonomy alias "Gen-EWS"
 function normalizeSeatTypeForIndex(seatType: string): string {
   return seatType === "Gen-EWS" ? "EWS" : seatType;
@@ -286,7 +299,10 @@ export function predictPrograms(opts: {
 
   for (const row of filtered) {
     const roundProbs = computeRoundProbs(opts.studentRank, row);
-    const probability = roundProbs.at(-1) ?? 0;
+    const probability = computeAverageRoundProbability(
+      roundProbs,
+      row.fill_round,
+    );
 
     allPredictions.push({
       institute_id: row.institute_id,

@@ -10,6 +10,7 @@ import { describe, expect, it } from "vitest";
 import {
   type CollegePredictorIndexRow,
   classifyBand,
+  computeAverageRoundProbability,
   computeProbability,
   computeRoundProbs,
   normalCDF,
@@ -179,6 +180,22 @@ describe("computeRoundProbs", () => {
     const probs = computeRoundProbs(1000, row);
     expect(probs).toHaveLength(6);
     expect(probs[2]).toBeCloseTo(probs[1]!, 4);
+  });
+});
+
+describe("computeAverageRoundProbability", () => {
+  it("averages only active rounds up to fill_round", () => {
+    const probs = [0.3, 0.5, 0.7, 0.7, 0.7, 0.7];
+    expect(computeAverageRoundProbability(probs, 3)).toBeCloseTo(0.5, 4);
+  });
+
+  it("includes all rounds when fill_round is 6", () => {
+    const probs = [0.2, 0.4, 0.5, 0.6, 0.65, 0.7];
+    expect(computeAverageRoundProbability(probs, 6)).toBeCloseTo(0.5083, 3);
+  });
+
+  it("returns 0 for empty round probs", () => {
+    expect(computeAverageRoundProbability([], 3)).toBe(0);
   });
 });
 
