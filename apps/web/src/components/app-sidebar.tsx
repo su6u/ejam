@@ -39,7 +39,7 @@ export function AppSidebar() {
                     height={89}
                     priority
                     aria-hidden
-                    className="image-outline size-6 shrink-0 rounded-[5px]"
+                    className="size-6 shrink-0"
                   />
                 </a>
               }
