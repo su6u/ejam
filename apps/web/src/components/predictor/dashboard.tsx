@@ -61,8 +61,8 @@ export function Dashboard() {
   });
 
   return (
-    <div className="h-[calc(100dvh-7rem)] overflow-visible bg-border p-px">
-      <div className="h-full min-h-0 min-w-0 overflow-visible">{middle}</div>
+    <div className="h-[calc(100dvh-7rem)] min-h-0 w-full min-w-0 bg-border p-px">
+      <div className="h-full min-h-0 min-w-0">{middle}</div>
 
       <CollegeDetailSheet
         program={selected}

@@ -29,7 +29,7 @@ export function ResultsCardShell({
 }) {
   return (
     <DashboardCard
-      className={cn("relative h-full min-h-0 gap-0 overflow-visible py-0")}
+      className={cn("relative h-full min-h-0 w-full min-w-0 gap-0 overflow-visible py-0")}
     >
       <DecorIcon position="top-left" />
       <DecorIcon position="top-right" />
@@ -43,11 +43,13 @@ export function ResultsCardShell({
       >
         <DecorIcon position="bottom-left" />
         <DecorIcon position="bottom-right" />
-        <div className="flex flex-row items-center justify-between gap-4">
-          <div className="flex min-w-0 flex-col gap-1">
-            <CardTitle>Prediction results</CardTitle>
+        <div className="flex min-w-0 flex-row items-center justify-between gap-4">
+          <div className="flex min-w-0 flex-1 flex-col gap-1">
+            <CardTitle className="text-pretty">Prediction results</CardTitle>
             {description ? (
-              <CardDescription>{description}</CardDescription>
+              <CardDescription className="text-pretty">
+                {description}
+              </CardDescription>
             ) : null}
           </div>
           {headerExtra}
@@ -58,7 +60,7 @@ export function ResultsCardShell({
       </CardHeader>
       <CardContent
         className={cn(
-          "flex min-h-0 flex-1 flex-col px-0 py-0",
+          "flex min-h-0 min-w-0 flex-1 flex-col px-0 py-0",
           contentClassName,
         )}
       >

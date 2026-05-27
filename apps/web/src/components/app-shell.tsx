@@ -16,19 +16,19 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   return (
     <Suspense fallback={null}>
       <PredictorProvider>
-        <SidebarProvider className={cn("[--app-wrapper-max-width:80rem]")}>
+        <SidebarProvider>
           <AppSidebar />
-          <SidebarInset className="flex flex-col">
-            <div className={appShellLayoutClass()}>
-              <div
-                className={cn(
-                  appHeaderGutterClass,
-                  "sticky top-0 z-50 shrink-0 border-b",
-                  "bg-background/95 backdrop-blur-sm supports-backdrop-filter:bg-background/50",
-                )}
-              >
-                <AppHeader />
-              </div>
+          <SidebarInset className="flex min-h-svh flex-col">
+            <div
+              className={cn(
+                appHeaderGutterClass,
+                "sticky top-0 z-50 w-full shrink-0 border-b",
+                "bg-background/95 backdrop-blur-sm supports-backdrop-filter:bg-background/50",
+              )}
+            >
+              <AppHeader />
+            </div>
+            <div className={cn(appShellLayoutClass(), "min-h-0 flex-1")}>
               <div className={appShellContentClass()}>{children}</div>
             </div>
           </SidebarInset>
