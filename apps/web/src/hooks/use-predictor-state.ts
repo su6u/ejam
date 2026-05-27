@@ -120,18 +120,16 @@ export function usePredictorState(): PredictorStateReturn {
     (v: ExamType) => {
       if (v === exam) return;
 
-      const updates: Record<string, string | null> = {
+      updateParam({
         exam: v,
         rank: null,
-      };
-
-      if (v === "jee-advanced") {
-        updates.quota = null;
-        updates.state = null;
-        updates.counselling = null;
-      }
-
-      updateParam(updates);
+        category: null,
+        gender: null,
+        quota: null,
+        state: null,
+        counselling: null,
+        ews: null,
+      });
     },
     [exam, updateParam],
   );
