@@ -96,7 +96,7 @@ export function ResultsTable({
                       type="button"
                       variant="outline"
                       size="sm"
-                      className="rounded-none"
+                      className="rounded-none border-border bg-transparent text-muted-foreground shadow-none hover:bg-transparent hover:text-foreground dark:bg-transparent dark:hover:bg-transparent"
                       onClick={onClearFilters}
                     >
                       Clear filters
