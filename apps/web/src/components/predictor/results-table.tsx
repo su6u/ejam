@@ -16,6 +16,7 @@ import {
   ResultsSort,
   type ResultsSortKey,
 } from "@/components/predictor/results-sort";
+import { RoundProbabilityBars } from "@/components/predictor/round-probability-bars";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -26,7 +27,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { RoundProbabilityBars } from "@/components/predictor/round-probability-bars";
 import { BAND_STYLES } from "@/lib/bands";
 import { cn } from "@/lib/utils";
 

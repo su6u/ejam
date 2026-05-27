@@ -14,11 +14,11 @@ import {
   computeProbability,
   computeRoundProbs,
   normalCDF,
+  type ProgramPrediction,
   predictPrograms,
   REACH_BAND_MIN_PROBABILITY,
   sortByChance,
   sortByClosingRank,
-  type ProgramPrediction,
 } from "../college-predictor/engine";
 
 describe("normalCDF", () => {

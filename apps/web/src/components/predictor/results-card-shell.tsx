@@ -1,6 +1,6 @@
+import { predictorHeaderStripClass } from "@/components/app-layout";
 import { DashboardCard } from "@/components/dashboard-card";
 import { DecorIcon } from "@/components/decor-icon";
-import { predictorHeaderStripClass } from "@/components/app-layout";
 import {
   CardContent,
   CardDescription,
@@ -29,7 +29,9 @@ export function ResultsCardShell({
 }) {
   return (
     <DashboardCard
-      className={cn("relative h-full min-h-0 w-full min-w-0 gap-0 overflow-visible py-0")}
+      className={cn(
+        "relative h-full min-h-0 w-full min-w-0 gap-0 overflow-visible py-0",
+      )}
     >
       <DecorIcon position="top-left" />
       <DecorIcon position="top-right" />

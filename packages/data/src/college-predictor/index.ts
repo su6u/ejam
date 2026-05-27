@@ -11,8 +11,8 @@ export {
   computeBalancedScore,
   computeBranchScore,
   computeInstituteScore,
-  instituteMetaFromPrograms,
   type InstituteRankingMeta,
+  instituteMetaFromPrograms,
   sortByBalancedScore,
 } from "./balanced-ranking";
 export type {

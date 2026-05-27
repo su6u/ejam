@@ -6,6 +6,8 @@
 "use client";
 
 import type { ProgramPrediction } from "@ejam/data/college-predictor";
+import { XIcon } from "lucide-react";
+import { DashboardCard } from "@/components/dashboard-card";
 import {
   ActiveDot,
   Area,
@@ -16,9 +18,7 @@ import {
   XAxis,
   YAxis,
 } from "@/components/evilcharts/charts/area-chart";
-import { type ChartConfig } from "@/components/evilcharts/ui/chart";
-import { XIcon } from "lucide-react";
-import { DashboardCard } from "@/components/dashboard-card";
+import type { ChartConfig } from "@/components/evilcharts/ui/chart";
 import { formatInteger } from "@/components/formatter";
 import { Button } from "@/components/ui/button";
 import {

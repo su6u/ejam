@@ -1,8 +1,12 @@
 "use client";
 
+import { quotaRequiresHomeState } from "@ejam/predictors/shared/quota-input";
 import Image from "next/image";
 import { type ReactNode, Suspense } from "react";
-import { sidebarPanelTopInsetClass, predictorHeaderStripClass } from "@/components/app-layout";
+import {
+  predictorHeaderStripClass,
+  sidebarPanelTopInsetClass,
+} from "@/components/app-layout";
 import { HomeStateCombobox } from "@/components/predictor/home-state-combobox";
 import { usePredictor } from "@/components/predictor/predictor-context";
 import { ProximityPicker } from "@/components/predictor/proximity-picker";
@@ -16,7 +20,6 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { quotaRequiresHomeState } from "@ejam/predictors/shared/quota-input";
 import type { CounsellingBody, ExamType } from "@/hooks/use-predictor-state";
 import { isJeeMainCounselling } from "@/hooks/use-predictor-state";
 import { deferAfterPress, pressableClass } from "@/lib/pressable";
@@ -137,8 +140,7 @@ function PredictorSidebarPanelInner() {
                     aria-hidden
                     className={cn(
                       "size-9 shrink-0 object-contain transition-opacity",
-                      !isActive &&
-                        "opacity-55 group-hover/exam:opacity-80",
+                      !isActive && "opacity-55 group-hover/exam:opacity-80",
                       isActive && "opacity-100",
                     )}
                   />

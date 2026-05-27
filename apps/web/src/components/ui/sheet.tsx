@@ -26,10 +26,7 @@ function SheetOverlay({ className, ...props }: SheetPrimitive.Backdrop.Props) {
   return (
     <SheetPrimitive.Backdrop
       data-slot="sheet-overlay"
-      className={cn(
-        "sheet-overlay fixed inset-0 z-50",
-        className,
-      )}
+      className={cn("sheet-overlay fixed inset-0 z-50", className)}
       {...props}
     />
   );

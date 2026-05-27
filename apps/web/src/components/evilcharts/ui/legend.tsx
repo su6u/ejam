@@ -1,7 +1,11 @@
-import { getPayloadConfigFromPayload, getColorsCount, useChart } from "@/components/evilcharts/ui/chart";
+import type * as React from "react";
 import * as RechartsPrimitive from "recharts";
+import {
+  getColorsCount,
+  getPayloadConfigFromPayload,
+  useChart,
+} from "@/components/evilcharts/ui/chart";
 import { cn } from "@/lib/utils";
-import * as React from "react";
 
 type ChartLegendVariant =
   | "square"
@@ -118,7 +122,9 @@ function LegendIndicator({
       return <div className="h-2 w-2 shrink-0" style={fillStyle} />;
 
     case "circle":
-      return <div className="h-2 w-2 shrink-0 rounded-full" style={fillStyle} />;
+      return (
+        <div className="h-2 w-2 shrink-0 rounded-full" style={fillStyle} />
+      );
 
     case "circle-outline":
       return (
@@ -129,10 +135,14 @@ function LegendIndicator({
       );
 
     case "vertical-bar":
-      return <div className="h-3 w-1 shrink-0 rounded-[2px]" style={fillStyle} />;
+      return (
+        <div className="h-3 w-1 shrink-0 rounded-[2px]" style={fillStyle} />
+      );
 
     case "horizontal-bar":
-      return <div className="h-1 w-3 shrink-0 rounded-[2px]" style={fillStyle} />;
+      return (
+        <div className="h-1 w-3 shrink-0 rounded-[2px]" style={fillStyle} />
+      );
 
     case "rounded-square-outline":
       return (
@@ -144,7 +154,9 @@ function LegendIndicator({
 
     case "rounded-square":
     default:
-      return <div className="h-2 w-2 shrink-0 rounded-[2px]" style={fillStyle} />;
+      return (
+        <div className="h-2 w-2 shrink-0 rounded-[2px]" style={fillStyle} />
+      );
   }
 }
 
@@ -153,7 +165,10 @@ function LegendIndicator({
 // ---------------------------------------------------------------------------
 
 /** Solid fill / gradient background for filled variants. */
-function getLegendFillStyle(dataKey: string, colorsCount: number): React.CSSProperties {
+function getLegendFillStyle(
+  dataKey: string,
+  colorsCount: number,
+): React.CSSProperties {
   if (colorsCount <= 1) {
     return { backgroundColor: `var(--color-${dataKey}-0)` };
   }
@@ -172,7 +187,10 @@ function getLegendFillStyle(dataKey: string, colorsCount: number): React.CSSProp
  * "border" visible. Works with both solid colors and gradients, and respects
  * border-radius — unlike plain `border-color`.
  */
-function getLegendOutlineStyle(dataKey: string, colorsCount: number): React.CSSProperties {
+function getLegendOutlineStyle(
+  dataKey: string,
+  colorsCount: number,
+): React.CSSProperties {
   const maskStyle: React.CSSProperties = {
     WebkitMask:
       "linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)",

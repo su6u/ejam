@@ -2,11 +2,6 @@
 
 import { quotaRequiresHomeState } from "@ejam/predictors/shared/quota-input";
 import {
-  counsellingToPredictorExam,
-  parseCounsellingBody,
-  predictorUsesQuotaHomeState,
-} from "@/hooks/use-predictor-state";
-import {
   createContext,
   useCallback,
   useContext,
@@ -25,7 +20,10 @@ import {
 } from "@/components/predictor/results-sort";
 import { usePredictorQuery } from "@/hooks/use-predictor-query";
 import {
+  counsellingToPredictorExam,
   type PredictorStateReturn,
+  parseCounsellingBody,
+  predictorUsesQuotaHomeState,
   usePredictorState,
 } from "@/hooks/use-predictor-state";
 

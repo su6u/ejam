@@ -70,7 +70,8 @@ export function ResultsFilters({
   enabled,
 }: ResultsFiltersProps) {
   const instituteTypes = availableInstituteTypes(programs, exam);
-  const showInstituteGroup = isJeeMainCounselling(exam) && instituteTypes.length > 0;
+  const showInstituteGroup =
+    isJeeMainCounselling(exam) && instituteTypes.length > 0;
 
   function toggleInstitute(type: string) {
     const next = new Set(filters.instituteTypes);

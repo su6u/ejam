@@ -107,9 +107,7 @@ function renderMiddle({
   if (error) return <ErrorState message={error} provenance={provenance} />;
   if (!hasResults) {
     if (isLoading) return <LoadingState provenance={provenance} />;
-    return (
-      <EmptyState hasPredicted={hasPredicted} provenance={provenance} />
-    );
+    return <EmptyState hasPredicted={hasPredicted} provenance={provenance} />;
   }
 
   return (

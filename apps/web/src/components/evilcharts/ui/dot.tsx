@@ -1,5 +1,5 @@
-import { cn } from "@/lib/utils";
 import * as React from "react";
+import { cn } from "@/lib/utils";
 
 export type DotVariant = "default" | "border" | "colored-border";
 
@@ -81,7 +81,15 @@ type DotVariantProps = {
 };
 
 const DefaultDot = React.memo(
-  ({ cx, cy, dotId, fillOpacity, gradientUrl, className, maskId }: DotVariantProps) => {
+  ({
+    cx,
+    cy,
+    dotId,
+    fillOpacity,
+    gradientUrl,
+    className,
+    maskId,
+  }: DotVariantProps) => {
     const r = 3;
     return (
       <g className={className} mask={maskId ? `url(#${maskId})` : undefined}>
@@ -108,11 +116,22 @@ const DefaultDot = React.memo(
 DefaultDot.displayName = "DefaultDot";
 
 const PrimaryBorderDot = React.memo(
-  ({ cx, cy, dotId, fillOpacity, gradientUrl, className, maskId }: DotVariantProps) => {
+  ({
+    cx,
+    cy,
+    dotId,
+    fillOpacity,
+    gradientUrl,
+    className,
+    maskId,
+  }: DotVariantProps) => {
     const r = 6;
     const strokeWidth = 5;
     return (
-      <g className={cn(className, "text-background")} mask={maskId ? `url(#${maskId})` : undefined}>
+      <g
+        className={cn(className, "text-background")}
+        mask={maskId ? `url(#${maskId})` : undefined}
+      >
         <defs>
           <clipPath id={`dot-clip-${dotId}`}>
             <circle cx={cx} cy={cy} r={r} />
@@ -143,11 +162,22 @@ const PrimaryBorderDot = React.memo(
 PrimaryBorderDot.displayName = "PrimaryBorderDot";
 
 const ColoredBorderDot = React.memo(
-  ({ cx, cy, dotId, fillOpacity, gradientUrl, className, maskId }: DotVariantProps) => {
+  ({
+    cx,
+    cy,
+    dotId,
+    fillOpacity,
+    gradientUrl,
+    className,
+    maskId,
+  }: DotVariantProps) => {
     const r = 3;
     const strokeWidth = 1;
     return (
-      <g className={cn(className, "text-background")} mask={maskId ? `url(#${maskId})` : undefined}>
+      <g
+        className={cn(className, "text-background")}
+        mask={maskId ? `url(#${maskId})` : undefined}
+      >
         <defs>
           <clipPath id={`dot-clip-${dotId}`}>
             <circle cx={cx} cy={cy} r={r + strokeWidth / 2} />

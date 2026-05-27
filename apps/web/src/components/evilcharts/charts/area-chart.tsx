@@ -1,20 +1,29 @@
 "use client";
 
+import { motion, useReducedMotion } from "motion/react";
 import {
   Children,
+  type ComponentProps,
   createContext,
+  type FC,
   isValidElement,
+  type ReactElement,
+  type ReactNode,
   use,
   useCallback,
   useId,
   useMemo,
   useRef,
   useState,
-  type ComponentProps,
-  type FC,
-  type ReactElement,
-  type ReactNode,
 } from "react";
+import {
+  CartesianGrid,
+  Area as RechartsArea,
+  AreaChart as RechartsAreaChart,
+  XAxis as RechartsXAxis,
+  YAxis as RechartsYAxis,
+} from "recharts";
+import type { ValueType } from "recharts/types/component/DefaultTooltipContent";
 import {
   axisValueToPercentFormatter,
   type ChartConfig,
@@ -23,24 +32,23 @@ import {
   getLoadingData,
   LoadingIndicator,
 } from "@/components/evilcharts/ui/chart";
+import { ChartDot, type DotVariant } from "@/components/evilcharts/ui/dot";
 import {
-  Area as RechartsArea,
-  AreaChart as RechartsAreaChart,
-  CartesianGrid,
-  XAxis as RechartsXAxis,
-  YAxis as RechartsYAxis,
-} from "recharts";
+  EvilBrush,
+  type EvilBrushRange,
+  useEvilBrush,
+} from "@/components/evilcharts/ui/evil-brush";
+import {
+  ChartLegend,
+  ChartLegendContent,
+  type ChartLegendVariant,
+} from "@/components/evilcharts/ui/legend";
 import {
   ChartTooltip,
   ChartTooltipContent,
   type TooltipRoundness,
   type TooltipVariant,
 } from "@/components/evilcharts/ui/tooltip";
-import { ChartLegend, ChartLegendContent, type ChartLegendVariant } from "@/components/evilcharts/ui/legend";
-import { EvilBrush, useEvilBrush, type EvilBrushRange } from "@/components/evilcharts/ui/evil-brush";
-import { ChartDot, type DotVariant } from "@/components/evilcharts/ui/dot";
-import { motion, useReducedMotion } from "motion/react";
-import type { ValueType } from "recharts/types/component/DefaultTooltipContent";
 
 // Constants
 const STROKE_WIDTH = 0.8;
@@ -53,7 +61,13 @@ const REVEAL_EASE: [number, number, number, number] = [0, 0.7, 0.5, 1]; // intro
 type CurveType = ComponentProps<typeof RechartsArea>["type"];
 type AreaDotProp = ComponentProps<typeof RechartsArea>["dot"];
 type AreaActiveDotProp = ComponentProps<typeof RechartsArea>["activeDot"];
-type AreaVariant = "gradient" | "gradient-reverse" | "solid" | "dotted" | "lines" | "hatched";
+type AreaVariant =
+  | "gradient"
+  | "gradient-reverse"
+  | "solid"
+  | "dotted"
+  | "lines"
+  | "hatched";
 type StrokeVariant = "solid" | "dashed" | "animated-dashed";
 type StackType = "default" | "expanded" | "stacked";
 
@@ -66,7 +80,12 @@ type StackType = "default" | "expanded" | "stacked";
  * static chart. `"none"` opts out entirely; it is also what a device with the
  * OS "reduce motion" preference falls back to automatically.
  */
-type AreaAnimationType = "none" | "left-to-right" | "right-to-left" | "center-out" | "edges-in";
+type AreaAnimationType =
+  | "none"
+  | "left-to-right"
+  | "right-to-left"
+  | "center-out"
+  | "edges-in";
 type RevealAnimationType = Exclude<AreaAnimationType, "none">;
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -170,8 +189,13 @@ export function EvilAreaChart<
   onBrushChange,
 }: EvilAreaChartProps<TData, TConfig>) {
   const chartId = useId().replace(/:/g, ""); // colon-free id keeps CSS/SVG selectors valid
-  const [selectedDataKey, setSelectedDataKey] = useState<string | null>(defaultSelectedDataKey);
-  const { loadingData, onShimmerExit } = useLoadingData(isLoading, loadingPoints);
+  const [selectedDataKey, setSelectedDataKey] = useState<string | null>(
+    defaultSelectedDataKey,
+  );
+  const { loadingData, onShimmerExit } = useLoadingData(
+    isLoading,
+    loadingPoints,
+  );
   const { visibleData, brushProps } = useEvilBrush({ data });
 
   const isExpanded = stackType === "expanded";
@@ -248,7 +272,11 @@ export function EvilAreaChart<
         >
           {children}
           {isLoading && (
-            <LoadingArea chartId={chartId} curveType={curveType} onShimmerExit={onShimmerExit} />
+            <LoadingArea
+              chartId={chartId}
+              curveType={curveType}
+              onShimmerExit={onShimmerExit}
+            />
           )}
         </RechartsAreaChart>
       </ChartContainer>
@@ -321,7 +349,13 @@ export function Area({
   const opacity = getOpacity(selectedDataKey, dataKey);
   const showUnselected = hasSelection && !isSelected;
 
-  const { dot, activeDot } = resolveDots(children, id, dataKey, opacity.dot, maskId);
+  const { dot, activeDot } = resolveDots(
+    children,
+    id,
+    dataKey,
+    opacity.dot,
+    maskId,
+  );
 
   const isAnimatedDashed = strokeVariant === "animated-dashed";
   const isDashed = strokeVariant === "dashed" || isAnimatedDashed;
@@ -360,9 +394,18 @@ export function Area({
       </RechartsArea>
       <defs>
         {revealType !== "none" && <RevealMask id={id} type={revealType} />}
-        <ColorGradient id={id} dataKey={dataKey} config={config} isExpanded={isExpanded} />
-        {variant === "gradient" && <GradientPattern id={id} dataKey={dataKey} />}
-        {variant === "gradient-reverse" && <ReverseGradientPattern id={id} dataKey={dataKey} />}
+        <ColorGradient
+          id={id}
+          dataKey={dataKey}
+          config={config}
+          isExpanded={isExpanded}
+        />
+        {variant === "gradient" && (
+          <GradientPattern id={id} dataKey={dataKey} />
+        )}
+        {variant === "gradient-reverse" && (
+          <ReverseGradientPattern id={id} dataKey={dataKey} />
+        )}
         {variant === "solid" && <SolidPattern id={id} dataKey={dataKey} />}
         {variant === "dotted" && <DottedPattern id={id} dataKey={dataKey} />}
         {variant === "lines" && <LinesPattern id={id} dataKey={dataKey} />}
@@ -458,8 +501,18 @@ type GridProps = ComponentProps<typeof CartesianGrid>;
  * The background grid lines. Defaults to horizontal-only dashed lines and
  * forwards every Recharts CartesianGrid prop for full control.
  */
-export function Grid({ vertical = false, strokeDasharray = "3 3", ...props }: GridProps) {
-  return <CartesianGrid vertical={vertical} strokeDasharray={strokeDasharray} {...props} />;
+export function Grid({
+  vertical = false,
+  strokeDasharray = "3 3",
+  ...props
+}: GridProps) {
+  return (
+    <CartesianGrid
+      vertical={vertical}
+      strokeDasharray={strokeDasharray}
+      {...props}
+    />
+  );
 }
 
 type TooltipProps = {
@@ -488,7 +541,9 @@ export function Tooltip({
   return (
     <ChartTooltip
       defaultIndex={defaultIndex}
-      cursor={cursor ? { strokeDasharray: "3 3", strokeWidth: STROKE_WIDTH } : false}
+      cursor={
+        cursor ? { strokeDasharray: "3 3", strokeWidth: STROKE_WIDTH } : false
+      }
       content={
         <ChartTooltipContent
           selected={selectedDataKey}
@@ -552,7 +607,11 @@ const getOpacity = (selectedDataKey: string | null, dataKey: string) => {
 };
 
 // Resolves the SVG paint reference for an area's fill based on its variant
-const getFillPattern = (variant: AreaVariant, showUnselected: boolean, id: string): string => {
+const getFillPattern = (
+  variant: AreaVariant,
+  showUnselected: boolean,
+  id: string,
+): string => {
   // A non-selected area in a clickable chart is striped to recede visually
   if (showUnselected) return `url(#${id}-unselected)`;
 
@@ -592,7 +651,12 @@ const resolveDots = (
     if (child.type === ActiveDot) {
       const { variant } = (child as ReactElement<DotProps>).props;
       activeDot = (
-        <ChartDot type={variant} dataKey={dataKey} chartId={id} fillOpacity={dotOpacity} />
+        <ChartDot
+          type={variant}
+          dataKey={dataKey}
+          chartId={id}
+          fillOpacity={dotOpacity}
+        />
       );
     }
   });
@@ -633,7 +697,10 @@ const AnimatedDashedStroke = () => {
 
 // motion `originX` for each single-rect reveal — the edge the wipe grows from.
 // 0 = left edge, 1 = right edge, 0.5 = centre (grows outward to both edges).
-const SINGLE_REVEAL_ORIGIN: Record<Exclude<RevealAnimationType, "edges-in">, number> = {
+const SINGLE_REVEAL_ORIGIN: Record<
+  Exclude<RevealAnimationType, "edges-in">,
+  number
+> = {
   "left-to-right": 0,
   "right-to-left": 1,
   "center-out": 0.5,
@@ -651,7 +718,13 @@ const SINGLE_REVEAL_ORIGIN: Record<Exclude<RevealAnimationType, "edges-in">, num
  * Each rect animates `scaleX` 0 → 1; `originX` decides which edge it grows from.
  * "edges-in" needs two rects — each half grows inward from an opposite edge.
  */
-const RevealMask = ({ id, type }: { id: string; type: RevealAnimationType }) => {
+const RevealMask = ({
+  id,
+  type,
+}: {
+  id: string;
+  type: RevealAnimationType;
+}) => {
   const reveal = {
     initial: { scaleX: 0 },
     animate: { scaleX: 1 },
@@ -759,7 +832,12 @@ const GradientPattern = ({ id, dataKey }: StyleProps) => {
       <mask id={`${id}-gradient-mask`}>
         <rect width="100%" height="100%" fill={`url(#${id}-vertical-fade)`} />
       </mask>
-      <pattern id={`${id}-gradient`} patternUnits="userSpaceOnUse" width="100%" height="100%">
+      <pattern
+        id={`${id}-gradient`}
+        patternUnits="userSpaceOnUse"
+        width="100%"
+        height="100%"
+      >
         <rect
           width="100%"
           height="100%"
@@ -775,12 +853,22 @@ const GradientPattern = ({ id, dataKey }: StyleProps) => {
 const ReverseGradientPattern = ({ id, dataKey }: StyleProps) => {
   return (
     <>
-      <linearGradient id={`${id}-vertical-fade-reverse`} x1="0" y1="0" x2="0" y2="1">
+      <linearGradient
+        id={`${id}-vertical-fade-reverse`}
+        x1="0"
+        y1="0"
+        x2="0"
+        y2="1"
+      >
         <stop offset="0%" stopColor="white" stopOpacity={0} />
         <stop offset="100%" stopColor="white" stopOpacity={0.1} />
       </linearGradient>
       <mask id={`${id}-gradient-reverse-mask`}>
-        <rect width="100%" height="100%" fill={`url(#${id}-vertical-fade-reverse)`} />
+        <rect
+          width="100%"
+          height="100%"
+          fill={`url(#${id}-vertical-fade-reverse)`}
+        />
       </mask>
       <pattern
         id={`${id}-gradient-reverse`}
@@ -810,7 +898,12 @@ const SolidPattern = ({ id, dataKey }: StyleProps) => {
       <mask id={`${id}-solid-mask`}>
         <rect width="100%" height="100%" fill={`url(#${id}-solid-fade)`} />
       </mask>
-      <pattern id={`${id}-solid`} patternUnits="userSpaceOnUse" width="100%" height="100%">
+      <pattern
+        id={`${id}-solid`}
+        patternUnits="userSpaceOnUse"
+        width="100%"
+        height="100%"
+      >
         <rect
           width="100%"
           height="100%"
@@ -836,9 +929,19 @@ const LinesPattern = ({ id, dataKey }: StyleProps) => {
         <line x1="0" y1="0" x2="0" y2="5" stroke="white" strokeWidth="1" />
       </pattern>
       <mask id={`${id}-lines-mask`}>
-        <rect width="100%" height="100%" fill={`url(#${id}-lines-texture)`} fillOpacity="0.3" />
+        <rect
+          width="100%"
+          height="100%"
+          fill={`url(#${id}-lines-texture)`}
+          fillOpacity="0.3"
+        />
       </mask>
-      <pattern id={`${id}-lines`} patternUnits="userSpaceOnUse" width="100%" height="100%">
+      <pattern
+        id={`${id}-lines`}
+        patternUnits="userSpaceOnUse"
+        width="100%"
+        height="100%"
+      >
         <rect
           width="100%"
           height="100%"
@@ -865,9 +968,19 @@ const DottedPattern = ({ id, dataKey }: StyleProps) => {
         <circle cx="4" cy="4" r="0.5" fill="white" />
       </pattern>
       <mask id={`${id}-dotted-mask`}>
-        <rect width="100%" height="100%" fill={`url(#${id}-dotted-texture)`} fillOpacity="0.5" />
+        <rect
+          width="100%"
+          height="100%"
+          fill={`url(#${id}-dotted-texture)`}
+          fillOpacity="0.5"
+        />
       </mask>
-      <pattern id={`${id}-dotted`} patternUnits="userSpaceOnUse" width="100%" height="100%">
+      <pattern
+        id={`${id}-dotted`}
+        patternUnits="userSpaceOnUse"
+        width="100%"
+        height="100%"
+      >
         <rect
           width="100%"
           height="100%"
@@ -900,9 +1013,19 @@ const HatchedPattern = ({ id, dataKey }: StyleProps) => {
         <rect width="20" height="10" fill={`url(#${id}-hatched-stripe)`} />
       </pattern>
       <mask id={`${id}-hatched-mask`}>
-        <rect width="100%" height="100%" fill={`url(#${id}-hatched-texture)`} fillOpacity="0.2" />
+        <rect
+          width="100%"
+          height="100%"
+          fill={`url(#${id}-hatched-texture)`}
+          fillOpacity="0.2"
+        />
       </mask>
-      <pattern id={`${id}-hatched`} patternUnits="userSpaceOnUse" width="100%" height="100%">
+      <pattern
+        id={`${id}-hatched`}
+        patternUnits="userSpaceOnUse"
+        width="100%"
+        height="100%"
+      >
         <rect
           width="100%"
           height="100%"
@@ -935,7 +1058,12 @@ const UnselectedPattern = ({ id, dataKey }: StyleProps) => {
           fillOpacity="0.3"
         />
       </mask>
-      <pattern id={`${id}-unselected`} patternUnits="userSpaceOnUse" width="100%" height="100%">
+      <pattern
+        id={`${id}-unselected`}
+        patternUnits="userSpaceOnUse"
+        width="100%"
+        height="100%"
+      >
         <rect
           width="100%"
           height="100%"
@@ -962,7 +1090,10 @@ const generateEasedGradientStops = (
     // Sine-based bell curve easing: peaks at center (t=0.5), smooth falloff at edges
     const eased = Math.sin(t * Math.PI) ** 2;
     const opacity = minOpacity + eased * (maxOpacity - minOpacity);
-    return { offset: `${(t * 100).toFixed(0)}%`, opacity: Number(opacity.toFixed(3)) };
+    return {
+      offset: `${(t * 100).toFixed(0)}%`,
+      opacity: Number(opacity.toFixed(3)),
+    };
   });
 };
 
@@ -1056,9 +1187,20 @@ const LoadingPattern = ({
 
   return (
     <>
-      <linearGradient id={`${chartId}-loading-gradient`} x1="0" y1="0" x2="1" y2="0">
+      <linearGradient
+        id={`${chartId}-loading-gradient`}
+        x1="0"
+        y1="0"
+        x2="1"
+        y2="0"
+      >
         {gradientStops.map(({ offset, opacity }) => (
-          <stop key={offset} offset={offset} stopColor="white" stopOpacity={opacity} />
+          <stop
+            key={offset}
+            offset={offset}
+            stopColor="white"
+            stopOpacity={opacity}
+          />
         ))}
       </linearGradient>
       <pattern
@@ -1098,7 +1240,11 @@ const LoadingPattern = ({
         />
       </pattern>
       <mask id={`${chartId}-loading-mask`} maskUnits="userSpaceOnUse">
-        <rect width="100%" height="100%" fill={`url(#${chartId}-loading-pattern)`} />
+        <rect
+          width="100%"
+          height="100%"
+          fill={`url(#${chartId}-loading-pattern)`}
+        />
       </mask>
     </>
   );

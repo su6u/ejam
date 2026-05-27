@@ -213,7 +213,9 @@ export function groupProgramsByBand(
 }
 
 /** Highest average round chance first; closing rank breaks ties. */
-export function sortByChance(programs: ProgramPrediction[]): ProgramPrediction[] {
+export function sortByChance(
+  programs: ProgramPrediction[],
+): ProgramPrediction[] {
   return [...programs].sort((a, b) => {
     const probDiff = b.cumulative_probability - a.cumulative_probability;
     if (probDiff !== 0) return probDiff;

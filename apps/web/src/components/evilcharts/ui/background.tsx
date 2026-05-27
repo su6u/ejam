@@ -1,7 +1,7 @@
 "use client";
 
-import { ZIndexLayer } from "recharts";
 import { useId } from "react";
+import { ZIndexLayer } from "recharts";
 
 // ── Background Variant Types ─────────────────────────────────────────────────
 // To add a new variant:
@@ -27,13 +27,33 @@ export type BackgroundVariant =
 type PatternProps = { id: string };
 
 const DotsPattern = ({ id }: PatternProps) => (
-  <pattern id={id} x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
-    <circle className="text-border dark:text-border" cx="2" cy="2" r="1" fill="currentColor" />
+  <pattern
+    id={id}
+    x="0"
+    y="0"
+    width="20"
+    height="20"
+    patternUnits="userSpaceOnUse"
+  >
+    <circle
+      className="text-border dark:text-border"
+      cx="2"
+      cy="2"
+      r="1"
+      fill="currentColor"
+    />
   </pattern>
 );
 
 const GridPattern = ({ id }: PatternProps) => (
-  <pattern id={id} x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
+  <pattern
+    id={id}
+    x="0"
+    y="0"
+    width="20"
+    height="20"
+    patternUnits="userSpaceOnUse"
+  >
     <path
       className="text-border dark:text-border"
       d="M 20 0 L 0 0 0 20"
@@ -45,7 +65,14 @@ const GridPattern = ({ id }: PatternProps) => (
 );
 
 const CrossHatchPattern = ({ id }: PatternProps) => (
-  <pattern id={id} x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
+  <pattern
+    id={id}
+    x="0"
+    y="0"
+    width="20"
+    height="20"
+    patternUnits="userSpaceOnUse"
+  >
     <path
       className="text-border/60 dark:text-border/50"
       d="M 0 0 L 20 20 M 20 0 L 0 20"
@@ -79,7 +106,14 @@ const DiagonalLinesPattern = ({ id }: PatternProps) => (
 );
 
 const PlusPattern = ({ id }: PatternProps) => (
-  <pattern id={id} x="0" y="0" width="16" height="16" patternUnits="userSpaceOnUse">
+  <pattern
+    id={id}
+    x="0"
+    y="0"
+    width="16"
+    height="16"
+    patternUnits="userSpaceOnUse"
+  >
     <path
       className="text-border dark:text-border"
       d="M 8 4 L 8 12 M 4 8 L 12 8"
@@ -92,7 +126,14 @@ const PlusPattern = ({ id }: PatternProps) => (
 );
 
 const FallingTrianglesPattern = ({ id }: PatternProps) => (
-  <pattern id={id} x="0" y="0" width="18" height="36" patternUnits="userSpaceOnUse">
+  <pattern
+    id={id}
+    x="0"
+    y="0"
+    width="18"
+    height="36"
+    patternUnits="userSpaceOnUse"
+  >
     <path
       className="text-border dark:text-border"
       d="M2 6h12L8 18 2 6zm18 36h12l-6 12-6-12z"
@@ -104,7 +145,14 @@ const FallingTrianglesPattern = ({ id }: PatternProps) => (
 );
 
 const FourPointedStarPattern = ({ id }: PatternProps) => (
-  <pattern id={id} x="0" y="0" width="16" height="16" patternUnits="userSpaceOnUse">
+  <pattern
+    id={id}
+    x="0"
+    y="0"
+    width="16"
+    height="16"
+    patternUnits="userSpaceOnUse"
+  >
     <polygon
       className="text-border dark:text-border"
       fillRule="evenodd"
@@ -116,7 +164,14 @@ const FourPointedStarPattern = ({ id }: PatternProps) => (
 );
 
 const TinyCheckersPattern = ({ id }: PatternProps) => (
-  <pattern id={id} x="0" y="0" width="8" height="8" patternUnits="userSpaceOnUse">
+  <pattern
+    id={id}
+    x="0"
+    y="0"
+    width="8"
+    height="8"
+    patternUnits="userSpaceOnUse"
+  >
     <path
       className="text-border dark:text-border"
       fillRule="evenodd"
@@ -128,7 +183,14 @@ const TinyCheckersPattern = ({ id }: PatternProps) => (
 );
 
 const OverlappingCirclesPattern = ({ id }: PatternProps) => (
-  <pattern id={id} x="0" y="0" width="40" height="40" patternUnits="userSpaceOnUse">
+  <pattern
+    id={id}
+    x="0"
+    y="0"
+    width="40"
+    height="40"
+    patternUnits="userSpaceOnUse"
+  >
     <path
       className="text-border dark:text-border"
       fillRule="evenodd"
@@ -220,10 +282,22 @@ export function ChartBackground({ variant }: ChartBackgroundProps) {
         </filter>
         {/* Mask: a slightly inset white rect with blur creates smooth transparent edges */}
         <mask id={maskId} maskUnits="userSpaceOnUse">
-          <rect x="8%" y="20%" width="85%" height="60%" fill="white" filter={`url(#${filterId})`} />
+          <rect
+            x="8%"
+            y="20%"
+            width="85%"
+            height="60%"
+            fill="white"
+            filter={`url(#${filterId})`}
+          />
         </mask>
       </defs>
-      <rect width="100%" height="100%" fill={`url(#${patternId})`} mask={`url(#${maskId})`} />
+      <rect
+        width="100%"
+        height="100%"
+        fill={`url(#${patternId})`}
+        mask={`url(#${maskId})`}
+      />
     </ZIndexLayer>
   );
 }

@@ -12,9 +12,9 @@ import {
 } from "@ejam/data";
 import type { CollegePredictionResult } from "@ejam/data/college-predictor";
 import { uiQuotaToApi } from "@ejam/predictors/shared/quota-input";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { PredictorExamId } from "@/hooks/use-predictor-state";
 import { predictorUsesQuotaHomeState } from "@/hooks/use-predictor-state";
-import { useCallback, useEffect, useRef, useState } from "react";
 
 interface PredictorQueryOptions {
   predictorExamId: PredictorExamId;

@@ -69,14 +69,12 @@ export function RoundProbabilityBars({
 
   const overallPct = toPercent(overallProbability);
   const displayPct =
-    hoveredRound === null ? overallPct : toPercent(rounds[hoveredRound - 1] ?? 0);
-
-  const ariaLabel =
     hoveredRound === null
-      ? `${overallPct}% average chance across ${fillRound ?? BAR_COUNT} rounds`
-      : `Round ${hoveredRound}: ${displayPct}% cumulative chance`;
+      ? overallPct
+      : toPercent(rounds[hoveredRound - 1] ?? 0);
 
   // Freeze bars after each entrance so DOM moves never restart animation mid-flight.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: re-run when round data changes
   useEffect(() => {
     const root = barsRef.current;
     if (!root) return;
@@ -127,11 +125,12 @@ export function RoundProbabilityBars({
   }, [rounds]);
 
   return (
-    <div
-      className={cn("flex items-center gap-2", className)}
-      role="group"
-      aria-label="Admission chance by round"
+    <fieldset
+      className={cn("flex min-w-0 items-center gap-2 border-0 p-0", className)}
     >
+      <legend className="sr-only">Admission chance by round</legend>
+      {/* biome-ignore lint/a11y/noStaticElementInteractions: pointer hover between bar buttons */}
+      {/* biome-ignore lint/a11y/useKeyWithClickEvents: keyboard focus handled by bar buttons */}
       <div
         className="t-round-bars-track"
         onMouseMove={(event) => {
@@ -158,56 +157,53 @@ export function RoundProbabilityBars({
           className="t-round-bars flex items-end gap-[2px]"
           data-hovering={hoveredRound !== null ? "" : undefined}
         >
-        {rounds.map((prob, index) => {
-          const roundNum = index + 1;
-          const clamped = clampProbability(prob);
-          const band = classifyBand(clamped);
-          const { color, label } = BAND_STYLES[band];
-          const scale = Math.max(MIN_SCALE, clamped);
-          const roundPct = toPercent(clamped);
+          {rounds.map((prob, index) => {
+            const roundNum = index + 1;
+            const clamped = clampProbability(prob);
+            const band = classifyBand(clamped);
+            const { color, label } = BAND_STYLES[band];
+            const scale = Math.max(MIN_SCALE, clamped);
+            const roundPct = toPercent(clamped);
 
-          return (
-            <button
-              key={roundNum}
-              type="button"
-              className="t-round-bar-hit flex shrink-0 items-end justify-center"
-              data-round={roundNum}
-              data-active={hoveredRound === roundNum ? "" : undefined}
-              aria-label={`Round ${roundNum}: ${roundPct}% (${label})`}
-              onFocus={() => setHoveredRound(roundNum)}
-              onClick={(event) => event.stopPropagation()}
-            >
-              <div
-                className="t-round-bar h-3 w-[3px] shrink-0 rounded-none"
+            return (
+              <button
+                key={roundNum}
+                type="button"
+                className="t-round-bar-hit flex shrink-0 items-end justify-center"
                 data-round={roundNum}
-                data-fill-round={fillRound === roundNum ? "" : undefined}
-                data-band={band}
-                style={
-                  {
-                    "--bar-scale": String(scale),
-                    backgroundColor: color,
-                  } as React.CSSProperties
-                }
-              />
-            </button>
-          );
-        })}
+                data-active={hoveredRound === roundNum ? "" : undefined}
+                aria-label={`Round ${roundNum}: ${roundPct}% (${label})`}
+                onFocus={() => setHoveredRound(roundNum)}
+                onClick={(event) => event.stopPropagation()}
+              >
+                <div
+                  className="t-round-bar h-3 w-[3px] shrink-0 rounded-none"
+                  data-round={roundNum}
+                  data-fill-round={fillRound === roundNum ? "" : undefined}
+                  data-band={band}
+                  style={
+                    {
+                      "--bar-scale": String(scale),
+                      backgroundColor: color,
+                    } as React.CSSProperties
+                  }
+                />
+              </button>
+            );
+          })}
         </div>
       </div>
       <span
         key={hoveredRound === null ? "avg" : `r${hoveredRound}-${displayPct}`}
         aria-live="polite"
         aria-atomic="true"
-        aria-label={ariaLabel}
         className={cn(
           "t-round-chance w-10 shrink-0 text-right text-xs tabular-nums transition-colors duration-150 ease-out",
-          hoveredRound === null
-            ? "text-muted-foreground"
-            : "text-foreground",
+          hoveredRound === null ? "text-muted-foreground" : "text-foreground",
         )}
       >
         {displayPct}%
       </span>
-    </div>
+    </fieldset>
   );
 }
