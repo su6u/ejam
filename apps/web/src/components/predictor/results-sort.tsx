@@ -61,7 +61,7 @@ interface ResultsSortProps {
 
 export function ResultsSort({ sortBy, onChange }: ResultsSortProps) {
   return (
-    <FilterGroup label="Sort">
+    <FilterGroup label="Sort by">
       {SORT_OPTIONS.map(({ id, label, icon }) => (
         <FilterChip
           key={id}
