@@ -3,6 +3,7 @@
 import { Suspense } from "react";
 import { AppHeader } from "@/components/app-header";
 import {
+  appChromeStripClass,
   appHeaderGutterClass,
   appShellContentClass,
   appShellLayoutClass,
@@ -21,8 +22,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           <SidebarInset className="flex min-h-svh flex-col">
             <div
               className={cn(
+                appChromeStripClass,
                 appHeaderGutterClass,
-                "sticky top-0 z-50 w-full shrink-0 border-b",
+                "sticky top-0 z-50 w-full",
                 "bg-background/95 backdrop-blur-sm supports-backdrop-filter:bg-background/50",
               )}
             >

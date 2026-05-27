@@ -5,7 +5,7 @@ import { headerPillClass } from "@/lib/pressable";
 
 export function AppHeader() {
   return (
-    <header className="flex h-14 items-center justify-end gap-2">
+    <header className="flex w-full items-center justify-end gap-2">
       <a
         href="https://github.com/su6u/ejam#readme"
         target="_blank"
