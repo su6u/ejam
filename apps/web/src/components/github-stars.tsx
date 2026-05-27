@@ -1,11 +1,11 @@
 "use client";
 
 import { motion, useReducedMotion } from "motion/react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 
-const COUNTDOWN_DURATION = 2000;
+const COUNTDOWN_DURATION = 700;
 const STAR_REVEAL_TRANSITION = {
   type: "spring" as const,
   duration: 0.3,
@@ -48,26 +48,37 @@ export default function GitHubStars({
   className = "",
   countClassName = "",
 }: Readonly<GitHubStarsProps>) {
-  const [cachedCount] = useState<number | null>(() => readCachedCount());
-  const [starCount, setStarCount] = useState(
-    providedStarCount ?? cachedCount ?? 0,
+  const hasProvidedCount = providedStarCount !== undefined;
+
+  const [starCount, setStarCount] = useState(providedStarCount ?? 0);
+  const [displayCount, setDisplayCount] = useState(
+    hasProvidedCount ? (providedStarCount ?? 0) : 0,
   );
-  const [displayCount, setDisplayCount] = useState(0);
-  const [isLoading, setIsLoading] = useState(providedStarCount === undefined);
+  const [isLoading, setIsLoading] = useState(!hasProvidedCount);
   const [error, setError] = useState(false);
   const shouldReduceMotion = useReducedMotion();
   const rafIdRef = useRef<number | null>(null);
+  const hadCacheRef = useRef(false);
+
+  useLayoutEffect(() => {
+    if (hasProvidedCount) return;
+
+    const cached = readCachedCount();
+    if (cached === null) return;
+
+    hadCacheRef.current = true;
+    setStarCount(cached);
+    setIsLoading(false);
+  }, [hasProvidedCount]);
 
   useEffect(() => {
-    if (providedStarCount !== undefined) {
-      setStarCount(providedStarCount);
-      setIsLoading(false);
-      return;
-    }
+    if (hasProvidedCount) return;
 
     const fetchData = async () => {
       try {
-        setIsLoading(true);
+        if (!hadCacheRef.current) {
+          setIsLoading(true);
+        }
         setError(false);
         const res = await fetch(
           `https://api.github.com/repos/${owner}/${repo}`,
@@ -89,7 +100,7 @@ export default function GitHubStars({
     };
 
     fetchData();
-  }, [owner, repo, providedStarCount]);
+  }, [owner, repo, hasProvidedCount]);
 
   useEffect(() => {
     if (isLoading || starCount === 0 || shouldReduceMotion) {
@@ -110,7 +121,7 @@ export default function GitHubStars({
       const elapsed = performance.now() - startTime;
       const progress = Math.min(elapsed / COUNTDOWN_DURATION, 1);
       const eased = 1 - (1 - progress) ** 3;
-      const current = Math.floor(starCount * eased);
+      const current = Math.round(starCount * eased);
 
       setDisplayCount(current);
 
@@ -134,8 +145,7 @@ export default function GitHubStars({
 
   if (error && starCount === 0) return null;
 
-  const sizerCount = starCount || cachedCount || FALLBACK_SIZER;
-  const sizerLabel = `${sizerCount.toLocaleString()} stars`;
+  const sizerLabel = `${FALLBACK_SIZER.toLocaleString()} stars`;
 
   return (
     <span className={cn("relative inline-flex items-center", className)}>

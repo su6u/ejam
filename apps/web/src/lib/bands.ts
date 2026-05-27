@@ -1,12 +1,10 @@
 import type { ProbabilityBand } from "@ejam/data/college-predictor";
-import type { LucideIcon } from "lucide-react";
-import { Shield, Target, TrendingUp, Zap } from "lucide-react";
 
 export const BAND_STYLES: Record<
   ProbabilityBand,
   { label: string; color: string }
 > = {
-  safe: { label: "Safe", color: "#00D5BE" },
+  safe: { label: "Safe", color: "#00C951" },
   target: { label: "Target", color: "#52A2FF" },
   reach: { label: "Reach", color: "#FEB903" },
   "long-shot": { label: "Long-shot", color: "#FF6467" },
@@ -22,26 +20,9 @@ export const BAND_ORDER: Record<ProbabilityBand, number> = {
 export const BAND_FILTER_OPTIONS: Array<{
   id: ProbabilityBand;
   label: string;
-  icon: LucideIcon;
   color: string;
-}> = [
-  { id: "safe", label: "Safe", icon: Shield, color: BAND_STYLES.safe.color },
-  {
-    id: "target",
-    label: "Target",
-    icon: Target,
-    color: BAND_STYLES.target.color,
-  },
-  {
-    id: "reach",
-    label: "Reach",
-    icon: TrendingUp,
-    color: BAND_STYLES.reach.color,
-  },
-  {
-    id: "long-shot",
-    label: "Long-shot",
-    icon: Zap,
-    color: BAND_STYLES["long-shot"].color,
-  },
-];
+}> = (
+  Object.entries(BAND_STYLES) as Array<
+    [ProbabilityBand, (typeof BAND_STYLES)[ProbabilityBand]]
+  >
+).map(([id, { label, color }]) => ({ id, label, color }));

@@ -5,8 +5,8 @@ import type {
   ProgramPrediction,
 } from "@ejam/data/college-predictor";
 import { FilterChip, FilterGroup } from "@/components/predictor/filter-chips";
-import { Separator } from "@/components/ui/separator";
 import type { ExamType } from "@/hooks/use-predictor-state";
+import { isJeeMainCounselling } from "@/hooks/use-predictor-state";
 import { BAND_FILTER_OPTIONS } from "@/lib/bands";
 import { cn } from "@/lib/utils";
 
@@ -20,13 +20,13 @@ export const EMPTY_RESULTS_FILTERS: ResultsFilterState = {
   bands: new Set(),
 };
 
-const JEE_MAIN_INSTITUTE_ORDER = ["NIT", "IIIT", "GFTI", "IIEST"] as const;
+const JEE_MAIN_INSTITUTE_ORDER = ["NIT", "IIIT", "CFI"] as const;
 
 export function availableInstituteTypes(
   programs: ProgramPrediction[],
   exam: ExamType,
 ): string[] {
-  if (exam !== "jee-main") return [];
+  if (!isJeeMainCounselling(exam)) return [];
 
   const present = new Set(programs.map((p) => p.instype));
   return JEE_MAIN_INSTITUTE_ORDER.filter((type) => present.has(type));
@@ -70,7 +70,8 @@ export function ResultsFilters({
   enabled,
 }: ResultsFiltersProps) {
   const instituteTypes = availableInstituteTypes(programs, exam);
-  const showInstituteGroup = exam === "jee-main" && instituteTypes.length > 0;
+  const showInstituteGroup =
+    isJeeMainCounselling(exam) && instituteTypes.length > 0;
 
   function toggleInstitute(type: string) {
     const next = new Set(filters.instituteTypes);
@@ -103,11 +104,10 @@ export function ResultsFilters({
 
   const chanceGroup = (
     <FilterGroup label="Chance" vertical grid={2}>
-      {BAND_FILTER_OPTIONS.map(({ id, label, icon, color }) => (
+      {BAND_FILTER_OPTIONS.map(({ id, label, color }) => (
         <FilterChip
           key={id}
           label={label}
-          icon={icon}
           active={filters.bands.has(id)}
           disabled={!enabled}
           fullWidth
@@ -127,7 +127,6 @@ export function ResultsFilters({
       aria-disabled={!enabled}
     >
       {instituteGroup}
-      {showInstituteGroup ? <Separator /> : null}
       {chanceGroup}
     </div>
   );

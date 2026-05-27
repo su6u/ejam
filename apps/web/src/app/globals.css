@@ -44,6 +44,14 @@
   --z-modal: 400;
   --z-toast: 500;
   --z-tooltip: 600;
+
+  /* Sheet / drawer — iOS open curve, snappy close (Emil asymmetric timing) */
+  --sheet-open-dur: 380ms;
+  --sheet-close-dur: 260ms;
+  --sheet-ease-open: cubic-bezier(0.32, 0.72, 0, 1);
+  --sheet-ease-close: cubic-bezier(0.23, 1, 0.32, 1);
+  --sheet-backdrop-open-dur: 380ms;
+  --sheet-backdrop-close-dur: 220ms;
 }
 
 .dark {
@@ -237,6 +245,278 @@ input {
 
     .pressable:active:not(:disabled) {
       scale: 1;
+    }
+  }
+
+  /* Sheet overlay — blur stays constant; scrim fades so blur never repaints */
+  .sheet-overlay {
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+  }
+
+  @supports not (backdrop-filter: blur(1px)) {
+    .sheet-overlay {
+      background: rgb(0 0 0 / 0.45);
+    }
+  }
+
+  .sheet-overlay::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgb(0 0 0 / 0.2);
+    opacity: 1;
+    transition: opacity var(--sheet-backdrop-open-dur) var(--sheet-ease-open);
+  }
+
+  .sheet-overlay[data-starting-style]::before {
+    opacity: 0;
+  }
+
+  .sheet-overlay[data-ending-style]::before {
+    opacity: 0;
+    transition-duration: var(--sheet-backdrop-close-dur);
+    transition-timing-function: var(--sheet-ease-close);
+  }
+
+  .sheet-popup {
+    backface-visibility: hidden;
+    will-change: transform;
+    transition: transform var(--sheet-open-dur) var(--sheet-ease-open);
+    box-shadow:
+      0 0 0 1px rgb(255 255 255 / 0.06),
+      -10px 0 32px rgb(0 0 0 / 0.14),
+      -28px 0 56px rgb(0 0 0 / 0.08);
+  }
+
+  .sheet-popup[data-side="right"] {
+    transform-origin: right center;
+  }
+
+  .sheet-popup[data-side="left"] {
+    transform-origin: left center;
+  }
+
+  .sheet-popup[data-side="bottom"] {
+    transform-origin: bottom center;
+  }
+
+  .sheet-popup[data-side="top"] {
+    transform-origin: top center;
+  }
+
+  .sheet-popup[data-ending-style] {
+    transition: transform var(--sheet-close-dur) var(--sheet-ease-close);
+  }
+
+  /* 40×40 hit area — visible control can stay smaller */
+  .sheet-close-hit {
+    position: relative;
+  }
+
+  .sheet-close-hit::after {
+    content: "";
+    position: absolute;
+    inset: -6px;
+  }
+
+  /* Stagger content enter — semantic sections, 50ms apart */
+  @keyframes sheet-section-in {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .sheet-body > * {
+    opacity: 0;
+    animation: sheet-section-in 280ms var(--sheet-ease-open) forwards;
+  }
+
+  .sheet-body > *:nth-child(1) {
+    animation-delay: 50ms;
+  }
+
+  .sheet-body > *:nth-child(2) {
+    animation-delay: 100ms;
+  }
+
+  .sheet-body > *:nth-child(3) {
+    animation-delay: 150ms;
+  }
+
+  .sheet-body > *:nth-child(4) {
+    animation-delay: 200ms;
+  }
+
+  .sheet-body > *:nth-child(5) {
+    animation-delay: 250ms;
+  }
+
+  .sheet-body > *:nth-child(6) {
+    animation-delay: 300ms;
+  }
+
+  /* Round probability mini-bars — equalizer sparkline in results table */
+  .t-round-bars {
+    --round-bar-ease: cubic-bezier(0.23, 1, 0.32, 1);
+    --round-bar-dur: 200ms;
+    --round-bar-stagger: 35ms;
+    --round-chance-swap-dur: 180ms;
+    --round-chance-swap-y: 4px;
+    --round-chance-swap-blur: 2px;
+  }
+
+  /* Extend hover hit area upward without shifting row alignment */
+  .t-round-bars-track {
+    cursor: pointer;
+    padding-top: 1rem;
+    margin-top: -1rem;
+  }
+
+  .t-round-bar-hit {
+    position: relative;
+    display: flex;
+    width: 3px;
+    height: 0.75rem;
+    flex-shrink: 0;
+    align-items: flex-end;
+    justify-content: center;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    cursor: inherit;
+    outline: none;
+  }
+
+  .t-round-bar-hit:focus-visible .t-round-bar {
+    outline: 2px solid var(--ring);
+    outline-offset: 1px;
+  }
+
+  .t-round-chance {
+    animation: round-chance-swap var(--round-chance-swap-dur)
+      var(--round-bar-ease) backwards;
+  }
+
+  @keyframes round-chance-swap {
+    from {
+      opacity: 0;
+      transform: translateY(var(--round-chance-swap-y));
+      filter: blur(var(--round-chance-swap-blur));
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+      filter: blur(0);
+    }
+  }
+
+  @keyframes round-bar-rise {
+    from {
+      opacity: 0;
+      transform: scaleY(0.12);
+    }
+
+    to {
+      opacity: 0.92;
+      transform: scaleY(var(--bar-scale, 1));
+    }
+  }
+
+  .t-round-bar {
+    transform: scaleY(var(--bar-scale, 1));
+    transform-origin: bottom center;
+    opacity: 0.92;
+    animation: round-bar-rise 240ms var(--round-bar-ease) backwards;
+    transition: transform var(--round-bar-dur) var(--round-bar-ease);
+  }
+
+  .t-round-bar-hit:nth-child(1) .t-round-bar {
+    animation-delay: 0ms;
+  }
+  .t-round-bar-hit:nth-child(2) .t-round-bar {
+    animation-delay: calc(var(--round-bar-stagger) * 1);
+  }
+  .t-round-bar-hit:nth-child(3) .t-round-bar {
+    animation-delay: calc(var(--round-bar-stagger) * 2);
+  }
+  .t-round-bar-hit:nth-child(4) .t-round-bar {
+    animation-delay: calc(var(--round-bar-stagger) * 3);
+  }
+  .t-round-bar-hit:nth-child(5) .t-round-bar {
+    animation-delay: calc(var(--round-bar-stagger) * 4);
+  }
+  .t-round-bar-hit:nth-child(6) .t-round-bar {
+    animation-delay: calc(var(--round-bar-stagger) * 5);
+  }
+
+  .t-round-bar[data-fill-round] {
+    opacity: 1;
+    box-shadow: 0 0 0 1px rgb(255 255 255 / 0.18);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .t-round-bars[data-hovering] .t-round-bar {
+      opacity: 0.45;
+    }
+
+    .t-round-bar-hit[data-active] .t-round-bar,
+    .t-round-bar-hit:focus-visible .t-round-bar {
+      opacity: 1;
+      transform: scaleY(calc(var(--bar-scale, 1) * 1.1));
+    }
+
+    .t-round-bar-hit[data-active] .t-round-bar[data-fill-round],
+    .t-round-bar-hit:focus-visible .t-round-bar[data-fill-round] {
+      box-shadow: 0 0 0 1px rgb(255 255 255 / 0.35);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .t-round-bar {
+      animation: none !important;
+      transition: transform 150ms ease !important;
+    }
+
+    .t-round-chance {
+      animation: none !important;
+    }
+
+    @media (hover: hover) and (pointer: fine) {
+      .t-round-bars[data-hovering] .t-round-bar,
+      .t-round-bar-hit[data-active] .t-round-bar,
+      .t-round-bar-hit:focus-visible .t-round-bar {
+        transform: scaleY(var(--bar-scale, 1)) !important;
+        opacity: 0.92 !important;
+      }
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .sheet-overlay::before {
+      transition: opacity 150ms ease !important;
+    }
+
+    .sheet-popup {
+      transition: none !important;
+    }
+
+    .sheet-popup[data-starting-style],
+    .sheet-popup[data-ending-style] {
+      transform: none !important;
+    }
+
+    .sheet-body > * {
+      animation: none !important;
+      opacity: 1 !important;
+      transform: none !important;
     }
   }
 }

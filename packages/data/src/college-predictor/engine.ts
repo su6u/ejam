@@ -56,6 +56,7 @@ export interface ProgramPrediction {
   weighted_mean: number;
   predicted_closing_rank: number;
   sigma_effective: number;
+  /** Mean cumulative chance across rounds 1..fill_round — drives band and display */
   cumulative_probability: number;
   band: ProbabilityBand;
   data_quality: "sufficient" | "inferred" | "pooled";
@@ -63,6 +64,8 @@ export interface ProgramPrediction {
   last_data_year: number;
   fill_round: number;
   round_probs: number[];
+  /** NIRF rank when known — used to recompute balanced scores on filtered subsets */
+  nirf_rank?: number | null;
   /** 0–100 institute quality for balanced ranking */
   institute_score?: number;
   /** 0–100 branch desirability for balanced ranking */
@@ -209,6 +212,41 @@ export function groupProgramsByBand(
   };
 }
 
+/** Highest average round chance first; closing rank breaks ties. */
+export function sortByChance(
+  programs: ProgramPrediction[],
+): ProgramPrediction[] {
+  return [...programs].sort((a, b) => {
+    const probDiff = b.cumulative_probability - a.cumulative_probability;
+    if (probDiff !== 0) return probDiff;
+    return compareClosingRank(a, b);
+  });
+}
+
+/** Most competitive programs first (lower predicted closing rank is better). */
+export function sortByClosingRank(
+  programs: ProgramPrediction[],
+): ProgramPrediction[] {
+  return [...programs].sort(compareClosingRank);
+}
+
+function compareClosingRank(
+  a: ProgramPrediction,
+  b: ProgramPrediction,
+): number {
+  const rankDiff = a.predicted_closing_rank - b.predicted_closing_rank;
+  if (rankDiff !== 0) return rankDiff;
+  const instituteDiff = a.institute_id.localeCompare(b.institute_id);
+  if (instituteDiff !== 0) return instituteDiff;
+  const programDiff = a.program_id.localeCompare(b.program_id);
+  if (programDiff !== 0) return programDiff;
+  const seatDiff = a.seat_type.localeCompare(b.seat_type);
+  if (seatDiff !== 0) return seatDiff;
+  const quotaDiff = a.quota.localeCompare(b.quota);
+  if (quotaDiff !== 0) return quotaDiff;
+  return a.gender.localeCompare(b.gender);
+}
+
 function getRoundMeans(row: CollegePredictorIndexRow): (number | null)[] {
   return [
     row.round1_mean,
@@ -255,6 +293,18 @@ export function computeRoundProbs(
   return result;
 }
 
+/** Mean cumulative chance across counselling rounds 1..fill_round (excludes frozen tail). */
+export function computeAverageRoundProbability(
+  roundProbs: number[],
+  fillRound: number,
+): number {
+  const activeRoundCount = Math.min(Math.max(fillRound, 1), roundProbs.length);
+  const activeProbs = roundProbs.slice(0, activeRoundCount);
+  if (activeProbs.length === 0) return 0;
+  const sum = activeProbs.reduce((acc, prob) => acc + prob, 0);
+  return Math.round((sum / activeProbs.length) * 10000) / 10000;
+}
+
 // index parquet uses JoSAA label "EWS"; callers may still send taxonomy alias "Gen-EWS"
 function normalizeSeatTypeForIndex(seatType: string): string {
   return seatType === "Gen-EWS" ? "EWS" : seatType;
@@ -286,7 +336,10 @@ export function predictPrograms(opts: {
 
   for (const row of filtered) {
     const roundProbs = computeRoundProbs(opts.studentRank, row);
-    const probability = roundProbs.at(-1) ?? 0;
+    const probability = computeAverageRoundProbability(
+      roundProbs,
+      row.fill_round,
+    );
 
     allPredictions.push({
       institute_id: row.institute_id,
@@ -326,7 +379,7 @@ export function predictPrograms(opts: {
   // band first, then ascending predicted_closing_rank as a competitiveness proxy
   predictions.sort((a, b) => {
     if (a.band !== b.band) return BAND_ORDER[a.band] - BAND_ORDER[b.band];
-    return a.predicted_closing_rank - b.predicted_closing_rank;
+    return compareClosingRank(a, b);
   });
 
   return {

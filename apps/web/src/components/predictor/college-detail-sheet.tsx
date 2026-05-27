@@ -6,9 +6,21 @@
 "use client";
 
 import type { ProgramPrediction } from "@ejam/data/college-predictor";
-import { CartesianGrid, Line, LineChart, XAxis, YAxis } from "recharts";
+import { XIcon } from "lucide-react";
 import { DashboardCard } from "@/components/dashboard-card";
+import {
+  ActiveDot,
+  Area,
+  Dot,
+  EvilAreaChart,
+  Grid,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "@/components/evilcharts/charts/area-chart";
+import type { ChartConfig } from "@/components/evilcharts/ui/chart";
 import { formatInteger } from "@/components/formatter";
+import { Button } from "@/components/ui/button";
 import {
   CardContent,
   CardDescription,
@@ -16,13 +28,8 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import {
-  type ChartConfig,
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
-} from "@/components/ui/chart";
-import {
   Sheet,
+  SheetClose,
   SheetContent,
   SheetDescription,
   SheetHeader,
@@ -46,9 +53,15 @@ export function CollegeDetailSheet({
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent
         side="right"
-        className="no-scrollbar w-full overflow-y-auto bg-background p-0 text-foreground sm:max-w-xl"
+        showCloseButton={false}
+        className="w-full bg-background p-0 text-foreground sm:max-w-xl"
       >
-        {program ? <DetailBody program={program} /> : null}
+        {program ? (
+          <DetailBody
+            key={`${program.institute_id}-${program.program_id}`}
+            program={program}
+          />
+        ) : null}
       </SheetContent>
     </Sheet>
   );
@@ -56,11 +69,25 @@ export function CollegeDetailSheet({
 
 function DetailBody({ program }: { program: ProgramPrediction }) {
   return (
-    <>
+    <div className="sheet-body">
       <SheetHeader className="border-b border-border p-4 pb-3">
-        <div className="flex items-start gap-2">
-          <InstituteTypeBadge type={program.instype} />
-          <BandBadge band={program.band} />
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex min-w-0 flex-wrap items-center gap-2">
+            <InstituteTypeBadge type={program.instype} />
+            <BandBadge band={program.band} />
+          </div>
+          <SheetClose
+            render={
+              <Button
+                variant="ghost"
+                className="sheet-close-hit shrink-0 rounded-none"
+                size="icon-sm"
+              />
+            }
+          >
+            <XIcon />
+            <span className="sr-only">Close</span>
+          </SheetClose>
         </div>
         <SheetTitle className="mt-1.5 leading-tight">
           {program.institute_id}
@@ -68,7 +95,7 @@ function DetailBody({ program }: { program: ProgramPrediction }) {
         <SheetDescription className="leading-relaxed">
           {program.program_name ?? program.program_id}
           {program.degree ? (
-            <span className="ml-1.5 text-[11px] uppercase tracking-[0.05em] text-muted-foreground/80">
+            <span className="ml-1.5 text-[11px] uppercase tracking-[0.05em] text-muted-foreground/80 tabular-nums">
               {program.degree} · {program.duration_years}y
             </span>
           ) : null}
@@ -141,7 +168,7 @@ function DetailBody({ program }: { program: ProgramPrediction }) {
         actual round cutoffs can drift with seat-matrix changes, demand shifts,
         and counselling rule updates each year.
       </section>
-    </>
+    </div>
   );
 }
 
@@ -157,11 +184,11 @@ function ProgramMetricCard({
   return (
     <DashboardCard className="gap-2 border-0 bg-background px-4 py-3" size="sm">
       <CardHeader className="px-0">
-        <CardTitle className="text-[10px] font-medium uppercase tracking-[0.08em] text-muted-foreground">
+        <CardTitle className="min-h-[2lh] text-[10px] font-medium uppercase tracking-[0.08em] text-muted-foreground">
           {label}
         </CardTitle>
       </CardHeader>
-      <CardContent className="px-0">
+      <CardContent className="mt-auto px-0">
         <div className="text-lg font-semibold tabular-nums text-foreground">
           {value}
         </div>
@@ -176,7 +203,10 @@ function ProgramMetricCard({
 const roundChartConfig = {
   chance: {
     label: "Chance",
-    color: "var(--chart-2)",
+    colors: {
+      light: ["#525252"],
+      dark: ["#d4d4d4"],
+    },
   },
 } satisfies ChartConfig;
 
@@ -194,45 +224,25 @@ function RoundProbabilityChart({ program }: { program: ProgramPrediction }) {
         </h3>
         <p className="text-[11px] text-muted-foreground/80">
           Cumulative chance the seat closes at or after your rank by round{" "}
-          {program.fill_round}.
+          <span className="tabular-nums">{program.fill_round}</span>.
         </p>
       </div>
-      <ChartContainer
+      <EvilAreaChart
         className="mt-4 aspect-auto h-44 w-full"
         config={roundChartConfig}
+        curveType="step"
+        data={rows}
+        chartProps={{ margin: { left: 8, right: 8, top: 12, bottom: 0 } }}
       >
-        <LineChart
-          accessibilityLayer
-          data={rows}
-          margin={{ left: 8, right: 8, top: 12, bottom: 0 }}
-        >
-          <CartesianGrid className="stroke-border" vertical={false} />
-          <XAxis
-            axisLine={false}
-            dataKey="round"
-            interval={0}
-            tickLine={false}
-            tickMargin={8}
-          />
-          <YAxis domain={[0, 100]} hide />
-          <ChartTooltip
-            content={
-              <ChartTooltipContent
-                hideLabel
-                formatter={(value) => `${value}%`}
-              />
-            }
-            cursor={false}
-          />
-          <Line
-            dataKey="chance"
-            dot={{ r: 3 }}
-            stroke="var(--color-chance)"
-            strokeWidth={2}
-            type="monotone"
-          />
-        </LineChart>
-      </ChartContainer>
+        <Grid />
+        <XAxis dataKey="round" interval={0} />
+        <YAxis domain={[0, 100]} hide />
+        <Tooltip cursor={false} valueFormatter={(value) => `${value}%`} />
+        <Area dataKey="chance" variant="gradient">
+          <Dot variant="default" />
+          <ActiveDot variant="default" />
+        </Area>
+      </EvilAreaChart>
     </section>
   );
 }

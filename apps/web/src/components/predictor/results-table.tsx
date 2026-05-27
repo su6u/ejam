@@ -16,6 +16,7 @@ import {
   ResultsSort,
   type ResultsSortKey,
 } from "@/components/predictor/results-sort";
+import { RoundProbabilityBars } from "@/components/predictor/round-probability-bars";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -95,7 +96,7 @@ export function ResultsTable({
                       type="button"
                       variant="outline"
                       size="sm"
-                      className="rounded-none"
+                      className="rounded-none border-border bg-transparent text-muted-foreground shadow-none hover:bg-transparent hover:text-foreground dark:bg-transparent dark:hover:bg-transparent"
                       onClick={onClearFilters}
                     >
                       Clear filters
@@ -135,7 +136,12 @@ export function ResultsTable({
                     <BandBadge band={row.band} />
                   </TableCell>
                   <TableCell>
-                    <ProbabilityBar value={row.cumulative_probability} />
+                    <RoundProbabilityBars
+                      key={sortBy}
+                      roundProbs={row.round_probs}
+                      overallProbability={row.cumulative_probability}
+                      fillRound={row.fill_round}
+                    />
                   </TableCell>
                   <TableCell className="w-0 pe-6 whitespace-nowrap tabular-nums">
                     {formatInteger(row.predicted_closing_rank)}
@@ -187,23 +193,6 @@ export function BandBadge({ band }: { band: ProgramPrediction["band"] }) {
     >
       {label}
     </span>
-  );
-}
-
-function ProbabilityBar({ value }: { value: number }) {
-  const pct = Math.min(1, Math.max(0, value));
-  return (
-    <div className="flex items-center gap-2">
-      <div className="relative h-1 w-20 overflow-hidden rounded-full bg-muted">
-        <div
-          className="absolute inset-y-0 left-0 rounded-full bg-foreground/80 transition-[width] duration-300 ease-out"
-          style={{ width: `${pct * 100}%` }}
-        />
-      </div>
-      <span className="w-10 text-right text-xs tabular-nums text-muted-foreground">
-        {Math.round(pct * 100)}%
-      </span>
-    </div>
   );
 }
 
