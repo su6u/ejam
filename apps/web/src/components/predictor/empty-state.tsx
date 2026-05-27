@@ -104,16 +104,10 @@ export function LoadingState({
 }) {
   return (
     <ResultsCardShell footer={<DataVersionFooter provenance={provenance} />}>
-      <Empty>
-        <EmptyHeader>
-          <EmptyMedia className="mb-0 bg-transparent">
-            <LoadingAnimation className="size-8" />
-          </EmptyMedia>
-          <EmptyTitle>Generating predictions…</EmptyTitle>
-          <EmptyDescription>
-            Crunching cutoffs against your inputs.
-          </EmptyDescription>
-        </EmptyHeader>
+      <Empty role="status" aria-label="Loading">
+        <EmptyMedia className="mb-0 bg-transparent">
+          <LoadingAnimation className="size-8" />
+        </EmptyMedia>
       </Empty>
     </ResultsCardShell>
   );
