@@ -218,10 +218,10 @@ export function usePredictorQuery({
         setError(message);
         return false;
       } finally {
-        if (predictInFlightInputKeyRef.current === inputKey) {
-          predictInFlightInputKeyRef.current = null;
-        }
         if (isCurrent()) {
+          if (predictInFlightInputKeyRef.current === inputKey) {
+            predictInFlightInputKeyRef.current = null;
+          }
           setIsLoading(false);
           abortControllerRef.current = null;
         }
