@@ -35,11 +35,11 @@ export function AppSidebar() {
                   <Image
                     src="/brand/logo.svg"
                     alt=""
-                    width={118}
-                    height={89}
+                    width={116}
+                    height={92}
                     priority
                     aria-hidden
-                    className="size-6 shrink-0"
+                    className="h-6 w-auto shrink-0"
                   />
                 </a>
               }
