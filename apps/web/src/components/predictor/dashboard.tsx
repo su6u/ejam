@@ -50,7 +50,6 @@ export function Dashboard() {
     filteredPrograms,
     sortBy,
     onSortChange: setSortBy,
-    hasRank: Boolean(state.rank),
     selectedId,
     provenance: query.provenance,
     onSelect: (p) => {
@@ -87,7 +86,6 @@ function renderMiddle({
   filteredPrograms,
   sortBy,
   onSortChange,
-  hasRank,
   selectedId,
   provenance,
   onSelect,
@@ -101,7 +99,6 @@ function renderMiddle({
   filteredPrograms: ProgramPrediction[];
   sortBy: ResultsSortKey;
   onSortChange: (next: ResultsSortKey) => void;
-  hasRank: boolean;
   selectedId: string | null;
   provenance: import("@ejam/data").PredictionProvenance | null;
   onSelect: (p: ProgramPrediction) => void;
@@ -111,11 +108,7 @@ function renderMiddle({
   if (!hasResults) {
     if (isLoading) return <LoadingState provenance={provenance} />;
     return (
-      <EmptyState
-        hasRank={hasRank}
-        hasPredicted={hasPredicted}
-        provenance={provenance}
-      />
+      <EmptyState hasPredicted={hasPredicted} provenance={provenance} />
     );
   }
 

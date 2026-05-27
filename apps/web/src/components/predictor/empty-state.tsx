@@ -1,7 +1,6 @@
 "use client";
 
 import type { PredictionProvenance } from "@ejam/data";
-import { CircleAlert } from "lucide-react";
 import { useReducedMotion } from "motion/react";
 import { LoadingAnimation } from "@/components/loading-animation";
 import { DataVersionFooter } from "@/components/predictor/data-version-footer";
@@ -12,10 +11,9 @@ import {
   EmptyDescription,
   EmptyHeader,
   EmptyMedia,
-  EmptyTitle,
 } from "@/components/ui/empty";
 
-function EmptyIllustration() {
+function StateIllustration({ src }: { src: string }) {
   const shouldReduceMotion = useReducedMotion();
 
   return (
@@ -28,34 +26,23 @@ function EmptyIllustration() {
         aria-hidden
         className="h-auto w-full object-contain"
       >
-        <source src="/media/eye.webm" type="video/webm" />
+        <source src={src} type="video/webm" />
       </video>
     </EmptyMedia>
   );
 }
 
-function emptyDescription({
-  hasRank,
-  hasPredicted,
-}: {
-  hasRank: boolean;
-  hasPredicted: boolean;
-}): string {
+function emptyDescription({ hasPredicted }: { hasPredicted: boolean }): string {
   if (hasPredicted) {
     return "No colleges at reach or better for this rank — try a lower rank or use include-all";
   }
-  if (hasRank) {
-    return "Hit Predict on the left to see the colleges and programs ranked by chance, strongest options first within each band.";
-  }
-  return "Enter your rank and pick a category on the left, then run a prediction to see colleges ranked by your admission chance.";
+  return "Pick an exam, enter your rank, then run a prediction to see colleges ranked by your admission chance.";
 }
 
 export function EmptyState({
-  hasRank,
   hasPredicted = false,
   provenance,
 }: {
-  hasRank: boolean;
   hasPredicted?: boolean;
   provenance?: PredictionProvenance | null;
 }) {
@@ -66,9 +53,9 @@ export function EmptyState({
     >
       <Empty>
         <EmptyHeader>
-          <EmptyIllustration />
+          <StateIllustration src="/media/empty.webm" />
           <EmptyDescription>
-            {emptyDescription({ hasRank, hasPredicted })}
+            {emptyDescription({ hasPredicted })}
           </EmptyDescription>
         </EmptyHeader>
         <EmptyContent />
@@ -89,15 +76,16 @@ export function ErrorState({
       description={null}
       footer={<DataVersionFooter provenance={provenance} />}
     >
-      <Empty>
-        <EmptyHeader>
-          <EmptyMedia variant="icon">
-            <CircleAlert aria-hidden="true" />
-          </EmptyMedia>
-          <EmptyTitle>Prediction failed</EmptyTitle>
-          <EmptyDescription>{message}</EmptyDescription>
+      <Empty className="min-h-0">
+        <EmptyHeader className="my-auto">
+          <StateIllustration src="/media/404.webm" />
+          <EmptyDescription>
+            <span className="mb-1 block font-heading text-sm font-medium tracking-tight text-foreground">
+              Prediction failed
+            </span>
+            {message}
+          </EmptyDescription>
         </EmptyHeader>
-        <EmptyContent />
       </Empty>
     </ResultsCardShell>
   );
