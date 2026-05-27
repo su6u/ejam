@@ -8,18 +8,23 @@ import {
 } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 
+const RESULTS_DESCRIPTION =
+  "Programs matched to your rank, have fun exploring!";
+
 export function ResultsCardShell({
   children,
   headerExtra,
   toolbar,
   footer,
   contentClassName,
+  description = RESULTS_DESCRIPTION,
 }: {
   children: React.ReactNode;
   headerExtra?: React.ReactNode;
   toolbar?: React.ReactNode;
   footer?: React.ReactNode;
   contentClassName?: string;
+  description?: string | null;
 }) {
   return (
     <DashboardCard
@@ -35,9 +40,9 @@ export function ResultsCardShell({
         <div className="flex flex-row items-end justify-between gap-4">
           <div className="flex min-w-0 flex-col gap-1">
             <CardTitle>Prediction results</CardTitle>
-            <CardDescription>
-              Ranked by chance, strongest programs first within each band.
-            </CardDescription>
+            {description ? (
+              <CardDescription>{description}</CardDescription>
+            ) : null}
           </div>
           {headerExtra}
         </div>

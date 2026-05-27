@@ -60,7 +60,10 @@ export function EmptyState({
   provenance?: PredictionProvenance | null;
 }) {
   return (
-    <ResultsCardShell footer={<DataVersionFooter provenance={provenance} />}>
+    <ResultsCardShell
+      description={null}
+      footer={<DataVersionFooter provenance={provenance} />}
+    >
       <Empty>
         <EmptyHeader>
           <EmptyIllustration />
@@ -82,7 +85,10 @@ export function ErrorState({
   provenance?: PredictionProvenance | null;
 }) {
   return (
-    <ResultsCardShell footer={<DataVersionFooter provenance={provenance} />}>
+    <ResultsCardShell
+      description={null}
+      footer={<DataVersionFooter provenance={provenance} />}
+    >
       <Empty>
         <EmptyHeader>
           <EmptyMedia variant="icon">
@@ -103,7 +109,10 @@ export function LoadingState({
   provenance?: PredictionProvenance | null;
 }) {
   return (
-    <ResultsCardShell footer={<DataVersionFooter provenance={provenance} />}>
+    <ResultsCardShell
+      description={null}
+      footer={<DataVersionFooter provenance={provenance} />}
+    >
       <Empty role="status" aria-label="Loading">
         <EmptyMedia className="mb-0 bg-transparent">
           <LoadingAnimation className="size-8" />
