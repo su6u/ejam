@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { type ReactNode, Suspense } from "react";
-import { sidebarPanelTopInsetClass } from "@/components/app-layout";
+import { sidebarPanelTopInsetClass, predictorHeaderStripClass } from "@/components/app-layout";
 import { HomeStateCombobox } from "@/components/predictor/home-state-combobox";
 import { usePredictor } from "@/components/predictor/predictor-context";
 import { ProximityPicker } from "@/components/predictor/proximity-picker";
@@ -26,37 +26,20 @@ import { cn } from "@/lib/utils";
 const sidebarControlClass =
   "bg-transparent shadow-none dark:bg-transparent dark:hover:bg-transparent";
 
-type ExamPickerId = ExamType | "bitsat" | "met";
-
 const EXAM_OPTIONS: Array<{
-  id: ExamPickerId;
+  id: ExamType;
   label: string;
   logo: string;
-  enabled: boolean;
 }> = [
   {
     id: "jee-main",
     label: "JEE Main",
     logo: "/assets/exam/jee_main.svg",
-    enabled: true,
   },
   {
     id: "jee-advanced",
     label: "JEE Advanced",
     logo: "/assets/exam/jee_adv.svg",
-    enabled: true,
-  },
-  {
-    id: "bitsat",
-    label: "BITSAT",
-    logo: "/assets/exam/bitsat.webp",
-    enabled: false,
-  },
-  {
-    id: "met",
-    label: "MET",
-    logo: "/assets/exam/met.svg",
-    enabled: false,
   },
 ];
 
@@ -121,35 +104,27 @@ function PredictorSidebarPanelInner() {
           )}
         >
           {EXAM_OPTIONS.map((exam) => {
-            const isActive = exam.enabled && state.exam === exam.id;
+            const isActive = state.exam === exam.id;
 
             return (
               <Tooltip key={exam.id}>
                 <TooltipTrigger
-                  disabled={!exam.enabled}
                   render={
                     <button
                       type="button"
                       aria-label={exam.label}
                       aria-pressed={isActive}
-                      disabled={!exam.enabled}
                       onClick={() => {
-                        if (exam.enabled) {
-                          deferAfterPress(() =>
-                            state.setExam(exam.id as ExamType),
-                          );
-                        }
+                        deferAfterPress(() => state.setExam(exam.id));
                       }}
                       className={cn(
-                        "flex h-12 w-full items-center justify-center rounded-none border bg-transparent outline-none",
+                        "flex w-full items-center justify-center rounded-none border bg-transparent outline-none",
+                        predictorHeaderStripClass,
                         pressableClass,
                         "focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50",
                         isActive && "border-foreground/40",
-                        exam.enabled &&
-                          !isActive &&
+                        !isActive &&
                           "group/exam border-border/70 hover:border-border",
-                        !exam.enabled &&
-                          "cursor-not-allowed border-border opacity-40 grayscale",
                       )}
                     />
                   }
@@ -162,8 +137,7 @@ function PredictorSidebarPanelInner() {
                     aria-hidden
                     className={cn(
                       "size-9 shrink-0 object-contain transition-opacity",
-                      exam.enabled &&
-                        !isActive &&
+                      !isActive &&
                         "opacity-55 group-hover/exam:opacity-80",
                       isActive && "opacity-100",
                     )}
@@ -176,7 +150,6 @@ function PredictorSidebarPanelInner() {
                   className="rounded-none"
                 >
                   {exam.label}
-                  {!exam.enabled ? " (coming soon)" : null}
                 </TooltipContent>
               </Tooltip>
             );

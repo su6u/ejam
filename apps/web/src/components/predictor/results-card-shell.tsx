@@ -1,5 +1,6 @@
 import { DashboardCard } from "@/components/dashboard-card";
 import { DecorIcon } from "@/components/decor-icon";
+import { predictorHeaderStripClass } from "@/components/app-layout";
 import {
   CardContent,
   CardDescription,
@@ -34,10 +35,15 @@ export function ResultsCardShell({
       <DecorIcon position="top-right" />
       <DecorIcon position="bottom-left" />
       <DecorIcon position="bottom-right" />
-      <CardHeader className="relative shrink-0 overflow-visible rounded-none border-b px-4 pt-4 pb-4">
+      <CardHeader
+        className={cn(
+          "relative shrink-0 overflow-visible rounded-none border-b px-4 pt-4 pb-4",
+          predictorHeaderStripClass,
+        )}
+      >
         <DecorIcon position="bottom-left" />
         <DecorIcon position="bottom-right" />
-        <div className="flex flex-row items-end justify-between gap-4">
+        <div className="flex flex-row items-center justify-between gap-4">
           <div className="flex min-w-0 flex-col gap-1">
             <CardTitle>Prediction results</CardTitle>
             {description ? (
