@@ -2,10 +2,8 @@
 
 import type { ProgramPrediction } from "@ejam/data/college-predictor";
 import { SlidersHorizontal } from "lucide-react";
-import {
-  type ResultsFilterState,
-  ResultsFilters,
-} from "@/components/predictor/results-filters";
+import type { ResultsFilterState } from "@/components/predictor/results-filter-logic";
+import { ResultsFilters } from "@/components/predictor/results-filters";
 import type { ExamType } from "@/hooks/use-predictor-state";
 
 interface SidebarFilterSectionProps {

@@ -71,7 +71,7 @@ describe("balanced ranking", () => {
   it("neutralizes branch score when branch filter is active", () => {
     const instituteMeta = new Map([["nit-a", { nirf_rank: 20 }]]);
 
-    const cse = applyBalancedRanking(
+    const cseResult = applyBalancedRanking(
       [
         makeProgram({
           institute_id: "nit-a",
@@ -80,8 +80,8 @@ describe("balanced ranking", () => {
         }),
       ],
       { instituteMeta, branchFilterActive: true },
-    )[0]!;
-    const civil = applyBalancedRanking(
+    )[0];
+    const civilResult = applyBalancedRanking(
       [
         makeProgram({
           institute_id: "nit-a",
@@ -90,9 +90,13 @@ describe("balanced ranking", () => {
         }),
       ],
       { instituteMeta, branchFilterActive: true },
-    )[0]!;
+    )[0];
 
-    expect(cse.balanced_score).toBe(civil.balanced_score);
+    expect(cseResult).toBeDefined();
+    expect(civilResult).toBeDefined();
+    if (!cseResult || !civilResult) return;
+
+    expect(cseResult.balanced_score).toBe(civilResult.balanced_score);
   });
 
   it("scores branches with fixed global order", () => {

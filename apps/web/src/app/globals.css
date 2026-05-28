@@ -45,6 +45,9 @@
   --z-toast: 500;
   --z-tooltip: 600;
 
+  --selection: rgb(0 0 0 / 0.12);
+  --selection-foreground: var(--foreground);
+
   /* Sheet / drawer — iOS open curve, snappy close (Emil asymmetric timing) */
   --sheet-open-dur: 380ms;
   --sheet-close-dur: 260ms;
@@ -86,6 +89,9 @@
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
+
+  --selection: rgb(255 255 255 / 0.14);
+  --selection-foreground: var(--foreground);
 }
 
 @theme inline {
@@ -177,6 +183,16 @@ input {
   }
   html {
     @apply font-sans;
+  }
+
+  ::selection {
+    background-color: var(--selection);
+    color: var(--selection-foreground);
+  }
+
+  ::-moz-selection {
+    background-color: var(--selection);
+    color: var(--selection-foreground);
   }
 
   /* Chrome autofill (#E9F0FE) — transparent inputs inherit the sidebar canvas */
@@ -517,6 +533,28 @@ input {
       animation: none !important;
       opacity: 1 !important;
       transform: none !important;
+    }
+  }
+
+  /* Home folders — stagger enter on first paint */
+  .home-folder-item {
+    opacity: 0;
+    transform: translateY(8px);
+    animation: home-folder-enter 420ms cubic-bezier(0.23, 1, 0.32, 1) forwards;
+  }
+
+  @keyframes home-folder-enter {
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .home-folder-item {
+      animation: none;
+      opacity: 1;
+      transform: none;
     }
   }
 }

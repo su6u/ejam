@@ -157,12 +157,18 @@ export function useProximityHover<T extends HTMLElement>(
   }, []);
 
   useEffect(() => {
+    const rafIdRefBox = rafIdRef;
+    const remeasureRafIdRefBox = remeasureRafIdRef;
     return () => {
-      if (rafIdRef.current !== null) {
-        cancelAnimationFrame(rafIdRef.current);
+      const rafId = rafIdRefBox.current;
+      if (rafId !== null) {
+        cancelAnimationFrame(rafId);
+        rafIdRefBox.current = null;
       }
-      if (remeasureRafIdRef.current !== null) {
-        cancelAnimationFrame(remeasureRafIdRef.current);
+      const remeasureRafId = remeasureRafIdRefBox.current;
+      if (remeasureRafId !== null) {
+        cancelAnimationFrame(remeasureRafId);
+        remeasureRafIdRefBox.current = null;
       }
     };
   }, []);

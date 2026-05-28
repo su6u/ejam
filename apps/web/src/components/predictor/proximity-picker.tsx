@@ -1,7 +1,7 @@
 "use client";
 
 import { ChevronDownIcon } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import {
   Popover,
   PopoverContent,
@@ -23,6 +23,7 @@ interface ProximityPickerProps {
   placeholder?: string;
   triggerClassName?: string;
   listClassName?: string;
+  id?: string;
 }
 
 export function ProximityPicker({
@@ -32,21 +33,26 @@ export function ProximityPicker({
   placeholder = "Select…",
   triggerClassName,
   listClassName,
+  id,
 }: ProximityPickerProps) {
   const [open, setOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const { activeIndex, itemRects, handlers, registerItem, measureItems } =
     useProximityHover(containerRef, { axis: "y" });
 
-  useEffect(() => {
-    if (open) measureItems();
-  }, [open, measureItems]);
+  const handleOpenChange = (next: boolean) => {
+    setOpen(next);
+    if (next) {
+      requestAnimationFrame(() => measureItems());
+    }
+  };
 
   const selected = options.find((option) => option.value === value);
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
+    <Popover open={open} onOpenChange={handleOpenChange}>
       <PopoverTrigger
+        id={id}
         className={cn(
           "flex h-8 w-full items-center justify-between rounded-none border border-input bg-transparent px-2.5 text-sm outline-none",
           pressableClass,

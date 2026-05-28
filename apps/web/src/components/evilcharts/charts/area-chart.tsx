@@ -1,9 +1,8 @@
 "use client";
 
-import { motion, useReducedMotion } from "motion/react";
+import { domAnimation, LazyMotion, m, useReducedMotion } from "motion/react";
 import {
   Children,
-  type ComponentProps,
   createContext,
   type FC,
   isValidElement,
@@ -16,22 +15,23 @@ import {
   useRef,
   useState,
 } from "react";
-import {
-  CartesianGrid,
-  Area as RechartsArea,
-  AreaChart as RechartsAreaChart,
-  XAxis as RechartsXAxis,
-  YAxis as RechartsYAxis,
-} from "recharts";
+import type { Props as RechartsAreaProps } from "recharts/types/cartesian/Area";
+import type { Props as RechartsCartesianGridProps } from "recharts/types/cartesian/CartesianGrid";
+import type { Props as RechartsXAxisProps } from "recharts/types/cartesian/XAxis";
+import type { Props as RechartsYAxisProps } from "recharts/types/cartesian/YAxis";
 import type { ValueType } from "recharts/types/component/DefaultTooltipContent";
+import type { CurveType } from "recharts/types/shape/Curve";
+import type { CartesianChartProps } from "recharts/types/util/types";
 import {
-  axisValueToPercentFormatter,
-  type ChartConfig,
   ChartContainer,
-  getColorsCount,
-  getLoadingData,
   LoadingIndicator,
 } from "@/components/evilcharts/ui/chart";
+import type { ChartConfig } from "@/components/evilcharts/ui/chart-types";
+import {
+  axisValueToPercentFormatter,
+  getColorsCount,
+  getLoadingData,
+} from "@/components/evilcharts/ui/chart-utils";
 import { ChartDot, type DotVariant } from "@/components/evilcharts/ui/dot";
 import {
   EvilBrush,
@@ -39,16 +39,18 @@ import {
   useEvilBrush,
 } from "@/components/evilcharts/ui/evil-brush";
 import {
-  ChartLegend,
-  ChartLegendContent,
-  type ChartLegendVariant,
-} from "@/components/evilcharts/ui/legend";
-import {
   ChartTooltip,
   ChartTooltipContent,
   type TooltipRoundness,
   type TooltipVariant,
 } from "@/components/evilcharts/ui/tooltip";
+import {
+  CartesianGrid,
+  Area as RechartsArea,
+  AreaChart as RechartsAreaChart,
+  XAxis as RechartsXAxis,
+  YAxis as RechartsYAxis,
+} from "@/lib/recharts-client";
 
 // Constants
 const STROKE_WIDTH = 0.8;
@@ -58,9 +60,8 @@ const STACK_ID = "evil-stacked";
 const REVEAL_DURATION = 1; // intro wipe length, in seconds
 const REVEAL_EASE: [number, number, number, number] = [0, 0.7, 0.5, 1]; // intro wipe easing
 
-type CurveType = ComponentProps<typeof RechartsArea>["type"];
-type AreaDotProp = ComponentProps<typeof RechartsArea>["dot"];
-type AreaActiveDotProp = ComponentProps<typeof RechartsArea>["activeDot"];
+type AreaDotProp = RechartsAreaProps<unknown, unknown>["dot"];
+type AreaActiveDotProp = RechartsAreaProps<unknown, unknown>["activeDot"];
 type AreaVariant =
   | "gradient"
   | "gradient-reverse"
@@ -140,7 +141,7 @@ type EvilAreaChartBaseProps<
   data: TData[]; // rows rendered by the chart
   children: ReactNode; // composed parts — <Area />, <XAxis />, <Legend />, …
   className?: string; // extra classes for the chart container
-  chartProps?: ComponentProps<typeof RechartsAreaChart>; // escape hatch for the raw Recharts chart
+  chartProps?: CartesianChartProps<unknown>; // escape hatch for the raw Recharts chart
   curveType?: CurveType; // default curve interpolation for every <Area />
   animationType?: AreaAnimationType; // default intro reveal for every <Area />
   stackType?: StackType; // how multiple areas combine
@@ -235,52 +236,54 @@ export function EvilAreaChart<
   );
 
   return (
-    <AreaChartContext value={contextValue}>
-      <ChartContainer
-        className={className}
-        config={config}
-        footer={
-          showBrush &&
-          !isLoading && (
-            <EvilBrush
-              data={data}
-              chartConfig={config}
-              xDataKey={xDataKey}
-              variant="area"
-              curveType={curveType}
-              height={brushHeight}
-              formatLabel={brushFormatLabel}
-              stacked={isStacked}
-              skipStyle
-              className="mt-1"
-              {...brushProps}
-              onChange={(range) => {
-                brushProps.onChange(range);
-                onBrushChange?.(range);
-              }}
-            />
-          )
-        }
-      >
-        <LoadingIndicator isLoading={isLoading} />
-        <RechartsAreaChart
-          id={chartId}
-          accessibilityLayer
-          stackOffset={isExpanded ? "expand" : undefined}
-          data={isLoading ? loadingData : displayData}
-          {...chartProps}
+    <LazyMotion features={domAnimation} strict>
+      <AreaChartContext value={contextValue}>
+        <ChartContainer
+          className={className}
+          config={config}
+          footer={
+            showBrush &&
+            !isLoading && (
+              <EvilBrush
+                data={data}
+                chartConfig={config}
+                xDataKey={xDataKey}
+                variant="area"
+                curveType={curveType}
+                height={brushHeight}
+                formatLabel={brushFormatLabel}
+                stacked={isStacked}
+                skipStyle
+                className="mt-1"
+                {...brushProps}
+                onChange={(range) => {
+                  brushProps.onChange(range);
+                  onBrushChange?.(range);
+                }}
+              />
+            )
+          }
         >
-          {children}
-          {isLoading && (
-            <LoadingArea
-              chartId={chartId}
-              curveType={curveType}
-              onShimmerExit={onShimmerExit}
-            />
-          )}
-        </RechartsAreaChart>
-      </ChartContainer>
-    </AreaChartContext>
+          <LoadingIndicator isLoading={isLoading} />
+          <RechartsAreaChart
+            id={chartId}
+            accessibilityLayer
+            stackOffset={isExpanded ? "expand" : undefined}
+            data={isLoading ? loadingData : displayData}
+            {...chartProps}
+          >
+            {children}
+            {isLoading && (
+              <LoadingArea
+                chartId={chartId}
+                curveType={curveType}
+                onShimmerExit={onShimmerExit}
+              />
+            )}
+          </RechartsAreaChart>
+        </ChartContainer>
+      </AreaChartContext>
+    </LazyMotion>
   );
 }
 
@@ -297,7 +300,7 @@ type AreaProps = {
   connectNulls?: boolean; // join segments across null/missing values
   isClickable?: boolean; // lets this area be selected by clicking it
   children?: ReactNode; // optional <Dot /> and <ActiveDot /> composition
-  areaProps?: ComponentProps<typeof RechartsArea>; // escape hatch for raw Recharts Area props
+  areaProps?: Partial<RechartsAreaProps<unknown, unknown>>; // escape hatch for raw Recharts Area props
 };
 
 /**
@@ -433,7 +436,7 @@ export const Dot: FC<DotProps> = () => null;
  */
 export const ActiveDot: FC<DotProps> = () => null;
 
-type XAxisProps = ComponentProps<typeof RechartsXAxis>;
+type XAxisProps = RechartsXAxisProps<unknown, unknown>;
 
 /**
  * The horizontal category axis. Ships with the chart's flat default styling and
@@ -462,7 +465,7 @@ export function XAxis({
   );
 }
 
-type YAxisProps = ComponentProps<typeof RechartsYAxis>;
+type YAxisProps = RechartsYAxisProps<unknown, unknown>;
 
 /**
  * The vertical value axis. Forwards every Recharts YAxis prop and, when the
@@ -495,7 +498,7 @@ export function YAxis({
   );
 }
 
-type GridProps = ComponentProps<typeof CartesianGrid>;
+type GridProps = RechartsCartesianGridProps;
 
 /**
  * The background grid lines. Defaults to horizontal-only dashed lines and
@@ -550,41 +553,6 @@ export function Tooltip({
           roundness={roundness}
           variant={variant}
           valueFormatter={valueFormatter}
-        />
-      }
-    />
-  );
-}
-
-type LegendProps = {
-  variant?: ChartLegendVariant; // visual style of the legend indicators
-  align?: "left" | "center" | "right"; // horizontal placement
-  verticalAlign?: "top" | "middle" | "bottom"; // vertical placement
-  isClickable?: boolean; // lets each entry toggle selection of its series
-};
-
-/**
- * The series legend. When `isClickable` is set, each entry toggles selection of
- * its series, driving the shared selection state read by every <Area />.
- */
-export function Legend({
-  variant,
-  align = "right",
-  verticalAlign = "top",
-  isClickable = false,
-}: LegendProps) {
-  const { selectedDataKey, selectDataKey } = useAreaChart();
-
-  return (
-    <ChartLegend
-      verticalAlign={verticalAlign}
-      align={align}
-      content={
-        <ChartLegendContent
-          selected={selectedDataKey}
-          onSelectChange={selectDataKey}
-          isClickable={isClickable}
-          variant={variant}
         />
       }
     />
@@ -744,7 +712,7 @@ const RevealMask = ({
       {type === "edges-in" ? (
         <>
           {/* left half wipes inward from the left edge toward the centre */}
-          <motion.rect
+          <m.rect
             {...reveal}
             x="0"
             y="0"
@@ -754,7 +722,7 @@ const RevealMask = ({
             style={{ originX: 0 }}
           />
           {/* right half wipes inward from the right edge toward the centre */}
-          <motion.rect
+          <m.rect
             {...reveal}
             x="50%"
             y="0"
@@ -765,7 +733,7 @@ const RevealMask = ({
           />
         </>
       ) : (
-        <motion.rect
+        <m.rect
           {...reveal}
           x="0"
           y="0"
@@ -1104,7 +1072,7 @@ const generateEasedGradientStops = (
  * when the shimmer has completely exited the visible area. This eliminates
  * timing drift issues from setTimeout/setInterval.
  */
-export function useLoadingData(isLoading: boolean, loadingPoints: number = 14) {
+function useLoadingData(isLoading: boolean, loadingPoints: number = 14) {
   const [loadingDataKey, setLoadingDataKey] = useState(false);
 
   // Callback fired by motion.dev when the shimmer exits the visible area
@@ -1114,12 +1082,10 @@ export function useLoadingData(isLoading: boolean, loadingPoints: number = 14) {
     }
   }, [isLoading]);
 
-  const loadingData = useMemo(
-    () => getLoadingData(loadingPoints),
-    // loadingDataKey toggle triggers re-computation when the shimmer exits
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [loadingPoints, loadingDataKey],
-  );
+  const loadingData = useMemo(() => {
+    void loadingDataKey;
+    return getLoadingData(loadingPoints);
+  }, [loadingPoints, loadingDataKey]);
 
   return { loadingData, onShimmerExit };
 }
@@ -1213,7 +1179,7 @@ const LoadingPattern = ({
         x="0"
         y="0"
       >
-        <motion.rect
+        <m.rect
           y="0"
           width="1"
           height="1"

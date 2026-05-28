@@ -2,7 +2,14 @@
 
 import { quotaRequiresHomeState } from "@ejam/predictors/shared/quota-input";
 import Image from "next/image";
-import { type ReactNode, Suspense } from "react";
+import {
+  cloneElement,
+  isValidElement,
+  type ReactElement,
+  type ReactNode,
+  Suspense,
+  useId,
+} from "react";
 import {
   predictorHeaderStripClass,
   sidebarPanelTopInsetClass,
@@ -13,7 +20,6 @@ import { ProximityPicker } from "@/components/predictor/proximity-picker";
 import { RankInput } from "@/components/predictor/rank-input";
 import { SidebarFilterSection } from "@/components/predictor/sidebar-filter-section";
 import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
 import {
   Tooltip,
   TooltipContent,
@@ -253,6 +259,7 @@ function OptionToggle({
   onChange,
   options,
   columns,
+  "aria-labelledby": ariaLabelledBy,
 }: {
   value: string;
   onChange: (value: string) => void;
@@ -262,11 +269,13 @@ function OptionToggle({
     enabled?: boolean;
   }>;
   columns: 2 | 3;
+  "aria-labelledby"?: string;
 }) {
   return (
-    <div
+    <fieldset
+      aria-labelledby={ariaLabelledBy}
       className={cn(
-        "grid gap-1",
+        "grid min-w-0 gap-1 border-0 p-0",
         columns === 2 ? "grid-cols-2" : "grid-cols-3",
       )}
     >
@@ -297,7 +306,7 @@ function OptionToggle({
           </button>
         );
       })}
-    </div>
+    </fieldset>
   );
 }
 
@@ -306,15 +315,39 @@ function SetupField({
   required,
   hint,
   children,
+  fieldId,
 }: {
   label: string;
   required?: boolean;
   hint?: string;
   children: ReactNode;
+  fieldId?: string;
 }) {
+  const generatedId = useId();
+  const controlId = fieldId ?? generatedId;
+  const labelId = `${controlId}-label`;
+  const usesGroupLabel =
+    isValidElement(children) && children.type === OptionToggle;
+  const control = isValidElement(children)
+    ? cloneElement(
+        children as ReactElement<{ id?: string; "aria-labelledby"?: string }>,
+        usesGroupLabel
+          ? { "aria-labelledby": labelId }
+          : {
+              id:
+                (children as ReactElement<{ id?: string }>).props.id ??
+                controlId,
+            },
+      )
+    : children;
+
   return (
     <div className="flex min-w-0 flex-col gap-1.5">
-      <Label className="text-xs text-muted-foreground">
+      <label
+        id={labelId}
+        htmlFor={usesGroupLabel ? undefined : controlId}
+        className="flex items-center gap-2 text-xs leading-none font-medium text-muted-foreground select-none"
+      >
         {label}
         {required ? (
           <span className="text-muted-foreground/70" aria-hidden>
@@ -322,8 +355,8 @@ function SetupField({
             *
           </span>
         ) : null}
-      </Label>
-      {children}
+      </label>
+      {control}
       {hint ? (
         <p className="text-[10px] leading-snug text-muted-foreground/50">
           {hint}

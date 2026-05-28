@@ -3,6 +3,17 @@ import { cn } from "@/lib/utils";
 /** one horizontal gutter for main content */
 export const appContentGutterClass = "px-4 md:px-6";
 
+/** centered marketing/home column — navbar and body share one width */
+export const homePageContainerClass = "mx-auto w-full max-w-3xl px-4 md:px-6";
+
+/** frosted sticky chrome — navbar, table headers, etc. */
+export const stickyGlassChromeClass =
+  "bg-background/95 backdrop-blur-sm supports-backdrop-filter:bg-background/50";
+
+/** sticky table thead — blur on thead, tint on cells so rows scroll beneath */
+export const stickyGlassTableHeaderClass =
+  "sticky top-0 z-10 backdrop-blur-sm [&_th]:bg-background/95 supports-backdrop-filter:[&_th]:bg-background/50";
+
 /** h-14 top chrome — sidebar logo row and main header actions share one strip height */
 export const appChromeStripClass =
   "flex h-14 shrink-0 items-center border-b border-border";

@@ -97,16 +97,31 @@ export function usePredictorQuery({
   const abortControllerRef = useRef<AbortController | null>(null);
   const predictInFlightInputKeyRef = useRef<string | null>(null);
 
+  const currentInputKey = requestInputKey({
+    predictorExamId,
+    rank,
+    apiSeatType,
+    apiGender,
+    quota,
+    homeState,
+    has_ews_certificate,
+  });
+
+  const [prevInputKey, setPrevInputKey] = useState(currentInputKey);
+  if (currentInputKey !== prevInputKey) {
+    setPrevInputKey(currentInputKey);
+    if (
+      predictInFlightInputKeyRef.current === null ||
+      predictInFlightInputKeyRef.current !== currentInputKey
+    ) {
+      setData(null);
+      setProvenance(null);
+      setError(null);
+      setIsLoading(false);
+    }
+  }
+
   useEffect(() => {
-    const currentInputKey = requestInputKey({
-      predictorExamId,
-      rank,
-      apiSeatType,
-      apiGender,
-      quota,
-      homeState,
-      has_ews_certificate,
-    });
     if (
       predictInFlightInputKeyRef.current !== null &&
       predictInFlightInputKeyRef.current === currentInputKey
@@ -117,19 +132,7 @@ export function usePredictorQuery({
     abortControllerRef.current?.abort();
     abortControllerRef.current = null;
     predictInFlightInputKeyRef.current = null;
-    setData(null);
-    setProvenance(null);
-    setError(null);
-    setIsLoading(false);
-  }, [
-    predictorExamId,
-    rank,
-    apiSeatType,
-    apiGender,
-    quota,
-    homeState,
-    has_ews_certificate,
-  ]);
+  }, [currentInputKey]);
 
   useEffect(
     () => () => {
@@ -168,6 +171,8 @@ export function usePredictorQuery({
 
       try {
         const examId = examToApiId(predictorExamId);
+        if (!isCurrent()) return false;
+
         const res = await fetch(`/api/predict/${examId}`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -175,10 +180,9 @@ export function usePredictorQuery({
           signal: controller.signal,
         });
 
-        if (!isCurrent()) return false;
-
         let body: unknown;
         try {
+          if (!isCurrent()) return false;
           body = await res.json();
         } catch {
           if (!isCurrent()) return false;
