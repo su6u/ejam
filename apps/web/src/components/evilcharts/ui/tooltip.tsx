@@ -110,7 +110,7 @@ function ChartTooltipContent({
 
           return [
             <div
-              key={index}
+              key={`${key}-${String(item.dataKey ?? item.name ?? index)}`}
               className={cn(
                 "[&>svg]:text-muted-foreground flex w-full flex-wrap items-stretch gap-2 [&>svg]:size-2.5",
                 indicator === "dot" && "items-center",
