@@ -111,9 +111,9 @@ function resolveDatasets(
     year,
   });
   if (!resolution.publishable) {
-    const missing = resolution.missing
-      .filter((m) => m.required)
-      .map((m) => m.dataset);
+    const missing = resolution.missing.flatMap((m) =>
+      m.required ? [m.dataset] : [],
+    );
     return {
       ok: false,
       response: errResponse(
