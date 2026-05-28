@@ -10,14 +10,14 @@ import type { PredictionProvenance } from "@ejam/data";
 import type { ProgramPrediction } from "@ejam/data/college-predictor";
 import { ChevronRight } from "lucide-react";
 import { formatInteger } from "@/components/formatter";
+import { BandBadge } from "@/components/predictor/band-badge";
 import { DataVersionFooter } from "@/components/predictor/data-version-footer";
+import { InstituteTypeBadge } from "@/components/predictor/institute-type-badge";
+import { programKey } from "@/components/predictor/program-key";
 import { ResultsCardShell } from "@/components/predictor/results-card-shell";
-import {
-  ResultsSort,
-  type ResultsSortKey,
-} from "@/components/predictor/results-sort";
+import { ResultsSort } from "@/components/predictor/results-sort";
+import type { ResultsSortKey } from "@/components/predictor/results-sort-logic";
 import { RoundProbabilityBars } from "@/components/predictor/round-probability-bars";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Table,
@@ -27,7 +27,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { BAND_STYLES } from "@/lib/bands";
 import { cn } from "@/lib/utils";
 
 interface ResultsTableProps {
@@ -168,34 +167,6 @@ export function ResultsTable({
   );
 }
 
-const BAND_BADGE = BAND_STYLES;
-
-export function InstituteTypeBadge({ type }: { type: string }) {
-  return (
-    <Badge
-      variant="outline"
-      className="rounded-none font-mono text-[10px] text-muted-foreground"
-    >
-      {type}
-    </Badge>
-  );
-}
-
-export function BandBadge({ band }: { band: ProgramPrediction["band"] }) {
-  const { label, color } = BAND_BADGE[band];
-  return (
-    <span
-      className="inline-flex h-5 shrink-0 items-center justify-center rounded-none px-2 text-xs font-medium whitespace-nowrap"
-      style={{
-        color,
-        backgroundColor: `color-mix(in srgb, ${color} 18%, transparent)`,
-      }}
-    >
-      {label}
-    </span>
-  );
-}
-
 function seatPoolLabel(row: ProgramPrediction): string {
   return [row.seat_type, row.quota.toUpperCase(), genderShort(row.gender)]
     .filter(Boolean)
@@ -206,8 +177,4 @@ function genderShort(gender: string): string {
   if (gender.startsWith("Gender")) return "GN";
   if (gender.startsWith("Female")) return "F";
   return gender;
-}
-
-export function programKey(p: ProgramPrediction): string {
-  return `${p.institute_id}::${p.program_id}::${p.seat_type}::${p.quota}::${p.gender}`;
 }
