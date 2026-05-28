@@ -29,7 +29,7 @@ function hasPredictorQueryParams(request: NextRequest): boolean {
   return false;
 }
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   if (!hasPredictorQueryParams(request)) {
     return NextResponse.next();
   }
