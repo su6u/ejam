@@ -18,7 +18,7 @@ import {
   XAxis,
   YAxis,
 } from "@/components/evilcharts/charts/area-chart";
-import type { ChartConfig } from "@/components/evilcharts/ui/chart";
+import type { ChartConfig } from "@/components/evilcharts/ui/chart-types";
 import { formatInteger } from "@/components/formatter";
 import { Button } from "@/components/ui/button";
 import {
@@ -36,7 +36,8 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
-import { BandBadge, InstituteTypeBadge } from "./results-table";
+import { BandBadge } from "./band-badge";
+import { InstituteTypeBadge } from "./institute-type-badge";
 
 interface CollegeDetailSheetProps {
   program: ProgramPrediction | null;
@@ -132,16 +133,16 @@ function DetailBody({ program }: { program: ProgramPrediction }) {
           Seat pool
         </h3>
         <dl className="mt-2 grid grid-cols-2 gap-y-2 text-[12px]">
-          <DT>Category</DT>
-          <DD>{program.seat_type}</DD>
-          <DT>Quota</DT>
-          <DD>{program.quota.toUpperCase()}</DD>
-          <DT>Gender</DT>
-          <DD>{program.gender}</DD>
+          <dt className={detailTermClassName}>Category</dt>
+          <dd className={detailDescClassName}>{program.seat_type}</dd>
+          <dt className={detailTermClassName}>Quota</dt>
+          <dd className={detailDescClassName}>{program.quota.toUpperCase()}</dd>
+          <dt className={detailTermClassName}>Gender</dt>
+          <dd className={detailDescClassName}>{program.gender}</dd>
           {program.state ? (
             <>
-              <DT>Home state</DT>
-              <DD>{program.state}</DD>
+              <dt className={detailTermClassName}>Home state</dt>
+              <dd className={detailDescClassName}>{program.state}</dd>
             </>
           ) : null}
         </dl>
@@ -152,19 +153,27 @@ function DetailBody({ program }: { program: ProgramPrediction }) {
           Data quality
         </h3>
         <dl className="mt-2 grid grid-cols-2 gap-y-2 text-[12px]">
-          <DT>Signal</DT>
-          <DD className="capitalize">{program.data_quality}</DD>
-          <DT>Years of data</DT>
-          <DD className="tabular-nums">{program.years_of_data}</DD>
-          <DT>Most recent</DT>
-          <DD className="tabular-nums">{program.last_data_year}</DD>
-          <DT>Final round</DT>
-          <DD className="tabular-nums">{program.fill_round}</DD>
+          <dt className={detailTermClassName}>Signal</dt>
+          <dd className={cn(detailDescClassName, "capitalize")}>
+            {program.data_quality}
+          </dd>
+          <dt className={detailTermClassName}>Years of data</dt>
+          <dd className={cn(detailDescClassName, "tabular-nums")}>
+            {program.years_of_data}
+          </dd>
+          <dt className={detailTermClassName}>Most recent</dt>
+          <dd className={cn(detailDescClassName, "tabular-nums")}>
+            {program.last_data_year}
+          </dd>
+          <dt className={detailTermClassName}>Final round</dt>
+          <dd className={cn(detailDescClassName, "tabular-nums")}>
+            {program.fill_round}
+          </dd>
         </dl>
       </section>
 
       <section className="p-4 pt-3 text-[11px] leading-relaxed text-muted-foreground">
-        Predictions are estimated from historical cutoffs and trend slope —
+        Predictions are estimated from historical cutoffs and trend slope:
         actual round cutoffs can drift with seat-matrix changes, demand shifts,
         and counselling rule updates each year.
       </section>
@@ -247,25 +256,9 @@ function RoundProbabilityChart({ program }: { program: ProgramPrediction }) {
   );
 }
 
-function DT({ children }: { children: React.ReactNode }) {
-  return (
-    <dt className="text-[11px] uppercase tracking-[0.05em] text-muted-foreground">
-      {children}
-    </dt>
-  );
-}
-
-function DD({
-  children,
-  className,
-}: {
-  children: React.ReactNode;
-  className?: string;
-}) {
-  return (
-    <dd className={cn("text-[12px] text-foreground", className)}>{children}</dd>
-  );
-}
+const detailTermClassName =
+  "text-[11px] uppercase tracking-[0.05em] text-muted-foreground";
+const detailDescClassName = "text-[12px] text-foreground";
 
 function formatProbability(value: number): string {
   return `${Math.round(Math.min(1, Math.max(0, value)) * 100)}%`;
