@@ -21,7 +21,7 @@ export function AppHeader() {
         target="_blank"
         rel="noopener noreferrer"
         className={headerPillClass}
-        aria-label="GitHub repository"
+        aria-label="View ejam repository on GitHub"
       >
         <Image
           src="/icons/github.svg"

@@ -2,8 +2,7 @@
 
 import { domAnimation, LazyMotion, m, useReducedMotion } from "motion/react";
 import {
-  Suspense,
-  use,
+  useEffect,
   useLayoutEffect,
   useRef,
   useState,
@@ -18,7 +17,9 @@ const STAR_REVEAL_TRANSITION = {
   duration: 0.3,
   bounce: 0,
 };
-const FALLBACK_SIZER = 99;
+const SIZER_LABEL = "99 stars";
+/** Keep skeleton visible long enough to perceive on fast networks. */
+const MIN_SKELETON_MS = 400;
 
 export interface GitHubStarsProps {
   owner?: string;
@@ -132,30 +133,30 @@ function GitHubStarsDisplay({
   countClassName: string;
   shouldReduceMotion: boolean | null;
 }) {
-  const sizerLabel = `${FALLBACK_SIZER.toLocaleString()} stars`;
-
   return (
-    <LazyMotion features={domAnimation} strict>
-      <span className={cn("relative inline-flex items-center", className)}>
-        <span
-          className={cn(
-            "invisible whitespace-nowrap text-xs tabular-nums",
-            countClassName,
-          )}
-          aria-hidden
-        >
-          {sizerLabel}
-        </span>
+    <span
+      aria-hidden
+      className={cn("inline-grid items-center whitespace-nowrap", className)}
+    >
+      <span
+        className={cn(
+          "invisible col-start-1 row-start-1 text-xs tabular-nums",
+          countClassName,
+        )}
+      >
+        {SIZER_LABEL}
+      </span>
 
-        {isLoading ? (
-          <Skeleton className="absolute inset-0 rounded-none bg-muted-foreground/40" />
-        ) : (
+      {isLoading ? (
+        <Skeleton className="col-start-1 row-start-1 h-3.5 w-full rounded-none bg-foreground/25" />
+      ) : (
+        <LazyMotion features={domAnimation} strict>
           <m.span
             animate={
               shouldReduceMotion ? { opacity: 1 } : { opacity: 1, scale: 1 }
             }
             className={cn(
-              "absolute inset-0 flex items-center gap-1.5 whitespace-nowrap text-xs font-medium tabular-nums",
+              "col-start-1 row-start-1 flex items-center gap-1.5 text-xs font-medium tabular-nums",
               countClassName,
             )}
             initial={
@@ -168,9 +169,9 @@ function GitHubStarsDisplay({
             <span>{displayCount.toLocaleString()}</span>
             <span className="font-normal text-muted-foreground">stars</span>
           </m.span>
-        )}
-      </span>
-    </LazyMotion>
+        </LazyMotion>
+      )}
+    </span>
   );
 }
 
@@ -208,43 +209,6 @@ function GitHubStarsProvided({
   );
 }
 
-function GitHubStarsResolved({
-  owner,
-  repo,
-  className,
-  countClassName,
-}: {
-  owner: string;
-  repo: string;
-  className: string;
-  countClassName: string;
-}) {
-  const starCount = use(fetchGitHubStarCount(owner, repo));
-  const [displayCount, setDisplayCount] = useState(0);
-  const shouldReduceMotion = useReducedMotion();
-  const rafIdRef = useRef<number | null>(null);
-
-  useLayoutEffect(() => {
-    animateDisplayCount(
-      starCount,
-      shouldReduceMotion,
-      rafIdRef,
-      setDisplayCount,
-    );
-    return () => cancelCountAnimation(rafIdRef);
-  }, [starCount, shouldReduceMotion]);
-
-  return (
-    <GitHubStarsDisplay
-      isLoading={false}
-      displayCount={displayCount}
-      className={className}
-      countClassName={countClassName}
-      shouldReduceMotion={shouldReduceMotion}
-    />
-  );
-}
-
 function GitHubStarsFetched({
   owner,
   repo,
@@ -256,27 +220,55 @@ function GitHubStarsFetched({
   className: string;
   countClassName: string;
 }) {
-  const cached = readCachedCount(owner, repo);
+  const [starCount, setStarCount] = useState<number | null>(null);
+  const [displayCount, setDisplayCount] = useState(0);
+  const shouldReduceMotion = useReducedMotion();
+  const rafIdRef = useRef<number | null>(null);
+
+  const isLoading = starCount === null;
+
+  useEffect(() => {
+    let cancelled = false;
+    let timeoutId: ReturnType<typeof setTimeout> | undefined;
+    const startedAt = performance.now();
+
+    void fetchGitHubStarCount(owner, repo).then((count) => {
+      const remaining = MIN_SKELETON_MS - (performance.now() - startedAt);
+      const apply = () => {
+        if (!cancelled) {
+          setDisplayCount(0);
+          setStarCount(count);
+        }
+      };
+      if (remaining > 0) timeoutId = setTimeout(apply, remaining);
+      else apply();
+    });
+
+    return () => {
+      cancelled = true;
+      if (timeoutId !== undefined) clearTimeout(timeoutId);
+    };
+  }, [owner, repo]);
+
+  useLayoutEffect(() => {
+    if (starCount === null) return;
+    animateDisplayCount(
+      starCount,
+      shouldReduceMotion,
+      rafIdRef,
+      setDisplayCount,
+    );
+    return () => cancelCountAnimation(rafIdRef);
+  }, [starCount, shouldReduceMotion]);
 
   return (
-    <Suspense
-      fallback={
-        <GitHubStarsDisplay
-          isLoading={cached === null}
-          displayCount={cached ?? 0}
-          className={className}
-          countClassName={countClassName}
-          shouldReduceMotion={false}
-        />
-      }
-    >
-      <GitHubStarsResolved
-        owner={owner}
-        repo={repo}
-        className={className}
-        countClassName={countClassName}
-      />
-    </Suspense>
+    <GitHubStarsDisplay
+      isLoading={isLoading}
+      displayCount={displayCount}
+      className={className}
+      countClassName={countClassName}
+      shouldReduceMotion={isLoading ? false : shouldReduceMotion}
+    />
   );
 }
 
