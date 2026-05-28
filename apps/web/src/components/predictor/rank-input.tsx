@@ -52,12 +52,17 @@ export function RankInput({
     onValueChange(next);
   };
 
-  useImperativeHandle(ref, () => ({
-    flush: () => {
-      commit(draft);
-      return draft;
-    },
-  }));
+  useImperativeHandle(
+    ref,
+    () => ({
+      flush: () => {
+        const next = focused ? draft : value;
+        commit(next);
+        return next;
+      },
+    }),
+    [draft, focused, value, onValueChange],
+  );
 
   const handleChange = (raw: string) => {
     const next = raw.replace(/\D/g, "").slice(0, MAX_RANK_LENGTH);
