@@ -3,6 +3,7 @@
 import { quotaRequiresHomeState } from "@ejam/predictors/shared/quota-input";
 import {
   createContext,
+  Suspense,
   use,
   useCallback,
   useEffect,
@@ -27,6 +28,7 @@ import {
   predictorUsesQuotaHomeState,
   usePredictorState,
 } from "@/hooks/use-predictor-state";
+import { useSearchParams } from "next/navigation";
 
 type PredictorQueryReturn = ReturnType<typeof usePredictorQuery>;
 
@@ -69,7 +71,16 @@ function shareLinkReadyToPredict(params: URLSearchParams): boolean {
 }
 
 export function PredictorProvider({ children }: { children: React.ReactNode }) {
-  const state = usePredictorState();
+  return (
+    <Suspense fallback={null}>
+      <PredictorProviderInner>{children}</PredictorProviderInner>
+    </Suspense>
+  );
+}
+
+function PredictorProviderInner({ children }: { children: React.ReactNode }) {
+  const params = useSearchParams();
+  const state = usePredictorState(params);
   const query = usePredictorQuery({
     predictorExamId: state.predictorExamId,
     rank: state.rank,

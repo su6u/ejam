@@ -8,7 +8,7 @@
 
 "use client";
 
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter, type ReadonlyURLSearchParams } from "next/navigation";
 import { useCallback } from "react";
 
 export type ExamType = "jee-advanced" | "jee-main";
@@ -84,9 +84,10 @@ export interface PredictorStateReturn extends PredictorInputState {
   predictorExamId: PredictorExamId;
 }
 
-export function usePredictorState(): PredictorStateReturn {
+export function usePredictorState(
+  params: ReadonlyURLSearchParams,
+): PredictorStateReturn {
   const router = useRouter();
-  const params = useSearchParams();
 
   const rank = params.get("rank") ?? "";
   const exam = (params.get("exam") as ExamType | null) ?? "jee-main";
