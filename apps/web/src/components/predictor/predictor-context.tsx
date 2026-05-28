@@ -3,9 +3,10 @@
 import { quotaRequiresHomeState } from "@ejam/predictors/shared/quota-input";
 import {
   createContext,
+  use,
   useCallback,
-  useContext,
   useEffect,
+  useMemo,
   useRef,
   useState,
 } from "react";
@@ -13,11 +14,11 @@ import type { RankInputHandle } from "@/components/predictor/rank-input";
 import {
   EMPTY_RESULTS_FILTERS,
   type ResultsFilterState,
-} from "@/components/predictor/results-filters";
+} from "@/components/predictor/results-filter-logic";
 import {
   DEFAULT_RESULTS_SORT,
   type ResultsSortKey,
-} from "@/components/predictor/results-sort";
+} from "@/components/predictor/results-sort-logic";
 import { usePredictorQuery } from "@/hooks/use-predictor-query";
 import {
   counsellingToPredictorExam,
@@ -116,27 +117,37 @@ export function PredictorProvider({ children }: { children: React.ReactNode }) {
     void onPredict();
   }, [onPredict]);
 
+  const contextValue = useMemo(
+    () => ({
+      state,
+      query,
+      onPredict,
+      rankInputRef,
+      filters,
+      setFilters,
+      sortBy,
+      setSortBy,
+      hasResults,
+    }),
+    [
+      state,
+      query,
+      onPredict,
+      filters,
+      sortBy,
+      hasResults,
+    ],
+  );
+
   return (
-    <PredictorContext.Provider
-      value={{
-        state,
-        query,
-        onPredict,
-        rankInputRef,
-        filters,
-        setFilters,
-        sortBy,
-        setSortBy,
-        hasResults,
-      }}
-    >
+    <PredictorContext.Provider value={contextValue}>
       {children}
     </PredictorContext.Provider>
   );
 }
 
 export function usePredictor(): PredictorContextValue {
-  const ctx = useContext(PredictorContext);
+  const ctx = use(PredictorContext);
   if (!ctx) {
     throw new Error("usePredictor must be used within PredictorProvider");
   }
