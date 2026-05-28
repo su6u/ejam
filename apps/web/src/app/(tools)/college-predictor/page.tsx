@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { AppShell } from "@/components/app-shell";
 import { Dashboard } from "@/components/predictor/dashboard";
+import { collegePredictorIdentity } from "@/lib/identity";
 
 export const metadata: Metadata = {
   title: "College Predictor",
@@ -10,7 +11,7 @@ export const metadata: Metadata = {
 
 export default function CollegePredictorPage() {
   return (
-    <AppShell>
+    <AppShell identity={collegePredictorIdentity}>
       <Dashboard />
     </AppShell>
   );

@@ -12,9 +12,14 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
+import { type AppIdentity, ejamIdentity } from "@/lib/identity";
 import { cn } from "@/lib/utils";
 
-export function AppSidebar() {
+export function AppSidebar({
+  identity = ejamIdentity,
+}: {
+  identity?: AppIdentity;
+}) {
   return (
     <Sidebar
       className={cn(
@@ -32,18 +37,18 @@ export function AppSidebar() {
               className="h-9 hover:bg-transparent active:bg-transparent data-active:bg-transparent"
               render={
                 <Link
-                  href="/"
-                  aria-label="Ejam home"
-                  className="flex items-center"
+                  href={identity.homeHref}
+                  aria-label={identity.homeAriaLabel}
+                  className="flex max-w-full items-center"
                 >
                   <Image
-                    src="/brand/logo.svg"
+                    src={identity.logoSrc}
                     alt=""
-                    width={116}
-                    height={92}
+                    width={identity.logoWidth}
+                    height={identity.logoHeight}
                     priority
                     aria-hidden
-                    className="h-6 w-auto shrink-0"
+                    className="h-6 max-w-full w-auto shrink-0"
                   />
                 </Link>
               }

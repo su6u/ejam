@@ -38,7 +38,7 @@ export default function ToolsHub() {
           className="flex shrink-0 items-center"
         >
           <Image
-            src="/brand/logo.svg"
+            src="/identity/logo.svg"
             alt=""
             width={116}
             height={92}

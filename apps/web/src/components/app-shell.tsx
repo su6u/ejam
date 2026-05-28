@@ -12,14 +12,21 @@ import {
 import { AppSidebar } from "@/components/app-sidebar";
 import { PredictorProvider } from "@/components/predictor/predictor-context";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
+import { type AppIdentity, ejamIdentity } from "@/lib/identity";
 import { cn } from "@/lib/utils";
 
-export function AppShell({ children }: { children: React.ReactNode }) {
+export function AppShell({
+  children,
+  identity = ejamIdentity,
+}: {
+  children: React.ReactNode;
+  identity?: AppIdentity;
+}) {
   return (
     <Suspense fallback={null}>
       <PredictorProvider>
         <SidebarProvider>
-          <AppSidebar />
+          <AppSidebar identity={identity} />
           <SidebarInset className="flex min-h-svh flex-col">
             <div
               className={cn(

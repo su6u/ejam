@@ -20,11 +20,11 @@ export const metadata: Metadata = {
   description: "ejam",
   icons: {
     icon: [
-      { url: "/brand/favicon.ico", sizes: "any" },
-      { url: "/brand/icon.svg", type: "image/svg+xml" },
-      { url: "/brand/icon.png", type: "image/png", sizes: "32x32" },
+      { url: "/identity/favicon.ico", sizes: "any" },
+      { url: "/identity/icon.svg", type: "image/svg+xml" },
+      { url: "/identity/icon.png", type: "image/png", sizes: "32x32" },
     ],
-    apple: "/brand/apple-icon.png",
+    apple: "/identity/apple-icon.png",
   },
 };
 
