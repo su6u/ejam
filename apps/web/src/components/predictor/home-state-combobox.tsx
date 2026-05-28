@@ -1,7 +1,7 @@
 "use client";
 
 import { ChevronDownIcon, SearchIcon } from "lucide-react";
-import { useEffect, useId, useMemo, useRef, useState } from "react";
+import { useId, useMemo, useRef, useState } from "react";
 import {
   Popover,
   PopoverContent,
@@ -24,6 +24,7 @@ export function HomeStateCombobox({
   className,
 }: HomeStateComboboxProps) {
   const id = useId();
+  const listboxId = `${id}-listbox`;
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
   const containerRef = useRef<HTMLDivElement>(null);
@@ -36,19 +37,21 @@ export function HomeStateCombobox({
     return HOME_STATES.filter((state) => state.toLowerCase().includes(query));
   }, [search]);
 
-  useEffect(() => {
-    if (open) measureItems();
-  }, [open, measureItems]);
-
-  useEffect(() => {
-    if (!open) setSearch("");
-  }, [open]);
+  const handleOpenChange = (next: boolean) => {
+    setOpen(next);
+    if (next) {
+      requestAnimationFrame(() => measureItems());
+    } else {
+      setSearch("");
+    }
+  };
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
+    <Popover open={open} onOpenChange={handleOpenChange}>
       <PopoverTrigger
         id={id}
         role="combobox"
+        aria-controls={listboxId}
         aria-expanded={open}
         className={cn(
           "flex h-8 w-full items-center justify-between rounded-none border border-input bg-transparent px-2.5 text-sm outline-none",
@@ -77,12 +80,15 @@ export function HomeStateCombobox({
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search state…"
+            aria-label="Search states"
             className="flex h-9 w-full bg-transparent py-3 text-sm outline-none"
           />
         </div>
         <div
+          id={listboxId}
+          role="listbox"
           ref={containerRef}
-          className="no-scrollbar relative max-h-60 overflow-y-auto px-1 py-1"
+          className="no-scrollbar relative max-h-60 overflow-y-auto p-1"
           {...handlers}
         >
           {activeIndex !== null && itemRects[activeIndex] ? (
