@@ -7,6 +7,7 @@
 "use client";
 
 import { stickyGlassTableHeaderClass } from "@/components/app-layout";
+import { useMemo } from "react";
 import type { PredictionProvenance } from "@ejam/data";
 import type { ProgramPrediction } from "@ejam/data/college-predictor";
 import { ChevronRight } from "lucide-react";
@@ -57,16 +58,21 @@ export function ResultsTable({
       ? `${rows.length} program${rows.length === 1 ? "" : "s"}`
       : `${rows.length} of ${allRows.length}`;
 
+  const headerExtra = useMemo(
+    () => (
+      <span className="shrink-0 text-xs tabular-nums text-muted-foreground">
+        {countLabel}
+      </span>
+    ),
+    [countLabel],
+  );
+
   return (
     <ResultsCardShell
       contentClassName="no-scrollbar overflow-y-auto [&_[data-slot=table-container]]:no-scrollbar"
       toolbar={<ResultsSort sortBy={sortBy} onChange={onSortChange} />}
       footer={<DataVersionFooter provenance={provenance} />}
-      headerExtra={
-        <span className="shrink-0 text-xs tabular-nums text-muted-foreground">
-          {countLabel}
-        </span>
-      }
+      headerExtra={headerExtra}
     >
       <Table>
         <TableHeader className={stickyGlassTableHeaderClass}>
