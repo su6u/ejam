@@ -2,6 +2,7 @@
 
 import {
   type Ref,
+  useCallback,
   useEffect,
   useImperativeHandle,
   useRef,
@@ -44,13 +45,16 @@ export function RankInput({
     [],
   );
 
-  const commit = (next: string) => {
-    if (debounceRef.current) {
-      clearTimeout(debounceRef.current);
-      debounceRef.current = null;
-    }
-    onValueChange(next);
-  };
+  const commit = useCallback(
+    (next: string) => {
+      if (debounceRef.current) {
+        clearTimeout(debounceRef.current);
+        debounceRef.current = null;
+      }
+      onValueChange(next);
+    },
+    [onValueChange],
+  );
 
   useImperativeHandle(
     ref,
@@ -61,7 +65,7 @@ export function RankInput({
         return next;
       },
     }),
-    [draft, focused, value, onValueChange],
+    [draft, focused, value, commit],
   );
 
   const handleChange = (raw: string) => {
