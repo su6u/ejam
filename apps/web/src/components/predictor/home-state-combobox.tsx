@@ -16,18 +16,21 @@ interface HomeStateComboboxProps {
   value: string;
   onValueChange: (value: string) => void;
   className?: string;
+  id?: string;
 }
 
 export function HomeStateCombobox({
   value,
   onValueChange,
   className,
+  id: idProp,
 }: HomeStateComboboxProps) {
-  const id = useId();
+  const generatedId = useId();
+  const id = idProp ?? generatedId;
   const listboxId = `${id}-listbox`;
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
-  const containerRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLUListElement>(null);
   const { activeIndex, itemRects, handlers, registerItem, measureItems } =
     useProximityHover(containerRef, { axis: "y" });
 
@@ -84,11 +87,10 @@ export function HomeStateCombobox({
             className="flex h-9 w-full bg-transparent py-3 text-sm outline-none"
           />
         </div>
-        <div
+        <ul
           id={listboxId}
-          role="listbox"
           ref={containerRef}
-          className="no-scrollbar relative max-h-60 overflow-y-auto p-1"
+          className="no-scrollbar relative max-h-60 list-none overflow-y-auto p-1"
           {...handlers}
         >
           {activeIndex !== null && itemRects[activeIndex] ? (
@@ -112,30 +114,33 @@ export function HomeStateCombobox({
               const isHovered = activeIndex === index;
 
               return (
-                <button
-                  key={stateName}
-                  ref={(element) => registerItem(index, element)}
-                  type="button"
-                  onClick={() => {
-                    deferAfterPress(() => {
-                      onValueChange(stateName === value ? "" : stateName);
-                      setOpen(false);
-                    });
-                  }}
-                  className={cn(
-                    "relative z-10 flex h-8 w-full items-center rounded-none bg-transparent px-2 text-left text-sm outline-none",
-                    pressableClass,
-                    isSelected || isHovered
-                      ? "text-foreground"
-                      : "text-muted-foreground",
-                  )}
-                >
-                  <span className="truncate">{stateName}</span>
-                </button>
+                <li key={stateName}>
+                  <button
+                    ref={(element) => registerItem(index, element)}
+                    type="button"
+                    role="option"
+                    aria-selected={isSelected}
+                    onClick={() => {
+                      deferAfterPress(() => {
+                        onValueChange(stateName === value ? "" : stateName);
+                        setOpen(false);
+                      });
+                    }}
+                    className={cn(
+                      "relative z-10 flex h-8 w-full items-center rounded-none bg-transparent px-2 text-left text-sm outline-none",
+                      pressableClass,
+                      isSelected || isHovered
+                        ? "text-foreground"
+                        : "text-muted-foreground",
+                    )}
+                  >
+                    <span className="truncate">{stateName}</span>
+                  </button>
+                </li>
               );
             })
           )}
-        </div>
+        </ul>
       </PopoverContent>
     </Popover>
   );
