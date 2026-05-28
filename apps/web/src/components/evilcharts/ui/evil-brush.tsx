@@ -2,14 +2,20 @@
 
 import type { MotionValue } from "motion/react";
 import {
-  motion,
+  domAnimation,
+  LazyMotion,
+  m,
   useMotionValue,
   useMotionValueEvent,
   useSpring,
   useTransform,
 } from "motion/react";
 import * as React from "react";
-import { type ComponentProps, useCallback, useEffect } from "react";
+import { useCallback } from "react";
+import type { CurveType } from "recharts/types/shape/Curve";
+import { ChartStyle } from "@/components/evilcharts/ui/chart-style";
+import type { ChartConfig } from "@/components/evilcharts/ui/chart-types";
+import { getColorsCount } from "@/components/evilcharts/ui/chart-utils";
 import {
   Area,
   AreaChart,
@@ -18,18 +24,12 @@ import {
   Line,
   LineChart,
   ResponsiveContainer,
-} from "recharts";
-import {
-  type ChartConfig,
-  ChartStyle,
-  getColorsCount,
-} from "@/components/evilcharts/ui/chart";
+} from "@/lib/recharts-client";
 import { cn } from "@/lib/utils";
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
 type EvilBrushVariant = "line" | "area" | "bar";
-type CurveType = ComponentProps<typeof Area>["type"];
 
 interface EvilBrushRange {
   startIndex: number;
@@ -245,18 +245,17 @@ function EvilBrush({
   // mouse movements don't produce index changes (e.g., at boundaries)
   const lastCommittedRef = React.useRef<EvilBrushRange>(internalRange);
 
-  useEffect(() => {
-    if (!isControlled) {
-      setInternalRange((prev) => {
-        const adjusted = {
-          startIndex: Math.min(prev.startIndex, Math.max(0, totalPoints - 1)),
-          endIndex: Math.min(prev.endIndex, Math.max(0, totalPoints - 1)),
-        };
-        lastCommittedRef.current = adjusted;
-        return adjusted;
-      });
-    }
-  }, [totalPoints, isControlled]);
+  const [prevTotalPoints, setPrevTotalPoints] = React.useState(totalPoints);
+  if (!isControlled && totalPoints !== prevTotalPoints) {
+    setPrevTotalPoints(totalPoints);
+    const maxIndex = Math.max(0, totalPoints - 1);
+    const adjusted = {
+      startIndex: Math.min(internalRange.startIndex, maxIndex),
+      endIndex: Math.min(internalRange.endIndex, maxIndex),
+    };
+    setInternalRange(adjusted);
+    lastCommittedRef.current = adjusted;
+  }
 
   // ── Clamping & committing ───────────────────────────────────────────────
 
@@ -329,18 +328,31 @@ function EvilBrush({
   // Position always driven by internalRange (never lags behind controlled props)
   const range = internalRange;
 
-  // Sync internalRange with controlled props when not dragging
-  useEffect(() => {
-    if (isControlled && !isDragging) {
+  const [prevControlledStart, setPrevControlledStart] =
+    React.useState(controlledStart);
+  const [prevControlledEnd, setPrevControlledEnd] =
+    React.useState(controlledEnd);
+  const [wasDragging, setWasDragging] = React.useState(isDragging);
+
+  if (isControlled && !isDragging) {
+    if (
+      controlledStart !== prevControlledStart ||
+      controlledEnd !== prevControlledEnd ||
+      wasDragging
+    ) {
+      setPrevControlledStart(controlledStart);
+      setPrevControlledEnd(controlledEnd);
+      setWasDragging(false);
       const syncedRange = {
         startIndex: controlledStart,
         endIndex: controlledEnd,
       };
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setInternalRange(syncedRange);
       lastCommittedRef.current = syncedRange;
     }
-  }, [isControlled, controlledStart, controlledEnd, isDragging]);
+  } else if (isDragging && !wasDragging) {
+    setWasDragging(true);
+  }
 
   // ── Computed positions (%) ──────────────────────────────────────────────
 
@@ -387,66 +399,68 @@ function EvilBrush({
   if (totalPoints === 0) return null;
 
   return (
-    <div
-      ref={containerRef}
-      data-chart={skipStyle ? undefined : chartId}
-      className={cn("group relative select-none", className)}
-      style={{ height }}
-    >
-      {!skipStyle && <ChartStyle id={chartId} config={chartConfig} />}
+    <LazyMotion features={domAnimation} strict>
+      <div
+        ref={containerRef}
+        data-chart={skipStyle ? undefined : chartId}
+        className={cn("group relative select-none", className)}
+        style={{ height }}
+      >
+        {!skipStyle && <ChartStyle id={chartId} config={chartConfig} />}
 
-      {/* Mini chart – always shows all data */}
-      <div className="absolute inset-0 overflow-hidden rounded-md">
-        <MiniChart
-          data={data}
-          keys={keys}
-          chartConfig={chartConfig}
-          variant={variant}
-          curveType={curveType}
-          chartId={chartId}
-          stacked={stacked}
-          strokeVariant={
-            strokeVariant === "animated-dashed" ? "dashed" : strokeVariant
-          }
-          connectNulls={connectNulls}
-          barRadius={barRadius}
+        {/* Mini chart – always shows all data */}
+        <div className="absolute inset-0 overflow-hidden rounded-md">
+          <MiniChart
+            data={data}
+            keys={keys}
+            chartConfig={chartConfig}
+            variant={variant}
+            curveType={curveType}
+            chartId={chartId}
+            stacked={stacked}
+            strokeVariant={
+              strokeVariant === "animated-dashed" ? "dashed" : strokeVariant
+            }
+            connectNulls={connectNulls}
+            barRadius={barRadius}
+          />
+        </div>
+
+        {/* Dim overlay – left */}
+        <m.div
+          className="bg-background/70 pointer-events-none absolute inset-y-0 left-0 rounded-l-md backdrop-blur-[2px]"
+          style={{ width: leftOverlayWidth }}
+        />
+        {/* Dim overlay – right */}
+        <m.div
+          className="bg-background/70 pointer-events-none absolute inset-y-0 right-0 rounded-r-md backdrop-blur-[2px]"
+          style={{ width: rightOverlayWidth }}
+        />
+
+        {/* Selected region – draggable to pan */}
+        <m.div
+          className="absolute inset-y-0 cursor-grab touch-none rounded-sm border active:cursor-grabbing"
+          style={{ left: leftPosition, width: selectedWidth }}
+          {...bind("middle")}
+        />
+
+        {/* Left handle */}
+        <BrushHandle
+          side="left"
+          position={leftPosition}
+          label={showLabels ? getLabel(range.startIndex) : undefined}
+          bind={bind("left")}
+        />
+
+        {/* Right handle */}
+        <BrushHandle
+          side="right"
+          position={rightPosition}
+          label={showLabels ? getLabel(range.endIndex) : undefined}
+          bind={bind("right")}
         />
       </div>
-
-      {/* Dim overlay – left */}
-      <motion.div
-        className="bg-background/70 pointer-events-none absolute inset-y-0 left-0 rounded-l-md backdrop-blur-[2px]"
-        style={{ width: leftOverlayWidth }}
-      />
-      {/* Dim overlay – right */}
-      <motion.div
-        className="bg-background/70 pointer-events-none absolute inset-y-0 right-0 rounded-r-md backdrop-blur-[2px]"
-        style={{ width: rightOverlayWidth }}
-      />
-
-      {/* Selected region – draggable to pan */}
-      <motion.div
-        className="absolute inset-y-0 cursor-grab touch-none rounded-sm border active:cursor-grabbing"
-        style={{ left: leftPosition, width: selectedWidth }}
-        {...bind("middle")}
-      />
-
-      {/* Left handle */}
-      <BrushHandle
-        side="left"
-        position={leftPosition}
-        label={showLabels ? getLabel(range.startIndex) : undefined}
-        bind={bind("left")}
-      />
-
-      {/* Right handle */}
-      <BrushHandle
-        side="right"
-        position={rightPosition}
-        label={showLabels ? getLabel(range.endIndex) : undefined}
-        bind={bind("right")}
-      />
-    </div>
+    </LazyMotion>
   );
 }
 
@@ -470,7 +484,7 @@ function BrushHandle({
   const isLeft = side === "left";
 
   return (
-    <motion.div className="absolute inset-y-0 z-10" style={{ left: position }}>
+    <m.div className="absolute inset-y-0 z-10" style={{ left: position }}>
       <div
         className={cn(
           "group absolute inset-y-0 flex w-3 cursor-ew-resize touch-none items-center justify-center after:absolute after:inset-y-0 after:-left-4 after:w-11 after:content-['']",
@@ -485,9 +499,9 @@ function BrushHandle({
           )}
         >
           <div className="flex flex-col gap-[2px]">
-            <div className="bg-background/70 h-[2px] w-[2px] rounded-full" />
-            <div className="bg-background/70 h-[2px] w-[2px] rounded-full" />
-            <div className="bg-background/70 h-[2px] w-[2px] rounded-full" />
+            <div className="bg-background/70 size-[2px] rounded-full" />
+            <div className="bg-background/70 size-[2px] rounded-full" />
+            <div className="bg-background/70 size-[2px] rounded-full" />
           </div>
         </div>
       </div>
@@ -502,7 +516,7 @@ function BrushHandle({
           {label}
         </div>
       )}
-    </motion.div>
+    </m.div>
   );
 }
 
@@ -533,12 +547,11 @@ function MiniChart({
 }) {
   const gradients = React.useMemo(
     () =>
-      Object.entries(chartConfig)
-        .filter(([key]) => keys.includes(key))
-        .map(([dataKey, config]) => ({
-          dataKey,
-          colorsCount: getColorsCount(config),
-        })),
+      Object.entries(chartConfig).flatMap(([key, config]) =>
+        keys.includes(key)
+          ? [{ dataKey: key, colorsCount: getColorsCount(config) }]
+          : [],
+      ),
     [chartConfig, keys],
   );
 
@@ -728,13 +741,14 @@ function useEvilBrush<TData extends Record<string, unknown>>({
   // deferred value.  React can skip intermediate slices during fast drags.
   const deferredRange = React.useDeferredValue(range);
 
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
+  const [prevDataLength, setPrevDataLength] = React.useState(data.length);
+  if (data.length !== prevDataLength) {
+    setPrevDataLength(data.length);
     setRange({
       startIndex: 0,
       endIndex: Math.max(0, data.length - 1),
     });
-  }, [data.length]);
+  }
 
   const visibleData = React.useMemo(
     () => data.slice(deferredRange.startIndex, deferredRange.endIndex + 1),
