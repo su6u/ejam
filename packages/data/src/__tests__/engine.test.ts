@@ -55,7 +55,12 @@ describe("normalCDF", () => {
   it("is monotonically increasing", () => {
     const xs = [-3, -2, -1, 0, 1, 2, 3];
     for (let i = 0; i < xs.length - 1; i++) {
-      expect(normalCDF(xs[i]!)).toBeLessThan(normalCDF(xs[i + 1]!));
+      const current = xs[i];
+      const next = xs[i + 1];
+      expect(current).toBeDefined();
+      expect(next).toBeDefined();
+      if (current === undefined || next === undefined) continue;
+      expect(normalCDF(current)).toBeLessThan(normalCDF(next));
     }
   });
 });
@@ -153,16 +158,24 @@ describe("computeRoundProbs", () => {
   it("probabilities are non-decreasing across rounds (cumulative)", () => {
     const probs = computeRoundProbs(800, makeRow());
     for (let i = 0; i < probs.length - 1; i++) {
-      expect(probs[i]!).toBeLessThanOrEqual(probs[i + 1]! + 0.0001);
+      const current = probs[i];
+      const next = probs[i + 1];
+      expect(current).toBeDefined();
+      expect(next).toBeDefined();
+      if (current === undefined || next === undefined) continue;
+      expect(current).toBeLessThanOrEqual(next + 0.0001);
     }
   });
 
   it("freezes at fill_round value for subsequent rounds", () => {
     // fill_round=3 means rounds 4–6 must equal round 3's cumulative value
     const probs = computeRoundProbs(1000, makeRow({ fill_round: 3 }));
-    expect(probs[3]).toBeCloseTo(probs[2]!, 4);
-    expect(probs[4]).toBeCloseTo(probs[2]!, 4);
-    expect(probs[5]).toBeCloseTo(probs[2]!, 4);
+    const round3 = probs[2];
+    expect(round3).toBeDefined();
+    if (round3 === undefined) return;
+    expect(probs[3]).toBeCloseTo(round3, 4);
+    expect(probs[4]).toBeCloseTo(round3, 4);
+    expect(probs[5]).toBeCloseTo(round3, 4);
   });
 
   it("all values are in [0, 1]", () => {
@@ -182,7 +195,10 @@ describe("computeRoundProbs", () => {
     });
     const probs = computeRoundProbs(1000, row);
     expect(probs).toHaveLength(6);
-    expect(probs[2]).toBeCloseTo(probs[1]!, 4);
+    const round2 = probs[1];
+    expect(round2).toBeDefined();
+    if (round2 === undefined) return;
+    expect(probs[2]).toBeCloseTo(round2, 4);
   });
 });
 
@@ -399,9 +415,12 @@ describe("predictPrograms", () => {
     const bands = result.programs.map((p) => p.band);
     const bandOrder = { safe: 0, target: 1, reach: 2, "long-shot": 3 };
     for (let i = 0; i < bands.length - 1; i++) {
-      expect(bandOrder[bands[i]!]).toBeLessThanOrEqual(
-        bandOrder[bands[i + 1]!],
-      );
+      const current = bands[i];
+      const next = bands[i + 1];
+      expect(current).toBeDefined();
+      expect(next).toBeDefined();
+      if (current === undefined || next === undefined) continue;
+      expect(bandOrder[current]).toBeLessThanOrEqual(bandOrder[next]);
     }
   });
 

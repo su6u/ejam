@@ -2,7 +2,14 @@
 
 import { quotaRequiresHomeState } from "@ejam/predictors/shared/quota-input";
 import Image from "next/image";
-import { type ReactNode, Suspense, useId, cloneElement, isValidElement, type ReactElement } from "react";
+import {
+  cloneElement,
+  isValidElement,
+  type ReactElement,
+  type ReactNode,
+  Suspense,
+  useId,
+} from "react";
 import {
   predictorHeaderStripClass,
   sidebarPanelTopInsetClass,
@@ -265,10 +272,10 @@ function OptionToggle({
   "aria-labelledby"?: string;
 }) {
   return (
-    <div
+    <fieldset
       aria-labelledby={ariaLabelledBy}
       className={cn(
-        "grid gap-1",
+        "grid min-w-0 gap-1 border-0 p-0",
         columns === 2 ? "grid-cols-2" : "grid-cols-3",
       )}
     >
@@ -299,7 +306,7 @@ function OptionToggle({
           </button>
         );
       })}
-    </div>
+    </fieldset>
   );
 }
 

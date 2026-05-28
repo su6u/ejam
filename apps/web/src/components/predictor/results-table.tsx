@@ -6,11 +6,11 @@
 
 "use client";
 
-import { stickyGlassTableHeaderClass } from "@/components/app-layout";
-import { useMemo } from "react";
 import type { PredictionProvenance } from "@ejam/data";
 import type { ProgramPrediction } from "@ejam/data/college-predictor";
 import { ChevronRight } from "lucide-react";
+import { useMemo } from "react";
+import { stickyGlassTableHeaderClass } from "@/components/app-layout";
 import { formatInteger } from "@/components/formatter";
 import { BandBadge } from "@/components/predictor/band-badge";
 import { DataVersionFooter } from "@/components/predictor/data-version-footer";

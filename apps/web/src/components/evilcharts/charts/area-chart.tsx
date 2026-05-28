@@ -19,9 +19,9 @@ import type { Props as RechartsAreaProps } from "recharts/types/cartesian/Area";
 import type { Props as RechartsCartesianGridProps } from "recharts/types/cartesian/CartesianGrid";
 import type { Props as RechartsXAxisProps } from "recharts/types/cartesian/XAxis";
 import type { Props as RechartsYAxisProps } from "recharts/types/cartesian/YAxis";
+import type { ValueType } from "recharts/types/component/DefaultTooltipContent";
 import type { CurveType } from "recharts/types/shape/Curve";
 import type { CartesianChartProps } from "recharts/types/util/types";
-import type { ValueType } from "recharts/types/component/DefaultTooltipContent";
 import {
   ChartContainer,
   LoadingIndicator,

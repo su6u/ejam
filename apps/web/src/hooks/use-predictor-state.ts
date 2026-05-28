@@ -8,7 +8,7 @@
 
 "use client";
 
-import { useRouter, type ReadonlyURLSearchParams } from "next/navigation";
+import { type ReadonlyURLSearchParams, useRouter } from "next/navigation";
 import { useCallback } from "react";
 
 export type ExamType = "jee-advanced" | "jee-main";

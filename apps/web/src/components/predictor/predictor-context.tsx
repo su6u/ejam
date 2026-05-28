@@ -1,6 +1,7 @@
 "use client";
 
 import { quotaRequiresHomeState } from "@ejam/predictors/shared/quota-input";
+import { useSearchParams } from "next/navigation";
 import {
   createContext,
   Suspense,
@@ -28,7 +29,6 @@ import {
   predictorUsesQuotaHomeState,
   usePredictorState,
 } from "@/hooks/use-predictor-state";
-import { useSearchParams } from "next/navigation";
 
 type PredictorQueryReturn = ReturnType<typeof usePredictorQuery>;
 
@@ -140,14 +140,7 @@ function PredictorProviderInner({ children }: { children: React.ReactNode }) {
       setSortBy,
       hasResults,
     }),
-    [
-      state,
-      query,
-      onPredict,
-      filters,
-      sortBy,
-      hasResults,
-    ],
+    [state, query, onPredict, filters, sortBy, hasResults],
   );
 
   return (

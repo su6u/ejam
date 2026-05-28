@@ -1,4 +1,4 @@
-import * as React from "react";
+import type * as React from "react";
 import type { DefaultTooltipContentProps } from "recharts";
 import type {
   NameType,

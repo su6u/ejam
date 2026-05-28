@@ -2,12 +2,12 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { AppHeader } from "@/components/app-header";
-import { HomeFolderGrid } from "@/components/home-folder-grid";
 import {
   appChromeStripClass,
   homePageContainerClass,
   stickyGlassChromeClass,
 } from "@/components/app-layout";
+import { HomeFolderGrid } from "@/components/home-folder-grid";
 import { cn } from "@/lib/utils";
 
 export const metadata: Metadata = {

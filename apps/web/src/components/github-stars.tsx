@@ -2,11 +2,11 @@
 
 import { domAnimation, LazyMotion, m, useReducedMotion } from "motion/react";
 import {
+  type RefObject,
   useEffect,
   useLayoutEffect,
   useRef,
   useState,
-  type RefObject,
 } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";

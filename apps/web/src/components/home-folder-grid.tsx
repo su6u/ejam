@@ -24,10 +24,7 @@ function FolderIcon() {
 export function HomeFolderGrid({ className }: { className?: string }) {
   return (
     <div
-      className={cn(
-        "home-folders flex flex-col items-center gap-8",
-        className,
-      )}
+      className={cn("home-folders flex flex-col items-center gap-8", className)}
     >
       <nav
         aria-label="Category"

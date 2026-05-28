@@ -4,8 +4,7 @@ import { cn } from "@/lib/utils";
 export const appContentGutterClass = "px-4 md:px-6";
 
 /** centered marketing/home column — navbar and body share one width */
-export const homePageContainerClass =
-  "mx-auto w-full max-w-3xl px-4 md:px-6";
+export const homePageContainerClass = "mx-auto w-full max-w-3xl px-4 md:px-6";
 
 /** frosted sticky chrome — navbar, table headers, etc. */
 export const stickyGlassChromeClass =
