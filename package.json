@@ -8,7 +8,7 @@
   },
   "scripts": {
     "build": "turbo run build",
-    "dev": "turbo run dev --parallel",
+    "dev": "turbo run dev",
     "lint": "turbo run lint",
     "format": "turbo run format",
     "typecheck": "turbo run typecheck",
@@ -26,7 +26,7 @@
   "devDependencies": {
     "@biomejs/biome": "^2.4.14",
     "tsx": "^4.21.0",
-    "turbo": "^2.9.8",
+    "turbo": "^2.9.15",
     "typescript": "^6.0.3"
   }
 }
