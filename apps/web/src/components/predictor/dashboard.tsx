@@ -7,17 +7,18 @@
 import type { ProgramPrediction } from "@ejam/data/college-predictor";
 import { useEffect, useState } from "react";
 import { usePredictor } from "@/components/predictor/predictor-context";
+import { programKey } from "@/components/predictor/program-key";
 import {
   applyResultsFilters,
   EMPTY_RESULTS_FILTERS,
-} from "@/components/predictor/results-filters";
+} from "@/components/predictor/results-filter-logic";
 import {
   applyResultsSort,
   type ResultsSortKey,
-} from "@/components/predictor/results-sort";
+} from "@/components/predictor/results-sort-logic";
 import { CollegeDetailSheet } from "./college-detail-sheet";
 import { EmptyState, ErrorState, LoadingState } from "./empty-state";
-import { programKey, ResultsTable } from "./results-table";
+import { ResultsTable } from "./results-table";
 
 export function Dashboard() {
   const { state, query, filters, setFilters, sortBy, setSortBy } =

@@ -5,24 +5,15 @@ import type {
   ProgramPrediction,
 } from "@ejam/data/college-predictor";
 import { FilterChip, FilterGroup } from "@/components/predictor/filter-chips";
+import type { ResultsFilterState } from "@/components/predictor/results-filter-logic";
 import type { ExamType } from "@/hooks/use-predictor-state";
 import { isJeeMainCounselling } from "@/hooks/use-predictor-state";
 import { BAND_FILTER_OPTIONS } from "@/lib/bands";
 import { cn } from "@/lib/utils";
 
-export interface ResultsFilterState {
-  instituteTypes: Set<string>;
-  bands: Set<ProbabilityBand>;
-}
-
-export const EMPTY_RESULTS_FILTERS: ResultsFilterState = {
-  instituteTypes: new Set(),
-  bands: new Set(),
-};
-
 const JEE_MAIN_INSTITUTE_ORDER = ["NIT", "IIIT", "CFI"] as const;
 
-export function availableInstituteTypes(
+function availableInstituteTypes(
   programs: ProgramPrediction[],
   exam: ExamType,
 ): string[] {
@@ -30,28 +21,6 @@ export function availableInstituteTypes(
 
   const present = new Set(programs.map((p) => p.instype));
   return JEE_MAIN_INSTITUTE_ORDER.filter((type) => present.has(type));
-}
-
-export function applyResultsFilters(
-  programs: ProgramPrediction[],
-  filters: ResultsFilterState,
-): ProgramPrediction[] {
-  return programs.filter((program) => {
-    if (
-      filters.instituteTypes.size > 0 &&
-      !filters.instituteTypes.has(program.instype)
-    ) {
-      return false;
-    }
-    if (filters.bands.size > 0 && !filters.bands.has(program.band)) {
-      return false;
-    }
-    return true;
-  });
-}
-
-export function hasActiveFilters(filters: ResultsFilterState): boolean {
-  return filters.instituteTypes.size > 0 || filters.bands.size > 0;
 }
 
 interface ResultsFiltersProps {

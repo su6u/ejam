@@ -10,13 +10,6 @@ export const BAND_STYLES: Record<
   "long-shot": { label: "Long-shot", color: "#FF6467" },
 };
 
-export const BAND_ORDER: Record<ProbabilityBand, number> = {
-  safe: 0,
-  target: 1,
-  reach: 2,
-  "long-shot": 3,
-};
-
 export const BAND_FILTER_OPTIONS: Array<{
   id: ProbabilityBand;
   label: string;
