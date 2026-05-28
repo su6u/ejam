@@ -245,9 +245,9 @@ function EvilBrush({
   // mouse movements don't produce index changes (e.g., at boundaries)
   const lastCommittedRef = React.useRef<EvilBrushRange>(internalRange);
 
-  const [prevTotalPoints, setPrevTotalPoints] = React.useState(totalPoints);
-  if (!isControlled && totalPoints !== prevTotalPoints) {
-    setPrevTotalPoints(totalPoints);
+  const prevTotalPointsRef = React.useRef(totalPoints);
+  if (!isControlled && totalPoints !== prevTotalPointsRef.current) {
+    prevTotalPointsRef.current = totalPoints;
     const maxIndex = Math.max(0, totalPoints - 1);
     const adjusted = {
       startIndex: Math.min(internalRange.startIndex, maxIndex),
@@ -328,21 +328,19 @@ function EvilBrush({
   // Position always driven by internalRange (never lags behind controlled props)
   const range = internalRange;
 
-  const [prevControlledStart, setPrevControlledStart] =
-    React.useState(controlledStart);
-  const [prevControlledEnd, setPrevControlledEnd] =
-    React.useState(controlledEnd);
-  const [wasDragging, setWasDragging] = React.useState(isDragging);
+  const prevControlledStartRef = React.useRef(controlledStart);
+  const prevControlledEndRef = React.useRef(controlledEnd);
+  const wasDraggingRef = React.useRef(isDragging);
 
   if (isControlled && !isDragging) {
     if (
-      controlledStart !== prevControlledStart ||
-      controlledEnd !== prevControlledEnd ||
-      wasDragging
+      controlledStart !== prevControlledStartRef.current ||
+      controlledEnd !== prevControlledEndRef.current ||
+      wasDraggingRef.current
     ) {
-      setPrevControlledStart(controlledStart);
-      setPrevControlledEnd(controlledEnd);
-      setWasDragging(false);
+      prevControlledStartRef.current = controlledStart;
+      prevControlledEndRef.current = controlledEnd;
+      wasDraggingRef.current = false;
       const syncedRange = {
         startIndex: controlledStart,
         endIndex: controlledEnd,
@@ -350,8 +348,8 @@ function EvilBrush({
       setInternalRange(syncedRange);
       lastCommittedRef.current = syncedRange;
     }
-  } else if (isDragging && !wasDragging) {
-    setWasDragging(true);
+  } else if (isDragging && !wasDraggingRef.current) {
+    wasDraggingRef.current = true;
   }
 
   // ── Computed positions (%) ──────────────────────────────────────────────
@@ -741,9 +739,9 @@ function useEvilBrush<TData extends Record<string, unknown>>({
   // deferred value.  React can skip intermediate slices during fast drags.
   const deferredRange = React.useDeferredValue(range);
 
-  const [prevDataLength, setPrevDataLength] = React.useState(data.length);
-  if (data.length !== prevDataLength) {
-    setPrevDataLength(data.length);
+  const prevDataLengthRef = React.useRef(data.length);
+  if (data.length !== prevDataLengthRef.current) {
+    prevDataLengthRef.current = data.length;
     setRange({
       startIndex: 0,
       endIndex: Math.max(0, data.length - 1),
