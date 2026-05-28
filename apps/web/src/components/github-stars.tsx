@@ -1,7 +1,14 @@
 "use client";
 
 import { domAnimation, LazyMotion, m, useReducedMotion } from "motion/react";
-import { useEffect, useLayoutEffect, useRef, useState, type RefObject } from "react";
+import {
+  Suspense,
+  use,
+  useLayoutEffect,
+  useRef,
+  useState,
+  type RefObject,
+} from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 
@@ -11,7 +18,6 @@ const STAR_REVEAL_TRANSITION = {
   duration: 0.3,
   bounce: 0,
 };
-const CACHE_KEY = "github-stars:su6u/ejam";
 const FALLBACK_SIZER = 99;
 
 export interface GitHubStarsProps {
@@ -22,9 +28,13 @@ export interface GitHubStarsProps {
   countClassName?: string;
 }
 
-function readCachedCount(): number | null {
+function cacheKey(owner: string, repo: string) {
+  return `github-stars:${owner}/${repo}`;
+}
+
+function readCachedCount(owner: string, repo: string): number | null {
   try {
-    const raw = sessionStorage.getItem(CACHE_KEY);
+    const raw = sessionStorage.getItem(cacheKey(owner, repo));
     if (!raw) return null;
     const parsed = Number.parseInt(raw, 10);
     return Number.isFinite(parsed) ? parsed : null;
@@ -33,12 +43,41 @@ function readCachedCount(): number | null {
   }
 }
 
-function writeCachedCount(count: number): void {
+function writeCachedCount(owner: string, repo: string, count: number): void {
   try {
-    sessionStorage.setItem(CACHE_KEY, String(count));
+    sessionStorage.setItem(cacheKey(owner, repo), String(count));
   } catch {
     // ignore quota errors
   }
+}
+
+const starCountPromises = new Map<string, Promise<number>>();
+
+function fetchGitHubStarCount(owner: string, repo: string): Promise<number> {
+  const key = cacheKey(owner, repo);
+  const cached = readCachedCount(owner, repo);
+  if (cached !== null) return Promise.resolve(cached);
+
+  const inflight = starCountPromises.get(key);
+  if (inflight) return inflight;
+
+  const promise = fetch(`https://api.github.com/repos/${owner}/${repo}`, {
+    headers: { Accept: "application/vnd.github.v3+json" },
+  })
+    .then(async (res) => {
+      if (!res.ok) throw new Error("github stars fetch failed");
+      const data = await res.json();
+      const next = data.stargazers_count ?? 0;
+      writeCachedCount(owner, repo, next);
+      return next;
+    })
+    .catch(() => readCachedCount(owner, repo) ?? 0)
+    .finally(() => {
+      starCountPromises.delete(key);
+    });
+
+  starCountPromises.set(key, promise);
+  return promise;
 }
 
 function cancelCountAnimation(rafIdRef: RefObject<number | null>) {
@@ -169,6 +208,43 @@ function GitHubStarsProvided({
   );
 }
 
+function GitHubStarsResolved({
+  owner,
+  repo,
+  className,
+  countClassName,
+}: {
+  owner: string;
+  repo: string;
+  className: string;
+  countClassName: string;
+}) {
+  const starCount = use(fetchGitHubStarCount(owner, repo));
+  const [displayCount, setDisplayCount] = useState(0);
+  const shouldReduceMotion = useReducedMotion();
+  const rafIdRef = useRef<number | null>(null);
+
+  useLayoutEffect(() => {
+    animateDisplayCount(
+      starCount,
+      shouldReduceMotion,
+      rafIdRef,
+      setDisplayCount,
+    );
+    return () => cancelCountAnimation(rafIdRef);
+  }, [starCount, shouldReduceMotion]);
+
+  return (
+    <GitHubStarsDisplay
+      isLoading={false}
+      displayCount={displayCount}
+      className={className}
+      countClassName={countClassName}
+      shouldReduceMotion={shouldReduceMotion}
+    />
+  );
+}
+
 function GitHubStarsFetched({
   owner,
   repo,
@@ -180,81 +256,27 @@ function GitHubStarsFetched({
   className: string;
   countClassName: string;
 }) {
-  const [starCount, setStarCount] = useState(0);
-  const [displayCount, setDisplayCount] = useState(0);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(false);
-  const shouldReduceMotion = useReducedMotion();
-  const rafIdRef = useRef<number | null>(null);
-  const hadCacheRef = useRef(false);
-
-  useLayoutEffect(() => {
-    const cached = readCachedCount();
-    if (cached === null) return;
-
-    hadCacheRef.current = true;
-    setStarCount(cached);
-    setIsLoading(false);
-    animateDisplayCount(cached, shouldReduceMotion, rafIdRef, setDisplayCount);
-  }, [shouldReduceMotion]);
-
-  useEffect(() => {
-    let cancelled = false;
-
-    const fetchData = async () => {
-      try {
-        if (!hadCacheRef.current && !cancelled) {
-          setIsLoading(true);
-        }
-        if (!cancelled) setError(false);
-
-        const res = await fetch(
-          `https://api.github.com/repos/${owner}/${repo}`,
-          {
-            headers: { Accept: "application/vnd.github.v3+json" },
-          },
-        );
-
-        if (cancelled) return;
-
-        if (res.ok) {
-          const data = await res.json();
-          const next = data.stargazers_count ?? 0;
-          setStarCount(next);
-          writeCachedCount(next);
-          animateDisplayCount(
-            next,
-            shouldReduceMotion,
-            rafIdRef,
-            setDisplayCount,
-          );
-        }
-      } catch {
-        if (!cancelled) setError(true);
-      } finally {
-        if (!cancelled) setIsLoading(false);
-      }
-    };
-
-    fetchData();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [owner, repo, shouldReduceMotion]);
-
-  useEffect(() => () => cancelCountAnimation(rafIdRef), []);
-
-  if (error && starCount === 0) return null;
+  const cached = readCachedCount(owner, repo);
 
   return (
-    <GitHubStarsDisplay
-      isLoading={isLoading}
-      displayCount={displayCount}
-      className={className}
-      countClassName={countClassName}
-      shouldReduceMotion={shouldReduceMotion}
-    />
+    <Suspense
+      fallback={
+        <GitHubStarsDisplay
+          isLoading={cached === null}
+          displayCount={cached ?? 0}
+          className={className}
+          countClassName={countClassName}
+          shouldReduceMotion={false}
+        />
+      }
+    >
+      <GitHubStarsResolved
+        owner={owner}
+        repo={repo}
+        className={className}
+        countClassName={countClassName}
+      />
+    </Suspense>
   );
 }
 
