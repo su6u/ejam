@@ -2,10 +2,13 @@ import { BookOpenIcon } from "lucide-react";
 import Image from "next/image";
 import GitHubStars from "@/components/github-stars";
 import { headerPillClass } from "@/lib/pressable";
+import { cn } from "@/lib/utils";
 
-export function AppHeader() {
+export function AppHeader({ className }: { className?: string }) {
   return (
-    <header className="flex w-full items-center justify-end gap-2">
+    <header
+      className={cn("flex shrink-0 items-center justify-end gap-2", className)}
+    >
       <a
         href="https://github.com/su6u/ejam#readme"
         target="_blank"

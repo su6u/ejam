@@ -36,7 +36,7 @@ export function AppShell({
                 stickyGlassChromeClass,
               )}
             >
-              <AppHeader />
+              <AppHeader className="w-full" />
             </div>
             <div className={cn(appShellLayoutClass(), "min-h-0 flex-1")}>
               <div className={appShellContentClass()}>{children}</div>
