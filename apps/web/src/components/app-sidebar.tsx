@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { appChromeStripClass } from "@/components/app-layout";
 import { PredictorSidebarPanel } from "@/components/predictor/predictor-sidebar-panel";
 import {
@@ -30,7 +31,7 @@ export function AppSidebar() {
             <SidebarMenuButton
               className="h-9 hover:bg-transparent active:bg-transparent data-active:bg-transparent"
               render={
-                <a
+                <Link
                   href="/"
                   aria-label="Ejam home"
                   className="flex items-center"
@@ -44,7 +45,7 @@ export function AppSidebar() {
                     aria-hidden
                     className="h-6 w-auto shrink-0"
                   />
-                </a>
+                </Link>
               }
             />
           </SidebarMenuItem>
