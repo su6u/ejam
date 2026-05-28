@@ -7,6 +7,7 @@ import {
   appHeaderGutterClass,
   appShellContentClass,
   appShellLayoutClass,
+  stickyGlassChromeClass,
 } from "@/components/app-layout";
 import { AppSidebar } from "@/components/app-sidebar";
 import { PredictorProvider } from "@/components/predictor/predictor-context";
@@ -25,7 +26,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 appChromeStripClass,
                 appHeaderGutterClass,
                 "sticky top-0 z-50 w-full",
-                "bg-background/95 backdrop-blur-sm supports-backdrop-filter:bg-background/50",
+                stickyGlassChromeClass,
               )}
             >
               <AppHeader />

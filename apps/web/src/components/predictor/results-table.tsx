@@ -6,6 +6,7 @@
 
 "use client";
 
+import { stickyGlassTableHeaderClass } from "@/components/app-layout";
 import type { PredictionProvenance } from "@ejam/data";
 import type { ProgramPrediction } from "@ejam/data/college-predictor";
 import { ChevronRight } from "lucide-react";
@@ -68,8 +69,8 @@ export function ResultsTable({
       }
     >
       <Table>
-        <TableHeader className="sticky top-0 z-10 bg-background shadow-[0_1px_0_0_var(--border)]">
-          <TableRow>
+        <TableHeader className={stickyGlassTableHeaderClass}>
+          <TableRow className="hover:bg-transparent">
             <TableHead className="ps-6">Institute</TableHead>
             <TableHead>Program</TableHead>
             <TableHead>Band</TableHead>
