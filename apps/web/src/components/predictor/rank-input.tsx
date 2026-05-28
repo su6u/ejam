@@ -21,6 +21,7 @@ interface RankInputProps {
   value: string;
   onValueChange: (value: string) => void;
   className?: string;
+  id?: string;
   ref?: Ref<RankInputHandle>;
 }
 
@@ -29,9 +30,10 @@ export function RankInput({
   value,
   onValueChange,
   className,
+  id,
   ref,
 }: RankInputProps) {
-  const [draft, setDraft] = useState(value);
+  const [draft, setDraft] = useState("");
   const [focused, setFocused] = useState(false);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -66,6 +68,7 @@ export function RankInput({
 
   return (
     <Input
+      id={id}
       type="text"
       inputMode="numeric"
       pattern="[0-9]*"
