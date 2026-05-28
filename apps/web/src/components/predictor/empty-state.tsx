@@ -24,6 +24,7 @@ function StateIllustration({ src }: { src: string }) {
         muted
         playsInline
         aria-hidden
+        tabIndex={-1}
         className="h-auto w-full object-contain"
       >
         <source src={src} type="video/webm" />
