@@ -62,3 +62,4 @@ apps/scraper/data/cache/
 # backtesting — local tuning scripts (CI: predictor.ts only)
 packages/data-cli/src/backtest/*
 !packages/data-cli/src/backtest/predictor.ts
+.vercel
