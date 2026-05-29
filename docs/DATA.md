@@ -7,7 +7,7 @@ ejam publishes counselling datasets as versioned parquet files pinned by a manif
 | Dataset | Path pattern | Used by |
 |---------|--------------|---------|
 | Cutoffs | `data/engineering/jee/{josaa\|csab}/cutoffs/year=YYYY/round=R/cutoffs.parquet` | Index build (linked in provenance via sidecar) |
-| Seat matrix | `data/engineering/jee/seats/matrix/year=YYYY/seat-matrix.parquet` | Optional seat transparency |
+| Seat matrix | `data/engineering/jee/seats/matrix/year=YYYY/seat-matrix.parquet` | Registry / transparency only; **not** loaded by the prediction runtime |
 | Predictor index | `data/dist/college_predictor_index.parquet` | JEE Main, JEE Advanced |
 | CSAB index | `data/dist/csab_predictor_index.parquet` | CSAB |
 | Index lineage | `data/dist/*.lineage.json` | Maps each index to cutoff files consumed at build time |
@@ -18,7 +18,7 @@ Official source URLs are listed in `data/engineering/jee/_sources.json`.
 
 ## Data attribution
 
-This is a personal hobby project — not a company or official service. I don't
+This is a personal hobby project. I don't
 own the counselling or exam data; it's compiled from public NTA, JoSAA, and
 CSAB releases. See [NOTICE](../NOTICE) for the full disclaimer. Always verify
 on official portals before making decisions.
@@ -53,7 +53,7 @@ pnpm verify:index-lineage    # assert sidecars match on-disk cutoffs
 
 ## Post-ingest checklist
 
-1. Ingest new cutoffs or seat matrix from official sources.
+1. Ingest new cutoffs from official sources (seat matrix is optional registry data; not consumed by prediction runtime).
 2. Rebuild predictor indices when cutoff history changed.
 3. Run `pnpm generate:manifest --version=vX.Y.Z`.
 4. Run `pnpm data:fetch` and `pnpm verify:index-lineage`.
