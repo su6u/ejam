@@ -68,6 +68,14 @@ function requestInputKey(opts: PredictorQueryOptions): string {
   ]);
 }
 
+function hasResponseForInput(
+  inputKey: string,
+  pendingInputKey: string | null,
+  settledInputKey: string | null,
+): boolean {
+  return pendingInputKey === inputKey || settledInputKey === inputKey;
+}
+
 function readErrorMessage(body: unknown): string {
   const parsed = PredictionErrorResponse.safeParse(body);
   return parsed.success ? parsed.data.error.message : "Prediction failed";
@@ -96,6 +104,7 @@ export function usePredictorQuery({
   const requestGenerationRef = useRef(0);
   const abortControllerRef = useRef<AbortController | null>(null);
   const predictInFlightInputKeyRef = useRef<string | null>(null);
+  const settledInputKeyRef = useRef<string | null>(null);
 
   const currentInputKey = requestInputKey({
     predictorExamId,
@@ -111,9 +120,13 @@ export function usePredictorQuery({
   if (currentInputKey !== prevInputKey) {
     setPrevInputKey(currentInputKey);
     if (
-      predictInFlightInputKeyRef.current === null ||
-      predictInFlightInputKeyRef.current !== currentInputKey
+      !hasResponseForInput(
+        currentInputKey,
+        predictInFlightInputKeyRef.current,
+        settledInputKeyRef.current,
+      )
     ) {
+      settledInputKeyRef.current = null;
       setData(null);
       setProvenance(null);
       setError(null);
@@ -186,6 +199,7 @@ export function usePredictorQuery({
           body = await res.json();
         } catch {
           if (!isCurrent()) return false;
+          settledInputKeyRef.current = inputKey;
           setError("Network error — please try again");
           return false;
         }
@@ -199,16 +213,19 @@ export function usePredictorQuery({
             "ok" in body &&
             body.ok === false)
         ) {
+          settledInputKeyRef.current = inputKey;
           setError(readErrorMessage(body));
           return false;
         }
 
         const json = readSuccessResponse(body);
         if (!json) {
+          settledInputKeyRef.current = inputKey;
           setError("Prediction failed");
           return false;
         }
 
+        settledInputKeyRef.current = inputKey;
         setData(json.result as CollegePredictionResult);
         setProvenance(json.provenance);
         return false;
@@ -219,6 +236,7 @@ export function usePredictorQuery({
           err instanceof Error
             ? err.message
             : "Network error — please try again";
+        settledInputKeyRef.current = inputKey;
         setError(message);
         return false;
       } finally {
