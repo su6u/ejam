@@ -62,5 +62,7 @@ for (const nftPath of walkNftFiles(serverDir)) {
 }
 
 if (patched > 0) {
-  console.log(`patch-duckdb-nft: updated ${patched} trace file(s) with libduckdb shared libs`);
+  console.log(
+    `patch-duckdb-nft: updated ${patched} trace file(s) with libduckdb shared libs`,
+  );
 }
