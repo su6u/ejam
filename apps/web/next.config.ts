@@ -9,7 +9,8 @@ const monorepoRoot = path.join(import.meta.dirname, "../..");
 const isProd = process.env.NODE_ENV === "production";
 
 const nextConfig: NextConfig = {
-  // Trace workspace packages + repo-root data/ into serverless bundles
+  // Trace workspace packages + repo-root data/ into serverless bundles.
+  // DuckDB libduckdb.{so,dylib}: patched post-build (see scripts/patch-duckdb-nft.mjs) — Turbopack skips includes.
   outputFileTracingRoot: monorepoRoot,
   outputFileTracingIncludes: {
     "/api/predict/[exam_id]": ["data/**/*"],

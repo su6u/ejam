@@ -100,6 +100,12 @@ importers:
       '@duckdb/node-bindings-darwin-x64':
         specifier: 1.5.2-r.1
         version: 1.5.2-r.1
+      '@duckdb/node-bindings-linux-arm64':
+        specifier: 1.5.2-r.1
+        version: 1.5.2-r.1
+      '@duckdb/node-bindings-linux-x64':
+        specifier: 1.5.2-r.1
+        version: 1.5.2-r.1
 
   packages/data:
     dependencies:
