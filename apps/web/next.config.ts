@@ -9,10 +9,15 @@ const monorepoRoot = path.join(import.meta.dirname, "../..");
 const isProd = process.env.NODE_ENV === "production";
 
 const nextConfig: NextConfig = {
-  // Trace workspace packages + repo-root data/ into serverless bundles
+  // Trace runtime-only files that Next's static analysis can miss in serverless bundles.
   outputFileTracingRoot: monorepoRoot,
   outputFileTracingIncludes: {
-    "/api/predict/[exam_id]": ["data/**/*"],
+    "/api/predict/[exam_id]": [
+      "data/**/*",
+      "../../node_modules/.pnpm/@duckdb+node-api@*/node_modules/@duckdb/node-api/**/*",
+      "../../node_modules/.pnpm/@duckdb+node-bindings@*/node_modules/@duckdb/node-bindings/**/*",
+      "../../node_modules/.pnpm/@duckdb+node-bindings-linux-x64@*/node_modules/@duckdb/node-bindings-linux-x64/**/*",
+    ],
   },
   // DuckDB uses platform-specific .node binaries — must not be bundled by Turbopack
   serverExternalPackages: ["@duckdb/node-api", "@duckdb/node-bindings"],
