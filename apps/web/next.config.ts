@@ -12,7 +12,7 @@ const nextConfig: NextConfig = {
   // Trace runtime-only files that Next's static analysis can miss in serverless bundles.
   outputFileTracingRoot: monorepoRoot,
   outputFileTracingIncludes: {
-    "/api/predict/[exam_id]": [
+    "/api/predict/\\[exam_id\\]": [
       "data/**/*",
       "../../node_modules/.pnpm/@duckdb+node-api@*/node_modules/@duckdb/node-api/**/*",
       "../../node_modules/.pnpm/@duckdb+node-bindings@*/node_modules/@duckdb/node-bindings/**/*",
