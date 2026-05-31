@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "next dev --turbopack",
-    "build": "next build",
+    "build": "next build && node scripts/patch-duckdb-nft.mjs",
     "start": "next start",
     "lint": "biome check .",
     "lint:write": "biome check --write .",
@@ -34,7 +34,9 @@
   },
   "optionalDependencies": {
     "@duckdb/node-bindings-darwin-arm64": "1.5.2-r.1",
-    "@duckdb/node-bindings-darwin-x64": "1.5.2-r.1"
+    "@duckdb/node-bindings-darwin-x64": "1.5.2-r.1",
+    "@duckdb/node-bindings-linux-arm64": "1.5.2-r.1",
+    "@duckdb/node-bindings-linux-x64": "1.5.2-r.1"
   },
   "devDependencies": {
     "@types/node": "^25.6.0",
