@@ -11,7 +11,11 @@ import {
 } from "@/components/app-layout";
 import { AppSidebar } from "@/components/app-sidebar";
 import { PredictorProvider } from "@/components/predictor/predictor-context";
-import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
+import {
+  SidebarInset,
+  SidebarProvider,
+  SidebarTrigger,
+} from "@/components/ui/sidebar";
 import { type AppIdentity, ejamIdentity } from "@/lib/identity";
 import { cn } from "@/lib/utils";
 
@@ -32,11 +36,12 @@ export function AppShell({
               className={cn(
                 appChromeStripClass,
                 appHeaderGutterClass,
-                "sticky top-0 z-50 w-full",
+                "sticky top-0 z-50 flex w-full items-center gap-2",
                 stickyGlassChromeClass,
               )}
             >
-              <AppHeader className="w-full" />
+              <SidebarTrigger />
+              <AppHeader className="min-w-0 flex-1" showToolsLink />
             </div>
             <div className={cn(appShellLayoutClass(), "min-h-0 flex-1")}>
               <div className={appShellContentClass()}>{children}</div>

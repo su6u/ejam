@@ -20,6 +20,7 @@ import { ResultsCardShell } from "@/components/predictor/results-card-shell";
 import { ResultsSort } from "@/components/predictor/results-sort";
 import type { ResultsSortKey } from "@/components/predictor/results-sort-logic";
 import { RoundProbabilityBars } from "@/components/predictor/round-probability-bars";
+import { DigitGroup } from "@/components/transitions/digit-group";
 import { Button } from "@/components/ui/button";
 import {
   Table,
@@ -53,23 +54,30 @@ export function ResultsTable({
   provenance,
 }: ResultsTableProps) {
   const isFiltered = rows.length !== allRows.length;
-  const countLabel =
-    rows.length === allRows.length
-      ? `${rows.length} program${rows.length === 1 ? "" : "s"}`
-      : `${rows.length} of ${allRows.length}`;
 
   const headerExtra = useMemo(
     () => (
       <span className="shrink-0 text-xs tabular-nums text-muted-foreground">
-        {countLabel}
+        {isFiltered ? (
+          <>
+            <DigitGroup value={String(rows.length)} />
+            <span> of </span>
+            <DigitGroup value={String(allRows.length)} />
+          </>
+        ) : (
+          <>
+            <DigitGroup value={String(rows.length)} />
+            <span> program{rows.length === 1 ? "" : "s"}</span>
+          </>
+        )}
       </span>
     ),
-    [countLabel],
+    [rows.length, allRows.length, isFiltered],
   );
 
   return (
     <ResultsCardShell
-      contentClassName="no-scrollbar overflow-y-auto [&_[data-slot=table-container]]:no-scrollbar"
+      contentClassName="theme-scrollbar min-h-0 flex-1 overflow-y-auto"
       toolbar={<ResultsSort sortBy={sortBy} onChange={onSortChange} />}
       footer={<DataVersionFooter provenance={provenance} />}
       headerExtra={headerExtra}
@@ -79,13 +87,13 @@ export function ResultsTable({
           <TableRow className="hover:bg-transparent">
             <TableHead className="ps-6">Institute</TableHead>
             <TableHead>Program</TableHead>
-            <TableHead>Band</TableHead>
-            <TableHead>Chance</TableHead>
+            <TableHead className="min-w-24">Band</TableHead>
+            <TableHead className="min-w-24">Chance</TableHead>
             <TableHead className="w-0 pe-6 whitespace-nowrap tabular-nums">
               Closing rank
             </TableHead>
-            <TableHead>Seat pool</TableHead>
-            <TableHead className="pe-6 text-right" />
+            <TableHead className="min-w-[7rem]">Seat pool</TableHead>
+            <TableHead className="w-10 pe-6 text-right" />
           </TableRow>
         </TableHeader>
         <TableBody className="[&_tr:first-child]:border-t-0">
@@ -119,8 +127,17 @@ export function ResultsTable({
                 <TableRow
                   key={id}
                   data-state={isSelected ? "selected" : undefined}
+                  tabIndex={0}
+                  role="button"
+                  aria-label={`${row.institute_id}, ${row.program_name ?? row.program_id}`}
                   onClick={() => onSelect(row)}
-                  className="h-12 cursor-pointer"
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter" || event.key === " ") {
+                      event.preventDefault();
+                      onSelect(row);
+                    }
+                  }}
+                  className="h-12 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                 >
                   <TableCell className="ps-6">
                     <div className="flex items-center gap-2">
@@ -138,12 +155,13 @@ export function ResultsTable({
                       </span>
                     ) : null}
                   </TableCell>
-                  <TableCell>
+                  <TableCell className="min-w-24">
                     <BandBadge band={row.band} />
                   </TableCell>
-                  <TableCell>
+                  <TableCell className="min-w-24">
                     <RoundProbabilityBars
                       key={sortBy}
+                      className="shrink-0"
                       roundProbs={row.round_probs}
                       overallProbability={row.cumulative_probability}
                       fillRound={row.fill_round}
@@ -152,13 +170,13 @@ export function ResultsTable({
                   <TableCell className="w-0 pe-6 whitespace-nowrap tabular-nums">
                     {formatInteger(row.predicted_closing_rank)}
                   </TableCell>
-                  <TableCell className="text-muted-foreground">
+                  <TableCell className="min-w-[7rem] text-muted-foreground">
                     {seatPoolLabel(row)}
                   </TableCell>
-                  <TableCell className="pe-6 text-right">
+                  <TableCell className="w-10 pe-6 text-right">
                     <ChevronRight
                       className={cn(
-                        "size-4 text-muted-foreground/70 transition-transform",
+                        "size-4 text-muted-foreground/70 transition-transform duration-150 ease-out",
                         isSelected && "translate-x-0.5 text-foreground",
                       )}
                       aria-hidden

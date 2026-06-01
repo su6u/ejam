@@ -8,7 +8,10 @@ import {
   useRef,
   useState,
 } from "react";
+import { RankInputErrorMessage } from "@/components/predictor/rank-input-error";
 import { Input } from "@/components/ui/input";
+import { useErrorShake } from "@/hooks/use-error-shake";
+import type { RankValidationError } from "@/lib/rank-validation";
 import { cn } from "@/lib/utils";
 
 const MAX_RANK_LENGTH = 7;
@@ -16,6 +19,7 @@ const URL_SYNC_MS = 400;
 
 export type RankInputHandle = {
   flush: () => string;
+  showValidationError: (error: RankValidationError) => void;
 };
 
 interface RankInputProps {
@@ -36,7 +40,12 @@ export function RankInput({
 }: RankInputProps) {
   const [draft, setDraft] = useState("");
   const [focused, setFocused] = useState(false);
+  const [validationError, setValidationError] = useState<RankValidationError>({
+    type: "empty",
+  });
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const typedThisFocusRef = useRef(false);
+  const { wrapRef, showError, clearError } = useErrorShake();
 
   useEffect(
     () => () => {
@@ -56,6 +65,14 @@ export function RankInput({
     [onValueChange],
   );
 
+  const revealValidationError = useCallback(
+    (error: RankValidationError) => {
+      setValidationError(error);
+      showError();
+    },
+    [showError],
+  );
+
   useImperativeHandle(
     ref,
     () => ({
@@ -64,47 +81,59 @@ export function RankInput({
         commit(next);
         return next;
       },
+      showValidationError: revealValidationError,
     }),
-    [draft, focused, value, commit],
+    [draft, focused, value, commit, revealValidationError],
   );
 
   const handleChange = (raw: string) => {
     const next = raw.replace(/\D/g, "").slice(0, MAX_RANK_LENGTH);
     setDraft(next);
+    if (next.length > 0) typedThisFocusRef.current = true;
+    clearError();
     if (debounceRef.current) clearTimeout(debounceRef.current);
     debounceRef.current = setTimeout(() => onValueChange(next), URL_SYNC_MS);
   };
 
   return (
-    <Input
-      id={id}
-      type="text"
-      inputMode="numeric"
-      pattern="[0-9]*"
-      autoComplete="off"
-      autoCorrect="off"
-      spellCheck={false}
-      name="predictor-rank"
-      value={focused ? draft : value}
-      onFocus={() => {
-        setDraft(value);
-        setFocused(true);
-      }}
-      onBlur={() => {
-        setFocused(false);
-        commit(draft);
-      }}
-      onChange={(e) => handleChange(e.target.value)}
-      placeholder="e.g. 4521"
-      maxLength={MAX_RANK_LENGTH}
-      required
-      aria-required
-      data-transparent-input=""
-      className={cn(
-        "w-full rounded-none tabular-nums",
-        "border-input bg-transparent shadow-none dark:bg-transparent dark:hover:bg-transparent",
-        className,
-      )}
-    />
+    <div ref={wrapRef} className="t-input-wrap flex flex-col gap-1">
+      <Input
+        id={id}
+        type="text"
+        inputMode="numeric"
+        pattern="[0-9]*"
+        autoComplete="off"
+        autoCorrect="off"
+        spellCheck={false}
+        name="predictor-rank"
+        value={focused ? draft : value}
+        onFocus={() => {
+          setDraft(value);
+          setFocused(true);
+          typedThisFocusRef.current = Boolean(value.trim());
+        }}
+        onBlur={() => {
+          setFocused(false);
+          commit(draft);
+          if (!draft.trim() && !typedThisFocusRef.current) {
+            revealValidationError({ type: "empty" });
+          }
+        }}
+        onChange={(e) => handleChange(e.target.value)}
+        placeholder="e.g. 4521"
+        maxLength={MAX_RANK_LENGTH}
+        required
+        aria-required
+        data-transparent-input=""
+        className={cn(
+          "t-input w-full rounded-none tabular-nums",
+          "border-input bg-transparent shadow-none dark:bg-transparent dark:hover:bg-transparent",
+          className,
+        )}
+      />
+      <p className="t-error-msg text-[10px] leading-snug text-destructive">
+        <RankInputErrorMessage error={validationError} />
+      </p>
+    </div>
   );
 }

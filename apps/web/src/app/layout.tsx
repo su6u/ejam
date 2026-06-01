@@ -17,7 +17,7 @@ const ibmPlex = IBM_Plex_Sans({
 
 export const metadata: Metadata = {
   title: "ejam",
-  description: "ejam",
+  description: "Open-source tools for students around Indian exams",
   icons: {
     icon: [
       { url: "/identity/favicon.ico", sizes: "any" },

@@ -21,7 +21,7 @@ import { EmptyState, ErrorState, LoadingState } from "./empty-state";
 import { ResultsTable } from "./results-table";
 
 export function Dashboard() {
-  const { state, query, filters, setFilters, sortBy, setSortBy } =
+  const { state, query, rankInputRef, filters, setFilters, sortBy, setSortBy } =
     usePredictor();
   const [selected, setSelected] = useState<ProgramPrediction | null>(null);
   const [sheetOpen, setSheetOpen] = useState(false);
@@ -47,6 +47,13 @@ export function Dashboard() {
     error: query.error,
     hasResults,
     hasPredicted: query.data !== null,
+    metadata: query.data?.metadata,
+    includeAll: state.include_all,
+    onShowLongShots: () => {
+      state.setIncludeAll(true);
+      const flushedRank = rankInputRef.current?.flush() ?? state.rank;
+      void query.trigger(flushedRank, { include_all: true });
+    },
     programs,
     filteredPrograms,
     sortBy,
@@ -83,6 +90,9 @@ function renderMiddle({
   error,
   hasResults,
   hasPredicted,
+  metadata,
+  includeAll,
+  onShowLongShots,
   programs,
   filteredPrograms,
   sortBy,
@@ -96,6 +106,9 @@ function renderMiddle({
   error: string | null;
   hasResults: boolean;
   hasPredicted: boolean;
+  metadata?: import("@ejam/data/college-predictor").CollegePredictionResult["metadata"];
+  includeAll: boolean;
+  onShowLongShots: () => void;
   programs: ProgramPrediction[];
   filteredPrograms: ProgramPrediction[];
   sortBy: ResultsSortKey;
@@ -108,7 +121,15 @@ function renderMiddle({
   if (error) return <ErrorState message={error} provenance={provenance} />;
   if (!hasResults) {
     if (isLoading) return <LoadingState provenance={provenance} />;
-    return <EmptyState hasPredicted={hasPredicted} provenance={provenance} />;
+    return (
+      <EmptyState
+        hasPredicted={hasPredicted}
+        metadata={metadata}
+        includeAll={includeAll}
+        onShowLongShots={onShowLongShots}
+        provenance={provenance}
+      />
+    );
   }
 
   return (

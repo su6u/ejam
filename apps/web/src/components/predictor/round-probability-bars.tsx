@@ -26,24 +26,37 @@ function toPercent(value: number): number {
   return Math.round(clampProbability(value) * 100);
 }
 
-/** Pick the bar whose center is closest to the pointer — avoids overlap skew */
-function roundAtPointer(root: HTMLElement, clientX: number): number | null {
+type BarHitRegion = { round: number; center: number };
+
+/** Measure bar centers once; avoids layout reads on every mousemove. */
+function measureBarHits(root: HTMLElement): BarHitRegion[] {
   const bars = Array.from(root.querySelectorAll<HTMLElement>(".t-round-bar"));
-  if (bars.length === 0) return null;
+  return bars.map((bar) => {
+    const rect = bar.getBoundingClientRect();
+    return {
+      round: Number(bar.dataset.round ?? 1),
+      center: rect.left + rect.width / 2,
+    };
+  });
+}
 
-  const { left, right } = root.getBoundingClientRect();
-  if (clientX < left || clientX > right) return null;
+function roundAtPointer(
+  hits: BarHitRegion[],
+  rootLeft: number,
+  rootRight: number,
+  clientX: number,
+): number | null {
+  if (hits.length === 0) return null;
+  if (clientX < rootLeft || clientX > rootRight) return null;
 
-  let bestRound = 1;
+  let bestRound = hits[0]?.round ?? 1;
   let bestDistance = Number.POSITIVE_INFINITY;
 
-  for (const bar of bars) {
-    const rect = bar.getBoundingClientRect();
-    const center = rect.left + rect.width / 2;
+  for (const { round, center } of hits) {
     const distance = Math.abs(clientX - center);
     if (distance < bestDistance) {
       bestDistance = distance;
-      bestRound = Number(bar.dataset.round ?? 1);
+      bestRound = round;
     }
   }
 
@@ -57,6 +70,8 @@ export function RoundProbabilityBars({
   className,
 }: RoundProbabilityBarsProps) {
   const barsRef = useRef<HTMLDivElement>(null);
+  const barHitsRef = useRef<BarHitRegion[]>([]);
+  const barBoundsRef = useRef({ left: 0, right: 0 });
   const [hoveredRound, setHoveredRound] = useState<number | null>(null);
 
   const rounds = useMemo(() => {
@@ -124,6 +139,25 @@ export function RoundProbabilityBars({
     };
   }, [rounds]);
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: re-measure bar centers when round data changes
+  useEffect(() => {
+    const root = barsRef.current;
+    if (!root) return;
+
+    const syncBarHits = () => {
+      const { left, right } = root.getBoundingClientRect();
+      barBoundsRef.current = { left, right };
+      barHitsRef.current = measureBarHits(root);
+    };
+
+    syncBarHits();
+    if (typeof ResizeObserver === "undefined") return;
+
+    const observer = new ResizeObserver(syncBarHits);
+    observer.observe(root);
+    return () => observer.disconnect();
+  }, [rounds]);
+
   return (
     <fieldset
       className={cn("flex min-w-0 items-center gap-2 border-0 p-0", className)}
@@ -135,8 +169,18 @@ export function RoundProbabilityBars({
         className="t-round-bars-track"
         onMouseMove={(event) => {
           const root = barsRef.current;
-          if (!root) return;
-          const round = roundAtPointer(root, event.clientX);
+          if (root && barHitsRef.current.length === 0) {
+            const { left, right } = root.getBoundingClientRect();
+            barBoundsRef.current = { left, right };
+            barHitsRef.current = measureBarHits(root);
+          }
+          const { left, right } = barBoundsRef.current;
+          const round = roundAtPointer(
+            barHitsRef.current,
+            left,
+            right,
+            event.clientX,
+          );
           if (round !== null) setHoveredRound(round);
         }}
         onMouseLeave={() => setHoveredRound(null)}

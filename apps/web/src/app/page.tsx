@@ -8,6 +8,7 @@ import {
   stickyGlassChromeClass,
 } from "@/components/app-layout";
 import { HomeFolderGrid } from "@/components/home-folder-grid";
+import { pressableClass } from "@/lib/pressable";
 import { cn } from "@/lib/utils";
 
 export const metadata: Metadata = {
@@ -34,7 +35,7 @@ export default function ToolsHub() {
           <Link
             href="/"
             aria-label="Ejam home"
-            className="flex shrink-0 items-center"
+            className={cn("flex shrink-0 items-center", pressableClass)}
           >
             <Image
               src="/identity/logo.svg"

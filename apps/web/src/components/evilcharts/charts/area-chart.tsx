@@ -1146,7 +1146,6 @@ const LoadingPattern = ({
   // 1 (left buffer) + 1 (visible) + 1 (right buffer)
   const patternWidth = 3;
   const startX = -1;
-  const endX = 2;
 
   // Tracks the last x value to detect the exit threshold crossing
   const lastXRef = useRef(startX);
@@ -1184,8 +1183,8 @@ const LoadingPattern = ({
           width="1"
           height="1"
           fill={`url(#${chartId}-loading-gradient)`}
-          initial={{ x: startX }}
-          animate={{ x: endX }}
+          initial={{ transform: "translateX(-100%)" }}
+          animate={{ transform: "translateX(200%)" }}
           transition={{
             duration: LOADING_ANIMATION_DURATION / 1000,
             ease: "linear",
@@ -1193,7 +1192,11 @@ const LoadingPattern = ({
             repeatType: "loop",
           }}
           onUpdate={(latest) => {
-            const xValue = typeof latest.x === "number" ? latest.x : startX;
+            const match =
+              typeof latest.transform === "string"
+                ? /translateX\(([-\d.]+)%\)/.exec(latest.transform)
+                : null;
+            const xValue = match ? Number(match[1]) / 100 : startX;
             const lastX = lastXRef.current;
 
             // Fire once per loop, when the shimmer fully exits the visible area
