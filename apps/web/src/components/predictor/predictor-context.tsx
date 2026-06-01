@@ -22,7 +22,6 @@ import {
   type ResultsSortKey,
 } from "@/components/predictor/results-sort-logic";
 import { usePredictorQuery } from "@/hooks/use-predictor-query";
-import { validatePredictorRank } from "@/lib/rank-validation";
 import {
   counsellingToPredictorExam,
   type PredictorStateReturn,
@@ -30,6 +29,7 @@ import {
   predictorUsesQuotaHomeState,
   usePredictorState,
 } from "@/hooks/use-predictor-state";
+import { validatePredictorRank } from "@/lib/rank-validation";
 
 type PredictorQueryReturn = ReturnType<typeof usePredictorQuery>;
 

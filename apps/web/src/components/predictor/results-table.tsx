@@ -67,10 +67,7 @@ export function ResultsTable({
         ) : (
           <>
             <DigitGroup value={String(rows.length)} />
-            <span>
-              {" "}
-              program{rows.length === 1 ? "" : "s"}
-            </span>
+            <span> program{rows.length === 1 ? "" : "s"}</span>
           </>
         )}
       </span>

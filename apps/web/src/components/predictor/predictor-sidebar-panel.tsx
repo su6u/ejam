@@ -15,11 +15,11 @@ import {
   sidebarPanelTopInsetClass,
 } from "@/components/app-layout";
 import { HomeStateCombobox } from "@/components/predictor/home-state-combobox";
-import { usePredictor } from "@/components/predictor/predictor-context";
 import { OptionPicker } from "@/components/predictor/option-picker";
+import { PredictButtonLabel } from "@/components/predictor/predict-button-label";
+import { usePredictor } from "@/components/predictor/predictor-context";
 import { RankInput } from "@/components/predictor/rank-input";
 import { SidebarFilterSection } from "@/components/predictor/sidebar-filter-section";
-import { PredictButtonLabel } from "@/components/predictor/predict-button-label";
 import { Button } from "@/components/ui/button";
 import { useSidebar } from "@/components/ui/sidebar";
 import {

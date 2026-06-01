@@ -66,10 +66,7 @@ export function OptionPicker({
         className="w-(--anchor-width) min-w-(--anchor-width) rounded-none p-1"
         align="start"
       >
-        <div
-          role="listbox"
-          className={cn("flex flex-col", listClassName)}
-        >
+        <div role="listbox" className={cn("flex flex-col", listClassName)}>
           {options.map((option) => {
             const isSelected = option.value === value;
 

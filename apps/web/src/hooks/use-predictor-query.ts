@@ -167,8 +167,7 @@ export function usePredictorQuery({
       const controller = new AbortController();
       abortControllerRef.current = controller;
 
-      const effectiveIncludeAll =
-        requestOverrides?.include_all ?? include_all;
+      const effectiveIncludeAll = requestOverrides?.include_all ?? include_all;
 
       const opts: PredictorQueryOptions = {
         predictorExamId,

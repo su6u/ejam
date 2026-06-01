@@ -24,7 +24,9 @@ export function PredictButtonLabel({
       aria-live="polite"
     >
       <span className="t-predict-label-layer label-idle">{LABEL_IDLE}</span>
-      <span className="t-predict-label-layer label-loading">{LABEL_LOADING}</span>
+      <span className="t-predict-label-layer label-loading">
+        {LABEL_LOADING}
+      </span>
     </span>
   );
 }
