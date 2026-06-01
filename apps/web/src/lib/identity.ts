@@ -18,6 +18,6 @@ export const collegePredictorIdentity: AppIdentity = {
   logoSrc: "/identity/p-logo.svg",
   logoWidth: 612,
   logoHeight: 94,
-  homeHref: "/college-predictor",
-  homeAriaLabel: "College predictor",
+  homeHref: "/",
+  homeAriaLabel: "All tools",
 };
