@@ -48,10 +48,10 @@
   --selection: rgb(0 0 0 / 0.12);
   --selection-foreground: var(--foreground);
 
-  /* Strong ease-out for UI enter/exit (Emil) */
+  /* Strong ease-out for UI enter/exit */
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
 
-  /* Sheet / drawer — iOS open curve, snappy close (Emil asymmetric timing) */
+  /* Sheet / drawer — asymmetric open and close timing */
   --sheet-open-dur: 380ms;
   --sheet-close-dur: 260ms;
   --sheet-ease-open: cubic-bezier(0.32, 0.72, 0, 1);
@@ -59,7 +59,7 @@
   --sheet-backdrop-open-dur: 380ms;
   --sheet-backdrop-close-dur: 220ms;
 
-  /* transitions-dev — semantic motion tokens */
+  /* Motion tokens */
   --resize-dur: 300ms;
   --resize-ease: cubic-bezier(0.22, 1, 0.36, 1);
   --digit-dur: 500ms;
@@ -686,7 +686,7 @@ input {
     }
   }
 
-  /* transitions-dev — menu dropdown (Base UI data-open / data-starting-style / data-ending-style) */
+  /* Menu dropdown (Base UI open/close states) */
   .t-dropdown {
     transform-origin: var(--transform-origin, top left);
     transform: scale(1);
@@ -717,7 +717,7 @@ input {
     }
   }
 
-  /* transitions-dev — icon swap */
+  /* Icon swap */
   .t-icon-swap {
     position: relative;
     display: inline-grid;
@@ -752,7 +752,7 @@ input {
     }
   }
 
-  /* transitions-dev — text states swap (verbatim) */
+  /* Text state swap */
   .t-text-swap {
     display: inline-block;
     transform: translateY(0);
@@ -835,7 +835,7 @@ input {
     }
   }
 
-  /* transitions-dev — number pop-in */
+  /* Number pop-in */
   @keyframes t-digit-pop-in {
     0% {
       transform: translate(
@@ -881,7 +881,7 @@ input {
     }
   }
 
-  /* transitions-dev — avatar group hover */
+  /* Avatar group hover */
   .t-avatar {
     transform-origin: center;
     transform: translateY(var(--shift, 0px)) scale(var(--scale-active, 1));
@@ -896,7 +896,7 @@ input {
     }
   }
 
-  /* transitions-dev — error state shake */
+  /* Input error shake */
   .t-input {
     transition: border-color 150ms ease-out;
     will-change: transform;

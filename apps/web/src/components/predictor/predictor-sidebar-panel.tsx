@@ -16,7 +16,7 @@ import {
 } from "@/components/app-layout";
 import { HomeStateCombobox } from "@/components/predictor/home-state-combobox";
 import { usePredictor } from "@/components/predictor/predictor-context";
-import { ProximityPicker } from "@/components/predictor/proximity-picker";
+import { OptionPicker } from "@/components/predictor/option-picker";
 import { RankInput } from "@/components/predictor/rank-input";
 import { SidebarFilterSection } from "@/components/predictor/sidebar-filter-section";
 import { PredictButtonLabel } from "@/components/predictor/predict-button-label";
@@ -195,7 +195,7 @@ function PredictorSidebarPanelInner() {
 
           <div className="grid grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)] gap-2">
             <SetupField label="Category" required>
-              <ProximityPicker
+              <OptionPicker
                 value={state.category}
                 onValueChange={state.setCategory}
                 options={CATEGORIES}

@@ -52,7 +52,7 @@ function Button({
   ...props
 }: ButtonPrimitive.Props &
   VariantProps<typeof buttonVariants> & {
-    /** Disable scale-on-press when motion would distract (e.g. text links). */
+    /** Skip press scale for link-style buttons. */
     static?: boolean;
   }) {
   const disablePress = isStatic || variant === "link";

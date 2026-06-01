@@ -2,7 +2,7 @@ import { cn } from "@/lib/utils";
 
 export const pressableClass = "pressable";
 
-/** shadcn Button — skip scale on popup triggers (aria-haspopup). */
+/** Skip press scale on popup triggers (aria-haspopup). */
 export const buttonPressableClass = "pressable pressable-button";
 
 export const headerPillClass = cn(

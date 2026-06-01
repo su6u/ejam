@@ -11,8 +11,7 @@ interface PredictButtonLabelProps {
 }
 
 /**
- * Both labels stay in the DOM (grid stack) so the button never collapses to zero
- * width during the blur slide. Pure CSS — no AnimatePresence gap.
+ * Both labels stay in the DOM so the button width stays stable during the blur slide.
  */
 export function PredictButtonLabel({
   loading,

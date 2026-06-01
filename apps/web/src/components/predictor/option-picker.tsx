@@ -1,32 +1,31 @@
 "use client";
 
 import { ChevronDownIcon, ChevronUpIcon } from "lucide-react";
-import { useRef, useState } from "react";
+import { useState } from "react";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { useProximityHover } from "@/hooks/use-proximity-hover";
 import { deferAfterPress, pressableClass } from "@/lib/pressable";
 import { cn } from "@/lib/utils";
 
-interface ProximityPickerOption {
+interface OptionPickerOption {
   value: string;
   label: string;
 }
 
-interface ProximityPickerProps {
+interface OptionPickerProps {
   value: string;
   onValueChange: (value: string) => void;
-  options: ReadonlyArray<ProximityPickerOption>;
+  options: ReadonlyArray<OptionPickerOption>;
   placeholder?: string;
   triggerClassName?: string;
   listClassName?: string;
   id?: string;
 }
 
-export function ProximityPicker({
+export function OptionPicker({
   value,
   onValueChange,
   options,
@@ -34,23 +33,12 @@ export function ProximityPicker({
   triggerClassName,
   listClassName,
   id,
-}: ProximityPickerProps) {
+}: OptionPickerProps) {
   const [open, setOpen] = useState(false);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const { activeIndex, itemRects, handlers, registerItem, measureItems } =
-    useProximityHover(containerRef, { axis: "y" });
-
-  const handleOpenChange = (next: boolean) => {
-    setOpen(next);
-    if (next) {
-      requestAnimationFrame(() => measureItems());
-    }
-  };
-
   const selected = options.find((option) => option.value === value);
 
   return (
-    <Popover open={open} onOpenChange={handleOpenChange}>
+    <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger
         id={id}
         aria-haspopup="listbox"
@@ -79,30 +67,15 @@ export function ProximityPicker({
         align="start"
       >
         <div
-          ref={containerRef}
           role="listbox"
-          className={cn("relative flex flex-col", listClassName)}
-          {...handlers}
+          className={cn("flex flex-col", listClassName)}
         >
-          {activeIndex !== null && itemRects[activeIndex] ? (
-            <div
-              aria-hidden
-              className="pointer-events-none absolute top-0 left-0 rounded-none bg-muted transition-transform duration-150 ease-out will-change-transform"
-              style={{
-                height: itemRects[activeIndex].height,
-                transform: `translate3d(${itemRects[activeIndex].left}px, ${itemRects[activeIndex].top}px, 0)`,
-                width: itemRects[activeIndex].width,
-              }}
-            />
-          ) : null}
-          {options.map((option, index) => {
+          {options.map((option) => {
             const isSelected = option.value === value;
-            const isHovered = activeIndex === index;
 
             return (
               <button
                 key={option.value}
-                ref={(element) => registerItem(index, element)}
                 type="button"
                 role="option"
                 aria-selected={isSelected}
@@ -113,11 +86,10 @@ export function ProximityPicker({
                   });
                 }}
                 className={cn(
-                  "relative z-10 flex h-8 w-full items-center rounded-none bg-transparent px-2 text-left text-sm outline-none",
+                  "flex h-8 w-full items-center rounded-none px-2 text-left text-sm outline-none",
                   pressableClass,
-                  isSelected || isHovered
-                    ? "text-foreground"
-                    : "text-muted-foreground",
+                  "hover:bg-muted hover:text-foreground",
+                  isSelected ? "text-foreground" : "text-muted-foreground",
                 )}
               >
                 {option.label}
