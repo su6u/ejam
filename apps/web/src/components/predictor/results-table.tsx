@@ -90,13 +90,13 @@ export function ResultsTable({
           <TableRow className="hover:bg-transparent">
             <TableHead className="ps-6">Institute</TableHead>
             <TableHead>Program</TableHead>
-            <TableHead>Band</TableHead>
-            <TableHead>Chance</TableHead>
+            <TableHead className="min-w-24">Band</TableHead>
+            <TableHead className="min-w-24">Chance</TableHead>
             <TableHead className="w-0 pe-6 whitespace-nowrap tabular-nums">
               Closing rank
             </TableHead>
-            <TableHead>Seat pool</TableHead>
-            <TableHead className="pe-6 text-right" />
+            <TableHead className="min-w-[7rem]">Seat pool</TableHead>
+            <TableHead className="w-10 pe-6 text-right" />
           </TableRow>
         </TableHeader>
         <TableBody className="[&_tr:first-child]:border-t-0">
@@ -158,12 +158,13 @@ export function ResultsTable({
                       </span>
                     ) : null}
                   </TableCell>
-                  <TableCell>
+                  <TableCell className="min-w-24">
                     <BandBadge band={row.band} />
                   </TableCell>
-                  <TableCell>
+                  <TableCell className="min-w-24">
                     <RoundProbabilityBars
                       key={sortBy}
+                      className="shrink-0"
                       roundProbs={row.round_probs}
                       overallProbability={row.cumulative_probability}
                       fillRound={row.fill_round}
@@ -172,10 +173,10 @@ export function ResultsTable({
                   <TableCell className="w-0 pe-6 whitespace-nowrap tabular-nums">
                     {formatInteger(row.predicted_closing_rank)}
                   </TableCell>
-                  <TableCell className="text-muted-foreground">
+                  <TableCell className="min-w-[7rem] text-muted-foreground">
                     {seatPoolLabel(row)}
                   </TableCell>
-                  <TableCell className="pe-6 text-right">
+                  <TableCell className="w-10 pe-6 text-right">
                     <ChevronRight
                       className={cn(
                         "size-4 text-muted-foreground/70 transition-transform duration-150 ease-out",
