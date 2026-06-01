@@ -1,13 +1,12 @@
 "use client";
 
-import { ChevronDownIcon, SearchIcon } from "lucide-react";
-import { useId, useMemo, useRef, useState } from "react";
+import { ChevronDownIcon, ChevronUpIcon, SearchIcon } from "lucide-react";
+import { useId, useMemo, useState } from "react";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { useProximityHover } from "@/hooks/use-proximity-hover";
 import { HOME_STATES, isHomeState } from "@/lib/home-states";
 import { deferAfterPress, pressableClass } from "@/lib/pressable";
 import { cn } from "@/lib/utils";
@@ -30,9 +29,6 @@ export function HomeStateCombobox({
   const listboxId = `${id}-listbox`;
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
-  const containerRef = useRef<HTMLUListElement>(null);
-  const { activeIndex, itemRects, handlers, registerItem, measureItems } =
-    useProximityHover(containerRef, { axis: "y" });
 
   const filteredStates = useMemo(() => {
     const query = search.trim().toLowerCase();
@@ -42,9 +38,7 @@ export function HomeStateCombobox({
 
   const handleOpenChange = (next: boolean) => {
     setOpen(next);
-    if (next) {
-      requestAnimationFrame(() => measureItems());
-    } else {
+    if (!next) {
       setSearch("");
     }
   };
@@ -54,6 +48,7 @@ export function HomeStateCombobox({
       <PopoverTrigger
         id={id}
         role="combobox"
+        aria-haspopup="listbox"
         aria-controls={listboxId}
         aria-expanded={open}
         className={cn(
@@ -68,10 +63,14 @@ export function HomeStateCombobox({
         ) : (
           <span className="text-muted-foreground">Select home state</span>
         )}
-        <ChevronDownIcon
-          className="size-4 shrink-0 text-muted-foreground/80"
+        <span
+          className="t-icon-swap shrink-0 text-muted-foreground/80"
+          data-state={open ? "b" : "a"}
           aria-hidden
-        />
+        >
+          <ChevronDownIcon className="t-icon size-4" data-icon="a" />
+          <ChevronUpIcon className="t-icon size-4" data-icon="b" />
+        </span>
       </PopoverTrigger>
       <PopoverContent
         className="w-(--anchor-width) min-w-(--anchor-width) rounded-none p-0"
@@ -89,34 +88,19 @@ export function HomeStateCombobox({
         </div>
         <ul
           id={listboxId}
-          ref={containerRef}
-          className="no-scrollbar relative max-h-60 list-none overflow-y-auto p-1"
-          {...handlers}
+          className="no-scrollbar max-h-60 list-none overflow-y-auto p-1"
         >
-          {activeIndex !== null && itemRects[activeIndex] ? (
-            <div
-              aria-hidden
-              className="pointer-events-none absolute top-0 left-0 rounded-none bg-muted transition-transform duration-150 ease-out will-change-transform"
-              style={{
-                height: itemRects[activeIndex].height,
-                transform: `translate3d(${itemRects[activeIndex].left}px, ${itemRects[activeIndex].top}px, 0)`,
-                width: itemRects[activeIndex].width,
-              }}
-            />
-          ) : null}
           {filteredStates.length === 0 ? (
             <p className="py-6 text-center text-sm text-muted-foreground">
               No state found.
             </p>
           ) : (
-            filteredStates.map((stateName, index) => {
+            filteredStates.map((stateName) => {
               const isSelected = value === stateName;
-              const isHovered = activeIndex === index;
 
               return (
                 <li key={stateName}>
                   <button
-                    ref={(element) => registerItem(index, element)}
                     type="button"
                     role="option"
                     aria-selected={isSelected}
@@ -127,11 +111,10 @@ export function HomeStateCombobox({
                       });
                     }}
                     className={cn(
-                      "relative z-10 flex h-8 w-full items-center rounded-none bg-transparent px-2 text-left text-sm outline-none",
+                      "flex h-8 w-full items-center rounded-none px-2 text-left text-sm outline-none",
                       pressableClass,
-                      isSelected || isHovered
-                        ? "text-foreground"
-                        : "text-muted-foreground",
+                      "hover:bg-muted hover:text-foreground",
+                      isSelected ? "text-foreground" : "text-muted-foreground",
                     )}
                   >
                     <span className="truncate">{stateName}</span>

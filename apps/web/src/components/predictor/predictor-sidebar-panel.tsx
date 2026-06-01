@@ -15,17 +15,20 @@ import {
   sidebarPanelTopInsetClass,
 } from "@/components/app-layout";
 import { HomeStateCombobox } from "@/components/predictor/home-state-combobox";
+import { OptionPicker } from "@/components/predictor/option-picker";
+import { PredictButtonLabel } from "@/components/predictor/predict-button-label";
 import { usePredictor } from "@/components/predictor/predictor-context";
-import { ProximityPicker } from "@/components/predictor/proximity-picker";
 import { RankInput } from "@/components/predictor/rank-input";
 import { SidebarFilterSection } from "@/components/predictor/sidebar-filter-section";
 import { Button } from "@/components/ui/button";
+import { useSidebar } from "@/components/ui/sidebar";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { useAvatarGroupHover } from "@/hooks/use-avatar-group-hover";
 import type { CounsellingBody, ExamType } from "@/hooks/use-predictor-state";
 import { isJeeMainCounselling } from "@/hooks/use-predictor-state";
 import { deferAfterPress, pressableClass } from "@/lib/pressable";
@@ -94,6 +97,7 @@ function PredictorSidebarPanelInner() {
     setFilters,
     hasResults,
   } = usePredictor();
+  const { isMobile, setOpenMobile } = useSidebar();
 
   const programs = query.data?.programs ?? [];
 
@@ -102,64 +106,80 @@ function PredictorSidebarPanelInner() {
   const canPredict =
     Boolean(state.rank) && !(needsHomeState && !state.homeState.trim());
   const hasPredictedForInputs = query.data !== null;
+  const predictDisabled =
+    query.isLoading || !canPredict || hasPredictedForInputs;
+  const predictDisabledReason = query.isLoading
+    ? undefined
+    : !state.rank.trim()
+      ? "Enter your counselling rank"
+      : needsHomeState && !state.homeState.trim()
+        ? "Select your home state for OS or HS quota"
+        : hasPredictedForInputs
+          ? "Change rank or profile to predict again"
+          : undefined;
+  const { rootRef: examGroupRef, onItemEnter } = useAvatarGroupHover();
 
   return (
     <TooltipProvider delay={200}>
       <div className="flex flex-col">
         <div
+          ref={examGroupRef}
           className={cn(
             "grid grid-cols-2 gap-2 px-2 pb-2",
             sidebarPanelTopInsetClass,
           )}
         >
-          {EXAM_OPTIONS.map((exam) => {
+          {EXAM_OPTIONS.map((exam, index) => {
             const isActive = state.exam === exam.id;
 
             return (
-              <Tooltip key={exam.id}>
-                <TooltipTrigger
-                  render={
-                    <button
-                      type="button"
-                      aria-label={exam.label}
-                      aria-pressed={isActive}
-                      onClick={() => {
-                        deferAfterPress(() => state.setExam(exam.id));
-                      }}
+              <div key={exam.id} className="t-avatar min-w-0">
+                <Tooltip>
+                  <TooltipTrigger
+                    render={
+                      <button
+                        type="button"
+                        aria-label={exam.label}
+                        aria-pressed={isActive}
+                        onMouseEnter={() => onItemEnter(index)}
+                        onClick={() => {
+                          deferAfterPress(() => state.setExam(exam.id));
+                        }}
+                        className={cn(
+                          "flex min-h-10 w-full items-center justify-center rounded-none border bg-transparent outline-none",
+                          predictorHeaderStripClass,
+                          pressableClass,
+                          "focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50",
+                          isActive && "border-foreground/40",
+                          !isActive &&
+                            "group/exam border-border/70 hover:border-border",
+                        )}
+                      />
+                    }
+                  >
+                    <Image
+                      src={exam.logo}
+                      alt=""
+                      width={36}
+                      height={36}
+                      aria-hidden
                       className={cn(
-                        "flex w-full items-center justify-center rounded-none border bg-transparent outline-none",
-                        predictorHeaderStripClass,
-                        pressableClass,
-                        "focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50",
-                        isActive && "border-foreground/40",
-                        !isActive &&
-                          "group/exam border-border/70 hover:border-border",
+                        "size-9 shrink-0 object-contain transition-opacity",
+                        !isActive && "opacity-55 group-hover/exam:opacity-80",
+                        isActive && "opacity-100",
                       )}
                     />
-                  }
-                >
-                  <Image
-                    src={exam.logo}
-                    alt=""
-                    width={36}
-                    height={36}
-                    aria-hidden
-                    className={cn(
-                      "size-9 shrink-0 object-contain transition-opacity",
-                      !isActive && "opacity-55 group-hover/exam:opacity-80",
-                      isActive && "opacity-100",
-                    )}
-                  />
-                </TooltipTrigger>
-                <TooltipContent
-                  side="top"
-                  sideOffset={6}
-                  align="center"
-                  className="rounded-none"
-                >
-                  {exam.label}
-                </TooltipContent>
-              </Tooltip>
+                  </TooltipTrigger>
+                  <TooltipContent
+                    side="top"
+                    sideOffset={6}
+                    align="center"
+                    className="rounded-none"
+                  >
+                    {exam.label}
+                  </TooltipContent>
+                </Tooltip>
+              </div>
             );
           })}
         </div>
@@ -175,7 +195,7 @@ function PredictorSidebarPanelInner() {
 
           <div className="grid grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)] gap-2">
             <SetupField label="Category" required>
-              <ProximityPicker
+              <OptionPicker
                 value={state.category}
                 onValueChange={state.setCategory}
                 options={CATEGORIES}
@@ -233,12 +253,26 @@ function PredictorSidebarPanelInner() {
 
           <Button
             type="button"
-            onClick={() => deferAfterPress(onPredict)}
-            disabled={query.isLoading || !canPredict || hasPredictedForInputs}
-            className="mt-1 w-full rounded-none"
+            onClick={() =>
+              deferAfterPress(() => {
+                void onPredict();
+                if (isMobile) setOpenMobile(false);
+              })
+            }
+            disabled={predictDisabled}
+            title={predictDisabledReason}
+            aria-describedby={
+              predictDisabledReason ? "predict-hint" : undefined
+            }
+            className="mt-1 w-full overflow-visible rounded-none"
           >
-            {query.isLoading ? "Predicting…" : "Predict colleges"}
+            <PredictButtonLabel loading={query.isLoading} />
           </Button>
+          {predictDisabledReason ? (
+            <p id="predict-hint" className="sr-only">
+              {predictDisabledReason}
+            </p>
+          ) : null}
         </div>
 
         {hasResults ? (
@@ -358,9 +392,7 @@ function SetupField({
       </label>
       {control}
       {hint ? (
-        <p className="text-[10px] leading-snug text-muted-foreground/50">
-          {hint}
-        </p>
+        <p className="text-xs leading-snug text-muted-foreground/70">{hint}</p>
       ) : null}
     </div>
   );

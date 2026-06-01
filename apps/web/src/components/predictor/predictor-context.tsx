@@ -29,6 +29,7 @@ import {
   predictorUsesQuotaHomeState,
   usePredictorState,
 } from "@/hooks/use-predictor-state";
+import { validatePredictorRank } from "@/lib/rank-validation";
 
 type PredictorQueryReturn = ReturnType<typeof usePredictorQuery>;
 
@@ -89,6 +90,7 @@ function PredictorProviderInner({ children }: { children: React.ReactNode }) {
     quota: state.quota,
     homeState: state.homeState,
     has_ews_certificate: state.has_ews_certificate,
+    include_all: state.include_all,
   });
   const [filters, setFilters] = useState<ResultsFilterState>(
     EMPTY_RESULTS_FILTERS,
@@ -112,12 +114,24 @@ function PredictorProviderInner({ children }: { children: React.ReactNode }) {
 
   const onPredict = useCallback(async () => {
     const flushedRank = rankInputRef.current?.flush() ?? state.rank;
-    const fromCache = await query.trigger(flushedRank);
+    const validationError = validatePredictorRank(
+      flushedRank,
+      state.predictorExamId,
+    );
+    if (validationError) {
+      rankInputRef.current?.showValidationError(validationError);
+      return;
+    }
+
+    const fromCache = await query.trigger(
+      flushedRank,
+      state.include_all ? { include_all: true } : undefined,
+    );
     if (!fromCache) {
       setFilters(EMPTY_RESULTS_FILTERS);
       setSortBy(DEFAULT_RESULTS_SORT);
     }
-  }, [query, state.rank]);
+  }, [query, state.rank, state.predictorExamId, state.include_all]);
 
   useEffect(() => {
     if (shareLinkAutoPredictDone.current) return;

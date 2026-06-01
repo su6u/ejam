@@ -135,7 +135,6 @@ function GitHubStarsDisplay({
 }) {
   return (
     <span
-      aria-hidden
       className={cn("inline-grid items-center whitespace-nowrap", className)}
     >
       <span
@@ -152,15 +151,15 @@ function GitHubStarsDisplay({
       ) : (
         <LazyMotion features={domAnimation} strict>
           <m.span
-            animate={
-              shouldReduceMotion ? { opacity: 1 } : { opacity: 1, scale: 1 }
-            }
+            animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
             className={cn(
               "col-start-1 row-start-1 flex items-center gap-1.5 text-xs font-medium tabular-nums",
               countClassName,
             )}
             initial={
-              shouldReduceMotion ? { opacity: 1 } : { opacity: 0, scale: 0.98 }
+              shouldReduceMotion
+                ? { opacity: 1, y: 0, filter: "blur(0px)" }
+                : { opacity: 0, y: 12, filter: "blur(4px)" }
             }
             transition={
               shouldReduceMotion ? { duration: 0 } : STAR_REVEAL_TRANSITION

@@ -48,11 +48,19 @@ function Button({
   className,
   variant = "default",
   size = "default",
+  static: isStatic,
   ...props
-}: ButtonPrimitive.Props & VariantProps<typeof buttonVariants>) {
+}: ButtonPrimitive.Props &
+  VariantProps<typeof buttonVariants> & {
+    /** Skip press scale for link-style buttons. */
+    static?: boolean;
+  }) {
+  const disablePress = isStatic || variant === "link";
+
   return (
     <ButtonPrimitive
       data-slot="button"
+      data-static={disablePress ? "" : undefined}
       className={cn(buttonVariants({ variant, size, className }))}
       {...props}
     />

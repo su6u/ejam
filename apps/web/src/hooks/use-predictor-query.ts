@@ -24,6 +24,7 @@ interface PredictorQueryOptions {
   quota: string;
   homeState: string;
   has_ews_certificate: boolean;
+  include_all: boolean;
 }
 
 interface PredictorQueryResult {
@@ -31,7 +32,10 @@ interface PredictorQueryResult {
   provenance: PredictionProvenance | null;
   isLoading: boolean;
   error: string | null;
-  trigger: (rankOverride?: string) => Promise<boolean>;
+  trigger: (
+    rankOverride?: string,
+    requestOverrides?: { include_all?: boolean },
+  ) => Promise<boolean>;
 }
 
 function examToApiId(predictorExamId: PredictorExamId): string {
@@ -47,6 +51,10 @@ function buildRequestBody(
     gender: opts.apiGender,
     has_ews_certificate: opts.has_ews_certificate,
   };
+
+  if (opts.include_all) {
+    body.include_all = true;
+  }
 
   if (predictorUsesQuotaHomeState(opts.predictorExamId)) {
     body.quota = uiQuotaToApi(opts.quota);
@@ -65,6 +73,7 @@ function requestInputKey(opts: PredictorQueryOptions): string {
     opts.quota,
     opts.homeState,
     opts.has_ews_certificate,
+    opts.include_all,
   ]);
 }
 
@@ -86,6 +95,7 @@ export function usePredictorQuery({
   quota,
   homeState,
   has_ews_certificate,
+  include_all,
 }: Readonly<PredictorQueryOptions>): PredictorQueryResult {
   const [data, setData] = useState<CollegePredictionResult | null>(null);
   const [provenance, setProvenance] = useState<PredictionProvenance | null>(
@@ -105,6 +115,7 @@ export function usePredictorQuery({
     quota,
     homeState,
     has_ews_certificate,
+    include_all,
   });
 
   const [prevInputKey, setPrevInputKey] = useState(currentInputKey);
@@ -142,7 +153,10 @@ export function usePredictorQuery({
   );
 
   const trigger = useCallback(
-    async (rankOverride?: string): Promise<boolean> => {
+    async (
+      rankOverride?: string,
+      requestOverrides?: { include_all?: boolean },
+    ): Promise<boolean> => {
       const effectiveRank = rankOverride ?? rank;
       if (!effectiveRank || Number.isNaN(Number(effectiveRank))) return false;
 
@@ -153,6 +167,8 @@ export function usePredictorQuery({
       const controller = new AbortController();
       abortControllerRef.current = controller;
 
+      const effectiveIncludeAll = requestOverrides?.include_all ?? include_all;
+
       const opts: PredictorQueryOptions = {
         predictorExamId,
         rank: effectiveRank,
@@ -161,6 +177,7 @@ export function usePredictorQuery({
         quota,
         homeState,
         has_ews_certificate,
+        include_all: effectiveIncludeAll,
       };
       const inputKey = requestInputKey(opts);
       predictInFlightInputKeyRef.current = inputKey;
@@ -239,6 +256,7 @@ export function usePredictorQuery({
       quota,
       homeState,
       has_ews_certificate,
+      include_all,
     ],
   );
 
