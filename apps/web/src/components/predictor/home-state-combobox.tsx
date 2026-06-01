@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronDownIcon, SearchIcon } from "lucide-react";
+import { ChevronDownIcon, ChevronUpIcon, SearchIcon } from "lucide-react";
 import { useId, useMemo, useRef, useState } from "react";
 import {
   Popover,
@@ -54,6 +54,7 @@ export function HomeStateCombobox({
       <PopoverTrigger
         id={id}
         role="combobox"
+        aria-haspopup="listbox"
         aria-controls={listboxId}
         aria-expanded={open}
         className={cn(
@@ -68,10 +69,14 @@ export function HomeStateCombobox({
         ) : (
           <span className="text-muted-foreground">Select home state</span>
         )}
-        <ChevronDownIcon
-          className="size-4 shrink-0 text-muted-foreground/80"
+        <span
+          className="t-icon-swap shrink-0 text-muted-foreground/80"
+          data-state={open ? "b" : "a"}
           aria-hidden
-        />
+        >
+          <ChevronDownIcon className="t-icon size-4" data-icon="a" />
+          <ChevronUpIcon className="t-icon size-4" data-icon="b" />
+        </span>
       </PopoverTrigger>
       <PopoverContent
         className="w-(--anchor-width) min-w-(--anchor-width) rounded-none p-0"

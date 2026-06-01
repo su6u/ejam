@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronDownIcon } from "lucide-react";
+import { ChevronDownIcon, ChevronUpIcon } from "lucide-react";
 import { useRef, useState } from "react";
 import {
   Popover,
@@ -53,6 +53,8 @@ export function ProximityPicker({
     <Popover open={open} onOpenChange={handleOpenChange}>
       <PopoverTrigger
         id={id}
+        aria-haspopup="listbox"
+        aria-expanded={open}
         className={cn(
           "flex h-8 w-full items-center justify-between rounded-none border border-input bg-transparent px-2.5 text-sm outline-none",
           pressableClass,
@@ -63,10 +65,14 @@ export function ProximityPicker({
         <span className={cn("truncate", !selected && "text-muted-foreground")}>
           {selected?.label ?? placeholder}
         </span>
-        <ChevronDownIcon
-          className="size-4 shrink-0 text-muted-foreground/80"
+        <span
+          className="t-icon-swap shrink-0 text-muted-foreground/80"
+          data-state={open ? "b" : "a"}
           aria-hidden
-        />
+        >
+          <ChevronDownIcon className="t-icon size-4" data-icon="a" />
+          <ChevronUpIcon className="t-icon size-4" data-icon="b" />
+        </span>
       </PopoverTrigger>
       <PopoverContent
         className="w-(--anchor-width) min-w-(--anchor-width) rounded-none p-1"
@@ -74,6 +80,7 @@ export function ProximityPicker({
       >
         <div
           ref={containerRef}
+          role="listbox"
           className={cn("relative flex flex-col", listClassName)}
           {...handlers}
         >
@@ -97,6 +104,8 @@ export function ProximityPicker({
                 key={option.value}
                 ref={(element) => registerItem(index, element)}
                 type="button"
+                role="option"
+                aria-selected={isSelected}
                 onClick={() => {
                   deferAfterPress(() => {
                     onValueChange(option.value);
