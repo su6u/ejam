@@ -35,9 +35,9 @@ function StateIllustration({ src }: { src: string }) {
 
 function emptyDescription({ hasPredicted }: { hasPredicted: boolean }): string {
   if (hasPredicted) {
-    return "No colleges at reach or better for this rank — try a lower rank or use include-all";
+    return "No colleges with a meaningful chance at this rank — try a lower rank.";
   }
-  return "Pick an exam, enter your rank, then run a prediction to see colleges ranked by your admission chance.";
+  return "Pick an exam, enter your rank, then run Predict colleges to see options ranked by admission chance.";
 }
 
 export function EmptyState({
@@ -77,7 +77,7 @@ export function ErrorState({
       description={null}
       footer={<DataVersionFooter provenance={provenance} />}
     >
-      <Empty className="min-h-0">
+      <Empty className="min-h-0" role="alert">
         <EmptyHeader className="my-auto">
           <StateIllustration src="/media/404.webm" />
           <EmptyDescription>
@@ -102,10 +102,13 @@ export function LoadingState({
       description={null}
       footer={<DataVersionFooter provenance={provenance} />}
     >
-      <Empty role="status" aria-label="Loading">
-        <EmptyMedia className="mb-0 bg-transparent">
-          <LoadingAnimation className="size-8" />
-        </EmptyMedia>
+      <Empty role="status" aria-live="polite" aria-busy="true">
+        <EmptyHeader>
+          <EmptyMedia className="mb-0 bg-transparent">
+            <LoadingAnimation className="size-8" aria-hidden />
+          </EmptyMedia>
+          <EmptyDescription>Loading predictions…</EmptyDescription>
+        </EmptyHeader>
       </Empty>
     </ResultsCardShell>
   );
