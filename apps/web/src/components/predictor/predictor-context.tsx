@@ -22,6 +22,7 @@ import {
   type ResultsSortKey,
 } from "@/components/predictor/results-sort-logic";
 import { usePredictorQuery } from "@/hooks/use-predictor-query";
+import { validatePredictorRank } from "@/lib/rank-validation";
 import {
   counsellingToPredictorExam,
   type PredictorStateReturn,
@@ -113,12 +114,24 @@ function PredictorProviderInner({ children }: { children: React.ReactNode }) {
 
   const onPredict = useCallback(async () => {
     const flushedRank = rankInputRef.current?.flush() ?? state.rank;
-    const fromCache = await query.trigger(flushedRank);
+    const validationError = validatePredictorRank(
+      flushedRank,
+      state.predictorExamId,
+    );
+    if (validationError) {
+      rankInputRef.current?.showValidationError(validationError);
+      return;
+    }
+
+    const fromCache = await query.trigger(
+      flushedRank,
+      state.include_all ? { include_all: true } : undefined,
+    );
     if (!fromCache) {
       setFilters(EMPTY_RESULTS_FILTERS);
       setSortBy(DEFAULT_RESULTS_SORT);
     }
-  }, [query, state.rank]);
+  }, [query, state.rank, state.predictorExamId, state.include_all]);
 
   useEffect(() => {
     if (shareLinkAutoPredictDone.current) return;

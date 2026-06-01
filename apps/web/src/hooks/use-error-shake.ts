@@ -11,7 +11,6 @@ function readMotionMs(name: string, fallback: number): number {
 
 export function useErrorShake() {
   const wrapRef = useRef<HTMLDivElement>(null);
-  const revertTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const shakeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const clearError = useCallback(() => {
@@ -19,10 +18,6 @@ export function useErrorShake() {
     const input = wrap?.querySelector<HTMLElement>(".t-input");
     if (!wrap || !input) return;
 
-    if (revertTimerRef.current) {
-      clearTimeout(revertTimerRef.current);
-      revertTimerRef.current = null;
-    }
     wrap.classList.remove("is-error");
     input.classList.remove("is-error", "is-shaking");
   }, []);
@@ -48,19 +43,10 @@ export function useErrorShake() {
       input.classList.remove("is-shaking");
       shakeTimerRef.current = null;
     }, shakeMs + 20);
-
-    if (revertTimerRef.current) clearTimeout(revertTimerRef.current);
-    const hold = readMotionMs("--revert-hold", 3000);
-    revertTimerRef.current = setTimeout(() => {
-      revertTimerRef.current = null;
-      wrap.classList.remove("is-error");
-      input.classList.remove("is-error");
-    }, shakeMs + hold);
   }, []);
 
   useEffect(
     () => () => {
-      if (revertTimerRef.current) clearTimeout(revertTimerRef.current);
       if (shakeTimerRef.current) clearTimeout(shakeTimerRef.current);
     },
     [],
