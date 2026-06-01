@@ -6,7 +6,6 @@ import {
   LazyMotion,
   m,
   useMotionValue,
-  useMotionValueEvent,
   useSpring,
   useTransform,
 } from "motion/react";
@@ -367,21 +366,29 @@ function EvilBrush({
 
   const leftSpring = useSpring(leftTarget, SPRING_CONFIG);
   const rightSpring = useSpring(rightTarget, SPRING_CONFIG);
-  const leftPosition = useTransform(leftSpring, (v) => `${v}%`);
-  const rightPosition = useTransform(rightSpring, (v) => `${v}%`);
-  const leftOverlayWidth = useTransform(leftSpring, (v) => `${v}%`);
-  const rightOverlayWidth = useTransform(
-    rightSpring,
-    (v) => `${Math.max(0, 100 - v)}%`,
+
+  // Compositor-only: scale/translate — not width/left (layout on drag).
+  const leftOverlayTransform = useTransform(
+    leftSpring,
+    (v) => `scaleX(${v / 100})`,
   );
-  const selectedWidth = useMotionValue(`${Math.max(0, rightPct - leftPct)}%`);
-
-  const updateSelectedWidth = useCallback(() => {
-    selectedWidth.set(`${Math.max(0, rightSpring.get() - leftSpring.get())}%`);
-  }, [leftSpring, rightSpring, selectedWidth]);
-
-  useMotionValueEvent(leftSpring, "change", updateSelectedWidth);
-  useMotionValueEvent(rightSpring, "change", updateSelectedWidth);
+  const rightOverlayTransform = useTransform(
+    rightSpring,
+    (v) => `scaleX(${Math.max(0, 100 - v) / 100})`,
+  );
+  const selectedTransform = useTransform(
+    [leftSpring, rightSpring],
+    ([left, right]: number[]) =>
+      `translateX(${left}%) scaleX(${Math.max(0, right - left) / 100})`,
+  );
+  const leftHandleTransform = useTransform(
+    leftSpring,
+    (v) => `translateX(${v}%)`,
+  );
+  const rightHandleTransform = useTransform(
+    rightSpring,
+    (v) => `translateX(${v}%)`,
+  );
 
   const getLabel = useCallback(
     (idx: number) => {
@@ -426,26 +433,26 @@ function EvilBrush({
 
         {/* Dim overlay – left */}
         <m.div
-          className="bg-background/70 pointer-events-none absolute inset-y-0 left-0 rounded-l-md backdrop-blur-[2px]"
-          style={{ width: leftOverlayWidth }}
+          className="bg-background/70 pointer-events-none absolute inset-y-0 left-0 w-full origin-left rounded-l-md backdrop-blur-[2px]"
+          style={{ transform: leftOverlayTransform }}
         />
         {/* Dim overlay – right */}
         <m.div
-          className="bg-background/70 pointer-events-none absolute inset-y-0 right-0 rounded-r-md backdrop-blur-[2px]"
-          style={{ width: rightOverlayWidth }}
+          className="bg-background/70 pointer-events-none absolute inset-y-0 right-0 w-full origin-right rounded-r-md backdrop-blur-[2px]"
+          style={{ transform: rightOverlayTransform }}
         />
 
         {/* Selected region – draggable to pan */}
         <m.div
-          className="absolute inset-y-0 cursor-grab touch-none rounded-sm border active:cursor-grabbing"
-          style={{ left: leftPosition, width: selectedWidth }}
+          className="absolute inset-y-0 left-0 w-full origin-left cursor-grab touch-none rounded-sm border active:cursor-grabbing"
+          style={{ transform: selectedTransform }}
           {...bind("middle")}
         />
 
         {/* Left handle */}
         <BrushHandle
           side="left"
-          position={leftPosition}
+          trackTransform={leftHandleTransform}
           label={showLabels ? getLabel(range.startIndex) : undefined}
           bind={bind("left")}
         />
@@ -453,7 +460,7 @@ function EvilBrush({
         {/* Right handle */}
         <BrushHandle
           side="right"
-          position={rightPosition}
+          trackTransform={rightHandleTransform}
           label={showLabels ? getLabel(range.endIndex) : undefined}
           bind={bind("right")}
         />
@@ -466,12 +473,12 @@ function EvilBrush({
 
 function BrushHandle({
   side,
-  position,
+  trackTransform,
   label,
   bind,
 }: {
   side: "left" | "right";
-  position: MotionValue<string>;
+  trackTransform: MotionValue<string>;
   label?: string;
   bind: {
     onPointerDown: (e: React.PointerEvent) => void;
@@ -482,10 +489,13 @@ function BrushHandle({
   const isLeft = side === "left";
 
   return (
-    <m.div className="absolute inset-y-0 z-10" style={{ left: position }}>
+    <m.div
+      className="pointer-events-none absolute inset-y-0 left-0 z-10 w-full"
+      style={{ transform: trackTransform }}
+    >
       <div
         className={cn(
-          "group absolute inset-y-0 flex w-3 cursor-ew-resize touch-none items-center justify-center after:absolute after:inset-y-0 after:-left-4 after:w-11 after:content-['']",
+          "group pointer-events-auto absolute inset-y-0 flex w-3 cursor-ew-resize touch-none items-center justify-center after:absolute after:inset-y-0 after:-left-4 after:w-11 after:content-['']",
           isLeft ? "" : "-translate-x-full",
         )}
         {...bind}
