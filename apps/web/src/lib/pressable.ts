@@ -6,9 +6,10 @@ export const pressableClass = "pressable";
 export const buttonPressableClass = "pressable pressable-button";
 
 export const headerPillClass = cn(
-  "inline-flex h-9 items-center gap-2 rounded-none border border-border bg-background px-3 text-xs font-medium text-foreground shadow-none",
+  "inline-flex h-9 items-center gap-2 rounded-none bg-background pl-2.5 pr-3 text-xs font-medium text-foreground",
+  "shadow-[var(--shadow-border)] transition-[box-shadow] duration-150 ease-out hover:shadow-[var(--shadow-border-hover)]",
   pressableClass,
-  "hover:bg-muted hover:opacity-90",
+  "hover:bg-muted",
 );
 
 /** Run click work after the press animation paints (double rAF). */
