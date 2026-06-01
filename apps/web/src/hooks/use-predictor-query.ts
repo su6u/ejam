@@ -32,7 +32,10 @@ interface PredictorQueryResult {
   provenance: PredictionProvenance | null;
   isLoading: boolean;
   error: string | null;
-  trigger: (rankOverride?: string) => Promise<boolean>;
+  trigger: (
+    rankOverride?: string,
+    requestOverrides?: { include_all?: boolean },
+  ) => Promise<boolean>;
 }
 
 function examToApiId(predictorExamId: PredictorExamId): string {
@@ -150,7 +153,10 @@ export function usePredictorQuery({
   );
 
   const trigger = useCallback(
-    async (rankOverride?: string): Promise<boolean> => {
+    async (
+      rankOverride?: string,
+      requestOverrides?: { include_all?: boolean },
+    ): Promise<boolean> => {
       const effectiveRank = rankOverride ?? rank;
       if (!effectiveRank || Number.isNaN(Number(effectiveRank))) return false;
 
@@ -161,6 +167,9 @@ export function usePredictorQuery({
       const controller = new AbortController();
       abortControllerRef.current = controller;
 
+      const effectiveIncludeAll =
+        requestOverrides?.include_all ?? include_all;
+
       const opts: PredictorQueryOptions = {
         predictorExamId,
         rank: effectiveRank,
@@ -169,7 +178,7 @@ export function usePredictorQuery({
         quota,
         homeState,
         has_ews_certificate,
-        include_all,
+        include_all: effectiveIncludeAll,
       };
       const inputKey = requestInputKey(opts);
       predictInFlightInputKeyRef.current = inputKey;
