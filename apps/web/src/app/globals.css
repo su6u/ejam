@@ -48,6 +48,9 @@
   --selection: rgb(0 0 0 / 0.12);
   --selection-foreground: var(--foreground);
 
+  /* Strong ease-out for UI enter/exit (Emil) */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+
   /* Sheet / drawer — iOS open curve, snappy close (Emil asymmetric timing) */
   --sheet-open-dur: 380ms;
   --sheet-close-dur: 260ms;
@@ -55,6 +58,86 @@
   --sheet-ease-close: cubic-bezier(0.23, 1, 0.32, 1);
   --sheet-backdrop-open-dur: 380ms;
   --sheet-backdrop-close-dur: 220ms;
+
+  /* transitions-dev — semantic motion tokens */
+  --resize-dur: 300ms;
+  --resize-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --digit-dur: 500ms;
+  --digit-distance: 8px;
+  --digit-stagger: 70ms;
+  --digit-blur: 2px;
+  --digit-ease: cubic-bezier(0.34, 1.45, 0.64, 1);
+  --digit-dir-x: 0;
+  --digit-dir-y: 1;
+  --badge-slide-dur: 260ms;
+  --badge-pop-dur: 500ms;
+  --badge-pop-close-dur: 180ms;
+  --badge-fade-dur: 400ms;
+  --badge-fade-close-dur: 180ms;
+  --badge-blur: 2px;
+  --badge-offset-x: -8.2px;
+  --badge-offset-y: 12.4px;
+  --badge-slide-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --badge-pop-ease: cubic-bezier(0.34, 1.36, 0.64, 1);
+  --badge-close-ease: cubic-bezier(0.4, 0, 0.2, 1);
+  --text-swap-dur: 200ms;
+  --text-swap-translate-y: 8px;
+  --text-swap-blur: 2px;
+  --text-swap-ease: cubic-bezier(0.23, 1, 0.32, 1);
+  --dropdown-open-dur: 250ms;
+  --dropdown-close-dur: 150ms;
+  --dropdown-pre-scale: 0.97;
+  --dropdown-closing-scale: 0.99;
+  --dropdown-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --modal-open-dur: 250ms;
+  --modal-close-dur: 150ms;
+  --modal-scale: 0.96;
+  --modal-scale-close: 0.96;
+  --modal-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --panel-open-dur: 400ms;
+  --panel-close-dur: 350ms;
+  --panel-translate-y: 100px;
+  --panel-blur: 2px;
+  --panel-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --page-slide-dur: 200ms;
+  --page-fade-dur: 200ms;
+  --page-slide-distance: 8px;
+  --page-blur: 3px;
+  --page-stagger: 0ms;
+  --page-exit-enabled: 1;
+  --page-slide-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --page-fade-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --icon-swap-dur: 300ms;
+  --icon-swap-blur: 4px;
+  --icon-swap-start-scale: 0.25;
+  --icon-swap-ease: cubic-bezier(0.2, 0, 0, 1);
+  --check-opacity-dur: 550ms;
+  --check-rotate-dur: 550ms;
+  --check-rotate-from: 80deg;
+  --check-bob-dur: 450ms;
+  --check-y-amount: 40px;
+  --check-blur-dur: 500ms;
+  --check-blur-from: 10px;
+  --check-path-dur: 550ms;
+  --check-path-delay: 80ms;
+  --check-ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --check-ease-opacity: cubic-bezier(0.22, 1, 0.36, 1);
+  --check-ease-rotate: cubic-bezier(0.22, 1, 0.36, 1);
+  --check-ease-bob: cubic-bezier(0.34, 1.35, 0.64, 1);
+  --check-ease-path: cubic-bezier(0.22, 1, 0.36, 1);
+  --avatar-lift: -4px;
+  --avatar-dur: 320ms;
+  --avatar-scale: 1.05;
+  --avatar-falloff: 0.45;
+  --avatar-ease-in: cubic-bezier(0.22, 1, 0.36, 1);
+  --avatar-ease-out: cubic-bezier(0.34, 3.85, 0.64, 1);
+  --shake-distance: 6px;
+  --shake-overshoot: 4px;
+  --shake-dur-a: 80ms;
+  --shake-dur-b: 60ms;
+  --shake-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --revert-hold: 3000ms;
+  --revert-dur: 280ms;
 }
 
 .dark {
@@ -92,6 +175,15 @@
 
   --selection: rgb(255 255 255 / 0.14);
   --selection-foreground: var(--foreground);
+
+  --shadow-border: 0 0 0 1px rgb(255 255 255 / 0.08);
+  --shadow-border-hover: 0 0 0 1px rgb(255 255 255 / 0.13);
+
+  /* Scrollbar — matches muted border language, pill thumb ok on macOS */
+  --scrollbar-size: 8px;
+  --scrollbar-track: transparent;
+  --scrollbar-thumb: oklch(1 0 0 / 20%);
+  --scrollbar-thumb-hover: oklch(1 0 0 / 35%);
 }
 
 @theme inline {
@@ -224,16 +316,45 @@ input {
     display: none;
   }
 
-  /* Pure white inset outline — dark-only app; never use tinted neutrals on images. */
-  .image-outline {
-    outline: 1px solid rgba(255, 255, 255, 0.1);
-    outline-offset: -1px;
+  /* Themed scrollbar — dark surfaces, rounded pill thumb, explicit properties only */
+  .theme-scrollbar {
+    scrollbar-gutter: stable;
+    scrollbar-width: thin;
+    scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+  }
+
+  .theme-scrollbar::-webkit-scrollbar {
+    width: var(--scrollbar-size);
+    height: var(--scrollbar-size);
+  }
+
+  .theme-scrollbar::-webkit-scrollbar-track {
+    background: var(--scrollbar-track);
+  }
+
+  .theme-scrollbar::-webkit-scrollbar-thumb {
+    background-color: var(--scrollbar-thumb);
+    border-radius: 9999px;
+    transition: background-color 150ms ease;
+  }
+
+  .theme-scrollbar::-webkit-scrollbar-thumb:hover {
+    background-color: var(--scrollbar-thumb-hover);
+  }
+
+  .theme-scrollbar::-webkit-scrollbar-corner {
+    background: transparent;
+  }
+
+  /* Pure white inset outline — dark-only app; never use tinted neutrals on media. */
+  .pressable[data-static]:active:not(:disabled) {
+    scale: 1;
   }
 
   /* Press feedback — scale on compositor, colors on main thread separately. */
   .pressable {
-    --press-scale-dur: 100ms;
-    --press-scale-ease: cubic-bezier(0.2, 0, 0, 1);
+    --press-scale-dur: 120ms;
+    --press-scale-ease: var(--ease-out);
     touch-action: manipulation;
     transition:
       scale var(--press-scale-dur) var(--press-scale-ease),
@@ -297,7 +418,6 @@ input {
 
   .sheet-popup {
     backface-visibility: hidden;
-    will-change: transform;
     transition: transform var(--sheet-open-dur) var(--sheet-ease-open);
     box-shadow:
       0 0 0 1px rgb(255 255 255 / 0.06),
@@ -384,8 +504,6 @@ input {
     --round-bar-dur: 200ms;
     --round-bar-stagger: 35ms;
     --round-chance-swap-dur: 180ms;
-    --round-chance-swap-y: 4px;
-    --round-chance-swap-blur: 2px;
   }
 
   /* Extend hover hit area upward without shifting row alignment */
@@ -423,8 +541,8 @@ input {
   @keyframes round-chance-swap {
     from {
       opacity: 0;
-      transform: translateY(var(--round-chance-swap-y));
-      filter: blur(var(--round-chance-swap-blur));
+      transform: translateY(4px);
+      filter: blur(2px);
     }
 
     to {
@@ -540,7 +658,7 @@ input {
   .home-folder-item {
     opacity: 0;
     transform: translateY(8px);
-    animation: home-folder-enter 420ms cubic-bezier(0.23, 1, 0.32, 1) forwards;
+    animation: home-folder-enter 280ms var(--ease-out) forwards;
   }
 
   @keyframes home-folder-enter {
@@ -555,6 +673,291 @@ input {
       animation: none;
       opacity: 1;
       transform: none;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    [data-slot="skeleton"].animate-pulse {
+      animation: none !important;
+    }
+
+    .animate-spin {
+      animation: none !important;
+    }
+  }
+
+  /* transitions-dev — menu dropdown (Base UI data-open / data-starting-style / data-ending-style) */
+  .t-dropdown {
+    transform-origin: var(--transform-origin, top left);
+    transform: scale(1);
+    opacity: 1;
+    transition:
+      transform var(--dropdown-open-dur) var(--dropdown-ease),
+      opacity var(--dropdown-open-dur) var(--dropdown-ease);
+    will-change: transform, opacity;
+  }
+
+  .t-dropdown[data-starting-style] {
+    transform: scale(var(--dropdown-pre-scale));
+    opacity: 0;
+  }
+
+  .t-dropdown[data-ending-style] {
+    transform: scale(var(--dropdown-closing-scale));
+    opacity: 0;
+    pointer-events: none;
+    transition:
+      transform var(--dropdown-close-dur) var(--dropdown-ease),
+      opacity var(--dropdown-close-dur) var(--dropdown-ease);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .t-dropdown {
+      transition: none !important;
+    }
+  }
+
+  /* transitions-dev — icon swap */
+  .t-icon-swap {
+    position: relative;
+    display: inline-grid;
+  }
+
+  .t-icon-swap .t-icon {
+    grid-area: 1 / 1;
+    transition:
+      opacity var(--icon-swap-dur) var(--icon-swap-ease),
+      filter var(--icon-swap-dur) var(--icon-swap-ease),
+      transform var(--icon-swap-dur) var(--icon-swap-ease);
+    will-change: opacity, filter, transform;
+  }
+
+  .t-icon-swap[data-state="a"] .t-icon[data-icon="a"],
+  .t-icon-swap[data-state="b"] .t-icon[data-icon="b"] {
+    opacity: 1;
+    filter: blur(0);
+    transform: scale(1);
+  }
+
+  .t-icon-swap[data-state="a"] .t-icon[data-icon="b"],
+  .t-icon-swap[data-state="b"] .t-icon[data-icon="a"] {
+    opacity: 0;
+    filter: blur(var(--icon-swap-blur));
+    transform: scale(var(--icon-swap-start-scale));
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .t-icon-swap .t-icon {
+      transition: none !important;
+    }
+  }
+
+  /* transitions-dev — text states swap (verbatim) */
+  .t-text-swap {
+    display: inline-block;
+    transform: translateY(0);
+    filter: blur(0);
+    opacity: 1;
+    transition:
+      transform var(--text-swap-dur) var(--text-swap-ease),
+      filter var(--text-swap-dur) var(--text-swap-ease),
+      opacity var(--text-swap-dur) var(--text-swap-ease);
+  }
+
+  .t-text-swap.is-exit {
+    transform: translateY(calc(var(--text-swap-translate-y) * -1));
+    filter: blur(var(--text-swap-blur));
+    opacity: 0;
+  }
+
+  .t-text-swap.is-enter-start {
+    transform: translateY(var(--text-swap-translate-y));
+    filter: blur(var(--text-swap-blur));
+    opacity: 0;
+    transition: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .t-text-swap {
+      transition: none !important;
+    }
+  }
+
+  /* Predict button — dual-label blur slide (always in DOM, never collapses) */
+  .t-predict-label-swap {
+    display: inline-grid;
+    place-items: center;
+    min-width: 9rem;
+  }
+
+  .t-predict-label-layer {
+    grid-area: 1 / 1;
+    filter: blur(0);
+    opacity: 1;
+    transform: translateY(0);
+    transition:
+      transform var(--text-swap-dur) var(--text-swap-ease),
+      filter var(--text-swap-dur) var(--text-swap-ease),
+      opacity var(--text-swap-dur) var(--text-swap-ease);
+  }
+
+  .t-predict-label-swap[data-loading="false"] .label-idle,
+  .t-predict-label-swap[data-loading="true"] .label-loading {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+
+  .t-predict-label-swap[data-loading="true"] .label-idle {
+    opacity: 0;
+    transform: translateY(calc(var(--text-swap-translate-y) * -1));
+    filter: blur(var(--text-swap-blur));
+    pointer-events: none;
+  }
+
+  .t-predict-label-swap[data-loading="false"] .label-loading {
+    opacity: 0;
+    transform: translateY(var(--text-swap-translate-y));
+    filter: blur(var(--text-swap-blur));
+    pointer-events: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .t-predict-label-layer {
+      transition: none !important;
+    }
+
+    .t-predict-label-swap[data-loading="true"] .label-idle,
+    .t-predict-label-swap[data-loading="false"] .label-loading {
+      opacity: 0 !important;
+      transform: none !important;
+      filter: none !important;
+    }
+  }
+
+  /* transitions-dev — number pop-in */
+  @keyframes t-digit-pop-in {
+    0% {
+      transform: translate(
+        calc(var(--digit-distance) * var(--digit-dir-x)),
+        calc(var(--digit-distance) * var(--digit-dir-y))
+      );
+      opacity: 0;
+      filter: blur(var(--digit-blur));
+    }
+
+    100% {
+      transform: translate(0, 0);
+      opacity: 1;
+      filter: blur(0);
+    }
+  }
+
+  .t-digit-group {
+    display: inline-flex;
+    align-items: baseline;
+  }
+
+  .t-digit {
+    display: inline-block;
+    will-change: transform, opacity, filter;
+  }
+
+  .t-digit-group.is-animating .t-digit {
+    animation: t-digit-pop-in var(--digit-dur) var(--digit-ease) both;
+  }
+
+  .t-digit-group.is-animating .t-digit[data-stagger="1"] {
+    animation-delay: var(--digit-stagger);
+  }
+
+  .t-digit-group.is-animating .t-digit[data-stagger="2"] {
+    animation-delay: calc(var(--digit-stagger) * 2);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .t-digit-group .t-digit {
+      animation: none !important;
+    }
+  }
+
+  /* transitions-dev — avatar group hover */
+  .t-avatar {
+    transform-origin: center;
+    transform: translateY(var(--shift, 0px)) scale(var(--scale-active, 1));
+    transition: transform var(--avatar-dur) var(--avatar-ease-in);
+    will-change: transform;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .t-avatar {
+      transition: none !important;
+      transform: none !important;
+    }
+  }
+
+  /* transitions-dev — error state shake */
+  .t-input {
+    transition: border-color 150ms ease-out;
+    will-change: transform;
+  }
+
+  .t-input.is-error {
+    transition: border-color var(--revert-dur, 280ms) ease-out;
+    border-color: var(--destructive);
+  }
+
+  .t-error-msg {
+    opacity: 0;
+    visibility: hidden;
+    transition:
+      opacity var(--revert-dur, 280ms) ease-out,
+      visibility 0s linear var(--revert-dur, 280ms);
+  }
+
+  .t-input-wrap.is-error .t-error-msg {
+    opacity: 1;
+    visibility: visible;
+    transition:
+      opacity var(--revert-dur, 280ms) ease-out,
+      visibility 0s linear 0s;
+  }
+
+  .t-input.is-shaking {
+    animation: t-input-shake
+      calc(var(--shake-dur-a) * 2 + var(--shake-dur-b) * 2) linear;
+  }
+
+  @keyframes t-input-shake {
+    0% {
+      transform: translateX(0);
+      animation-timing-function: var(--shake-ease);
+    }
+
+    28.57% {
+      transform: translateX(var(--shake-distance));
+      animation-timing-function: var(--shake-ease);
+    }
+
+    57.14% {
+      transform: translateX(calc(var(--shake-distance) * -1));
+      animation-timing-function: var(--shake-ease);
+    }
+
+    78.57% {
+      transform: translateX(var(--shake-overshoot));
+      animation-timing-function: var(--shake-ease);
+    }
+
+    100% {
+      transform: translateX(0);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .t-input {
+      animation: none !important;
+      transform: none !important;
     }
   }
 }
