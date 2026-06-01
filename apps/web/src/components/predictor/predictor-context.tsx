@@ -89,6 +89,7 @@ function PredictorProviderInner({ children }: { children: React.ReactNode }) {
     quota: state.quota,
     homeState: state.homeState,
     has_ews_certificate: state.has_ews_certificate,
+    include_all: state.include_all,
   });
   const [filters, setFilters] = useState<ResultsFilterState>(
     EMPTY_RESULTS_FILTERS,

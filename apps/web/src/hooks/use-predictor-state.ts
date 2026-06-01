@@ -68,6 +68,7 @@ export interface PredictorInputState {
   quota: string;
   homeState: string;
   has_ews_certificate: boolean;
+  include_all: boolean;
 }
 
 export interface PredictorStateReturn extends PredictorInputState {
@@ -79,6 +80,7 @@ export interface PredictorStateReturn extends PredictorInputState {
   setQuota: (v: string) => void;
   setHomeState: (v: string) => void;
   setHasEwsCertificate: (v: boolean) => void;
+  setIncludeAll: (v: boolean) => void;
   apiSeatType: string;
   apiGender: string;
   predictorExamId: PredictorExamId;
@@ -97,6 +99,7 @@ export function usePredictorState(
   const quota = params.get("quota") ?? "os";
   const homeState = params.get("state") ?? "";
   const has_ews_certificate = params.get("ews") === "true";
+  const include_all = params.get("include_all") === "true";
 
   const updateParam = useCallback(
     (updates: Record<string, string | null>) => {
@@ -154,6 +157,10 @@ export function usePredictorState(
     (v: boolean) => updateParam({ ews: v ? "true" : null }),
     [updateParam],
   );
+  const setIncludeAll = useCallback(
+    (v: boolean) => updateParam({ include_all: v ? "true" : null }),
+    [updateParam],
+  );
 
   const setHomeState = useCallback(
     (v: string) => updateParam({ state: v }),
@@ -169,6 +176,7 @@ export function usePredictorState(
     quota,
     homeState,
     has_ews_certificate,
+    include_all,
     setRank,
     setExam,
     setCounselling,
@@ -177,6 +185,7 @@ export function usePredictorState(
     setQuota,
     setHomeState,
     setHasEwsCertificate,
+    setIncludeAll,
     apiSeatType: CATEGORY_TO_SEAT_TYPE[category] ?? "OPEN",
     apiGender: GENDER_TO_API[gender] ?? "Gender-Neutral",
     predictorExamId: counsellingToPredictorExam(exam, counselling),

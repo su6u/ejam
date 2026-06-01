@@ -24,6 +24,7 @@ interface PredictorQueryOptions {
   quota: string;
   homeState: string;
   has_ews_certificate: boolean;
+  include_all: boolean;
 }
 
 interface PredictorQueryResult {
@@ -48,6 +49,10 @@ function buildRequestBody(
     has_ews_certificate: opts.has_ews_certificate,
   };
 
+  if (opts.include_all) {
+    body.include_all = true;
+  }
+
   if (predictorUsesQuotaHomeState(opts.predictorExamId)) {
     body.quota = uiQuotaToApi(opts.quota);
     body.state = opts.homeState;
@@ -65,6 +70,7 @@ function requestInputKey(opts: PredictorQueryOptions): string {
     opts.quota,
     opts.homeState,
     opts.has_ews_certificate,
+    opts.include_all,
   ]);
 }
 
@@ -86,6 +92,7 @@ export function usePredictorQuery({
   quota,
   homeState,
   has_ews_certificate,
+  include_all,
 }: Readonly<PredictorQueryOptions>): PredictorQueryResult {
   const [data, setData] = useState<CollegePredictionResult | null>(null);
   const [provenance, setProvenance] = useState<PredictionProvenance | null>(
@@ -105,6 +112,7 @@ export function usePredictorQuery({
     quota,
     homeState,
     has_ews_certificate,
+    include_all,
   });
 
   const [prevInputKey, setPrevInputKey] = useState(currentInputKey);
@@ -161,6 +169,7 @@ export function usePredictorQuery({
         quota,
         homeState,
         has_ews_certificate,
+        include_all,
       };
       const inputKey = requestInputKey(opts);
       predictInFlightInputKeyRef.current = inputKey;
@@ -239,6 +248,7 @@ export function usePredictorQuery({
       quota,
       homeState,
       has_ews_certificate,
+      include_all,
     ],
   );
 
