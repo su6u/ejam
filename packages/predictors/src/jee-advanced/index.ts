@@ -17,10 +17,9 @@ import {
   resultFromCacheEntry,
 } from "../shared/finalize-prediction";
 import {
-  fnv1a,
+  createServerCacheKey,
   indexShaFromDeps,
   type ServerCacheEntry,
-  stableStringify,
 } from "../shared/predictor-cache";
 
 const JeeAdvancedInput = z.object({
@@ -53,7 +52,7 @@ type RegistryMaps = {
   instituteNirf: Map<string, number | null | undefined>;
 };
 
-// in-memory server cache — keyed by FNV1a hash of canonical input
+// in-memory server cache — keyed by a canonical digest of input + index version
 // sessionStorage is a no-op on the server; this Map persists for the process lifetime
 // predictions are deterministic for a given index version, so no TTL is needed
 const _serverCache = new Map<string, ServerCacheEntry>();
@@ -118,12 +117,10 @@ export const predictor: ExamPredictor<
       ...input,
       quota: JEE_ADVANCED_QUOTA,
     };
-    const cacheKey = fnv1a(
-      stableStringify({
-        index_sha: indexShaFromDeps(deps),
-        ...cacheInput,
-      }),
-    );
+    const cacheKey = createServerCacheKey({
+      index_sha: indexShaFromDeps(deps),
+      ...cacheInput,
+    });
     const cached = _serverCache.get(cacheKey);
     if (cached) {
       return { result: resultFromCachedPrograms(cached, input.filters) };
