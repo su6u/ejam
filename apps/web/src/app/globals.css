@@ -966,9 +966,24 @@ input {
     color: #2e2e2e;
   }
 
-  /* Homepage — staggered enter, balance on hero line */
+  /* Homepage — staggered blur reveal on hero line */
   .home-tagline {
     text-wrap: balance;
+  }
+
+  .home-tagline-part {
+    opacity: 0;
+    filter: blur(4px);
+    animation: home-tagline-reveal 280ms var(--text-swap-ease) forwards;
+    animation-delay: var(--tagline-delay, 0ms);
+    will-change: filter, opacity;
+  }
+
+  @keyframes home-tagline-reveal {
+    to {
+      opacity: 1;
+      filter: blur(0);
+    }
   }
 
   .home-enter-item {
@@ -985,6 +1000,12 @@ input {
   }
 
   @media (prefers-reduced-motion: reduce) {
+    .home-tagline-part {
+      animation: none;
+      opacity: 1;
+      filter: none;
+    }
+
     .home-enter-item {
       animation: none;
       opacity: 1;
