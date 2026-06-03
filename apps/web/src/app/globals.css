@@ -999,6 +999,36 @@ input {
     }
   }
 
+  /* Folder cards — first-load enter stagger (delay set inline per card) */
+  .home-folder-enter {
+    opacity: 0;
+    transform: translateY(8px);
+    animation: home-folder-enter 240ms var(--ease-out) forwards;
+  }
+
+  @keyframes home-folder-enter {
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Live tool folder image — layered depth so it reads as actionable */
+  .home-folder-live-img {
+    filter: drop-shadow(0 1px 2px rgb(46 46 46 / 0.1))
+      drop-shadow(0 4px 8px rgb(46 46 46 / 0.06));
+  }
+
+  /* Soon folder — percussive shake on click (transitions-dev error-state pattern) */
+  .home-folder-card {
+    will-change: transform;
+  }
+
+  .home-folder-card.is-shaking {
+    animation: t-input-shake
+      calc(var(--shake-dur-a) * 2 + var(--shake-dur-b) * 2) linear;
+  }
+
   @media (prefers-reduced-motion: reduce) {
     .home-tagline-part {
       animation: none;
@@ -1010,6 +1040,17 @@ input {
       animation: none;
       opacity: 1;
       transform: none;
+    }
+
+    .home-folder-enter {
+      animation: none;
+      opacity: 1;
+      transform: none;
+    }
+
+    .home-folder-card.is-shaking {
+      animation: none !important;
+      transform: none !important;
     }
   }
 }
