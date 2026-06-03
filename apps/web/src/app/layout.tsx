@@ -2,7 +2,11 @@
 // against the dark palette declared in globals.css
 
 import type { Metadata } from "next";
-import { IBM_Plex_Sans, Instrument_Sans, Instrument_Serif } from "next/font/google";
+import {
+  IBM_Plex_Sans,
+  Instrument_Sans,
+  Instrument_Serif,
+} from "next/font/google";
 import { Toaster } from "sonner";
 import "./globals.css";
 import { AgentationDev } from "@/components/agentation-dev";

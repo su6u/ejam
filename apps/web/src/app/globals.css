@@ -944,13 +944,13 @@ input {
 
 @layer utilities {
   .font-serif-display {
-    font-family: var(--font-serif-display), ui-serif, Georgia, "Times New Roman",
-      serif;
+    font-family:
+      var(--font-serif-display), ui-serif, Georgia, "Times New Roman", serif;
   }
 
   .font-instrument-sans {
-    font-family: var(--font-instrument-sans), ui-sans-serif, system-ui,
-      sans-serif;
+    font-family:
+      var(--font-instrument-sans), ui-sans-serif, system-ui, sans-serif;
   }
 }
 

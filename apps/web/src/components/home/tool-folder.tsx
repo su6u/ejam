@@ -3,8 +3,8 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useFolderShake } from "@/hooks/use-folder-shake";
-import type { ToolCatalogEntry } from "@/lib/tools-catalog";
 import { pressableClass } from "@/lib/pressable";
+import type { ToolCatalogEntry } from "@/lib/tools-catalog";
 import { cn } from "@/lib/utils";
 
 const FOLDER_IMAGE = "/media/folder.png";

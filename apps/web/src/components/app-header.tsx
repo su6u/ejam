@@ -5,10 +5,7 @@ import Link from "next/link";
 import type { RefObject } from "react";
 import GitHubStars from "@/components/github-stars";
 import { useProximityHighlight } from "@/hooks/use-proximity-highlight";
-import {
-  headerPillClass,
-  homeHeaderLinkClass,
-} from "@/lib/pressable";
+import { headerPillClass, homeHeaderLinkClass } from "@/lib/pressable";
 import { cn } from "@/lib/utils";
 
 const SPONSOR_HREF = "https://github.com/sponsors/su6u";
@@ -35,7 +32,10 @@ export function AppHeader({
   if (!isHome) {
     return (
       <header
-        className={cn("flex shrink-0 items-center justify-end gap-2", className)}
+        className={cn(
+          "flex shrink-0 items-center justify-end gap-2",
+          className,
+        )}
       >
         {showToolsLink ? (
           <Link href="/" className={actionClass}>
@@ -100,7 +100,10 @@ export function AppHeader({
             aria-hidden
             className={toolHeaderIconClass}
           />
-          <GitHubStars className="text-xs" countClassName="text-xs font-medium" />
+          <GitHubStars
+            className="text-xs"
+            countClassName="text-xs font-medium"
+          />
         </a>
       </header>
     );
@@ -110,9 +113,7 @@ export function AppHeader({
   const githubIndex = secondaryIndex + 1;
 
   return (
-    <header
-      className={cn("flex shrink-0 items-center justify-end", className)}
-    >
+    <header className={cn("flex shrink-0 items-center justify-end", className)}>
       <div
         ref={rootRef as unknown as RefObject<HTMLDivElement>}
         className="home-header-proximity flex items-center gap-4 md:gap-5"

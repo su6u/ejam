@@ -176,7 +176,9 @@ function GitHubStarsDisplay({
               shouldReduceMotion ? { duration: 0 } : STAR_REVEAL_TRANSITION
             }
           >
-            <span className={countClassName}>{displayCount.toLocaleString()}</span>
+            <span className={countClassName}>
+              {displayCount.toLocaleString()}
+            </span>
             <span className={starsLabelClassName}>stars</span>
           </m.span>
         </LazyMotion>

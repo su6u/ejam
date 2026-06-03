@@ -24,8 +24,7 @@ export function HomeRequestTool({
         Missing something?
       </h2>
       <p className="font-instrument-sans text-[13px] leading-snug tracking-[-0.01em] text-[#2e2e2e]/70">
-        Wish a <span className="font-serif-display italic">tool</span>{" "}
-        existed?{" "}
+        Wish a <span className="font-serif-display italic">tool</span> existed?{" "}
         Tell me what — if I find the time, I&apos;ll try to build it :)
       </p>
       <Link

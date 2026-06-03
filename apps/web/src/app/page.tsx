@@ -2,15 +2,15 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { AppHeader } from "@/components/app-header";
-import { HomeRequestTool } from "@/components/home/home-request-tool";
-import { HomeToolsCatalog } from "@/components/home/home-tools-catalog";
-import { HomeTagline } from "@/components/home-tagline";
 import {
-  homeHeroColumnClass,
   homeHeaderActionsAlignClass,
+  homeHeroColumnClass,
   homeLogoAlignClass,
   homePageContainerClass,
 } from "@/components/app-layout";
+import { HomeRequestTool } from "@/components/home/home-request-tool";
+import { HomeToolsCatalog } from "@/components/home/home-tools-catalog";
+import { HomeTagline } from "@/components/home-tagline";
 import { pressableClass } from "@/lib/pressable";
 import { cn } from "@/lib/utils";
 

@@ -20,13 +20,11 @@ export function ToolFolderRow({
   return (
     <ul
       ref={rootRef as unknown as RefObject<HTMLUListElement>}
-      role="list"
       className="t-avatar-group flex flex-wrap gap-6 md:gap-8"
     >
       {tools.map((tool, index) => (
         <li
           key={tool.id}
-          role="listitem"
           className="home-folder-enter"
           style={{
             animationDelay: `${FOLDER_ENTER_BASE_MS + index * FOLDER_ENTER_STEP_MS}ms`,
@@ -39,7 +37,9 @@ export function ToolFolderRow({
                 onItemEnter(index);
                 if (tool.status === "live") primeClickSound();
               }}
-              onPointerDown={tool.status === "live" ? playClickSound : undefined}
+              onPointerDown={
+                tool.status === "live" ? playClickSound : undefined
+              }
             />
           </div>
         </li>

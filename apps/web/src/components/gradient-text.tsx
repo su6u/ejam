@@ -47,7 +47,12 @@ function blendHex(a: string, b: string, t: number): string {
 }
 
 /** White only tints mid-blends — never a visible stop */
-function blendWithWhiteHint(a: string, b: string, t: number, hint: number): string {
+function blendWithWhiteHint(
+  a: string,
+  b: string,
+  t: number,
+  hint: number,
+): string {
   const mixed = blendHex(a, b, t);
   return hint > 0 ? blendHex(mixed, "#FFFFFF", hint) : mixed;
 }
@@ -148,7 +153,9 @@ function MixedGradientText({
 }) {
   const gradientStyle = useMemo(
     () =>
-      animate ? buildMixedGradientStyle(colors) : buildStaticTricolorStyle(colors),
+      animate
+        ? buildMixedGradientStyle(colors)
+        : buildStaticTricolorStyle(colors),
     [colors, animate],
   );
 
@@ -157,7 +164,9 @@ function MixedGradientText({
       className={cn("gradient-text-mixed", animate && "is-drifting", className)}
       style={
         animate
-          ? ({ "--gradient-drift-duration": `${animationSpeed}s` } as React.CSSProperties)
+          ? ({
+              "--gradient-drift-duration": `${animationSpeed}s`,
+            } as React.CSSProperties)
           : undefined
       }
     >

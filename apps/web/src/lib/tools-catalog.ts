@@ -33,7 +33,8 @@ export const TOOL_CATALOG_GROUPS: readonly ToolCatalogGroup[] = [
         id: "jee-marks-calculator",
         href: "#",
         title: "JEE Marks Calculator",
-        description: "Raw marks to normalized score across JEE Main papers and sessions.",
+        description:
+          "Raw marks to normalized score across JEE Main papers and sessions.",
         examLogo: "/exams/jee_main.svg",
         examLabel: "JEE",
         status: "soon",
