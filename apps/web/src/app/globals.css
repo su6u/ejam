@@ -189,6 +189,8 @@
 @theme inline {
   --font-heading: var(--font-sans);
   --font-sans: var(--font-sans);
+  --font-serif-display: var(--font-serif-display);
+  --font-instrument-sans: var(--font-instrument-sans);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -654,28 +656,6 @@ input {
     }
   }
 
-  /* Home folders — stagger enter on first paint */
-  .home-folder-item {
-    opacity: 0;
-    transform: translateY(8px);
-    animation: home-folder-enter 280ms var(--ease-out) forwards;
-  }
-
-  @keyframes home-folder-enter {
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .home-folder-item {
-      animation: none;
-      opacity: 1;
-      transform: none;
-    }
-  }
-
   @media (prefers-reduced-motion: reduce) {
     [data-slot="skeleton"].animate-pulse {
       animation: none !important;
@@ -958,6 +938,141 @@ input {
     .t-input {
       animation: none !important;
       transform: none !important;
+    }
+  }
+}
+
+@layer utilities {
+  .font-serif-display {
+    font-family:
+      var(--font-serif-display), ui-serif, Georgia, "Times New Roman", serif;
+  }
+
+  .font-instrument-sans {
+    font-family:
+      var(--font-instrument-sans), ui-sans-serif, system-ui, sans-serif;
+  }
+}
+
+@layer components {
+  /* Homepage — light surface overrides dark-only ::selection tokens */
+  .home-page ::selection {
+    background-color: rgb(62 62 62 / 0.12);
+    color: #2e2e2e;
+  }
+
+  .home-page ::-moz-selection {
+    background-color: rgb(62 62 62 / 0.12);
+    color: #2e2e2e;
+  }
+
+  /* Homepage — staggered blur reveal on hero line */
+  .home-tagline {
+    text-wrap: balance;
+  }
+
+  .home-tagline-part {
+    opacity: 0;
+    filter: blur(var(--text-swap-blur));
+    animation: home-tagline-reveal 280ms var(--text-swap-ease) forwards;
+    animation-delay: var(--tagline-delay, 0ms);
+    will-change: opacity;
+  }
+
+  @keyframes home-tagline-reveal {
+    to {
+      opacity: 1;
+      filter: blur(0);
+    }
+  }
+
+  .home-enter-item {
+    opacity: 0;
+    transform: translateY(8px);
+    animation: home-enter 260ms var(--ease-out) forwards;
+  }
+
+  @keyframes home-enter {
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Folder cards — first-load enter stagger (delay set inline per card) */
+  .home-folder-enter {
+    opacity: 0;
+    transform: translateY(8px);
+    animation: home-folder-enter 240ms var(--ease-out) forwards;
+  }
+
+  @keyframes home-folder-enter {
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Live tool folder image — layered depth so it reads as actionable */
+  .home-folder-live-img {
+    filter: drop-shadow(0 1px 2px rgb(46 46 46 / 0.1))
+      drop-shadow(0 4px 8px rgb(46 46 46 / 0.06));
+  }
+
+  /* Soon folder — percussive shake on click (transitions-dev error-state pattern) */
+  .home-folder-card {
+    will-change: transform;
+  }
+
+  .home-folder-card.is-shaking {
+    animation: t-input-shake
+      calc(var(--shake-dur-a) * 2 + var(--shake-dur-b) * 2) linear;
+  }
+
+  /* Homepage header */
+  .home-header-proximity .t-proximity-item {
+    transform: none;
+    transition: none;
+    will-change: auto;
+  }
+
+  .home-header-proximity .home-header-link {
+    color: #2e2e2e;
+    background-color: rgb(46 46 46 / calc(var(--proximity, 0) * 0.06));
+  }
+
+  .home-header-proximity .home-header-link img,
+  .home-header-proximity .home-header-link svg {
+    opacity: calc(0.85 + var(--proximity, 0) * 0.15);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .home-tagline-part {
+      animation: none;
+      opacity: 1;
+      filter: none;
+    }
+
+    .home-enter-item {
+      animation: none;
+      opacity: 1;
+      transform: none;
+    }
+
+    .home-folder-enter {
+      animation: none;
+      opacity: 1;
+      transform: none;
+    }
+
+    .home-folder-card.is-shaking {
+      animation: none !important;
+      transform: none !important;
+    }
+
+    .home-header-proximity .t-proximity-item,
+    .home-header-proximity .home-header-link {
+      transition: none !important;
     }
   }
 }

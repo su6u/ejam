@@ -3,8 +3,20 @@ import { cn } from "@/lib/utils";
 /** one horizontal gutter for main content */
 export const appContentGutterClass = "px-4 md:px-6";
 
-/** centered marketing/home column — navbar and body share one width */
+/** home page content column — navbar and body share one width */
 export const homePageContainerClass = "mx-auto w-full max-w-3xl px-4 md:px-6";
+
+/** tools catalog inner column — same box as HomeTagline (pair with items-center wrapper) */
+export const homeHeroColumnClass =
+  "w-full max-w-[24rem] -ml-1.5 md:max-w-[28rem] md:-ml-2";
+
+/** header logo — matches catalog column left edge when tagline stays centered */
+export const homeLogoAlignClass =
+  "ml-[calc((100%-min(100%,24rem))/2+1.25rem-0.375rem)] md:ml-[calc((100%-min(100%,28rem))/2+1.75rem-0.5rem)]";
+
+/** header actions — inset left from catalog column right edge */
+export const homeHeaderActionsAlignClass =
+  "mr-[max(0px,calc((100%-min(100%,24rem))/2-1.25rem+0.375rem+0.75rem))] md:mr-[max(0px,calc((100%-min(100%,28rem))/2-1.75rem+0.5rem+1rem))]";
 
 /** frosted sticky chrome — navbar, table headers, etc. */
 export const stickyGlassChromeClass =

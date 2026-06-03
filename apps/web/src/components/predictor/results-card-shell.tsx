@@ -1,13 +1,5 @@
-import { predictorHeaderStripClass } from "@/components/app-layout";
-import { DashboardCard } from "@/components/dashboard-card";
-import { DecorIcon } from "@/components/decor-icon";
-import {
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { cn } from "@/lib/utils";
+import { DashboardCardShell } from "@/components/dashboard-card-shell";
+import { CardDescription, CardTitle } from "@/components/ui/card";
 
 const RESULTS_DESCRIPTION =
   "Programs matched to your rank, have fun exploring!";
@@ -28,47 +20,23 @@ export function ResultsCardShell({
   description?: string | null;
 }) {
   return (
-    <DashboardCard
-      className={cn(
-        "relative h-full min-h-0 w-full min-w-0 gap-0 overflow-visible py-0",
-      )}
+    <DashboardCardShell
+      header={
+        <>
+          <CardTitle className="text-pretty">Prediction results</CardTitle>
+          {description ? (
+            <CardDescription className="text-pretty">
+              {description}
+            </CardDescription>
+          ) : null}
+        </>
+      }
+      headerExtra={headerExtra}
+      toolbar={toolbar}
+      footer={footer}
+      contentClassName={contentClassName}
     >
-      <DecorIcon position="top-left" />
-      <DecorIcon position="top-right" />
-      <DecorIcon position="bottom-left" />
-      <DecorIcon position="bottom-right" />
-      <CardHeader
-        className={cn(
-          "relative shrink-0 overflow-visible rounded-none border-b px-4 pt-4 pb-4",
-          predictorHeaderStripClass,
-        )}
-      >
-        <DecorIcon position="bottom-left" />
-        <DecorIcon position="bottom-right" />
-        <div className="flex min-w-0 flex-row items-center justify-between gap-4">
-          <div className="flex min-w-0 flex-1 flex-col gap-1">
-            <CardTitle className="text-pretty">Prediction results</CardTitle>
-            {description ? (
-              <CardDescription className="text-pretty">
-                {description}
-              </CardDescription>
-            ) : null}
-          </div>
-          {headerExtra}
-        </div>
-        {toolbar ? (
-          <div className="mt-3 border-t border-border pt-3">{toolbar}</div>
-        ) : null}
-      </CardHeader>
-      <CardContent
-        className={cn(
-          "flex min-h-0 min-w-0 flex-1 flex-col px-0 py-0",
-          contentClassName,
-        )}
-      >
-        {children}
-      </CardContent>
-      {footer}
-    </DashboardCard>
+      {children}
+    </DashboardCardShell>
   );
 }

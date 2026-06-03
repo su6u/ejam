@@ -79,7 +79,7 @@ pnpm validate:data
 pnpm --filter @ejam/data test
 ```
 
-CI runs the app and data jobs based on which paths changed (see `.github/workflows/ci.yml`).
+CI runs the app and data jobs based on which paths changed (see `.github/workflows/ci.yml`). Passing **app** on `main` triggers production deploy via the CI deploy job
 
 Fix lint automatically when safe:
 

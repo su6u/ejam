@@ -27,6 +27,8 @@ export interface GitHubStarsProps {
   starCount?: number;
   className?: string;
   countClassName?: string;
+  starsLabelClassName?: string;
+  skeletonClassName?: string;
 }
 
 function cacheKey(owner: string, repo: string) {
@@ -125,12 +127,16 @@ function GitHubStarsDisplay({
   displayCount,
   className,
   countClassName,
+  starsLabelClassName = "font-normal text-muted-foreground",
+  skeletonClassName,
   shouldReduceMotion,
 }: {
   isLoading: boolean;
   displayCount: number;
   className: string;
   countClassName: string;
+  starsLabelClassName?: string;
+  skeletonClassName?: string;
   shouldReduceMotion: boolean | null;
 }) {
   return (
@@ -147,7 +153,12 @@ function GitHubStarsDisplay({
       </span>
 
       {isLoading ? (
-        <Skeleton className="col-start-1 row-start-1 h-3.5 w-full rounded-none bg-foreground/25" />
+        <Skeleton
+          className={cn(
+            "col-start-1 row-start-1 h-3.5 w-full rounded-none bg-foreground/25",
+            skeletonClassName,
+          )}
+        />
       ) : (
         <LazyMotion features={domAnimation} strict>
           <m.span
@@ -165,8 +176,10 @@ function GitHubStarsDisplay({
               shouldReduceMotion ? { duration: 0 } : STAR_REVEAL_TRANSITION
             }
           >
-            <span>{displayCount.toLocaleString()}</span>
-            <span className="font-normal text-muted-foreground">stars</span>
+            <span className={countClassName}>
+              {displayCount.toLocaleString()}
+            </span>
+            <span className={starsLabelClassName}>stars</span>
           </m.span>
         </LazyMotion>
       )}
@@ -178,10 +191,14 @@ function GitHubStarsProvided({
   starCount,
   className,
   countClassName,
+  starsLabelClassName,
+  skeletonClassName,
 }: {
   starCount: number;
   className: string;
   countClassName: string;
+  starsLabelClassName?: string;
+  skeletonClassName?: string;
 }) {
   const [displayCount, setDisplayCount] = useState(0);
   const shouldReduceMotion = useReducedMotion();
@@ -203,6 +220,8 @@ function GitHubStarsProvided({
       displayCount={displayCount}
       className={className}
       countClassName={countClassName}
+      starsLabelClassName={starsLabelClassName}
+      skeletonClassName={skeletonClassName}
       shouldReduceMotion={shouldReduceMotion}
     />
   );
@@ -213,11 +232,15 @@ function GitHubStarsFetched({
   repo,
   className,
   countClassName,
+  starsLabelClassName,
+  skeletonClassName,
 }: {
   owner: string;
   repo: string;
   className: string;
   countClassName: string;
+  starsLabelClassName?: string;
+  skeletonClassName?: string;
 }) {
   const [starCount, setStarCount] = useState<number | null>(null);
   const [displayCount, setDisplayCount] = useState(0);
@@ -266,6 +289,8 @@ function GitHubStarsFetched({
       displayCount={displayCount}
       className={className}
       countClassName={countClassName}
+      starsLabelClassName={starsLabelClassName}
+      skeletonClassName={skeletonClassName}
       shouldReduceMotion={isLoading ? false : shouldReduceMotion}
     />
   );
@@ -277,6 +302,8 @@ export default function GitHubStars({
   starCount: providedStarCount,
   className = "",
   countClassName = "",
+  starsLabelClassName,
+  skeletonClassName,
 }: Readonly<GitHubStarsProps>) {
   if (providedStarCount !== undefined) {
     return (
@@ -284,6 +311,8 @@ export default function GitHubStars({
         starCount={providedStarCount}
         className={className}
         countClassName={countClassName}
+        starsLabelClassName={starsLabelClassName}
+        skeletonClassName={skeletonClassName}
       />
     );
   }
@@ -294,6 +323,8 @@ export default function GitHubStars({
       repo={repo}
       className={className}
       countClassName={countClassName}
+      starsLabelClassName={starsLabelClassName}
+      skeletonClassName={skeletonClassName}
     />
   );
 }

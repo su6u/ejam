@@ -2,7 +2,11 @@
 // against the dark palette declared in globals.css
 
 import type { Metadata } from "next";
-import { IBM_Plex_Sans } from "next/font/google";
+import {
+  IBM_Plex_Sans,
+  Instrument_Sans,
+  Instrument_Serif,
+} from "next/font/google";
 import { Toaster } from "sonner";
 import "./globals.css";
 import { AgentationDev } from "@/components/agentation-dev";
@@ -13,6 +17,20 @@ const ibmPlex = IBM_Plex_Sans({
   weight: ["300", "400", "500", "600", "700"],
   display: "swap",
   variable: "--font-sans",
+});
+
+const instrumentSerif = Instrument_Serif({
+  subsets: ["latin"],
+  weight: "400",
+  style: ["italic"],
+  display: "swap",
+  variable: "--font-serif-display",
+});
+
+const instrumentSans = Instrument_Sans({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-instrument-sans",
 });
 
 export const metadata: Metadata = {
@@ -36,7 +54,13 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={cn("dark antialiased", ibmPlex.variable, "font-sans")}
+      className={cn(
+        "dark antialiased",
+        ibmPlex.variable,
+        instrumentSerif.variable,
+        instrumentSans.variable,
+        "font-sans",
+      )}
     >
       <body suppressHydrationWarning>
         {children}
