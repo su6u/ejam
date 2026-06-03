@@ -21,7 +21,7 @@ export function AppHeader({
     <header
       className={cn(
         "flex shrink-0 items-center justify-end",
-        variant === "home" ? "gap-2.5" : "gap-2",
+        variant === "home" ? "gap-2" : "gap-2",
         className,
       )}
     >
@@ -41,11 +41,12 @@ export function AppHeader({
         <Image
           src="/icons/docs.svg"
           alt=""
-          width={20}
-          height={20}
+          width={variant === "home" ? 16 : 20}
+          height={variant === "home" ? 16 : 20}
           aria-hidden
           className={cn(
-            "size-5 shrink-0",
+            variant === "home" ? "size-4" : "size-5",
+            "shrink-0",
             variant === "home" && homeIconClass,
           )}
         />
@@ -60,22 +61,28 @@ export function AppHeader({
         <Image
           src="/icons/github.svg"
           alt=""
-          width={16}
-          height={16}
+          width={variant === "home" ? 14 : 16}
+          height={variant === "home" ? 14 : 16}
           aria-hidden
           className={cn(
-            "size-4 shrink-0",
+            variant === "home" ? "size-3.5" : "size-4",
+            "shrink-0",
             variant === "home" && homeIconClass,
           )}
         />
         <GitHubStars
           className="text-xs"
           countClassName={cn(
-            "text-xs",
-            variant === "home" && "text-white",
+            "text-xs font-medium",
+            variant === "home" && "text-[#ffffff]",
           )}
           starsLabelClassName={
-            variant === "home" ? "font-normal text-white/60" : undefined
+            variant === "home"
+              ? "font-normal text-[#f0f0f0]"
+              : undefined
+          }
+          skeletonClassName={
+            variant === "home" ? "bg-white/35" : undefined
           }
         />
       </a>
