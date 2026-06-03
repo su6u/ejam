@@ -19,7 +19,7 @@ export function HomeRequestTool({
     >
       <h2
         id="home-request-tool-label"
-        className="font-mono text-[9px] font-medium leading-none tracking-[0.14em] text-[#2e2e2e]/45 uppercase"
+        className="mb-1.5 font-mono text-[9px] font-medium leading-none tracking-[0.14em] text-[#2e2e2e]/45 uppercase"
       >
         Missing something?
       </h2>
