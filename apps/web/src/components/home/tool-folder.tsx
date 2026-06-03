@@ -28,10 +28,10 @@ export function ToolFolderCard({
       width={116}
       height={87}
       className={cn(
-        "h-auto w-auto max-w-none select-none",
+        "h-auto w-full max-w-none select-none",
         isLive ? "home-folder-live-img" : "grayscale",
       )}
-      style={{ width: "auto", height: "auto" }}
+      style={{ width: "100%", height: "auto" }}
       aria-hidden
     />
   );
