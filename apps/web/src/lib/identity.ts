@@ -4,6 +4,8 @@ export type AppIdentity = {
   logoHeight: number;
   homeHref: string;
   homeAriaLabel: string;
+  /** When set, the tool header shows Docs instead of Sponsor. */
+  docsHref?: string;
 };
 
 export const ejamIdentity: AppIdentity = {
@@ -20,4 +22,6 @@ export const collegePredictorIdentity: AppIdentity = {
   logoHeight: 94,
   homeHref: "/",
   homeAriaLabel: "All tools",
+  docsHref:
+    "https://github.com/su6u/ejam/blob/main/docs/college-predictor/README.md",
 };
