@@ -973,10 +973,10 @@ input {
 
   .home-tagline-part {
     opacity: 0;
-    filter: blur(4px);
+    filter: blur(var(--text-swap-blur));
     animation: home-tagline-reveal 280ms var(--text-swap-ease) forwards;
     animation-delay: var(--tagline-delay, 0ms);
-    will-change: filter, opacity;
+    will-change: opacity;
   }
 
   @keyframes home-tagline-reveal {
@@ -1029,6 +1029,22 @@ input {
       calc(var(--shake-dur-a) * 2 + var(--shake-dur-b) * 2) linear;
   }
 
+  /* Homepage header — hover highlight on active link only (square, no lift/bounce) */
+  .home-header-proximity .t-proximity-item {
+    transform: none;
+    transition: none;
+    will-change: auto;
+  }
+
+  .home-header-proximity .home-header-link {
+    color: rgb(46 46 46 / calc(0.7 + var(--proximity, 0) * 0.3));
+    background-color: rgb(46 46 46 / calc(var(--proximity, 0) * 0.06));
+  }
+
+  .home-header-proximity .home-header-link img {
+    opacity: calc(0.7 + var(--proximity, 0) * 0.3);
+  }
+
   @media (prefers-reduced-motion: reduce) {
     .home-tagline-part {
       animation: none;
@@ -1051,6 +1067,11 @@ input {
     .home-folder-card.is-shaking {
       animation: none !important;
       transform: none !important;
+    }
+
+    .home-header-proximity .t-proximity-item,
+    .home-header-proximity .home-header-link {
+      transition: none !important;
     }
   }
 }

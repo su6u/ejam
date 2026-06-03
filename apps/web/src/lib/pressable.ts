@@ -12,14 +12,14 @@ export const headerPillClass = cn(
   "hover:bg-muted",
 );
 
-/** Homepage header pills — slightly compact on light hero */
-export const homeHeaderPillClass = cn(
-  "inline-flex h-9 items-center gap-1.5 rounded-none bg-[#2e2e2e] pl-2.5 pr-3 text-xs font-medium text-white",
-  "shadow-[0_1px_2px_rgb(46_46_46_/_0.14),0_0_0_1px_rgb(0_0_0_/_0.06)]",
-  "transition-[box-shadow,background-color] duration-150 ease-out",
-  "hover:shadow-[0_2px_6px_rgb(46_46_46_/_0.18),0_0_0_1px_rgb(0_0_0_/_0.08)]",
+/**
+ * Homepage header links — icon + label on light hero (#F6FBFF).
+ * `after` extends tap target to ~40px. Hover gated in `.home-header-link` (globals.css).
+ */
+export const homeHeaderLinkClass = cn(
+  "home-header-link relative inline-flex min-h-10 items-center gap-1.5 rounded-none px-2 text-[13px] font-medium text-[#2e2e2e]/70",
+  "after:absolute after:inset-x-0 after:-inset-y-0.5 after:content-['']",
   pressableClass,
-  "hover:bg-[#2e2e2e]/92",
 );
 
 /** Run click work after the press animation paints (double rAF). */
