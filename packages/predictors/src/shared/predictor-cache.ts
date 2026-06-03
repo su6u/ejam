@@ -3,6 +3,8 @@
  * index sha is mixed into cache keys so rebuilt indexes invalidate stale rows
  */
 
+import { createHash } from "node:crypto";
+
 import type {
   CollegePredictionResult,
   ProgramPrediction,
@@ -40,11 +42,6 @@ export function stableStringify(value: unknown): string {
   return JSON.stringify(stableNormalize(value));
 }
 
-export function fnv1a(value: string): string {
-  let hash = 0x811c9dc5;
-  for (const char of value) {
-    hash ^= char.codePointAt(0) ?? 0;
-    hash = Math.imul(hash, 0x01000193);
-  }
-  return (hash >>> 0).toString(16).padStart(8, "0");
+export function createServerCacheKey(value: unknown): string {
+  return createHash("sha256").update(stableStringify(value)).digest("hex");
 }
