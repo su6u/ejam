@@ -14,10 +14,10 @@ export const headerPillClass = cn(
 
 /**
  * Homepage header links — icon + label on light hero (#F6FBFF).
- * `after` extends tap target to ~40px. Hover gated in `.home-header-link` (globals.css).
+ * `after` extends tap target to ~40px. Proximity hover in `.home-header-proximity` (globals.css).
  */
 export const homeHeaderLinkClass = cn(
-  "home-header-link relative inline-flex min-h-10 items-center gap-1.5 rounded-none px-2 text-[13px] font-medium text-[#2e2e2e]/70",
+  "home-header-link relative inline-flex min-h-11 items-center gap-2 rounded-none px-2.5 text-[14px] font-medium text-[#2e2e2e]",
   "after:absolute after:inset-x-0 after:-inset-y-0.5 after:content-['']",
   pressableClass,
 );

@@ -15,7 +15,7 @@ export function useProximityHighlight(itemSelector = ".t-proximity-item") {
       if (!root) return;
 
       const timing = phase === "out" ? PROXIMITY_EASE_OUT : PROXIMITY_EASE_IN;
-      const transition = `background-color ${PROXIMITY_DUR_MS}ms ${timing}, color ${PROXIMITY_DUR_MS}ms ${timing}, opacity ${PROXIMITY_DUR_MS}ms ${timing}`;
+      const transition = `background-color ${PROXIMITY_DUR_MS}ms ${timing}, opacity ${PROXIMITY_DUR_MS}ms ${timing}`;
 
       root.querySelectorAll<HTMLElement>(itemSelector).forEach((el, i) => {
         const link = el.querySelector<HTMLElement>(".home-header-link");
