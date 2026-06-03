@@ -1,6 +1,5 @@
 "use client";
 
-import { LayoutGridIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import type { RefObject } from "react";
@@ -12,19 +11,26 @@ import {
 } from "@/lib/pressable";
 import { cn } from "@/lib/utils";
 
+const SPONSOR_HREF = "https://github.com/sponsors/su6u";
+const GITHUB_REPO_HREF = "https://github.com/su6u/ejam";
+
 export function AppHeader({
   className,
   showToolsLink = false,
   variant = "default",
+  docsHref,
 }: {
   className?: string;
   showToolsLink?: boolean;
   variant?: "default" | "home";
+  docsHref?: string;
 }) {
   const isHome = variant === "home";
+  const showDocs = Boolean(docsHref);
   const { rootRef, onItemEnter } = useProximityHighlight();
   const actionClass = isHome ? homeHeaderLinkClass : headerPillClass;
   const homeIconClass = "shrink-0";
+  const toolHeaderIconClass = "size-4 shrink-0 brightness-0 invert";
 
   if (!isHome) {
     return (
@@ -33,29 +39,55 @@ export function AppHeader({
       >
         {showToolsLink ? (
           <Link href="/" className={actionClass}>
-            <LayoutGridIcon aria-hidden className="size-4 shrink-0" />
+            <Image
+              src="/icons/tools.svg"
+              alt=""
+              width={16}
+              height={16}
+              aria-hidden
+              className={toolHeaderIconClass}
+            />
             Tools
           </Link>
         ) : null}
+        {showDocs ? (
+          <a
+            href={docsHref}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={actionClass}
+            aria-label="Documentation"
+          >
+            <Image
+              src="/icons/docs.svg"
+              alt=""
+              width={16}
+              height={16}
+              aria-hidden
+              className={toolHeaderIconClass}
+            />
+            Docs
+          </a>
+        ) : (
+          <a
+            href={SPONSOR_HREF}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={actionClass}
+          >
+            <Image
+              src="/icons/heart.svg"
+              alt=""
+              width={16}
+              height={16}
+              aria-hidden
+              className={toolHeaderIconClass}
+            />
+            Sponsor
+          </a>
+        )}
         <a
-          href="https://github.com/su6u/ejam#readme"
-          target="_blank"
-          rel="noopener noreferrer"
-          className={actionClass}
-          aria-label="Documentation"
-        >
-          <Image
-            src="/icons/docs.svg"
-            alt=""
-            width={20}
-            height={20}
-            aria-hidden
-            className="size-5 shrink-0"
-          />
-          Docs
-        </a>
-        <a
-          href="https://github.com/su6u/ejam"
+          href={GITHUB_REPO_HREF}
           target="_blank"
           rel="noopener noreferrer"
           className={actionClass}
@@ -66,7 +98,7 @@ export function AppHeader({
             width={16}
             height={16}
             aria-hidden
-            className="size-4 shrink-0"
+            className={toolHeaderIconClass}
           />
           <GitHubStars className="text-xs" countClassName="text-xs font-medium" />
         </a>
@@ -74,8 +106,8 @@ export function AppHeader({
     );
   }
 
-  const docsIndex = showToolsLink ? 1 : 0;
-  const githubIndex = showToolsLink ? 2 : 1;
+  const secondaryIndex = showToolsLink ? 1 : 0;
+  const githubIndex = secondaryIndex + 1;
 
   return (
     <header
@@ -92,34 +124,40 @@ export function AppHeader({
               className={actionClass}
               onMouseEnter={() => onItemEnter(0)}
             >
-              <LayoutGridIcon aria-hidden className="size-4 shrink-0" />
+              <Image
+                src="/icons/tools.svg"
+                alt=""
+                width={16}
+                height={16}
+                aria-hidden
+                className={cn("size-4", homeIconClass)}
+              />
               Tools
             </Link>
           </div>
         ) : null}
         <div className="t-proximity-item">
           <a
-            href="https://github.com/su6u/ejam#readme"
+            href={SPONSOR_HREF}
             target="_blank"
             rel="noopener noreferrer"
             className={actionClass}
-            aria-label="Documentation"
-            onMouseEnter={() => onItemEnter(docsIndex)}
+            onMouseEnter={() => onItemEnter(secondaryIndex)}
           >
             <Image
-              src="/icons/docs.svg"
+              src="/icons/heart.svg"
               alt=""
               width={16}
               height={16}
               aria-hidden
               className={cn("size-4", homeIconClass)}
             />
-            Docs
+            Sponsor
           </a>
         </div>
         <div className="t-proximity-item">
           <a
-            href="https://github.com/su6u/ejam"
+            href={GITHUB_REPO_HREF}
             target="_blank"
             rel="noopener noreferrer"
             className={actionClass}
@@ -128,14 +166,14 @@ export function AppHeader({
             <Image
               src="/icons/github.svg"
               alt=""
-              width={14}
-              height={14}
+              width={16}
+              height={16}
               aria-hidden
-              className={cn("size-3.5", homeIconClass)}
+              className={cn("size-4", homeIconClass)}
             />
             <GitHubStars
-              className="text-[13px]"
-              countClassName="text-[13px] font-medium text-[#2e2e2e]"
+              className="text-[14px]"
+              countClassName="text-[14px] font-medium tabular-nums text-[#2e2e2e]"
               starsLabelClassName="font-normal text-[#2e2e2e]/55"
               skeletonClassName="bg-[#2e2e2e]/12"
             />

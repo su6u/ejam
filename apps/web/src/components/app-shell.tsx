@@ -41,7 +41,11 @@ export function AppShell({
               )}
             >
               <SidebarTrigger />
-              <AppHeader className="min-w-0 flex-1" showToolsLink />
+              <AppHeader
+                className="min-w-0 flex-1"
+                showToolsLink
+                docsHref={identity.docsHref}
+              />
             </div>
             <div className={cn(appShellLayoutClass(), "min-h-0 flex-1")}>
               <div className={appShellContentClass()}>{children}</div>
