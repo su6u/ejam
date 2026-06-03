@@ -12,6 +12,16 @@ export const headerPillClass = cn(
   "hover:bg-muted",
 );
 
+/** Homepage header pills — #2e2e2e on #F6FBFF, 40px hit area */
+export const homeHeaderPillClass = cn(
+  "inline-flex min-h-10 h-10 items-center gap-2 rounded-none bg-[#2e2e2e] pl-3 pr-3.5 text-xs font-medium text-white",
+  "shadow-[0_1px_2px_rgb(46_46_46_/_0.14),0_0_0_1px_rgb(0_0_0_/_0.06)]",
+  "transition-[box-shadow,background-color] duration-150 ease-out",
+  "hover:shadow-[0_2px_6px_rgb(46_46_46_/_0.18),0_0_0_1px_rgb(0_0_0_/_0.08)]",
+  pressableClass,
+  "hover:bg-[#2e2e2e]/92",
+);
+
 /** Run click work after the press animation paints (double rAF). */
 export function deferAfterPress(fn: () => void) {
   requestAnimationFrame(() => {
