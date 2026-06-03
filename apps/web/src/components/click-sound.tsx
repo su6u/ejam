@@ -19,11 +19,20 @@ function getAudioContext(): AudioContext {
 function loadClickBuffer(): Promise<AudioBuffer> {
   if (clickBuffer) return Promise.resolve(clickBuffer);
   loadPromise ??= fetch(CLICK_SOUND_SRC)
-    .then((response) => response.arrayBuffer())
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error(`click sound fetch failed: ${response.status}`);
+      }
+      return response.arrayBuffer();
+    })
     .then((data) => getAudioContext().decodeAudioData(data))
     .then((buffer) => {
       clickBuffer = buffer;
       return buffer;
+    })
+    .catch((error) => {
+      loadPromise = null;
+      throw error;
     });
   return loadPromise;
 }
@@ -80,6 +89,8 @@ export function useClickSound() {
       playClickBuffer(clickBuffer);
       return;
     }
-    void loadClickBuffer().then(playClickBuffer);
+    void loadClickBuffer()
+      .then(playClickBuffer)
+      .catch(() => {});
   }, []);
 }
