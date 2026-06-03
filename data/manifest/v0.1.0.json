@@ -379,17 +379,17 @@
       "bytes": 88825
     },
     {
-      "path": "engineering/jee/seats/matrix/year=2023/seat-matrix.parquet",
+      "path": "engineering/jee/seats-matrix/jossa/year=2023/seat-matrix.parquet",
       "sha256": "20580398e2d67a527221944ab4f87559db9489584c36b7e34f1754af3720e67a",
       "bytes": 16515
     },
     {
-      "path": "engineering/jee/seats/matrix/year=2024/seat-matrix.parquet",
+      "path": "engineering/jee/seats-matrix/jossa/year=2024/seat-matrix.parquet",
       "sha256": "39bdcd38c6197d8aa4170eba585073e721e2fb4ecf37a4cc2b84d719d6a66632",
       "bytes": 17188
     },
     {
-      "path": "engineering/jee/seats/matrix/year=2025/seat-matrix.parquet",
+      "path": "engineering/jee/seats-matrix/jossa/year=2025/seat-matrix.parquet",
       "sha256": "ea5b429dc9c2a68b78df7758fbfc1b4f7f3dbee9b26433140b1b543fab5d9bdf",
       "bytes": 18693
     }

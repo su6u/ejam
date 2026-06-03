@@ -27,7 +27,7 @@ export function cutoffPath(args: CutoffPathArgs): string {
 }
 
 export function seatMatrixPath(args: SeatMatrixPathArgs): string {
-  return `${DATA_ROOT}/${args.stream}/jee/seats/matrix/year=${args.year}/seat-matrix.parquet`;
+  return `${DATA_ROOT}/${args.stream}/jee/seats-matrix/jossa/year=${args.year}/seat-matrix.parquet`;
 }
 
 export function registryPath(
