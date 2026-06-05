@@ -82,12 +82,14 @@ jobs:
 
   deploy:
     name: Deploy to production
-    needs: [changes, app]
+    needs: [changes, app, data]
     if: >-
+      always() &&
       github.event_name == 'push' &&
       github.ref == 'refs/heads/main' &&
-      needs.changes.outputs.app == 'true' &&
-      needs.app.result == 'success'
+      (needs.changes.outputs.app == 'true' || needs.changes.outputs.data == 'true') &&
+      (needs.changes.outputs.app != 'true' || needs.app.result == 'success') &&
+      (needs.changes.outputs.data != 'true' || needs.data.result == 'success')
     runs-on: ubuntu-latest
     timeout-minutes: 45
     environment: production
