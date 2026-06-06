@@ -166,6 +166,9 @@ importers:
       typescript:
         specifier: ^6.0.3
         version: 6.0.3
+      vitest:
+        specifier: ^3.2.4
+        version: 3.2.4(@types/node@25.7.0)(jiti@2.7.0)(lightningcss@1.32.0)(msw@2.14.6(@types/node@25.7.0)(typescript@6.0.3))(tsx@4.22.0)
 
 packages:
 
