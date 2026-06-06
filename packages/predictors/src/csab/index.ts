@@ -24,10 +24,9 @@ import {
   resultFromRankedPrograms,
 } from "../shared/finalize-prediction";
 import {
-  fnv1a,
+  createServerCacheKey,
   indexShaFromDeps,
   type ServerCacheEntry,
-  stableStringify,
 } from "../shared/predictor-cache";
 import { QuotaApi, refineQuotaRequiresState } from "../shared/quota-input";
 
@@ -83,12 +82,12 @@ type RegistryMaps = {
 // module-level caches — populated on first request, cleared on process restart
 let _cachedRegistry: RegistryMaps | null = null;
 
-// in-memory prediction result cache — keyed by FNV1a hash of canonical input
+// in-memory prediction result cache — keyed by a canonical digest of input + index version
 // avoids re-running the probability computation for identical requests
 const _resultCache = new Map<string, ServerCacheEntry>();
 
 function cacheKey(input: unknown): string {
-  return fnv1a(stableStringify(input));
+  return createServerCacheKey(input);
 }
 
 async function loadRegistryMaps(): Promise<RegistryMaps> {

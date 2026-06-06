@@ -17,10 +17,9 @@ import {
   resultFromCacheEntry,
 } from "../shared/finalize-prediction";
 import {
-  fnv1a,
+  createServerCacheKey,
   indexShaFromDeps,
   type ServerCacheEntry,
-  stableStringify,
 } from "../shared/predictor-cache";
 
 const JeeAdvancedInput = z.object({
@@ -118,12 +117,10 @@ export const predictor: ExamPredictor<
       ...input,
       quota: JEE_ADVANCED_QUOTA,
     };
-    const cacheKey = fnv1a(
-      stableStringify({
-        index_sha: indexShaFromDeps(deps),
-        ...cacheInput,
-      }),
-    );
+    const cacheKey = createServerCacheKey({
+      index_sha: indexShaFromDeps(deps),
+      ...cacheInput,
+    });
     const cached = _serverCache.get(cacheKey);
     if (cached) {
       return { result: resultFromCachedPrograms(cached, input.filters) };
