@@ -1,8 +1,8 @@
 # Index algorithms
 
-The predictor index is built offline with DuckDB. Each builder reads cutoff parquets, aggregates years of history, and writes one parquet file the live API loads.
+The predictor index is built offline with DuckDB. Each builder reads cutoff parquets, aggregates years of history, and writes one parquet the live API loads.
 
-Two algorithms exist on purpose:
+Two algorithms on purpose:
 
 - **`jam-josaa-v2`** for JoSAA cutoffs (JEE Main + JEE Advanced)
 - **`jam-csab-v2`** for CSAB cutoffs (supplementary counselling)
@@ -61,11 +61,11 @@ Both builders:
 2. Cap rounds above 6 into round 6.
 3. Rewrite raw `3IT` institute type to canonical `IIIT`.
 4. Deduplicate: keep the **max** closing rank per program, year, and round (worst closing rank wins ties).
-5. Compute year weights with a COVID-style **outlier guard**: if a year's closing rank is more than `2.5 × inter_year_std` away from the median of other years in the window, that year's weight drops to `0.01`.
-6. Compute per-round weighted means for the round trajectory columns.
-7. Compute `fill_round` as a weighted average of each year's last round with data.
-8. Set `sigma_base = max(weighted_std, floor_pct × weighted_mean)`.
-9. Inflate `sigma_effective` by `1.5×` when `years_of_data` is below 3.
+5. Year weights with a COVID-style **outlier guard**: if a year's closing rank is more than $2.5\,\sigma_{\mathrm{inter}}$ away from the median of other years in the window, that year's weight drops to $0.01$.
+6. Per-round weighted means for the round trajectory columns.
+7. `fill_round` as a weighted average of each year's last round with data.
+8. $\sigma_{\mathrm{base}} = \max(\sigma_w,\; p_{\mathrm{floor}} \cdot \bar{w})$.
+9. Inflate $\sigma_{\mathrm{eff}} \leftarrow 1.5\,\sigma_{\mathrm{base}}$ when years of data is below 3.
 
 Data quality labels:
 
@@ -85,27 +85,27 @@ Data quality labels:
 
 Before year-level stats, each year gets one anchor closing rank. Rounds inside that year are combined with fixed weights:
 
-| Round | Weight |
+| Round | Weight $w_r$ |
 | --- | --- |
-| 1 | 5% |
-| 2 | 8% |
-| 3 | 12% |
-| 4 | 15% |
-| 5 | 22% |
-| 6 | 38% |
+| 1 | $0.05$ |
+| 2 | $0.08$ |
+| 3 | $0.12$ |
+| 4 | $0.15$ |
+| 5 | $0.22$ |
+| 6 | $0.38$ |
 
-Later rounds count more because they reflect where seats actually settled.
+Later rounds count more because that's where seats actually settled.
 
 ### Year weights (4-year window)
 
 Most recent year first:
 
-| Recency (`yr`) | Weight |
+| Recency (`yr`) | Year weight |
 | --- | --- |
-| 1 (latest) | 0.50 |
-| 2 | 0.30 |
-| 3 | 0.15 |
-| 4 | 0.05 |
+| 1 (latest) | $0.50$ |
+| 2 | $0.30$ |
+| 3 | $0.15$ |
+| 4 | $0.05$ |
 
 ### Weighted statistics
 
@@ -117,18 +117,25 @@ From the anchor series:
 
 ### Predicted closing rank
 
-Let `gap = prediction_year − last_data_year`.
+Let $g = \mathrm{prediction\_year} - \mathrm{last\_data\_year}$.
 
-Trend is capped to ±3% of `weighted_mean` per year, then scaled by `0.7` before applying the gap:
+Trend is capped to $\pm 3\%$ of $\bar{w}$ per year, then scaled by $0.7$ before applying the gap:
 
-```
-trend_delta = clamp(trend_slope, ±3% of mean) × 0.7 × gap
-predicted = (weighted_mean + trend_delta) × (1 + pool_shift)^gap
-```
+$$
+\delta = \mathrm{clamp}(m,\; \pm 0.03\bar{w}) \cdot 0.7 \cdot g
+$$
 
-**Pool shift** models rank inflation as more candidates appear. Default is **+1% per year** from `nta-pool-stats.json` (`sandbox_p7_super_a_default`). Literal year-on-year unique appeared growth (~4.3% for 2025→2026) was backtested but not used as-is because it may overshoot. Override with env var `EJAM_POOL_SHIFT_PCT`.
+$$
+\hat{c} = \left(\bar{w} + \delta\right) \cdot (1 + s)^{g}
+$$
 
-**Prediction year** defaults to the current calendar year. Override with `EJAM_PREDICTION_YEAR`.
+$m$ = `trend_slope`, $\bar{w}$ = `weighted_mean`, $s$ = pool shift.
+
+**Pool shift** models rank inflation as more candidates appear. Default **+1% per year** from `nta-pool-stats.json` (`sandbox_p7_super_a_default`). Literal year-on-year unique appeared growth (~4.3% for 2025→2026) was backtested but not used as-is; it may overshoot. Override: `EJAM_POOL_SHIFT_PCT`.
+
+**Prediction year** defaults to calendar year. Override: `EJAM_PREDICTION_YEAR`.
+
+Same formula in SQL:
 
 ```sql
 ROUND(
@@ -139,9 +146,11 @@ ROUND(
 
 ### Sigma floor
 
-`sigma_base = max(weighted_std, 2.5% × weighted_mean)`
+$$
+\sigma_{\mathrm{base}} = \max(\sigma_w,\; 0.025\,\bar{w})
+$$
 
-So uncertainty scales with how high the typical cutoff rank is, instead of a flat ±50 for everyone.
+Uncertainty scales with how high the typical cutoff rank is, instead of a flat $\pm 50$ for everyone.
 
 ## jam-csab-v2 (CSAB)
 
@@ -149,14 +158,14 @@ So uncertainty scales with how high the typical cutoff rank is, instead of a fla
 
 **Output:** `data/dist/csab_predictor_index.parquet`
 
-CSAB cutoffs are worse (numerically higher rank) than JoSAA late rounds because strong candidates already took JoSAA seats. CSAB must not be blended into the JoSAA index.
+CSAB cutoffs are worse (numerically higher rank) than JoSAA late rounds because strong candidates already took JoSAA seats. CSAB stays in a separate index, not blended into JoSAA.
 
 ### Differences from JoSAA
 
 | Aspect | JoSAA | CSAB |
 | --- | --- | --- |
 | Year window | 4 years | 2 years |
-| Year weights | 0.50, 0.30, 0.15, 0.05 | 0.70, 0.30 |
+| Year weights | $0.50, 0.30, 0.15, 0.05$ | $0.70, 0.30$ |
 | Anchor series | Round-weighted blend | Last round of each year |
 | Pool shift | Yes (+1%/yr default) | No |
 | Default `fill_round` | Weighted from history | 2 |
@@ -166,26 +175,30 @@ CSAB cutoffs are worse (numerically higher rank) than JoSAA late rounds because 
 
 Each profile mixes weighted mean and median:
 
-```
-blended_mean = (1 − median_blend) × weighted_mean + median_blend × median_mean
-```
+$$
+\bar{w}_{\mathrm{blend}} = (1 - \beta)\,\bar{w} + \beta\,\tilde{w}
+$$
+
+$\beta$ = `median_blend`, $\tilde{w}$ = median mean.
 
 `median_blend` varies by institute type (`NIT`, `IIIT`, `CFI`). CFI gets a higher blend because CSAB CFI cutoffs are noisier.
 
 ### Production ensemble
 
-Two profiles are averaged with equal weight:
+Two profiles averaged 50/50:
 
 1. **best-split** (default blends per instype)
 2. **cap-cfi10** (tighter trend caps, especially for CFI at 10%)
 
-```
-predicted_closing_rank = round( (rank_profile_a + rank_profile_b) / 2 )
-```
+$$
+\hat{c} = \mathrm{round}\!\left(\frac{\hat{c}_a + \hat{c}_b}{2}\right)
+$$
 
-Trend cap default is ±6% of `weighted_mean` per year (instype-specific overrides in the cap profile). Trend gap multiplier is `1.0` (full gap applied, unlike JoSAA's `0.7`).
+Trend cap default $\pm 6\%$ of $\bar{w}$ per year (instype-specific overrides in the cap profile). Trend gap multiplier $1.0$ (full gap, unlike JoSAA's $0.7$).
 
-Sigma floor uses **3%** of `weighted_mean` instead of 2.5%.
+$$
+\sigma_{\mathrm{base}} = \max(\sigma_w,\; 0.03\,\bar{w})
+$$
 
 ## After the index loads
 

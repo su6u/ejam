@@ -1,16 +1,16 @@
 # Balanced ranking
 
-Chance alone pushes very safe but less popular branches to the top. Balanced ranking tries to surface options that are both reachable and reasonably desirable. It runs after probability calculation, using metadata already on each row plus NIRF ranks from the institute registry.
+Chance alone pushes very safe but less popular branches to the top. Balanced ranking tries to surface options that are both reachable and reasonably desirable. It runs after probability calculation, using metadata on each row plus NIRF ranks from the institute registry.
 
 ## Composite formula
 
-```
-balanced_score = (institute_score / 100) × (branch_factor / 100) × cumulative_probability
-```
+$$
+\mathrm{score} = \frac{I}{100} \cdot \frac{B}{100} \cdot P
+$$
 
-Higher is better. All three factors are on a 0-100 scale except probability, which is 0-1.
+$I$ = institute score, $B$ = branch factor, $P$ = cumulative probability. Higher is better. $I$ and $B$ are 0–100; $P$ is 0–1.
 
-When a **branch name filter** is active in the UI, `branch_factor` is forced to `100` so every visible row is treated as branch-neutral (the filter already narrowed branches).
+When a **branch name filter** is active in the UI, `branch_factor` is forced to `100` so every visible row is branch-neutral (the filter already narrowed branches).
 
 ## Institute score
 
@@ -25,25 +25,33 @@ Base score by institute type:
 | GFTI | 50 |
 | Unknown | 40 |
 
-**If NIRF rank is known:** add up to +5 points. Rank 1 gets the full bonus; rank 200+ gets none:
+**If NIRF rank is known:** up to +5 points. Rank 1 gets full bonus; rank 200+ gets none:
 
-```
-nirf_bonus = max(0, 5 × (1 − (nirf_rank − 1) / 199))
-institute_score = min(100, base + nirf_bonus)
-```
+$$
+b_{\mathrm{nirf}} = \max\!\left(0,\; 5 \cdot \left(1 - \frac{n - 1}{199}\right)\right)
+$$
+
+$$
+I = \min(100,\; I_{\mathrm{base}} + b_{\mathrm{nirf}})
+$$
+
+where $n$ = NIRF rank.
 
 **If NIRF is missing:** blend base with competitiveness vs the worst predicted closing rank in the current result set:
 
-```
-competitiveness = 1 − (predicted_closing_rank / closing_rank_ceiling)
-institute_score = min(100, base × 0.7 + max(0, competitiveness) × 100 × 0.3)
-```
+$$
+\kappa = 1 - \frac{\hat{c}}{\hat{c}_{\max}}
+$$
+
+$$
+I = \min\!\left(100,\; 0.7\, I_{\mathrm{base}} + 0.3 \cdot \max(0, \kappa) \cdot 100\right)
+$$
 
 Tighter cutoffs (lower rank number) imply stronger demand, so the fallback nudges score up.
 
 ## Branch score
 
-Branch names are matched with keyword tiers on `program_id` and `program_name`:
+Branch names matched with keyword tiers on `program_id` and `program_name`:
 
 | Pattern (examples) | Score |
 | --- | --- |
@@ -56,13 +64,11 @@ Branch names are matched with keyword tiers on `program_id` and `program_name`:
 | Chemical | 65 |
 | No match | 50 |
 
-First matching tier wins. This is a rough popularity proxy, not a placement or salary model.
-
-> **Info:** Branch scores are static heuristics. They do not read live placement reports or student preferences.
+First matching tier wins. Rough popularity proxy, not placement or salary data.
 
 ## Sort tie-breakers
 
-When `balanced_score` ties, the sorter falls through:
+When $\mathrm{score}$ ties:
 
 1. Higher `institute_score`
 2. Higher `branch_score`
@@ -71,8 +77,6 @@ When `balanced_score` ties, the sorter falls through:
 
 ## Other sort modes
 
-The results table also offers:
-
 | Sort key | Behavior |
 | --- | --- |
 | **Balanced** | Composite score above (default) |
@@ -80,4 +84,4 @@ The results table also offers:
 | **Closing rank** | Most competitive programs first |
 | **Institute** | Alphabetical by institute, then program |
 
-Balanced scores are recomputed on filtered subsets so competitiveness fallback uses the current result ceiling, not the full national list.
+Balanced scores recompute on filtered subsets so the competitiveness fallback uses the current result ceiling, not the full national list.
