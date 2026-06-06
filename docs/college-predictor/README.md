@@ -1,10 +1,10 @@
 # College Predictor
 
-Rank + category + quota in → table of colleges and branches from past JoSAA / CSAB cutoffs. Sort by chance, closing rank, or institute.
+After JEE results, counselling is mostly one question: at this rank, which colleges and branches are actually in play?
 
-Estimates only. Real choice filling happens on official portals.
+Give it a counselling rank plus category, gender, quota, and home state (for NIT pools). It matches that profile against years of **JoSAA** and **CSAB** closing ranks, scores each program with a chance band, and sorts by probability, predicted closing rank, or a balanced mix of institute quality and branch. Planning aid only. Not official allotment.
 
-App route: `/college-predictor`
+`/college-predictor`
 
 ## Contents
 
@@ -19,7 +19,7 @@ App route: `/college-predictor`
 
 | Page | Purpose |
 | --- | --- |
-| [Getting started](learn/getting-started.md) | Open the tool, exam routing, first prediction |
+| [Getting started](learn/getting-started.md) | Open the tool, pick exam, first prediction |
 | [What you need to know](learn/what-you-need-to-know.md) | Rank, quota, GFTI vs CFI, disclaimers |
 
 ## How it works
@@ -35,7 +35,7 @@ App route: `/college-predictor`
 | --- | --- |
 | [Prediction engine](nerd-stuff/prediction-engine.md) | CDF math, round probabilities, band thresholds |
 | [Index algorithms](nerd-stuff/index-algorithms.md) | DuckDB build, `jam-josaa-v2`, `jam-csab-v2` |
-| [Balanced ranking](nerd-stuff/balanced-ranking.md) | Institute × branch × chance score |
+| [Balanced ranking](nerd-stuff/balanced-ranking.md) | $I \times B \times P$ composite score |
 
 ## FAQs
 

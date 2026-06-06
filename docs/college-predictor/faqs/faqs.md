@@ -1,36 +1,36 @@
 # FAQs
 
-Quick answers about how ejam works and what to expect. For formulas and pipeline detail, see [Prediction engine](../nerd-stuff/prediction-engine.md) and [Index algorithms](../nerd-stuff/index-algorithms.md).
+Quick answers about how ejam works. For formulas and pipeline detail, see [Prediction engine](../nerd-stuff/prediction-engine.md) and [Index algorithms](../nerd-stuff/index-algorithms.md).
 
-> **Warning:** This is a hobby project, not an official NTA, JoSAA, or CSAB service. Always confirm ranks, eligibility, and seat counts on government portals before locking choices.
+> **Warning:** Hobby project, not an official NTA, JoSAA, or CSAB service. Confirm ranks, eligibility, and seat counts on government portals before locking choices.
 
 ## About predictions
 
 <details>
 <summary>Does a Safe band mean a guaranteed seat?</summary>
 
-No. **Safe** means the model gives roughly 85%+ cumulative chance based on past cutoffs and the stated rank. Cutoffs shift every year. New seats, category changes, and choice-filling order can all move the line.
+No. **Safe** means the model puts cumulative chance at roughly 85%+ from past cutoffs and the rank entered. That is a planning label, not a seat guarantee. Cutoffs move every year. New seats, category changes, and choice-filling order can all shift where a program actually closes.
 
 </details>
 
 <details>
 <summary>How accurate are the numbers?</summary>
 
-Accuracy depends on how stable that program's cutoff history is. Rows labeled `sufficient` (3+ years of data) tend to be steadier. `inferred` (2 years) and `pooled` (1 year) carry more uncertainty, and the index inflates `sigma_effective` for sparse rows. The builders are backtested on held-out years, but backtest performance is not a promise for the current year.
+Depends on how stable that program's cutoff history is. Rows tagged `sufficient` (3+ years) are usually steadier. `inferred` (2 years) and `pooled` (1 year) are noisier, and the index widens $\sigma_{\mathrm{eff}}$ for sparse rows. Builders are backtested on held-out years (see README), but a good backtest is not a promise for this year's counselling.
 
 </details>
 
 <details>
 <summary>Why might results differ from other predictors?</summary>
 
-Different sites use different years, formulas, or category matching. ejam uses published `jam-josaa-v2` / `jam-csab-v2` algo logic, round-weighted JoSAA anchors, explicit pool shift on JoSAA only, and a normal-CDF chance model. Another site might use last year's cutoff as a hard cutoff with no probability band.
+Different years, formulas, or category matching. ejam uses `jam-josaa-v2` / `jam-csab-v2`, round-weighted JoSAA anchors, pool shift on JoSAA only, and a normal-CDF chance model. Many sites treat last year's closing rank as a hard cutoff with no probability band.
 
 </details>
 
 <details>
 <summary>Why are some colleges missing?</summary>
 
-A program must exist in the cutoff dataset for the selected seat type, gender, and quota. Brand-new programs, rare quota combinations, or rows filtered out by home-state quota rules will not appear. Try toggling filters or checking whether that combination existed in recent JoSAA/CSAB data.
+A row only appears if that program exists in the cutoff dataset for the selected seat type, gender, and quota. Brand-new programs, rare quota combos, or home-state filtering can drop rows. Toggle filters or check whether that combo showed up in recent JoSAA/CSAB data.
 
 </details>
 
@@ -39,42 +39,66 @@ A program must exist in the cutoff dataset for the selected seat type, gender, a
 <details>
 <summary>Which rank should be entered?</summary>
 
-Use the counselling rank for the exam being predicted: JEE Main rank for NIT / IIIT / CFI (JoSAA or CSAB), JEE Advanced rank for IIT (JoSAA). Do not mix Main and Advanced ranks across predictors. Allotment is rank-based, not percentile-based.
+The counselling rank for the exam being predicted:
+
+- **JEE Main + JoSAA or CSAB:** JEE Main rank (NIT / IIIT / CFI)
+- **JEE Advanced:** JEE Advanced rank (IIT only)
+
+Do not mix Main and Advanced ranks across predictors. Allotment is rank-based, not percentile-based.
 
 </details>
 
 <details>
 <summary>What are the rank limits?</summary>
 
-JEE Main and CSAB accept ranks from 1 to **500,000**. JEE Advanced accepts 1 to **50,000**.
+Hard limits in the UI and API:
+
+| Exam | Accepted range |
+| --- | --- |
+| JEE Main | 1 to **500,000** |
+| CSAB | 1 to **500,000** |
+| JEE Advanced | 1 to **50,000** |
+
+These are not NTA's official rank caps. They are the range where this tool can return meaningful rows.
+
+The predictor matches rank against historical closing ranks in the index. JoSAA/CSAB data for NIT+ seats basically runs out long before 500,000, but that cap matches the Main/CSAB validators and leaves headroom for edge cases. IIT counselling is a much smaller pool (on the order of tens of thousands of qualified candidates), so Advanced stops at 50,000. Above these limits there are no seat rows to score against, so the app rejects the input instead of showing empty or nonsense results.
 
 </details>
 
 <details>
 <summary>What do Safe, Target, Reach, and Long-shot mean?</summary>
 
-Chance bands group rows by estimated admission probability. Full thresholds and how chance is computed: [From rank to results](../how-it-works/from-rank-to-results.md).
+Fixed chance bands for scanning the table:
+
+| Band | Threshold | Rough read |
+| --- | --- | --- |
+| **Safe** | $P \geq 0.85$ | Strong historical margin at this rank |
+| **Target** | $0.40 \leq P < 0.85$ | Competitive, plausible |
+| **Reach** | $0.10 \leq P < 0.40$ | Tight; possible but uncomfortable |
+| **Long-shot** | $P < 0.10$ | Hidden from default results |
+
+Labels only. Not counselling rules and not guarantees. Math and round bars: [From rank to results](../how-it-works/from-rank-to-results.md).
 
 </details>
 
 <details>
 <summary>Why are Long-shots hidden by default?</summary>
 
-Programs below 10% chance clutter the list. Append `include_all=true` to the URL (or API request) to include them. Band filters only narrow what the API already returned.
+Below 10% chance they mostly clutter the list. Add `include_all=true` to the URL (or API) to show them.
 
 </details>
 
 <details>
 <summary>What is predicted closing rank on each row?</summary>
 
-It is the index's forecast of where that seat might close this year, built from weighted history, capped trend, and (for JoSAA) pool shift. It is not last year's cutoff copied forward. Probability compares **student rank** to this forecast using `sigma_effective`.
+The index forecast $\hat{c}$ for where that seat might close this cycle: weighted history, capped trend, and (for JoSAA) pool shift. Not last year's cutoff copied forward. **Chance** compares student rank $r$ via $P_i = \Phi\!\left((\hat{c}_i - r)/\sigma_{\mathrm{eff}}\right)$.
 
 </details>
 
 <details>
-<summary>Why is the Predict button disabled after I run once?</summary>
+<summary>Why is the Predict button disabled after a run?</summary>
 
-After a successful prediction, the button stays disabled until **any** input changes: rank, category, gender, quota, home state, exam, or counselling. Change something to re-run. Sidebar filters do not require clicking Predict again.
+It re-enables when any main input changes: rank, category, gender, quota, home state, exam, or counselling. Sidebar filters apply on the client and do not need another Predict click.
 
 </details>
 
@@ -83,35 +107,35 @@ After a successful prediction, the button stays disabled until **any** input cha
 <details>
 <summary>Why does the tool ask for home state?</summary>
 
-For **HS** (Home State) and **OS** (Other State) quotas on JEE Main and CSAB, seat rows depend on whether the institute is in the student's home state. HS seats go to students from that state; OS seats go to students from other states. **AI** (All India) ignores home state for matching. Default quota is **OS**.
+For **HS** (Home State) and **OS** (Other State) on JEE Main and CSAB, which seat rows apply depends on whether the institute is in the student's home state. HS seats are for domiciled students; OS seats are for everyone else. **AI** (All India) ignores home state. Default quota is **OS**.
 
 </details>
 
 <details>
 <summary>What about EWS?</summary>
 
-Two separate mechanisms:
+Two separate paths:
 
-1. **Gen-EWS** in the category dropdown: predicts against EWS seat rows (normal path if you apply under EWS).
+1. **Gen-EWS** in the category dropdown: normal prediction against EWS seat rows.
 2. **`?ews=true` in the URL:** dual OPEN + EWS comparison for General students weighing a certificate.
 
-Both require official EWS certificate eligibility for real counselling. The dual-comparison mode shows a caveat when active.
+Both assume real EWS certificate eligibility for counselling. Dual mode shows a caveat when active.
 
 </details>
 
 <details>
 <summary>What is GFTI vs CFI?</summary>
 
-JoSAA official documents use **GFTI** (Government Funded Technical Institutes). ejam's index and UI badge use **CFI** for the same institute group. Same seats, different label.
+Same institute group. JoSAA documents say **GFTI**; ejam's index and UI badge say **CFI**.
 
 </details>
 
 <details>
 <summary>What is the difference between JEE Main, JEE Advanced, and CSAB in the app?</summary>
 
-- **JEE Main + JoSAA**: Non-IIT institutes (NIT, IIIT, CFI/GFTI) via the JoSAA six-round process
-- **JEE Advanced**: IIT only, AI quota
-- **CSAB**: Supplementary counselling after JoSAA for vacant seats; separate cutoff history and index; typically worse (higher) closing ranks
+- **JEE Main + JoSAA:** NIT, IIIT, CFI/GFTI via the six-round JoSAA process (non-IIT index)
+- **JEE Advanced:** IIT only, AI quota (same JoSAA index, IIT filter)
+- **CSAB:** Supplementary counselling after JoSAA for vacant seats; separate cutoff history and index; closing ranks are usually worse (higher numbers)
 
 </details>
 
@@ -120,7 +144,7 @@ JoSAA official documents use **GFTI** (Government Funded Technical Institutes). 
 <details>
 <summary>How do share links work?</summary>
 
-All main inputs sync to the URL: `rank`, `exam`, `counselling`, `category`, `gender`, `quota`, `state`, `ews`, `include_all`. When the URL is complete on load, the app **auto-runs** the prediction. Legacy links at `/` with these params redirect to `/college-predictor`.
+Main inputs sync to the URL: `rank`, `exam`, `counselling`, `category`, `gender`, `quota`, `state`, `ews`, `include_all`. A complete URL on load auto-runs the prediction. Legacy links at `/` with these params redirect to `/college-predictor`.
 
 </details>
 
@@ -129,35 +153,35 @@ All main inputs sync to the URL: `rank`, `exam`, `counselling`, `category`, `gen
 <details>
 <summary>Where does the data come from?</summary>
 
-Public JoSAA and CSAB cutoff releases, compiled into parquet files under `data/engineering/jee/`. Source URLs are listed in `data/engineering/jee/_sources.json`. NIRF ranks and institute metadata come from the repo registry (`institutes.json`, `programs.json`).
+Public JoSAA and CSAB cutoff releases in `data/engineering/jee/`. Source URLs: `data/engineering/jee/_sources.json`. Institute metadata and NIRF ranks: `data/registry/engineering/`.
 
 </details>
 
 <details>
 <summary>Can the data be trusted?</summary>
 
-Cutoffs are transcribed from official PDFs and notices. Errors and lag happen. Each API response includes provenance (manifest version, datasets used). For release mechanics and checksums, see [DATA.md](../DATA.md).
+Cutoffs are transcribed from official PDFs and notices. Typos and lag happen. Each API response includes provenance (manifest version, datasets used). Release mechanics and checksums: [DATA.md](../../DATA.md).
 
 </details>
 
 <details>
 <summary>Is ejam free?</summary>
 
-**Yes.** The college predictor is free to use: no account, no paywall, no payment step. Source code is open under AGPL. ejam is a personal hobby project, not affiliated with NTA, JoSAA, CSAB, or any institute.
+Yes. No account, no paywall. Source is AGPL. Personal hobby project, not affiliated with NTA, JoSAA, CSAB, or any institute.
 
 </details>
 
 <details>
 <summary>What does Balanced sort do?</summary>
 
-Default sort multiplies institute quality, branch desirability heuristics, and admission chance into one score. It is a navigation aid, not an official ranking of colleges. Switch to **Best chance** or **Closing rank** sort for pure probability or competitiveness ordering. Details: [Balanced ranking](../nerd-stuff/balanced-ranking.md).
+Default sort: $\frac{I}{100} \cdot \frac{B}{100} \cdot P$ (institute $\times$ branch $\times$ chance). Navigation aid, not an official college ranking. **Best chance** or **Closing rank** sort by probability or competitiveness only. Formula: [Balanced ranking](../nerd-stuff/balanced-ranking.md).
 
 </details>
 
 <details>
 <summary>What do the round bars on each row mean?</summary>
 
-Six bars map to JoSAA-style rounds 1–6. Each bar height reflects cumulative probability through that round. After the program's typical `fill_round`, later bars freeze. The percentage label is the average cumulative chance from round 1 through `fill_round`.
+Six bars for JoSAA-style rounds 1–6. Height is cumulative probability through that round. After the program's typical `fill_round`, later bars freeze. The % label is the average cumulative chance from round 1 through `fill_round`.
 
 </details>
 
@@ -169,4 +193,4 @@ Six bars map to JoSAA-style rounds 1–6. Each bar height reflects cumulative pr
 | [From rank to results](../how-it-works/from-rank-to-results.md) | Bands, chance, closing rank. |
 | [Prediction engine](../nerd-stuff/prediction-engine.md) | Runtime math and round probabilities. |
 | [Index algorithms](../nerd-stuff/index-algorithms.md) | Offline index build. |
-| [Data pipeline](../DATA.md) | Fetch, verify, and rebuild datasets locally. |
+| [Data pipeline](../../DATA.md) | Fetch, verify, and rebuild datasets locally. |
