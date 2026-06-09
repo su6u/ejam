@@ -18,6 +18,7 @@
     "generate:manifest": "pnpm --filter @ejam/data-cli generate-manifest",
     "data:fetch": "pnpm --filter @ejam/data-cli run fetch",
     "package:data-release": "pnpm --filter @ejam/data-cli package-data-release",
+    "publish:data-release": "pnpm --filter @ejam/data-cli publish-data-release",
     "build:predictor-index": "pnpm --filter @ejam/data-cli build-predictor-index",
     "backtest": "pnpm --filter @ejam/data-cli backtest",
     "build:csab-index": "pnpm --filter @ejam/data-cli build-csab-index",
