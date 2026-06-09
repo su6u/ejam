@@ -128,50 +128,51 @@ function PredictorSidebarPanelInner() {
               data-index={examActiveIndex <= 0 ? "0" : "1"}
             />
             <div className="sliding-toggle-grid grid grid-cols-2">
-            {EXAM_OPTIONS.map((exam) => {
-              const isActive = state.exam === exam.id;
+              {EXAM_OPTIONS.map((exam) => {
+                const isActive = state.exam === exam.id;
 
-              return (
-                <Tooltip key={exam.id}>
-                  <TooltipTrigger
-                    render={
-                      <button
-                        type="button"
-                        aria-label={exam.label}
-                        aria-pressed={isActive}
-                        onClick={() => {
-                          deferAfterPress(() => state.setExam(exam.id));
-                        }}
-                        className={cn(
-                          "exam-picker-tile rounded-none border-0 outline-none shadow-none",
-                          pressableClass,
-                          "focus-visible:ring-3 focus-visible:ring-ring/50",
-                        )}
-                      >
-                        {/* native img — avoids Next/Image SVG raster edge artifacts */}
-                        <img
-                          src={exam.logo}
-                          alt=""
-                          width={36}
-                          height={36}
-                          aria-hidden
-                          decoding="async"
-                          className="exam-picker-logo size-9 shrink-0 object-contain transition-[opacity,filter] duration-150"
-                        />
-                      </button>
-                    }
-                  />
-                  <TooltipContent
-                    side="top"
-                    sideOffset={6}
-                    align="center"
-                    className="rounded-none"
-                  >
-                    {exam.label}
-                  </TooltipContent>
-                </Tooltip>
-              );
-            })}
+                return (
+                  <Tooltip key={exam.id}>
+                    <TooltipTrigger
+                      render={
+                        <button
+                          type="button"
+                          aria-label={exam.label}
+                          aria-pressed={isActive}
+                          onClick={() => {
+                            deferAfterPress(() => state.setExam(exam.id));
+                          }}
+                          className={cn(
+                            "exam-picker-tile rounded-none border-0 outline-none shadow-none",
+                            pressableClass,
+                            "focus-visible:ring-3 focus-visible:ring-ring/50",
+                          )}
+                        >
+                          {/* native img — avoids Next/Image SVG raster edge artifacts */}
+                          {/* biome-ignore lint/performance/noImgElement: SVG exam logos rasterize poorly via next/image */}
+                          <img
+                            src={exam.logo}
+                            alt=""
+                            width={36}
+                            height={36}
+                            aria-hidden
+                            decoding="async"
+                            className="exam-picker-logo size-9 shrink-0 object-contain transition-[opacity,filter] duration-150"
+                          />
+                        </button>
+                      }
+                    />
+                    <TooltipContent
+                      side="top"
+                      sideOffset={6}
+                      align="center"
+                      className="rounded-none"
+                    >
+                      {exam.label}
+                    </TooltipContent>
+                  </Tooltip>
+                );
+              })}
             </div>
           </div>
         </div>
@@ -309,10 +310,7 @@ function OptionToggle({
   const activeIndex = options.findIndex((option) => option.value === value);
 
   return (
-    <fieldset
-      aria-labelledby={ariaLabelledBy}
-      className="min-w-0 border-0 p-0"
-    >
+    <fieldset aria-labelledby={ariaLabelledBy} className="min-w-0 border-0 p-0">
       <div className="sliding-toggle-track" data-gap="1">
         {activeIndex >= 0 ? (
           <span
@@ -329,32 +327,32 @@ function OptionToggle({
             columns === 2 ? "grid-cols-2" : "grid-cols-3",
           )}
         >
-      {options.map((option) => {
-        const isActive = option.value === value;
-        const isEnabled = option.enabled !== false;
+          {options.map((option) => {
+            const isActive = option.value === value;
+            const isEnabled = option.enabled !== false;
 
-        return (
-          <button
-            key={option.value}
-            type="button"
-            aria-pressed={isActive}
-            disabled={!isEnabled}
-            onClick={() => {
-              if (isEnabled) deferAfterPress(() => onChange(option.value));
-            }}
-            className={cn(
-              "sliding-toggle-tile flex h-8 items-center justify-center rounded-none text-xs font-medium text-muted-foreground outline-none",
-              pressableClass,
-              isEnabled && "hover:text-foreground",
-              "focus-visible:ring-3 focus-visible:ring-ring/50",
-              isActive && "text-foreground",
-              !isEnabled && "cursor-not-allowed opacity-40 grayscale",
-            )}
-          >
-            {option.label}
-          </button>
-        );
-      })}
+            return (
+              <button
+                key={option.value}
+                type="button"
+                aria-pressed={isActive}
+                disabled={!isEnabled}
+                onClick={() => {
+                  if (isEnabled) deferAfterPress(() => onChange(option.value));
+                }}
+                className={cn(
+                  "sliding-toggle-tile flex h-8 items-center justify-center rounded-none text-xs font-medium text-muted-foreground outline-none",
+                  pressableClass,
+                  isEnabled && "hover:text-foreground",
+                  "focus-visible:ring-3 focus-visible:ring-ring/50",
+                  isActive && "text-foreground",
+                  !isEnabled && "cursor-not-allowed opacity-40 grayscale",
+                )}
+              >
+                {option.label}
+              </button>
+            );
+          })}
         </div>
       </div>
     </fieldset>

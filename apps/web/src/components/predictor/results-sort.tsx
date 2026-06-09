@@ -1,9 +1,9 @@
 "use client";
 
 import { useCallback, useLayoutEffect, useRef, useState } from "react";
-import { ChipIcon } from "./chip-icon";
 import type { ResultsSortKey } from "@/components/predictor/results-sort-logic";
 import { cn } from "@/lib/utils";
+import { ChipIcon } from "./chip-icon";
 
 const SORT_OPTIONS: Array<{
   id: ResultsSortKey;
@@ -124,7 +124,9 @@ export function ResultsSort({ sortBy, onChange }: ResultsSortProps) {
   const indicatorIndex = activeIndex >= 0 ? activeIndex : 0;
   const indicatorPosition = positions[indicatorIndex];
 
-  const handleTransitionEnd = (event: React.TransitionEvent<HTMLSpanElement>) => {
+  const handleTransitionEnd = (
+    event: React.TransitionEvent<HTMLSpanElement>,
+  ) => {
     if (event.propertyName !== "transform") return;
     animatingUntilRef.current = 0;
   };
@@ -163,7 +165,7 @@ export function ResultsSort({ sortBy, onChange }: ResultsSortProps) {
                   itemRefs.current[index] = node;
                 }}
                 type="button"
-                aria-pressed={isActive ? true : false}
+                aria-pressed={isActive}
                 onClick={() => onChange(option.id)}
                 className={cn(
                   "sort-chip sliding-toggle-tile inline-flex h-8 shrink-0 items-center gap-1.5 rounded-none px-2.5 text-xs font-medium text-muted-foreground outline-none",

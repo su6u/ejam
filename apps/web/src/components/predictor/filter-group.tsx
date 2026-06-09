@@ -1,13 +1,8 @@
 "use client";
 
-import {
-  useCallback,
-  useLayoutEffect,
-  useRef,
-  useState,
-} from "react";
-import { ChipIcon } from "./chip-icon";
+import { useCallback, useLayoutEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
+import { ChipIcon } from "./chip-icon";
 
 interface GridIndicatorPosition {
   width: number;
@@ -41,7 +36,8 @@ export function FilterGroup({
   const useSlidingGrid = cols != null;
   const useMeasuredGrid = rows === 2;
 
-  const gapToken = cols === 4 || rows === 2 ? "15" : cols === 2 && !vertical ? "2" : "1";
+  const gapToken =
+    cols === 4 || rows === 2 ? "15" : cols === 2 && !vertical ? "2" : "1";
 
   const trackRef = useRef<HTMLDivElement>(null);
   const [layoutReady, setLayoutReady] = useState(false);
@@ -79,7 +75,7 @@ export function FilterGroup({
   useLayoutEffect(() => {
     if (!useMeasuredGrid) return;
     measureGridLayout();
-  }, [measureGridLayout, slidingIndex, useMeasuredGrid]);
+  }, [measureGridLayout, useMeasuredGrid]);
 
   useLayoutEffect(() => {
     if (!useMeasuredGrid) return;

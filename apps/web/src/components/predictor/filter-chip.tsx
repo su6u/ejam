@@ -1,8 +1,8 @@
 "use client";
 
-import { ChipIcon } from "./chip-icon";
 import { deferAfterPress, pressableClass } from "@/lib/pressable";
 import { cn } from "@/lib/utils";
+import { ChipIcon } from "./chip-icon";
 
 export function FilterChip({
   label,
