@@ -27,59 +27,107 @@ Personal hobby project. I don't own the counselling or exam data; it's compiled 
 
 <br>
 
-## Get data locally
+## Get Data Locally
 
-Parquet files under `data/` ship in git (~4 MB total). After clone, verify your checkout matches the pinned manifest:
-
-```bash
-pnpm data:fetch
-```
-
-Missing files (sparse clone, etc.):
+Parquet files under `data/` do not ship in git. Git tracks manifests, registry/config metadata, and source attribution; release payloads live in GitHub Releases.
 
 ```bash
 pnpm data:fetch --download
 ```
 
-`--download` pulls the tarball from the GitHub Release tagged `data-{version}`. Override with `EJAM_DATA_RELEASE_URL` if needed.
+`--download` pulls the tarball from the GitHub Release tagged `data-{version}` and verifies every manifest checksum. Override with `EJAM_DATA_RELEASE_URL` if needed.
+
+If you already have local data and only want to verify it:
+
+```bash
+pnpm data:fetch
+```
 
 <br>
 
-## Contributing cutoffs
+## Adding data
 
-Official cutoffs only. Cite the JoSAA OR/CR or CSAB notice URL in your PR. If it's a new source, add it to `data/engineering/jee/_sources.json`. No fabricated cutoffs, no paywalled PDFs you can't redistribute.
+Git tracks manifests, registry/config metadata, and source attribution. Parquet payloads live in GitHub Releases as `data-X.Y.Z.tar.gz`, pinned by `data/manifest/vX.Y.Z.json`. Local dev, CI, and Vercel all hydrate `data/` with `pnpm data:fetch --download`.
 
-Seat matrix is optional registry data. The predictor does not load it at runtime.
+Official cutoffs only. Cite the JoSAA OR/CR or CSAB notice URL in your PR. If it's a new source, add it to `data/engineering/jee/_sources.json`. No fabricated cutoffs, no paywalled PDFs you can't redistribute. Seat matrix is optional registry data; the predictor does not load it at runtime.
+
+### Where to put files
+
+Follow the path patterns in the table above. Examples:
+
+```text
+data/engineering/jee/josaa/cutoffs/year=2026/round=1/cutoffs.parquet
+data/engineering/jee/csab/cutoffs/year=2026/round=1/cutoffs.parquet
+data/engineering/jee/seats-matrix/jossa/year=2026/seat-matrix.parquet
+```
+
+Index outputs land in `data/dist/` after you run the build commands below — don't hand-edit those unless you know what you're doing.
+
+### What goes in git
+
+| Commit in PR | Keep local only |
+|--------------|-----------------|
+| `data/manifest/vX.Y.Z.json` | `data/engineering/**/*.parquet` |
+| `data/registry/**` (if institute/program ids changed) | `data/dist/*.parquet` |
+| `data/engineering/jee/_sources.json` (if sources changed) | `data/dist/*.lineage.json` |
+| docs, if you touched them | anything under `_raw/` |
+
+Parquet files stay on disk for your build but are gitignored. The manifest checksums are how CI and other machines get the same bytes from the release tarball.
+
+### Contributor steps
+
+1. **Start from current data**
+
+   ```bash
+   pnpm data:fetch --download
+   ```
+
+2. **Add or fix parquets** from official sources at the paths above.
+
+3. **Update metadata** when needed — new ids in `data/registry/engineering/`, new URLs in `_sources.json`.
+
+4. **Rebuild indices** if cutoff history changed:
+
+   ```bash
+   pnpm build:predictor-index
+   pnpm build:csab-index
+   ```
+
+5. **Bump the manifest** — pick a new semver, e.g. `v0.1.2`:
+
+   ```bash
+   pnpm generate:manifest --version=v0.1.2
+   ```
+
+6. **Verify locally**:
+
+   ```bash
+   pnpm data:fetch --version=v0.1.2
+   pnpm verify:index-lineage
+   pnpm validate:data
+   pnpm --filter @ejam/data test
+   ```
+
+   Changed index hyperparams? Also run `pnpm backtest`.
+
+7. **Open a PR** with manifest + registry + source attribution only. Mention the official source URL(s) in the PR description. You don't need to attach parquets — the manifest lists every file path and sha256.
 
 <br>
 
 ## Build and verify
 
+Quick reference — full walkthrough in [Adding data](#adding-data):
+
 ```bash
 pnpm build:predictor-index    # JoSAA -> data/dist/college_predictor_index.parquet + .lineage.json
 pnpm build:csab-index         # CSAB -> data/dist/csab_predictor_index.parquet + .lineage.json
 pnpm generate:manifest --version=vX.Y.Z
-pnpm data:fetch
+pnpm data:fetch --version=vX.Y.Z
 pnpm verify:index-lineage
 pnpm validate:data
 ```
 
-Rebuild indices when cutoff history changes. Changed index hyperparams? Also run `pnpm backtest`.
-
-<br>
-
-## Release checklist
-
-When new counselling rounds land:
-
-1. Add or fix cutoff parquets from official sources.
-2. Rebuild predictor indices if history changed.
-3. `pnpm generate:manifest --version=vX.Y.Z`
-4. `pnpm data:fetch`, `pnpm verify:index-lineage`, `pnpm validate:data`
-5. Commit parquets, sidecars, manifest, and any registry fixes.
-6. Tag and push: `git tag data-X.Y.Z && git push origin data-X.Y.Z`
-
-Pushing a `data-*` tag runs CI (`.github/workflows/data-release.yml`): verify datasets, package `data-X.Y.Z.tar.gz`, publish the GitHub Release. That's what `pnpm data:fetch --download` uses. Test the tarball locally first with `pnpm package:data-release --version=vX.Y.Z` if you want.
+Changed index hyperparams? Also run `pnpm backtest`.
 
 <br>
 
