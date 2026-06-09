@@ -923,6 +923,19 @@ input {
     opacity: 1;
   }
 
+  .sliding-toggle-indicator--grid {
+    bottom: auto;
+    height: auto;
+    box-sizing: border-box;
+    opacity: 0;
+    transition: none;
+    will-change: auto;
+  }
+
+  .sliding-toggle-indicator--grid[data-ready] {
+    opacity: 1;
+  }
+
   /* 2 columns, gap 0.25rem */
   .sliding-toggle-indicator[data-cols="2"][data-gap="1"] {
     width: calc((100% - 0.25rem) / 2);
@@ -1007,7 +1020,9 @@ input {
     border-color: color-mix(in oklch, var(--foreground) 40%, transparent);
   }
 
-  .sliding-toggle-track:has(.sliding-toggle-indicator)
+  .sliding-toggle-track:has(.sliding-toggle-indicator:not(.sliding-toggle-indicator--grid))
+    .filter-chip.sliding-toggle-tile[aria-pressed="true"],
+  .sliding-toggle-track:has(.sliding-toggle-indicator--grid[data-ready])
     .filter-chip.sliding-toggle-tile[aria-pressed="true"],
   .sort-toggle-track:has(.sliding-toggle-indicator--sort[data-ready])
     .sort-chip.sliding-toggle-tile[aria-pressed="true"] {

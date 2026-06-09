@@ -1,7 +1,20 @@
 "use client";
 
+import {
+  useCallback,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 import { deferAfterPress, pressableClass } from "@/lib/pressable";
 import { cn } from "@/lib/utils";
+
+interface GridIndicatorPosition {
+  width: number;
+  height: number;
+  x: number;
+  y: number;
+}
 
 export function ChipIcon({
   src,
@@ -48,14 +61,72 @@ export function FilterGroup({
   grid?: 2;
   slidingCols?: 2 | 3 | 4;
   slidingRows?: 1 | 2;
-  /** Index of the active chip for the sliding outline. */
+  /** Index of the sole active chip for the shared outline (null when 0 or 2+ selected). */
   slidingIndex?: number | null;
 }) {
   const cols = slidingCols ?? (vertical && grid === 2 ? 2 : undefined);
   const rows = slidingCols == null && vertical && grid === 2 ? 2 : slidingRows;
   const useSlidingGrid = cols != null;
+  const useMeasuredGrid = rows === 2;
 
   const gapToken = cols === 4 || rows === 2 ? "15" : cols === 2 && !vertical ? "2" : "1";
+
+  const trackRef = useRef<HTMLDivElement>(null);
+  const [layoutReady, setLayoutReady] = useState(false);
+  const [gridIndicatorPosition, setGridIndicatorPosition] =
+    useState<GridIndicatorPosition | null>(null);
+
+  const measureGridLayout = useCallback(() => {
+    if (!useMeasuredGrid || slidingIndex == null || slidingIndex < 0) {
+      setGridIndicatorPosition(null);
+      return;
+    }
+
+    const track = trackRef.current;
+    if (!track) return;
+
+    const tiles = track.querySelectorAll<HTMLElement>(".sliding-toggle-tile");
+    const tile = tiles[slidingIndex];
+    if (!tile) return;
+
+    const trackRect = track.getBoundingClientRect();
+    const rect = tile.getBoundingClientRect();
+    const next: GridIndicatorPosition = {
+      width: rect.width,
+      height: rect.height,
+      x: rect.left - trackRect.left,
+      y: rect.top - trackRect.top,
+    };
+
+    if (next.width <= 0 || next.height <= 0) return;
+
+    setGridIndicatorPosition(next);
+    if (!layoutReady) setLayoutReady(true);
+  }, [layoutReady, slidingIndex, useMeasuredGrid]);
+
+  useLayoutEffect(() => {
+    if (!useMeasuredGrid) return;
+    measureGridLayout();
+  }, [measureGridLayout, slidingIndex, useMeasuredGrid]);
+
+  useLayoutEffect(() => {
+    if (!useMeasuredGrid) return;
+
+    const track = trackRef.current;
+    if (!track) return;
+
+    let frame = 0;
+    const observer = new ResizeObserver(() => {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(measureGridLayout);
+    });
+
+    observer.observe(track);
+    return () => {
+      cancelAnimationFrame(frame);
+      observer.disconnect();
+    };
+  }, [measureGridLayout, useMeasuredGrid]);
 
   return (
     <div
@@ -71,6 +142,7 @@ export function FilterGroup({
       </span>
       {useSlidingGrid ? (
         <div
+          ref={useMeasuredGrid ? trackRef : undefined}
           className={cn(
             "sliding-toggle-track",
             cols === 4 && !vertical && "min-w-0 flex-1",
@@ -80,14 +152,30 @@ export function FilterGroup({
           data-rows={rows === 2 ? "2" : undefined}
         >
           {slidingIndex != null && slidingIndex >= 0 ? (
-            <span
-              aria-hidden
-              className="sliding-toggle-indicator"
-              data-cols={String(cols)}
-              data-gap={gapToken}
-              data-rows={rows === 2 ? "2" : undefined}
-              data-index={String(slidingIndex)}
-            />
+            useMeasuredGrid ? (
+              <span
+                aria-hidden
+                data-ready={layoutReady ? "" : undefined}
+                className="sliding-toggle-indicator sliding-toggle-indicator--grid"
+                style={
+                  gridIndicatorPosition
+                    ? {
+                        width: gridIndicatorPosition.width,
+                        height: gridIndicatorPosition.height,
+                        transform: `translate3d(${gridIndicatorPosition.x}px, ${gridIndicatorPosition.y}px, 0)`,
+                      }
+                    : undefined
+                }
+              />
+            ) : (
+              <span
+                aria-hidden
+                className="sliding-toggle-indicator"
+                data-cols={String(cols)}
+                data-gap={gapToken}
+                data-index={String(slidingIndex)}
+              />
+            )
           ) : null}
           <div
             className={cn(
