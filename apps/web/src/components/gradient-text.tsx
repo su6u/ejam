@@ -1,13 +1,15 @@
 "use client";
 
 import {
-  motion,
+  domAnimation,
+  LazyMotion,
+  m,
   useAnimationFrame,
   useMotionValue,
   useReducedMotion,
   useTransform,
 } from "motion/react";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 import { cn } from "@/lib/utils";
 import "./gradient-text.css";
 
@@ -204,14 +206,14 @@ function ShiftingGradientText({
     | "yoyo"
   >
 >) {
-  const [isPaused, setIsPaused] = useState(false);
+  const isPausedRef = useRef(false);
   const progress = useMotionValue(0);
   const elapsedRef = useRef(0);
   const lastTimeRef = useRef<number | null>(null);
   const animationDuration = animationSpeed * 1000;
 
   useAnimationFrame((time) => {
-    if (isPaused) {
+    if (isPausedRef.current) {
       lastTimeRef.current = null;
       return;
     }
@@ -256,11 +258,11 @@ function ShiftingGradientText({
   });
 
   const handleMouseEnter = useCallback(() => {
-    if (pauseOnHover) setIsPaused(true);
+    if (pauseOnHover) isPausedRef.current = true;
   }, [pauseOnHover]);
 
   const handleMouseLeave = useCallback(() => {
-    if (pauseOnHover) setIsPaused(false);
+    if (pauseOnHover) isPausedRef.current = false;
   }, [pauseOnHover]);
 
   const gradientStyle = useMemo(
@@ -269,28 +271,30 @@ function ShiftingGradientText({
   );
 
   return (
-    <motion.span
-      className={cn(
-        "animated-gradient-text",
-        showBorder && "with-border",
-        className,
-      )}
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
-    >
-      {showBorder ? (
-        <motion.span
-          className="gradient-overlay"
-          style={{ ...gradientStyle, backgroundPosition }}
-        />
-      ) : null}
-      <motion.span
-        className="text-content"
-        style={{ ...gradientStyle, backgroundPosition }}
+    <LazyMotion features={domAnimation} strict>
+      <m.span
+        className={cn(
+          "animated-gradient-text",
+          showBorder && "with-border",
+          className,
+        )}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
       >
-        {children}
-      </motion.span>
-    </motion.span>
+        {showBorder ? (
+          <m.span
+            className="gradient-overlay"
+            style={{ ...gradientStyle, backgroundPosition }}
+          />
+        ) : null}
+        <m.span
+          className="text-content"
+          style={{ ...gradientStyle, backgroundPosition }}
+        >
+          {children}
+        </m.span>
+      </m.span>
+    </LazyMotion>
   );
 }
 
