@@ -57,7 +57,12 @@ export function ResultsFilters({
   }
 
   const instituteGroup = showInstituteGroup ? (
-    <FilterGroup label="Institute" vertical grid={2}>
+    <FilterGroup
+      label="Institute"
+      iconSrc="/icons/filter.svg"
+      vertical
+      grid={2}
+    >
       {instituteTypes.map((type) => (
         <FilterChip
           key={type}

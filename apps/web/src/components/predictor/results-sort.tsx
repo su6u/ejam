@@ -1,18 +1,21 @@
 "use client";
 
-import { ArrowUpWideNarrow, Building2, Scale, Sparkles } from "lucide-react";
 import { FilterChip, FilterGroup } from "@/components/predictor/filter-chips";
 import type { ResultsSortKey } from "@/components/predictor/results-sort-logic";
 
 const SORT_OPTIONS: Array<{
   id: ResultsSortKey;
   label: string;
-  icon: typeof Sparkles;
+  iconSrc: string;
 }> = [
-  { id: "balanced", label: "Balanced", icon: Scale },
-  { id: "chance", label: "Best chance", icon: Sparkles },
-  { id: "closing-rank", label: "Closing rank", icon: ArrowUpWideNarrow },
-  { id: "institute", label: "Institute", icon: Building2 },
+  { id: "balanced", label: "Balanced", iconSrc: "/icons/balance.svg" },
+  { id: "chance", label: "Best chance", iconSrc: "/icons/stars.svg" },
+  { id: "closing-rank", label: "Closing rank", iconSrc: "/icons/rank.svg" },
+  {
+    id: "institute",
+    label: "Alphabetical",
+    iconSrc: "/icons/alphabetical-sorting.svg",
+  },
 ];
 
 interface ResultsSortProps {
@@ -23,11 +26,11 @@ interface ResultsSortProps {
 export function ResultsSort({ sortBy, onChange }: ResultsSortProps) {
   return (
     <FilterGroup label="Sort by">
-      {SORT_OPTIONS.map(({ id, label, icon }) => (
+      {SORT_OPTIONS.map(({ id, label, iconSrc }) => (
         <FilterChip
           key={id}
           label={label}
-          icon={icon}
+          iconSrc={iconSrc}
           active={sortBy === id}
           onClick={() => onChange(id)}
         />

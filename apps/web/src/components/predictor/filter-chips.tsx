@@ -1,16 +1,45 @@
 "use client";
 
-import type { LucideIcon } from "lucide-react";
 import { deferAfterPress, pressableClass } from "@/lib/pressable";
 import { cn } from "@/lib/utils";
 
+function ChipIcon({
+  src,
+  className,
+  style,
+}: {
+  src: string;
+  className?: string;
+  style?: React.CSSProperties;
+}) {
+  return (
+    <span
+      aria-hidden
+      className={cn("size-3 shrink-0 bg-current", className)}
+      style={{
+        maskImage: `url(${src})`,
+        maskSize: "contain",
+        maskRepeat: "no-repeat",
+        maskPosition: "center",
+        WebkitMaskImage: `url(${src})`,
+        WebkitMaskSize: "contain",
+        WebkitMaskRepeat: "no-repeat",
+        WebkitMaskPosition: "center",
+        ...style,
+      }}
+    />
+  );
+}
+
 export function FilterGroup({
   label,
+  iconSrc,
   children,
   vertical,
   grid,
 }: {
   label: string;
+  iconSrc?: string;
   children: React.ReactNode;
   vertical?: boolean;
   grid?: 2;
@@ -22,7 +51,8 @@ export function FilterGroup({
         vertical ? "flex-col items-stretch" : "flex-wrap items-center",
       )}
     >
-      <span className="text-[10px] font-medium tracking-wide text-muted-foreground uppercase">
+      <span className="inline-flex items-center gap-1 text-[10px] font-medium tracking-wide text-muted-foreground uppercase">
+        {iconSrc ? <ChipIcon src={iconSrc} className="size-2.5" /> : null}
         {label}
       </span>
       <div
@@ -41,7 +71,7 @@ export function FilterGroup({
 
 export function FilterChip({
   label,
-  icon: Icon,
+  iconSrc,
   active,
   disabled,
   accentColor,
@@ -50,7 +80,7 @@ export function FilterChip({
   className,
 }: {
   label: string;
-  icon?: LucideIcon;
+  iconSrc?: string;
   active: boolean;
   disabled?: boolean;
   accentColor?: string;
@@ -72,7 +102,7 @@ export function FilterChip({
         "disabled:pointer-events-none disabled:opacity-50",
         active && "border-foreground/40 text-foreground",
         fullWidth && "w-full justify-start",
-        Icon && "gap-1.5",
+        iconSrc && "gap-1.5",
         className,
       )}
       style={
@@ -85,10 +115,9 @@ export function FilterChip({
           : undefined
       }
     >
-      {Icon ? (
-        <Icon
-          className="size-3 shrink-0"
-          aria-hidden
+      {iconSrc ? (
+        <ChipIcon
+          src={iconSrc}
           style={active && accentColor ? { color: accentColor } : undefined}
         />
       ) : null}
