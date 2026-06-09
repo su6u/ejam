@@ -43,6 +43,8 @@ A JEE (will try to add more exams soon) counselling predictor. It estimates wher
 
 Offline DuckDB builds the index. Live predict just reads it.
 
+<br>
+
 <p align="center">
   <span style="color:#0969da">[1]</span>&nbsp;&nbsp; $\large \hat{c} = (\bar{w} + \mathrm{clamp}(m, \pm 0.03\bar{w}) \cdot 0.7 g)(1+s)^{g}$
   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -51,7 +53,9 @@ Offline DuckDB builds the index. Live predict just reads it.
 
 <br>
 
-The index build crunches years of closing ranks per seat. Recent years and later rounds (R6 > R1) count more. COVID-era spikes get downweighted. Trend can only nudge the forecast so much, then +1%/yr gets added for rank inflation. [**[1]**](docs/college-predictor/nerd-stuff/index-algorithms.md#predicted-closing-rank) forecasts where the seat closes. [**[2]**](docs/college-predictor/nerd-stuff/index-algorithms.md#sigma-floor) is how much to trust it (wider when data is thin).
+For each seat, the index looks at years of closing ranks. Recent years and later rounds (R6 > R1) weigh more; COVID spikes get trimmed. A small trend nudge plus ~1%/yr covers rank inflation. [**[1]**](docs/college-predictor/nerd-stuff/index-algorithms.md#predicted-closing-rank) is the predicted closing rank for this year. [**[2]**](docs/college-predictor/nerd-stuff/index-algorithms.md#sigma-floor) is how uncertain that guess is, wider when history is thin.
+
+<br>
 
 <p align="center">
   <span style="color:#0969da">[3]</span>&nbsp;&nbsp; $\large P_i = \Phi\!\left(\frac{\hat{c}_i - r}{\sigma}\right)$
@@ -63,18 +67,16 @@ The index build crunches years of closing ranks per seat. Recent years and later
 
 <br>
 
-Your rank hits each counselling round [**[3]**](docs/college-predictor/nerd-stuff/prediction-engine.md#single-round-probability). Miss R1 and R2 still counts [**[4]**](docs/college-predictor/nerd-stuff/prediction-engine.md#round-by-round-cumulative-chance). The % on each row is that stacked chance [**[4]**](docs/college-predictor/nerd-stuff/prediction-engine.md#round-by-round-cumulative-chance). Safe / target / reach are just labels (85% / 40% / 10%). Sort isn't dumb highest-first [**[5]**](docs/college-predictor/nerd-stuff/balanced-ranking.md#composite-formula): a decent IIT at 60% can beat a random branch at 95%.
+At predict time, [**[3]**](docs/college-predictor/nerd-stuff/prediction-engine.md#single-round-probability) compares your rank to that closing rank for each round. [**[4]**](docs/college-predictor/nerd-stuff/prediction-engine.md#round-by-round-cumulative-chance) stacks all six rounds, so a miss in R1 can still leave room in R2–R6. The % on each row is that cumulative chance. Safe / target / reach are labels at 85% / 40% / 10%. Default sort uses [**[5]**](docs/college-predictor/nerd-stuff/balanced-ranking.md#composite-formula): institute and branch quality matter, not just probability. A strong IIT at 60% can rank above a weak branch at 95%.
 
 <br>
 
+<h3>2025 backtest</h3>
 <p>
-  <strong>2025 backtest</strong><br>
-  <sub>train 2021–24 · holdout 2025</sub><br>
+  train 2021–24 · holdout 2025 · <a href="docs/college-predictor/nerd-stuff/backtest.md">how we measure this</a><br>
   <br>
-  ±20% cutoff accuracy · <strong>72.8%</strong> JoSAA · <strong>68.8%</strong> CSAB<br>
-  band boundary hit · <strong>42%</strong> JoSAA · <strong>52%</strong> CSAB<br>
-  <br>
-  <sub><code>pnpm backtest</code> · not a promise for this year</sub>
+  ±20% cutoff accuracy · <strong>72.8%</strong> JoSAA · <strong>68.7%</strong> CSAB<br>
+  band boundary hit · <strong>42.0%</strong> JoSAA · <strong>51.9%</strong> CSAB<br>
 </p>
 
 [Try it](https://ejam.in/college-predictor) · [Engine docs](docs/college-predictor/nerd-stuff/prediction-engine.md)
