@@ -19,7 +19,7 @@
 
 <br>
 
-## Why this exists
+## Why [ejam] exists
 
 Indian exam season means a flood of websites that promise to help: predictors, rank tools, guides, etc. Most of them are built to harvest your data first and help you second (like why tf do I need to give my data to use a simple tool). Ads everywhere, sign-up walls, phone number mandatory, then spam calls for weeks. Closed source, so you never know if the data/ tools is even reliable.
 
@@ -27,7 +27,7 @@ I started **ejam** as a hobby project to build the kind of tools I wished existe
 
 <br>
 
-## Tools
+## [TOOLS]
 
 <p align="center">
   <code>Engineering</code> / <code>Tools</code> / <code>College Predictor</code>
@@ -37,9 +37,9 @@ I started **ejam** as a hobby project to build the kind of tools I wished existe
 
 A JEE (will try to add more exams soon) counselling predictor. It estimates where your rank could land using years of **JoSAA** and **CSAB** closing ranks. Estimates only, not official allotment.
 
-<hr style="border: none; border-top: 0.5px solid #e8eaed; margin: 8px 0;">
+<br>
 
-### Nerd Stuff
+## [Nerd] Stuff
 
 Offline DuckDB builds the index. Live predict just reads it.
 
@@ -71,19 +71,7 @@ At predict time, [**[3]**](docs/college-predictor/nerd-stuff/prediction-engine.m
 
 <br>
 
-<h3>2025 backtest</h3>
-<p>
-  train 2021–24 · holdout 2025 · <a href="docs/college-predictor/nerd-stuff/backtest.md">how we measure this</a><br>
-  <br>
-  ±20% cutoff accuracy · <strong>72.8%</strong> JoSAA · <strong>68.7%</strong> CSAB<br>
-  band boundary hit · <strong>42.0%</strong> JoSAA · <strong>51.9%</strong> CSAB<br>
-</p>
-
-[Try it](https://ejam.in/college-predictor) · [Engine docs](docs/college-predictor/nerd-stuff/prediction-engine.md)
-
-<br>
-
-## Credits
+## [Credits]
 
 Dashboard layout adapted from [Efferd](https://efferd.com/) by [Shaban](https://x.com/shabanhr).
 
