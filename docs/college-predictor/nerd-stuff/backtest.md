@@ -71,10 +71,5 @@ This is not the same as "did we predict the right band for a random applicant." 
 
 Reproduce: `pnpm backtest` and read the summary, or open `data/dist/backtest-results.json`.
 
-## What this does not test
-
-- Round-by-round cumulative chance stacking ([4] in the README). Backtest only scores the index's $\hat{c}$ and $\sigma_{\mathrm{eff}}$.
-- Balanced sort ([5]). No institute/branch scoring in the backtest.
-- Live API filters (quota, HS/OS, exam path). All matched seat keys are scored.
-
+---
 When you change index hyperparams (`packages/data-cli/src/jam/config.ts`, `csab-config.ts`), run `pnpm backtest` before publishing a data release.
