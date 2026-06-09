@@ -13,6 +13,23 @@ import { cn } from "@/lib/utils";
 
 const JEE_MAIN_INSTITUTE_ORDER = ["NIT", "IIIT", "CFI"] as const;
 
+function singleActiveSlidingIndex<T>(
+  items: readonly T[],
+  isActive: (item: T) => boolean,
+): number | null {
+  let found = -1;
+  let count = 0;
+
+  for (let i = 0; i < items.length; i++) {
+    if (!isActive(items[i])) continue;
+    count += 1;
+    found = i;
+    if (count > 1) return null;
+  }
+
+  return count === 1 ? found : null;
+}
+
 function availableInstituteTypes(
   programs: ProgramPrediction[],
   exam: ExamType,
@@ -56,8 +73,22 @@ export function ResultsFilters({
     onChange({ ...filters, bands: next });
   }
 
+  const instituteSlidingIndex = singleActiveSlidingIndex(
+    instituteTypes,
+    (type) => filters.instituteTypes.has(type),
+  );
+  const chanceSlidingIndex = singleActiveSlidingIndex(
+    BAND_FILTER_OPTIONS,
+    (option) => filters.bands.has(option.id),
+  );
+
   const instituteGroup = showInstituteGroup ? (
-    <FilterGroup label="Institute" vertical grid={2}>
+    <FilterGroup
+      label="Institute"
+      vertical
+      grid={2}
+      slidingIndex={instituteSlidingIndex}
+    >
       {instituteTypes.map((type) => (
         <FilterChip
           key={type}
@@ -72,7 +103,12 @@ export function ResultsFilters({
   ) : null;
 
   const chanceGroup = (
-    <FilterGroup label="Chance" vertical grid={2}>
+    <FilterGroup
+      label="Chance"
+      vertical
+      grid={2}
+      slidingIndex={chanceSlidingIndex}
+    >
       {BAND_FILTER_OPTIONS.map(({ id, label, color }) => (
         <FilterChip
           key={id}

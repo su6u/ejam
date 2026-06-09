@@ -1,7 +1,7 @@
 "use client";
 
 import { ChevronDownIcon, ChevronUpIcon } from "lucide-react";
-import { useState } from "react";
+import { useId, useState } from "react";
 import {
   Popover,
   PopoverContent,
@@ -32,8 +32,11 @@ export function OptionPicker({
   placeholder = "Select…",
   triggerClassName,
   listClassName,
-  id,
+  id: idProp,
 }: OptionPickerProps) {
+  const generatedId = useId();
+  const id = idProp ?? generatedId;
+  const listboxId = `${id}-listbox`;
   const [open, setOpen] = useState(false);
   const selected = options.find((option) => option.value === value);
 
@@ -41,7 +44,9 @@ export function OptionPicker({
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger
         id={id}
+        role="combobox"
         aria-haspopup="listbox"
+        aria-controls={listboxId}
         aria-expanded={open}
         className={cn(
           "flex h-8 w-full items-center justify-between rounded-none border border-input bg-transparent px-2.5 text-sm outline-none",
@@ -66,34 +71,38 @@ export function OptionPicker({
         className="w-(--anchor-width) min-w-(--anchor-width) rounded-none p-1"
         align="start"
       >
-        <div role="listbox" className={cn("flex flex-col", listClassName)}>
+        <ul
+          id={listboxId}
+          className={cn("flex list-none flex-col p-0", listClassName)}
+        >
           {options.map((option) => {
             const isSelected = option.value === value;
 
             return (
-              <button
-                key={option.value}
-                type="button"
-                role="option"
-                aria-selected={isSelected}
-                onClick={() => {
-                  deferAfterPress(() => {
-                    onValueChange(option.value);
-                    setOpen(false);
-                  });
-                }}
-                className={cn(
-                  "flex h-8 w-full items-center rounded-none px-2 text-left text-sm outline-none",
-                  pressableClass,
-                  "hover:bg-muted hover:text-foreground",
-                  isSelected ? "text-foreground" : "text-muted-foreground",
-                )}
-              >
-                {option.label}
-              </button>
+              <li key={option.value}>
+                <button
+                  type="button"
+                  role="option"
+                  aria-selected={isSelected}
+                  onClick={() => {
+                    deferAfterPress(() => {
+                      onValueChange(option.value);
+                      setOpen(false);
+                    });
+                  }}
+                  className={cn(
+                    "flex h-8 w-full items-center rounded-none px-2 text-left text-sm outline-none",
+                    pressableClass,
+                    "hover:bg-muted hover:text-foreground",
+                    isSelected ? "text-foreground" : "text-muted-foreground",
+                  )}
+                >
+                  {option.label}
+                </button>
+              </li>
             );
           })}
-        </div>
+        </ul>
       </PopoverContent>
     </Popover>
   );

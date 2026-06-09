@@ -11,11 +11,8 @@ manifest/runs.jsonl
 dist/sandbox/
 dist/backtest-results.json
 
-# --- Parquet staged policy ---
-# Tracked today: engineering/**/cutoffs.parquet, engineering/**/seat-matrix.parquet,
-# dist/college_predictor_index.parquet, dist/csab_predictor_index.parquet (+ .lineage.json).
-# Pinned by data/manifest/v*.json; verify with `pnpm data:fetch`.
-#
-# engineering/**/*.parquet
-# dist/*.parquet
-# dist/*.lineage.json
+# Release payloads are published as GitHub Release assets.
+# Keep manifests and small registry/config metadata in git; keep large data local.
+engineering/**/*.parquet
+dist/*.parquet
+dist/*.lineage.json

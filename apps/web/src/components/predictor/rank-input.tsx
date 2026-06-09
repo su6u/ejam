@@ -44,7 +44,6 @@ export function RankInput({
     type: "empty",
   });
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const typedThisFocusRef = useRef(false);
   const { wrapRef, showError, clearError } = useErrorShake();
 
   useEffect(
@@ -89,7 +88,6 @@ export function RankInput({
   const handleChange = (raw: string) => {
     const next = raw.replace(/\D/g, "").slice(0, MAX_RANK_LENGTH);
     setDraft(next);
-    if (next.length > 0) typedThisFocusRef.current = true;
     clearError();
     if (debounceRef.current) clearTimeout(debounceRef.current);
     debounceRef.current = setTimeout(() => onValueChange(next), URL_SYNC_MS);
@@ -110,14 +108,10 @@ export function RankInput({
         onFocus={() => {
           setDraft(value);
           setFocused(true);
-          typedThisFocusRef.current = Boolean(value.trim());
         }}
         onBlur={() => {
           setFocused(false);
           commit(draft);
-          if (!draft.trim() && !typedThisFocusRef.current) {
-            revealValidationError({ type: "empty" });
-          }
         }}
         onChange={(e) => handleChange(e.target.value)}
         placeholder="e.g. 4521"

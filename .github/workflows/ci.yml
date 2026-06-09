@@ -77,6 +77,9 @@ jobs:
       - name: Lint
         run: pnpm check
 
+      - name: Fetch released data
+        run: pnpm data:fetch --download
+
       - name: Build
         run: pnpm turbo run build --filter=@ejam/web
 
@@ -152,7 +155,7 @@ jobs:
         run: pnpm --filter @ejam/data-cli typecheck
 
       - name: Verify manifest checksums
-        run: pnpm data:fetch
+        run: pnpm data:fetch --download
 
       - name: Verify index lineage sidecars
         run: pnpm verify:index-lineage

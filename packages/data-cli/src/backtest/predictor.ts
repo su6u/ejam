@@ -615,6 +615,13 @@ async function main(): Promise<void> {
 
   printSummary(`JoSAA/${JAM_JOSAA_V2}`, josaa);
   printSummary(`CSAB/${JAM_CSAB_V2}`, csab);
+  console.log("\n--- README summary (copy from here) ---");
+  console.log(
+    `±20% cutoff accuracy · ${(josaa.within_20pct * 100).toFixed(1)}% JoSAA · ${(csab.within_20pct * 100).toFixed(1)}% CSAB`,
+  );
+  console.log(
+    `band boundary hit · ${(josaa.band_accuracy * 100).toFixed(1)}% JoSAA · ${(csab.band_accuracy * 100).toFixed(1)}% CSAB`,
+  );
 
   fs.mkdirSync(path.dirname(OUTPUT_FILE), { recursive: true });
   fs.writeFileSync(

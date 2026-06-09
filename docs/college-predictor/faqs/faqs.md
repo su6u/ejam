@@ -16,7 +16,7 @@ No. **Safe** means the model puts cumulative chance at roughly 85%+ from past cu
 <details>
 <summary>How accurate are the numbers?</summary>
 
-Depends on how stable that program's cutoff history is. Rows tagged `sufficient` (3+ years) are usually steadier. `inferred` (2 years) and `pooled` (1 year) are noisier, and the index widens $\sigma_{\mathrm{eff}}$ for sparse rows. Builders are backtested on held-out years (see README), but a good backtest is not a promise for this year's counselling.
+Depends on how stable that program's cutoff history is. Rows tagged `sufficient` (3+ years) are usually steadier. `inferred` (2 years) and `pooled` (1 year) are noisier, and the index widens $\sigma_{\mathrm{eff}}$ for sparse rows. Builders are backtested on held-out years ([backtest.md](../nerd-stuff/backtest.md)); a good backtest is not a promise for this year's counselling.
 
 </details>
 

@@ -8,7 +8,7 @@ Read [NOTICE](NOTICE) before touching datasets. Official JoSAA / CSAB / NTA data
 
 ## Help with
 
-Code (web, engine, index build), cutoff data, docs, or issues. Small focused PRs beat giant rewrites. Not sure? Open an issue.
+Code (web, engine, index build), cutoff data, docs, or issues.
 
 **Non-engineering exams (NEET, etc.)** Right now ejam is mostly JEE / JoSAA / CSAB. I do not know how NEET or other counselling bodies work (MCC, state quotas, round rules, where official cutoffs live). If you do, I would genuinely love help: docs explaining the process, data sources, or what a tool should even look like. [Open an issue](https://github.com/su6u/ejam/issues/new).
 
@@ -21,11 +21,11 @@ Node 22+, pnpm 11 (`packageManager` in root). uv if you touch Python validation.
 ```bash
 git clone https://github.com/su6u/ejam.git && cd ejam
 pnpm install
-pnpm data:fetch
+pnpm data:fetch --download
 pnpm dev
 ```
 
-Missing parquets: `pnpm data:fetch --download`. App is `apps/web`, predictor at `/college-predictor`.
+App is `apps/web`, predictor at `/college-predictor`.
 
 <br>
 
@@ -54,7 +54,14 @@ Match existing style in the file you edit. One concern per PR when you can. Deta
 
 ## Data PRs
 
-Official cutoffs only. Cite the source URL. Rebuild indices, bump manifest, verify. No fabricated cutoffs or stuff you can't redistribute.
+Official cutoffs only. Cite the source URL. No fabricated cutoffs or stuff you can't redistribute.
+
+Full walkthrough: [docs/DATA.md — Adding data](docs/DATA.md#adding-data). Short version:
+
+1. `pnpm data:fetch --download`
+2. Add/fix parquets locally, rebuild indices if history changed
+3. `pnpm generate:manifest --version=vX.Y.Z` and run the verify commands in [Before a PR](#before-a-pr)
+4. Open PR with manifest + registry + `_sources.json` only — not parquets
 
 <br>
 

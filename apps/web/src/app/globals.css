@@ -51,6 +51,9 @@
   /* Strong ease-out for UI enter/exit */
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
 
+  /* Sort-by sliding outline */
+  --sort-slide-dur: 240ms;
+
   /* Sheet / drawer — asymmetric open and close timing */
   --sheet-open-dur: 380ms;
   --sheet-close-dur: 260ms;
@@ -858,6 +861,235 @@ input {
   @media (prefers-reduced-motion: reduce) {
     .t-digit-group .t-digit {
       animation: none !important;
+    }
+  }
+
+  .sliding-toggle-track {
+    position: relative;
+    isolation: isolate;
+    min-width: 0;
+  }
+
+  .sliding-toggle-grid {
+    display: grid;
+    gap: 0.25rem;
+  }
+
+  .sliding-toggle-track[data-gap="2"] .sliding-toggle-grid {
+    gap: 0.5rem;
+  }
+
+  .sliding-toggle-track[data-gap="15"] .sliding-toggle-grid {
+    gap: 0.375rem;
+  }
+
+  .chip-icon-mask {
+    mask-size: contain;
+    mask-repeat: no-repeat;
+    mask-position: center;
+    -webkit-mask-size: contain;
+    -webkit-mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+  }
+
+  .sliding-toggle-indicator {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 0;
+    pointer-events: none;
+    border: 1px solid color-mix(in oklch, var(--foreground) 50%, transparent);
+    background-color: transparent;
+    transition: transform 240ms var(--ease-out);
+    will-change: transform;
+  }
+
+  .sliding-toggle-track:not([data-rows="2"]) .sliding-toggle-indicator {
+    bottom: 0;
+  }
+
+  .sort-toggle-track .sliding-toggle-grid {
+    grid-auto-flow: column;
+    grid-auto-columns: max-content;
+    gap: 0.375rem;
+  }
+
+  .sliding-toggle-indicator--sort {
+    bottom: 0;
+    box-sizing: border-box;
+    opacity: 0;
+    transition:
+      transform var(--sort-slide-dur) var(--ease-out),
+      width var(--sort-slide-dur) var(--ease-out);
+    will-change: transform;
+  }
+
+  .sliding-toggle-indicator--sort:not([data-ready]) {
+    transition: none;
+  }
+
+  .sliding-toggle-indicator--sort[data-ready] {
+    opacity: 1;
+  }
+
+  .sliding-toggle-indicator--grid {
+    bottom: auto;
+    height: auto;
+    box-sizing: border-box;
+    opacity: 0;
+    transition: none;
+    will-change: auto;
+  }
+
+  .sliding-toggle-indicator--grid[data-ready] {
+    opacity: 1;
+  }
+
+  /* 2 columns, gap 0.25rem */
+  .sliding-toggle-indicator[data-cols="2"][data-gap="1"] {
+    width: calc((100% - 0.25rem) / 2);
+  }
+
+  .sliding-toggle-indicator[data-cols="2"][data-gap="1"][data-index="1"] {
+    transform: translateX(calc(100% + 0.25rem));
+  }
+
+  /* 2 columns, gap 0.5rem (exam picker) */
+  .sliding-toggle-indicator[data-cols="2"][data-gap="2"] {
+    width: calc((100% - 0.5rem) / 2);
+  }
+
+  .sliding-toggle-indicator[data-cols="2"][data-gap="2"][data-index="1"] {
+    transform: translateX(calc(100% + 0.5rem));
+  }
+
+  .sliding-toggle-indicator[data-cols="3"][data-gap="1"] {
+    width: calc((100% - 0.5rem) / 3);
+  }
+
+  .sliding-toggle-indicator[data-cols="3"][data-gap="1"][data-index="1"] {
+    transform: translateX(calc(100% + 0.25rem));
+  }
+
+  .sliding-toggle-indicator[data-cols="3"][data-gap="1"][data-index="2"] {
+    transform: translateX(calc(200% + 0.5rem));
+  }
+
+  /* 2×2 grid, gap 0.375rem (filter chips) */
+  .sliding-toggle-track[data-rows="2"]
+  .sliding-toggle-indicator[data-gap="15"] {
+    height: calc((100% - 0.375rem) / 2);
+  }
+
+  .sliding-toggle-indicator[data-cols="2"][data-gap="15"][data-rows="2"] {
+    width: calc((100% - 0.375rem) / 2);
+  }
+
+  .sliding-toggle-indicator[data-cols="2"][data-gap="15"][data-rows="2"][data-index="1"] {
+    transform: translateX(calc(100% + 0.375rem));
+  }
+
+  .sliding-toggle-indicator[data-cols="2"][data-gap="15"][data-rows="2"][data-index="2"] {
+    transform: translateY(calc(100% + 0.375rem));
+  }
+
+  .sliding-toggle-indicator[data-cols="2"][data-gap="15"][data-rows="2"][data-index="3"] {
+    transform: translate(calc(100% + 0.375rem), calc(100% + 0.375rem));
+  }
+
+  /* 4 columns, gap 0.375rem (sort by) */
+  .sliding-toggle-indicator[data-cols="4"][data-gap="15"] {
+    width: calc((100% - 1.125rem) / 4);
+  }
+
+  .sliding-toggle-indicator[data-cols="4"][data-gap="15"][data-index="1"] {
+    transform: translateX(calc(100% + 0.375rem));
+  }
+
+  .sliding-toggle-indicator[data-cols="4"][data-gap="15"][data-index="2"] {
+    transform: translateX(calc(200% + 0.75rem));
+  }
+
+  .sliding-toggle-indicator[data-cols="4"][data-gap="15"][data-index="3"] {
+    transform: translateX(calc(300% + 1.125rem));
+  }
+
+  .sliding-toggle-tile {
+    position: relative;
+    z-index: 1;
+    box-sizing: border-box;
+    border: 1px solid color-mix(in oklch, var(--border) 70%, transparent);
+    background-color: transparent;
+  }
+
+  .sliding-toggle-tile[aria-pressed="true"] {
+    border-color: transparent;
+  }
+
+  .filter-chip.sliding-toggle-tile[aria-pressed="true"] {
+    border-color: color-mix(in oklch, var(--foreground) 40%, transparent);
+  }
+
+  .sliding-toggle-track:has(
+      .sliding-toggle-indicator:not(.sliding-toggle-indicator--grid)
+    )
+    .filter-chip.sliding-toggle-tile[aria-pressed="true"],
+  .sliding-toggle-track:has(.sliding-toggle-indicator--grid[data-ready])
+    .filter-chip.sliding-toggle-tile[aria-pressed="true"],
+  .sort-toggle-track:has(.sliding-toggle-indicator--sort[data-ready])
+    .sort-chip.sliding-toggle-tile[aria-pressed="true"] {
+    border-color: transparent;
+  }
+
+  .sort-toggle-track .sort-chip.sliding-toggle-tile:not([aria-pressed="true"]) {
+    border-color: color-mix(in oklch, var(--border) 70%, transparent);
+  }
+
+  .exam-picker-grid {
+    min-height: 55px;
+  }
+
+  .exam-picker-grid .sliding-toggle-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .exam-picker-tile {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    min-height: 55px;
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+    border: 0;
+    box-shadow: none;
+    background-color: transparent;
+  }
+
+  .exam-picker-logo {
+    clip-path: inset(3%);
+  }
+
+  .exam-picker-tile[aria-pressed="false"] .exam-picker-logo {
+    opacity: 0.65;
+    filter: brightness(0.92);
+  }
+
+  .exam-picker-tile[aria-pressed="true"] .exam-picker-logo {
+    opacity: 1;
+    filter: none;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .exam-picker-tile[aria-pressed="false"]:hover .exam-picker-logo {
+      opacity: 0.82;
+      filter: brightness(1);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .sliding-toggle-indicator {
+      transition: none;
     }
   }
 

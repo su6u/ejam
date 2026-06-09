@@ -40,7 +40,7 @@ async function verifyDataset(
 }
 
 async function downloadRelease(version: string): Promise<void> {
-  const repo = process.env.EJAM_DATA_REPO ?? "ejam/ejam";
+  const repo = process.env.EJAM_DATA_REPO ?? "su6u/ejam";
   const tag =
     process.env.EJAM_DATA_RELEASE_TAG ?? `data-${version.replace(/^v/, "")}`;
   const url =

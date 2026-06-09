@@ -674,6 +674,12 @@ const SINGLE_REVEAL_ORIGIN: Record<
   "center-out": 0.5,
 };
 
+const REVEAL_MOTION = {
+  initial: { scaleX: 0 },
+  animate: { scaleX: 1 },
+  transition: { duration: REVEAL_DURATION, ease: REVEAL_EASE },
+};
+
 /**
  * Wipe mask driven by motion.dev, played once when an <Area /> mounts. The same
  * mask is applied to the area's fill, stroke, and resting dots, so all three
@@ -693,12 +699,6 @@ const RevealMask = ({
   id: string;
   type: RevealAnimationType;
 }) => {
-  const reveal = {
-    initial: { scaleX: 0 },
-    animate: { scaleX: 1 },
-    transition: { duration: REVEAL_DURATION, ease: REVEAL_EASE },
-  };
-
   return (
     <mask
       id={`${id}-reveal-mask`}
@@ -713,7 +713,7 @@ const RevealMask = ({
         <>
           {/* left half wipes inward from the left edge toward the centre */}
           <m.rect
-            {...reveal}
+            {...REVEAL_MOTION}
             x="0"
             y="0"
             width="50%"
@@ -723,7 +723,7 @@ const RevealMask = ({
           />
           {/* right half wipes inward from the right edge toward the centre */}
           <m.rect
-            {...reveal}
+            {...REVEAL_MOTION}
             x="50%"
             y="0"
             width="50%"
@@ -734,7 +734,7 @@ const RevealMask = ({
         </>
       ) : (
         <m.rect
-          {...reveal}
+          {...REVEAL_MOTION}
           x="0"
           y="0"
           width="100%"

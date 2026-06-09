@@ -14,6 +14,7 @@ import { cn } from "@/lib/utils";
 interface HomeStateComboboxProps {
   value: string;
   onValueChange: (value: string) => void;
+  placeholder?: string;
   className?: string;
   id?: string;
 }
@@ -21,6 +22,7 @@ interface HomeStateComboboxProps {
 export function HomeStateCombobox({
   value,
   onValueChange,
+  placeholder = "Select home state",
   className,
   id: idProp,
 }: HomeStateComboboxProps) {
@@ -61,7 +63,7 @@ export function HomeStateCombobox({
         {value && isHomeState(value) ? (
           <span className="truncate">{value}</span>
         ) : (
-          <span className="text-muted-foreground">Select home state</span>
+          <span className="text-muted-foreground">{placeholder}</span>
         )}
         <span
           className="t-icon-swap shrink-0 text-muted-foreground/80"

@@ -8,7 +8,7 @@ export type RankValidationError =
   | { type: "invalid" }
   | { type: "out_of_range"; maxRank: number };
 
-export function getMaxRankForExam(predictorExamId: PredictorExamId): number {
+function getMaxRankForExam(predictorExamId: PredictorExamId): number {
   return predictorExamId === "jee-advanced" ? 50_000 : 500_000;
 }
 
