@@ -3,7 +3,7 @@
 import { deferAfterPress, pressableClass } from "@/lib/pressable";
 import { cn } from "@/lib/utils";
 
-function ChipIcon({
+export function ChipIcon({
   src,
   className,
   style,
@@ -37,34 +37,80 @@ export function FilterGroup({
   children,
   vertical,
   grid,
+  slidingCols,
+  slidingRows = 1,
+  slidingIndex,
 }: {
   label: string;
   iconSrc?: string;
   children: React.ReactNode;
   vertical?: boolean;
   grid?: 2;
+  slidingCols?: 2 | 3 | 4;
+  slidingRows?: 1 | 2;
+  /** Index of the active chip for the sliding outline. */
+  slidingIndex?: number | null;
 }) {
+  const cols = slidingCols ?? (vertical && grid === 2 ? 2 : undefined);
+  const rows = slidingCols == null && vertical && grid === 2 ? 2 : slidingRows;
+  const useSlidingGrid = cols != null;
+
+  const gapToken = cols === 4 || rows === 2 ? "15" : cols === 2 && !vertical ? "2" : "1";
+
   return (
     <div
       className={cn(
         "flex gap-1.5",
-        vertical ? "flex-col items-stretch" : "flex-wrap items-center",
+        vertical ? "flex-col items-stretch" : "items-center",
+        cols === 4 && !vertical && "w-full",
       )}
     >
-      <span className="inline-flex items-center gap-1 text-[10px] font-medium tracking-wide text-muted-foreground uppercase">
+      <span className="inline-flex shrink-0 items-center gap-1 text-[10px] font-medium tracking-wide text-muted-foreground uppercase">
         {iconSrc ? <ChipIcon src={iconSrc} className="size-2.5" /> : null}
         {label}
       </span>
-      <div
-        className={cn(
-          "gap-1.5",
-          vertical && grid === 2 && "grid grid-cols-2",
-          vertical && !grid && "flex w-full flex-wrap",
-          !vertical && "flex flex-wrap items-center",
-        )}
-      >
-        {children}
-      </div>
+      {useSlidingGrid ? (
+        <div
+          className={cn(
+            "sliding-toggle-track",
+            cols === 4 && !vertical && "min-w-0 flex-1",
+            vertical && "w-full",
+          )}
+          data-gap={gapToken}
+          data-rows={rows === 2 ? "2" : undefined}
+        >
+          {slidingIndex != null && slidingIndex >= 0 ? (
+            <span
+              aria-hidden
+              className="sliding-toggle-indicator"
+              data-cols={String(cols)}
+              data-gap={gapToken}
+              data-rows={rows === 2 ? "2" : undefined}
+              data-index={String(slidingIndex)}
+            />
+          ) : null}
+          <div
+            className={cn(
+              "sliding-toggle-grid grid",
+              cols === 2 && "grid-cols-2",
+              cols === 3 && "grid-cols-3",
+              cols === 4 && "grid-cols-4",
+            )}
+          >
+            {children}
+          </div>
+        </div>
+      ) : (
+        <div
+          className={cn(
+            vertical && !grid && "flex w-full flex-wrap",
+            !vertical && "flex flex-wrap items-center",
+            vertical && grid && "grid grid-cols-2 gap-1.5",
+          )}
+        >
+          {children}
+        </div>
+      )}
     </div>
   );
 }
@@ -76,6 +122,7 @@ export function FilterChip({
   disabled,
   accentColor,
   fullWidth,
+  instant,
   onClick,
   className,
 }: {
@@ -85,6 +132,8 @@ export function FilterChip({
   disabled?: boolean;
   accentColor?: string;
   fullWidth?: boolean;
+  /** Skip double-rAF defer */
+  instant?: boolean;
   onClick: () => void;
   className?: string;
 }) {
@@ -93,14 +142,14 @@ export function FilterChip({
       type="button"
       aria-pressed={active}
       disabled={disabled}
-      onClick={() => deferAfterPress(onClick)}
+      onClick={() => (instant ? onClick() : deferAfterPress(onClick))}
       className={cn(
-        "inline-flex h-8 items-center rounded-none border border-border bg-transparent px-2.5 text-xs font-medium text-muted-foreground outline-none",
+        "filter-chip sliding-toggle-tile inline-flex h-8 items-center rounded-none px-2.5 text-xs font-medium text-muted-foreground outline-none",
         pressableClass,
         "hover:text-foreground",
-        "focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50",
+        "focus-visible:ring-3 focus-visible:ring-ring/50",
         "disabled:pointer-events-none disabled:opacity-50",
-        active && "border-foreground/40 text-foreground",
+        active && "text-foreground",
         fullWidth && "w-full justify-start",
         iconSrc && "gap-1.5",
         className,
@@ -121,7 +170,7 @@ export function FilterChip({
           style={active && accentColor ? { color: accentColor } : undefined}
         />
       ) : null}
-      {label}
+      <span className="truncate">{label}</span>
     </button>
   );
 }

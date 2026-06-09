@@ -1,7 +1,9 @@
 "use client";
 
-import { FilterChip, FilterGroup } from "@/components/predictor/filter-chips";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { ChipIcon } from "@/components/predictor/filter-chips";
 import type { ResultsSortKey } from "@/components/predictor/results-sort-logic";
+import { cn } from "@/lib/utils";
 
 const SORT_OPTIONS: Array<{
   id: ResultsSortKey;
@@ -18,23 +20,181 @@ const SORT_OPTIONS: Array<{
   },
 ];
 
+const SLIDE_MS = 240;
+
+interface IndicatorPosition {
+  width: number;
+  x: number;
+}
+
 interface ResultsSortProps {
   sortBy: ResultsSortKey;
   onChange: (next: ResultsSortKey) => void;
 }
 
+function positionsChanged(
+  previous: IndicatorPosition[],
+  next: IndicatorPosition[],
+): boolean {
+  if (previous.length !== next.length) return true;
+
+  return next.some((position, index) => {
+    const prior = previous[index];
+    if (!prior) return true;
+    return (
+      Math.abs(prior.width - position.width) > 0.5 ||
+      Math.abs(prior.x - position.x) > 0.5
+    );
+  });
+}
+
 export function ResultsSort({ sortBy, onChange }: ResultsSortProps) {
+  const trackRef = useRef<HTMLDivElement>(null);
+  const itemRefs = useRef<Array<HTMLButtonElement | null>>([]);
+  const positionsRef = useRef<IndicatorPosition[]>([]);
+  const hasInitializedIndicatorRef = useRef(false);
+  const animatingUntilRef = useRef(0);
+  const prevActiveIndexRef = useRef(0);
+
+  const [layoutReady, setLayoutReady] = useState(false);
+  const [layoutRevision, setLayoutRevision] = useState(0);
+  const [indicatorIndex, setIndicatorIndex] = useState(0);
+
+  const activeIndex = SORT_OPTIONS.findIndex((option) => option.id === sortBy);
+
+  if (
+    hasInitializedIndicatorRef.current &&
+    prevActiveIndexRef.current !== activeIndex
+  ) {
+    animatingUntilRef.current = performance.now() + SLIDE_MS + 32;
+    prevActiveIndexRef.current = activeIndex;
+  }
+
+  const measureLayout = useCallback(() => {
+    const track = trackRef.current;
+    if (!track) return;
+
+    const trackRect = track.getBoundingClientRect();
+    const next = SORT_OPTIONS.map((_, index) => {
+      const button = itemRefs.current[index];
+      if (!button) return { width: 0, x: 0 };
+
+      const rect = button.getBoundingClientRect();
+      return {
+        width: rect.width,
+        x: rect.left - trackRect.left,
+      };
+    });
+
+    if (next.every((position) => position.width <= 0)) return;
+
+    const changed = positionsChanged(positionsRef.current, next);
+    positionsRef.current = next;
+
+    if (!layoutReady) {
+      setLayoutReady(true);
+      return;
+    }
+
+    if (changed && performance.now() >= animatingUntilRef.current) {
+      setLayoutRevision((revision) => revision + 1);
+    }
+  }, [layoutReady]);
+
+  useLayoutEffect(() => {
+    measureLayout();
+  }, [measureLayout]);
+
+  useLayoutEffect(() => {
+    const track = trackRef.current;
+    if (!track) return;
+
+    let frame = 0;
+    const observer = new ResizeObserver(() => {
+      if (performance.now() < animatingUntilRef.current) return;
+
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(measureLayout);
+    });
+
+    observer.observe(track);
+    return () => {
+      cancelAnimationFrame(frame);
+      observer.disconnect();
+    };
+  }, [measureLayout]);
+
+  useEffect(() => {
+    if (!layoutReady || activeIndex < 0) return;
+
+    if (!hasInitializedIndicatorRef.current) {
+      hasInitializedIndicatorRef.current = true;
+      prevActiveIndexRef.current = activeIndex;
+      setIndicatorIndex(activeIndex);
+      return;
+    }
+
+    setIndicatorIndex(activeIndex);
+  }, [activeIndex, layoutReady]);
+
+  const indicatorPosition = positionsRef.current[indicatorIndex];
+  void layoutRevision;
+
+  const handleTransitionEnd = (event: React.TransitionEvent<HTMLSpanElement>) => {
+    if (event.propertyName !== "transform") return;
+    animatingUntilRef.current = 0;
+  };
+
   return (
-    <FilterGroup label="Sort by">
-      {SORT_OPTIONS.map(({ id, label, iconSrc }) => (
-        <FilterChip
-          key={id}
-          label={label}
-          iconSrc={iconSrc}
-          active={sortBy === id}
-          onClick={() => onChange(id)}
+    <div className="flex flex-wrap items-center gap-1.5">
+      <span className="inline-flex shrink-0 items-center gap-1 text-[10px] font-medium tracking-wide text-muted-foreground uppercase">
+        Sort by
+      </span>
+      <div
+        ref={trackRef}
+        className="sort-toggle-track sliding-toggle-track inline-flex h-8 w-fit items-center"
+      >
+        <span
+          aria-hidden
+          data-ready={layoutReady ? "" : undefined}
+          className="sliding-toggle-indicator sliding-toggle-indicator--sort"
+          style={
+            indicatorPosition
+              ? {
+                  width: indicatorPosition.width,
+                  transform: `translate3d(${indicatorPosition.x}px, 0, 0)`,
+                }
+              : undefined
+          }
+          onTransitionEnd={handleTransitionEnd}
         />
-      ))}
-    </FilterGroup>
+        <div className="sliding-toggle-grid grid">
+          {SORT_OPTIONS.map((option, index) => {
+            const isActive = sortBy === option.id;
+
+            return (
+              <button
+                key={option.id}
+                ref={(node) => {
+                  itemRefs.current[index] = node;
+                }}
+                type="button"
+                aria-pressed={isActive ? true : false}
+                onClick={() => onChange(option.id)}
+                className={cn(
+                  "sort-chip sliding-toggle-tile inline-flex h-8 shrink-0 items-center gap-1.5 rounded-none px-2.5 text-xs font-medium text-muted-foreground outline-none",
+                  "hover:text-foreground",
+                  "focus-visible:ring-3 focus-visible:ring-ring/50",
+                  isActive && "text-foreground",
+                )}
+              >
+                <ChipIcon src={option.iconSrc} />
+                <span>{option.label}</span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+    </div>
   );
 }

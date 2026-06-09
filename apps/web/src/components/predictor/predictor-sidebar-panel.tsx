@@ -1,7 +1,6 @@
 "use client";
 
 import { quotaRequiresHomeState } from "@ejam/predictors/shared/quota-input";
-import Image from "next/image";
 import {
   cloneElement,
   isValidElement,
@@ -10,10 +9,7 @@ import {
   Suspense,
   useId,
 } from "react";
-import {
-  predictorHeaderStripClass,
-  sidebarPanelTopInsetClass,
-} from "@/components/app-layout";
+import { sidebarPanelTopInsetClass } from "@/components/app-layout";
 import { HomeStateCombobox } from "@/components/predictor/home-state-combobox";
 import { OptionPicker } from "@/components/predictor/option-picker";
 import { PredictButtonLabel } from "@/components/predictor/predict-button-label";
@@ -28,7 +24,6 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { useAvatarGroupHover } from "@/hooks/use-avatar-group-hover";
 import type { CounsellingBody, ExamType } from "@/hooks/use-predictor-state";
 import { isJeeMainCounselling } from "@/hooks/use-predictor-state";
 import { deferAfterPress, pressableClass } from "@/lib/pressable";
@@ -117,59 +112,55 @@ function PredictorSidebarPanelInner() {
         : hasPredictedForInputs
           ? "Change rank or profile to predict again"
           : undefined;
-  const { rootRef: examGroupRef, onItemEnter } = useAvatarGroupHover();
+  const examActiveIndex = EXAM_OPTIONS.findIndex((e) => e.id === state.exam);
 
   return (
     <TooltipProvider delay={200}>
       <div className="flex flex-col">
-        <div
-          ref={examGroupRef}
-          className={cn(
-            "grid grid-cols-2 gap-2 px-2 pb-2",
-            sidebarPanelTopInsetClass,
-          )}
-        >
-          {EXAM_OPTIONS.map((exam, index) => {
-            const isActive = state.exam === exam.id;
+        <div className={cn("px-2 pb-2", sidebarPanelTopInsetClass)}>
+          {/* segmented control — one indicator slides between the exam tiles */}
+          <div className="exam-picker-grid sliding-toggle-track" data-gap="2">
+            <span
+              aria-hidden
+              className="sliding-toggle-indicator"
+              data-cols="2"
+              data-gap="2"
+              data-index={examActiveIndex <= 0 ? "0" : "1"}
+            />
+            <div className="sliding-toggle-grid grid grid-cols-2">
+            {EXAM_OPTIONS.map((exam) => {
+              const isActive = state.exam === exam.id;
 
-            return (
-              <div key={exam.id} className="t-avatar min-w-0">
-                <Tooltip>
+              return (
+                <Tooltip key={exam.id}>
                   <TooltipTrigger
                     render={
                       <button
                         type="button"
                         aria-label={exam.label}
                         aria-pressed={isActive}
-                        onMouseEnter={() => onItemEnter(index)}
                         onClick={() => {
                           deferAfterPress(() => state.setExam(exam.id));
                         }}
                         className={cn(
-                          "flex min-h-10 w-full items-center justify-center rounded-none border bg-transparent outline-none",
-                          predictorHeaderStripClass,
+                          "exam-picker-tile rounded-none border-0 outline-none shadow-none",
                           pressableClass,
-                          "focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50",
-                          isActive && "border-foreground/40",
-                          !isActive &&
-                            "group/exam border-border/70 hover:border-border",
+                          "focus-visible:ring-3 focus-visible:ring-ring/50",
                         )}
-                      />
+                      >
+                        {/* native img — avoids Next/Image SVG raster edge artifacts */}
+                        <img
+                          src={exam.logo}
+                          alt=""
+                          width={36}
+                          height={36}
+                          aria-hidden
+                          decoding="async"
+                          className="exam-picker-logo size-9 shrink-0 object-contain transition-[opacity,filter] duration-150"
+                        />
+                      </button>
                     }
-                  >
-                    <Image
-                      src={exam.logo}
-                      alt=""
-                      width={36}
-                      height={36}
-                      aria-hidden
-                      className={cn(
-                        "size-9 shrink-0 object-contain transition-opacity",
-                        !isActive && "opacity-55 group-hover/exam:opacity-80",
-                        isActive && "opacity-100",
-                      )}
-                    />
-                  </TooltipTrigger>
+                  />
                   <TooltipContent
                     side="top"
                     sideOffset={6}
@@ -179,9 +170,10 @@ function PredictorSidebarPanelInner() {
                     {exam.label}
                   </TooltipContent>
                 </Tooltip>
-              </div>
-            );
-          })}
+              );
+            })}
+            </div>
+          </div>
         </div>
 
         <div className="flex flex-col gap-3 border-t border-border px-2 py-3">
@@ -305,14 +297,29 @@ function OptionToggle({
   columns: 2 | 3;
   "aria-labelledby"?: string;
 }) {
+  const activeIndex = options.findIndex((option) => option.value === value);
+
   return (
     <fieldset
       aria-labelledby={ariaLabelledBy}
-      className={cn(
-        "grid min-w-0 gap-1 border-0 p-0",
-        columns === 2 ? "grid-cols-2" : "grid-cols-3",
-      )}
+      className="min-w-0 border-0 p-0"
     >
+      <div className="sliding-toggle-track" data-gap="1">
+        {activeIndex >= 0 ? (
+          <span
+            aria-hidden
+            className="sliding-toggle-indicator"
+            data-cols={String(columns)}
+            data-gap="1"
+            data-index={String(activeIndex)}
+          />
+        ) : null}
+        <div
+          className={cn(
+            "sliding-toggle-grid grid",
+            columns === 2 ? "grid-cols-2" : "grid-cols-3",
+          )}
+        >
       {options.map((option) => {
         const isActive = option.value === value;
         const isEnabled = option.enabled !== false;
@@ -327,19 +334,20 @@ function OptionToggle({
               if (isEnabled) deferAfterPress(() => onChange(option.value));
             }}
             className={cn(
-              "flex h-8 items-center justify-center rounded-none border border-border bg-transparent text-xs font-medium text-muted-foreground outline-none",
+              "sliding-toggle-tile flex h-8 items-center justify-center rounded-none text-xs font-medium text-muted-foreground outline-none",
               pressableClass,
               isEnabled && "hover:text-foreground",
-              "focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50",
-              isActive && "border-foreground/40 text-foreground",
-              !isEnabled &&
-                "cursor-not-allowed border-border/70 opacity-40 grayscale",
+              "focus-visible:ring-3 focus-visible:ring-ring/50",
+              isActive && "text-foreground",
+              !isEnabled && "cursor-not-allowed opacity-40 grayscale",
             )}
           >
             {option.label}
           </button>
         );
       })}
+        </div>
+      </div>
     </fieldset>
   );
 }

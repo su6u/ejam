@@ -160,7 +160,6 @@ export function ResultsTable({
                   </TableCell>
                   <TableCell className="min-w-24">
                     <RoundProbabilityBars
-                      key={sortBy}
                       className="shrink-0"
                       roundProbs={row.round_probs}
                       overallProbability={row.cumulative_probability}
