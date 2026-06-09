@@ -18,7 +18,9 @@ import {
 } from "../shared/finalize-prediction";
 import {
   createServerCacheKey,
+  getServerCacheEntry,
   indexShaFromDeps,
+  setServerCacheEntry,
   type ServerCacheEntry,
 } from "../shared/predictor-cache";
 
@@ -52,9 +54,9 @@ type RegistryMaps = {
   instituteNirf: Map<string, number | null | undefined>;
 };
 
-// in-memory server cache — keyed by FNV1a hash of canonical input
+// in-memory server cache — keyed by a canonical digest of input + index version
 // sessionStorage is a no-op on the server; this Map persists for the process lifetime
-// predictions are deterministic for a given index version, so no TTL is needed
+// predictions are deterministic for a given index version and capped to avoid unbounded growth
 const _serverCache = new Map<string, ServerCacheEntry>();
 
 let _cachedRegistry: RegistryMaps | null = null;
@@ -121,7 +123,7 @@ export const predictor: ExamPredictor<
       index_sha: indexShaFromDeps(deps),
       ...cacheInput,
     });
-    const cached = _serverCache.get(cacheKey);
+    const cached = getServerCacheEntry(_serverCache, cacheKey);
     if (cached) {
       return { result: resultFromCachedPrograms(cached, input.filters) };
     }
@@ -176,7 +178,7 @@ export const predictor: ExamPredictor<
       };
     }
 
-    _serverCache.set(cacheKey, {
+    setServerCacheEntry(_serverCache, cacheKey, {
       programs: result.programs,
       metadata: result.metadata,
       ews_comparison: result.ews_comparison,

@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { createServerCacheKey } from "./predictor-cache";
+import {
+  createServerCacheKey,
+  getServerCacheEntry,
+  setServerCacheEntry,
+  type ServerCacheEntry,
+} from "./predictor-cache";
 
 const COLLIDING_JEE_MAIN_REQUESTS = [
   {
@@ -50,6 +55,22 @@ function oldFnv1a(value: string): string {
   return (hash >>> 0).toString(16).padStart(8, "0");
 }
 
+function cacheEntry(): ServerCacheEntry {
+  return {
+    programs: [],
+    metadata: {
+      total_matching: 0,
+      total_above_threshold: 0,
+      threshold_used: 0,
+      hidden_count: 0,
+      total_matching_programs: 0,
+      displayed_programs: 0,
+      hidden_programs: 0,
+      active_filters: {},
+    },
+  };
+}
+
 describe("createServerCacheKey", () => {
   it("does not alias valid predictor inputs that collided under FNV-1a", () => {
     const [first, second] = COLLIDING_JEE_MAIN_REQUESTS;
@@ -58,5 +79,31 @@ describe("createServerCacheKey", () => {
       oldFnv1a(stableStringify(second)),
     );
     expect(createServerCacheKey(first)).not.toBe(createServerCacheKey(second));
+  });
+});
+
+describe("server result cache", () => {
+  it("evicts the oldest entry when the cache reaches its configured limit", () => {
+    const cache = new Map<string, ServerCacheEntry>();
+
+    setServerCacheEntry(cache, "first", cacheEntry(), 2);
+    setServerCacheEntry(cache, "second", cacheEntry(), 2);
+    setServerCacheEntry(cache, "third", cacheEntry(), 2);
+
+    expect([...cache.keys()]).toEqual(["second", "third"]);
+  });
+
+  it("refreshes recency on cache hits before evicting", () => {
+    const cache = new Map<string, ServerCacheEntry>();
+    const first = cacheEntry();
+
+    setServerCacheEntry(cache, "first", first, 2);
+    setServerCacheEntry(cache, "second", cacheEntry(), 2);
+
+    expect(getServerCacheEntry(cache, "first")).toBe(first);
+
+    setServerCacheEntry(cache, "third", cacheEntry(), 2);
+
+    expect([...cache.keys()]).toEqual(["first", "third"]);
   });
 });

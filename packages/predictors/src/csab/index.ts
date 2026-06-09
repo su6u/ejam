@@ -25,7 +25,9 @@ import {
 } from "../shared/finalize-prediction";
 import {
   createServerCacheKey,
+  getServerCacheEntry,
   indexShaFromDeps,
+  setServerCacheEntry,
   type ServerCacheEntry,
 } from "../shared/predictor-cache";
 import { QuotaApi, refineQuotaRequiresState } from "../shared/quota-input";
@@ -83,7 +85,7 @@ type RegistryMaps = {
 let _cachedRegistry: RegistryMaps | null = null;
 
 // in-memory prediction result cache — keyed by a canonical digest of input + index version
-// avoids re-running the probability computation for identical requests
+// avoids re-running the probability computation for identical requests, bounded for process health
 const _resultCache = new Map<string, ServerCacheEntry>();
 
 function cacheKey(input: unknown): string {
@@ -163,7 +165,7 @@ export const predictor: ExamPredictor<CsabInput, CollegePredictionResult> = {
       exam_id: deps.examId,
       ...input,
     });
-    const cached = _resultCache.get(key);
+    const cached = getServerCacheEntry(_resultCache, key);
     if (cached) {
       return { result: resultFromCachedPrograms(cached, input.filters) };
     }
@@ -224,7 +226,7 @@ export const predictor: ExamPredictor<CsabInput, CollegePredictionResult> = {
       };
     }
 
-    _resultCache.set(key, {
+    setServerCacheEntry(_resultCache, key, {
       programs: result.programs,
       metadata: result.metadata,
       ews_comparison: result.ews_comparison,

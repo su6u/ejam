@@ -16,6 +16,10 @@ export type ServerCacheEntry = {
   ews_comparison?: CollegePredictionResult["ews_comparison"];
 };
 
+export type ServerResultCache = Map<string, ServerCacheEntry>;
+
+export const SERVER_RESULT_CACHE_MAX_ENTRIES = 256;
+
 export function indexShaFromDeps(deps: {
   resolvedDatasets: Array<{ dataset: string; sha256: string }>;
 }): string {
@@ -44,4 +48,37 @@ export function stableStringify(value: unknown): string {
 
 export function createServerCacheKey(value: unknown): string {
   return createHash("sha256").update(stableStringify(value)).digest("hex");
+}
+
+export function getServerCacheEntry(
+  cache: ServerResultCache,
+  key: string,
+): ServerCacheEntry | undefined {
+  const entry = cache.get(key);
+  if (!entry) return undefined;
+
+  cache.delete(key);
+  cache.set(key, entry);
+  return entry;
+}
+
+export function setServerCacheEntry(
+  cache: ServerResultCache,
+  key: string,
+  entry: ServerCacheEntry,
+  maxEntries = SERVER_RESULT_CACHE_MAX_ENTRIES,
+): void {
+  if (maxEntries < 1) {
+    cache.clear();
+    return;
+  }
+
+  if (cache.has(key)) cache.delete(key);
+  cache.set(key, entry);
+
+  while (cache.size > maxEntries) {
+    const oldest = cache.keys().next();
+    if (oldest.done) break;
+    cache.delete(oldest.value);
+  }
 }
