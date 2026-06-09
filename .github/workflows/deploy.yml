@@ -47,6 +47,11 @@ jobs:
       - name: Lint
         run: pnpm check
 
+      - name: Prepare Vercel CI link
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        run: bash .github/scripts/vercel-ci-setup.sh
+
       - name: Pull Vercel environment
         run: pnpm dlx vercel@latest pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
 
