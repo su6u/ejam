@@ -1,7 +1,7 @@
 "use client";
 
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
-import { ChipIcon } from "@/components/predictor/filter-chips";
+import { useCallback, useLayoutEffect, useRef, useState } from "react";
+import { ChipIcon } from "./chip-icon";
 import type { ResultsSortKey } from "@/components/predictor/results-sort-logic";
 import { cn } from "@/lib/utils";
 
@@ -52,20 +52,15 @@ export function ResultsSort({ sortBy, onChange }: ResultsSortProps) {
   const trackRef = useRef<HTMLDivElement>(null);
   const itemRefs = useRef<Array<HTMLButtonElement | null>>([]);
   const positionsRef = useRef<IndicatorPosition[]>([]);
-  const hasInitializedIndicatorRef = useRef(false);
   const animatingUntilRef = useRef(0);
   const prevActiveIndexRef = useRef(0);
 
   const [layoutReady, setLayoutReady] = useState(false);
-  const [layoutRevision, setLayoutRevision] = useState(0);
-  const [indicatorIndex, setIndicatorIndex] = useState(0);
+  const [positions, setPositions] = useState<IndicatorPosition[]>([]);
 
   const activeIndex = SORT_OPTIONS.findIndex((option) => option.id === sortBy);
 
-  if (
-    hasInitializedIndicatorRef.current &&
-    prevActiveIndexRef.current !== activeIndex
-  ) {
+  if (layoutReady && prevActiveIndexRef.current !== activeIndex) {
     animatingUntilRef.current = performance.now() + SLIDE_MS + 32;
     prevActiveIndexRef.current = activeIndex;
   }
@@ -92,14 +87,16 @@ export function ResultsSort({ sortBy, onChange }: ResultsSortProps) {
     positionsRef.current = next;
 
     if (!layoutReady) {
+      prevActiveIndexRef.current = activeIndex;
+      setPositions(next);
       setLayoutReady(true);
       return;
     }
 
     if (changed && performance.now() >= animatingUntilRef.current) {
-      setLayoutRevision((revision) => revision + 1);
+      setPositions(next);
     }
-  }, [layoutReady]);
+  }, [activeIndex, layoutReady]);
 
   useLayoutEffect(() => {
     measureLayout();
@@ -124,21 +121,8 @@ export function ResultsSort({ sortBy, onChange }: ResultsSortProps) {
     };
   }, [measureLayout]);
 
-  useEffect(() => {
-    if (!layoutReady || activeIndex < 0) return;
-
-    if (!hasInitializedIndicatorRef.current) {
-      hasInitializedIndicatorRef.current = true;
-      prevActiveIndexRef.current = activeIndex;
-      setIndicatorIndex(activeIndex);
-      return;
-    }
-
-    setIndicatorIndex(activeIndex);
-  }, [activeIndex, layoutReady]);
-
-  const indicatorPosition = positionsRef.current[indicatorIndex];
-  void layoutRevision;
+  const indicatorIndex = activeIndex >= 0 ? activeIndex : 0;
+  const indicatorPosition = positions[indicatorIndex];
 
   const handleTransitionEnd = (event: React.TransitionEvent<HTMLSpanElement>) => {
     if (event.propertyName !== "transform") return;
