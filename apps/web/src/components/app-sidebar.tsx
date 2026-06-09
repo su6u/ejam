@@ -47,8 +47,12 @@ export function AppSidebar({
                     width={identity.logoWidth}
                     height={identity.logoHeight}
                     priority
+                    unoptimized
                     aria-hidden
-                    className="h-6 max-w-full w-auto shrink-0"
+                    className={cn(
+                      "max-w-full w-auto shrink-0",
+                      identity.logoDisplayClass ?? "h-6",
+                    )}
                   />
                 </Link>
               }
