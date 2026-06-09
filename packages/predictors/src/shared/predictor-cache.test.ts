@@ -2,8 +2,8 @@ import { describe, expect, it } from "vitest";
 import {
   createServerCacheKey,
   getServerCacheEntry,
-  setServerCacheEntry,
   type ServerCacheEntry,
+  setServerCacheEntry,
 } from "./predictor-cache";
 
 const COLLIDING_JEE_MAIN_REQUESTS = [
