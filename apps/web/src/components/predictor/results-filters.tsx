@@ -85,7 +85,6 @@ export function ResultsFilters({
   const instituteGroup = showInstituteGroup ? (
     <FilterGroup
       label="Institute"
-      iconSrc="/icons/filter.svg"
       vertical
       grid={2}
       slidingIndex={instituteSlidingIndex}
