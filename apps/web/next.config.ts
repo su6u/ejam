@@ -13,7 +13,7 @@ const nextConfig: NextConfig = {
   // DuckDB libduckdb.{so,dylib}: patched post-build (see scripts/patch-duckdb-nft.mjs) — Turbopack skips includes.
   outputFileTracingRoot: monorepoRoot,
   outputFileTracingIncludes: {
-    "/api/predict/[exam_id]": ["../../data/**/*"],
+    "/api/predict/*": ["../../data/**/*"],
   },
   // DuckDB uses platform-specific .node binaries — must not be bundled by Turbopack
   serverExternalPackages: ["@duckdb/node-api", "@duckdb/node-bindings"],
