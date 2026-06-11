@@ -225,22 +225,18 @@ function PredictorSidebarPanelInner() {
 
           {needsHomeState ? (
             <SetupField
-              label={state.quota === "hs" ? "Home state" : "Other state"}
+              label="Home state"
               required
               hint={
                 state.quota === "hs"
                   ? "required for HS seat pool"
-                  : "required for OS seat pool"
+                  : "your domicile state, used to find OS seats"
               }
             >
               <HomeStateCombobox
                 value={state.homeState}
                 onValueChange={state.setHomeState}
-                placeholder={
-                  state.quota === "hs"
-                    ? "Select home state"
-                    : "Select other state"
-                }
+                placeholder="Select home state"
               />
             </SetupField>
           ) : null}
