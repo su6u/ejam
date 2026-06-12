@@ -1,7 +1,7 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "installCommand": "cd ../.. && pnpm install --frozen-lockfile",
-  "buildCommand": "cd ../.. && pnpm data:fetch --download && cp -r data apps/web/data && pnpm turbo run build --filter=@ejam/web",
+  "buildCommand": "cd ../.. && pnpm data:fetch --download && rm -rf apps/web/data && cp -R data apps/web/data && pnpm turbo run build --filter=@ejam/web",
   "framework": "nextjs",
   "git": {
     "deploymentEnabled": {
