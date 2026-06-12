@@ -16,6 +16,7 @@ import { BandBadge } from "@/components/predictor/band-badge";
 import { DataVersionFooter } from "@/components/predictor/data-version-footer";
 import { InstituteTypeBadge } from "@/components/predictor/institute-type-badge";
 import { programKey } from "@/components/predictor/program-key";
+import { seatPoolLabel } from "@/components/predictor/results-row-format";
 import { ResultsCardShell } from "@/components/predictor/results-card-shell";
 import { ResultsSort } from "@/components/predictor/results-sort";
 import type { ResultsSortKey } from "@/components/predictor/results-sort-logic";
@@ -189,16 +190,4 @@ export function ResultsTable({
       </Table>
     </ResultsCardShell>
   );
-}
-
-function seatPoolLabel(row: ProgramPrediction): string {
-  return [row.seat_type, row.quota.toUpperCase(), genderShort(row.gender)]
-    .filter(Boolean)
-    .join(" · ");
-}
-
-function genderShort(gender: string): string {
-  if (gender.startsWith("Gender")) return "GN";
-  if (gender.startsWith("Female")) return "F";
-  return gender;
 }
