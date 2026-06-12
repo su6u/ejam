@@ -16,6 +16,7 @@ interface RoundProbabilityBarsProps {
   overallProbability: number;
   fillRound?: number;
   className?: string;
+  interactive?: boolean;
 }
 
 function clampProbability(value: number): number {
@@ -63,11 +64,68 @@ function roundAtPointer(
   return bestRound;
 }
 
+function renderBar(
+  prob: number,
+  index: number,
+  fillRound: number | undefined,
+  Wrapper: "button" | "div",
+  wrapperProps?: Record<string, unknown>,
+) {
+  const roundNum = index + 1;
+  const clamped = clampProbability(prob);
+  const band = classifyBand(clamped);
+  const { color } = BAND_STYLES[band];
+  const scale = Math.max(MIN_SCALE, clamped);
+
+  const bar = (
+    <div
+      className="t-round-bar h-3 w-[3px] shrink-0 rounded-none"
+      data-round={roundNum}
+      data-fill-round={fillRound === roundNum ? "" : undefined}
+      data-band={band}
+      style={
+        {
+          "--bar-scale": String(scale),
+          backgroundColor: color,
+        } as React.CSSProperties
+      }
+    />
+  );
+
+  if (Wrapper === "div") {
+    return (
+      <div
+        key={roundNum}
+        className="t-round-bar-hit flex shrink-0 items-end justify-center"
+        {...wrapperProps}
+      >
+        {bar}
+      </div>
+    );
+  }
+
+  const { label } = BAND_STYLES[band];
+  const roundPct = toPercent(clamped);
+  return (
+    <button
+      key={roundNum}
+      type="button"
+      className="t-round-bar-hit flex shrink-0 items-end justify-center"
+      data-round={roundNum}
+      aria-label={`Round ${roundNum}: ${roundPct}% (${label})`}
+      {...wrapperProps}
+    >
+      {bar}
+    </button>
+  );
+}
+
 export function RoundProbabilityBars({
   roundProbs,
   overallProbability,
   fillRound,
   className,
+  interactive = true,
 }: RoundProbabilityBarsProps) {
   const barsRef = useRef<HTMLDivElement>(null);
   const barHitsRef = useRef<BarHitRegion[]>([]);
@@ -91,6 +149,7 @@ export function RoundProbabilityBars({
   // Freeze bars after each entrance so DOM moves never restart animation mid-flight.
   // biome-ignore lint/correctness/useExhaustiveDependencies: re-run when round data changes
   useEffect(() => {
+    if (!interactive) return;
     const root = barsRef.current;
     if (!root) return;
 
@@ -137,10 +196,11 @@ export function RoundProbabilityBars({
         bar.removeEventListener("animationend", onEnd);
       }
     };
-  }, [rounds]);
+  }, [rounds, interactive]);
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: re-measure bar centers when round data changes
   useEffect(() => {
+    if (!interactive) return;
     const root = barsRef.current;
     if (!root) return;
 
@@ -156,7 +216,23 @@ export function RoundProbabilityBars({
     const observer = new ResizeObserver(syncBarHits);
     observer.observe(root);
     return () => observer.disconnect();
-  }, [rounds]);
+  }, [rounds, interactive]);
+
+  if (!interactive) {
+    return (
+      <div
+        className={cn("flex min-w-0 items-center gap-2", className)}
+        aria-hidden
+      >
+        <div className="t-round-bars flex items-end gap-[2px]">
+          {rounds.map((prob, index) => renderBar(prob, index, fillRound, "div"))}
+        </div>
+        <span className="w-10 shrink-0 text-right text-xs tabular-nums text-muted-foreground">
+          {overallPct}%
+        </span>
+      </div>
+    );
+  }
 
   return (
     <fieldset
@@ -203,37 +279,12 @@ export function RoundProbabilityBars({
         >
           {rounds.map((prob, index) => {
             const roundNum = index + 1;
-            const clamped = clampProbability(prob);
-            const band = classifyBand(clamped);
-            const { color, label } = BAND_STYLES[band];
-            const scale = Math.max(MIN_SCALE, clamped);
-            const roundPct = toPercent(clamped);
-
-            return (
-              <button
-                key={roundNum}
-                type="button"
-                className="t-round-bar-hit flex shrink-0 items-end justify-center"
-                data-round={roundNum}
-                data-active={hoveredRound === roundNum ? "" : undefined}
-                aria-label={`Round ${roundNum}: ${roundPct}% (${label})`}
-                onFocus={() => setHoveredRound(roundNum)}
-                onClick={(event) => event.stopPropagation()}
-              >
-                <div
-                  className="t-round-bar h-3 w-[3px] shrink-0 rounded-none"
-                  data-round={roundNum}
-                  data-fill-round={fillRound === roundNum ? "" : undefined}
-                  data-band={band}
-                  style={
-                    {
-                      "--bar-scale": String(scale),
-                      backgroundColor: color,
-                    } as React.CSSProperties
-                  }
-                />
-              </button>
-            );
+            return renderBar(prob, index, fillRound, "button", {
+              "data-active": hoveredRound === roundNum ? "" : undefined,
+              onFocus: () => setHoveredRound(roundNum),
+              onClick: (event: { stopPropagation: () => void }) =>
+                event.stopPropagation(),
+            });
           })}
         </div>
       </div>
