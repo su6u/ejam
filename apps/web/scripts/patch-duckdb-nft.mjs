@@ -63,9 +63,10 @@ function findDataDir() {
     path.join(appDir, "data"),
     path.join(monorepoRoot, "data"),
   ];
-  return candidates.find((dir) =>
-    fs.existsSync(path.join(dir, "manifest")) &&
-    fs.existsSync(path.join(dir, "registry")),
+  return candidates.find(
+    (dir) =>
+      fs.existsSync(path.join(dir, "manifest")) &&
+      fs.existsSync(path.join(dir, "registry")),
   );
 }
 
