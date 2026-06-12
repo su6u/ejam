@@ -503,6 +503,32 @@ input {
     animation-delay: 300ms;
   }
 
+  /* Mobile/tablet results cards — capped stagger enter (delay set inline) */
+  .results-card-enter {
+    opacity: 0;
+    animation: results-card-enter 260ms var(--ease-out) both;
+  }
+
+  @keyframes results-card-enter {
+    from {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .results-card-enter {
+      animation: none !important;
+      opacity: 1 !important;
+      transform: none !important;
+    }
+  }
+
   /* Round probability mini-bars — equalizer sparkline in results table */
   .t-round-bars {
     --round-bar-ease: cubic-bezier(0.23, 1, 0.32, 1);

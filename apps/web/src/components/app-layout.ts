@@ -24,11 +24,21 @@ export const stickyGlassChromeClass =
 
 /** sticky table thead — blur on thead, tint on cells so rows scroll beneath */
 export const stickyGlassTableHeaderClass =
-  "sticky top-0 z-10 backdrop-blur-sm [&_th]:bg-background/95 supports-backdrop-filter:[&_th]:bg-background/50";
+  "sticky top-0 z-10 backdrop-blur-sm [&_th]:sticky [&_th]:top-0 [&_th]:z-10 [&_th]:bg-background/95 supports-backdrop-filter:[&_th]:bg-background/50";
+
+/** results table scroll — mobile cards scroll in content; desktop table wrapper owns sticky scroll */
+export const resultsTableScrollClass =
+  "no-scrollbar min-h-0 flex-1 overflow-y-auto lg:overflow-hidden lg:[&_[data-slot=table-container]]:min-h-0 lg:[&_[data-slot=table-container]]:flex-1 lg:[&_[data-slot=table-container]]:overflow-auto lg:[&_[data-slot=table-container]]:no-scrollbar";
 
 /** h-14 top chrome — sidebar logo row and main header actions share one strip height */
 export const appChromeStripClass =
   "flex h-14 shrink-0 items-center border-b border-border";
+
+/** Sidebar logo row — same on desktop rail and mobile drawer (logo flush at px-2) */
+export const appSidebarHeaderClass = cn(
+  appChromeStripClass,
+  "flex flex-row items-center gap-0 p-0 px-2",
+);
 
 /** header right gutter includes the dashboard 1px frame so actions sit on the card edge */
 export const appHeaderGutterClass =

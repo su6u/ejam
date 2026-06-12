@@ -43,7 +43,7 @@ export function DashboardCardShell({
         >
           <DecorIcon position="bottom-left" />
           <DecorIcon position="bottom-right" />
-          <div className="flex min-w-0 flex-row items-center justify-between gap-4">
+          <div className="flex min-w-0 flex-row items-start justify-between gap-3 sm:gap-4">
             {header ? (
               <div className="flex min-w-0 flex-1 flex-col gap-1">{header}</div>
             ) : (
@@ -52,7 +52,9 @@ export function DashboardCardShell({
             {headerExtra}
           </div>
           {toolbar ? (
-            <div className="mt-3 border-t border-border pt-3">{toolbar}</div>
+            <div className="mt-3 min-w-0 border-t border-border pt-3">
+              {toolbar}
+            </div>
           ) : null}
         </CardHeader>
       ) : null}

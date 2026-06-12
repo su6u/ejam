@@ -132,13 +132,13 @@ export function ResultsSort({ sortBy, onChange }: ResultsSortProps) {
   };
 
   return (
-    <div className="flex flex-wrap items-center gap-1.5">
+    <div className="flex min-w-0 items-center gap-1.5">
       <span className="inline-flex shrink-0 items-center gap-1 text-[10px] font-medium tracking-wide text-muted-foreground uppercase">
         Sort by
       </span>
       <div
         ref={trackRef}
-        className="sort-toggle-track sliding-toggle-track inline-flex h-8 w-fit items-center"
+        className="sort-toggle-track sliding-toggle-track no-scrollbar inline-flex h-8 min-w-0 max-w-full items-center overflow-x-auto"
       >
         <span
           aria-hidden
