@@ -6,6 +6,7 @@ import { appChromeStripClass } from "@/components/app-layout";
 import { PredictorSidebarPanel } from "@/components/predictor/predictor-sidebar-panel";
 import {
   Sidebar,
+  SidebarCloseTrigger,
   SidebarContent,
   SidebarHeader,
   SidebarMenu,
@@ -29,9 +30,12 @@ export function AppSidebar({
       variant="sidebar"
     >
       <SidebarHeader
-        className={cn(appChromeStripClass, "gap-0 p-0 px-2 flex-row")}
+        className={cn(
+          appChromeStripClass,
+          "flex-row items-center gap-2 p-0 px-2",
+        )}
       >
-        <SidebarMenu>
+        <SidebarMenu className="w-auto min-w-0">
           <SidebarMenuItem>
             <SidebarMenuButton
               className="h-9 hover:bg-transparent active:bg-transparent data-active:bg-transparent"
@@ -59,6 +63,7 @@ export function AppSidebar({
             />
           </SidebarMenuItem>
         </SidebarMenu>
+        <SidebarCloseTrigger className="sheet-close-hit ml-auto shrink-0" />
       </SidebarHeader>
       <SidebarContent className="gap-0 p-0">
         <PredictorSidebarPanel />
