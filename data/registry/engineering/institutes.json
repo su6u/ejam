@@ -2,7 +2,11 @@
   {
     "id": "iit-kharagpur",
     "name": "Indian Institute of Technology Kharagpur",
-    "aliases": ["IIT Kharagpur", "IIT, Kharagpur", "IITKGP"],
+    "aliases": [
+      "IIT Kharagpur",
+      "IIT, Kharagpur",
+      "IITKGP"
+    ],
     "type": "IIT",
     "state": "West Bengal",
     "city": "Kharagpur",
@@ -12,7 +16,12 @@
   {
     "id": "iit-bombay",
     "name": "Indian Institute of Technology Bombay",
-    "aliases": ["IIT Bombay", "IIT, Bombay", "IIT Mumbai", "IITB"],
+    "aliases": [
+      "IIT Bombay",
+      "IIT, Bombay",
+      "IIT Mumbai",
+      "IITB"
+    ],
     "type": "IIT",
     "state": "Maharashtra",
     "city": "Mumbai",
@@ -22,7 +31,12 @@
   {
     "id": "iit-madras",
     "name": "Indian Institute of Technology Madras",
-    "aliases": ["IIT Madras", "IIT, Madras", "IIT Chennai", "IITM"],
+    "aliases": [
+      "IIT Madras",
+      "IIT, Madras",
+      "IIT Chennai",
+      "IITM"
+    ],
     "type": "IIT",
     "state": "Tamil Nadu",
     "city": "Chennai",
@@ -32,7 +46,11 @@
   {
     "id": "iit-kanpur",
     "name": "Indian Institute of Technology Kanpur",
-    "aliases": ["IIT Kanpur", "IIT, Kanpur", "IITK"],
+    "aliases": [
+      "IIT Kanpur",
+      "IIT, Kanpur",
+      "IITK"
+    ],
     "type": "IIT",
     "state": "Uttar Pradesh",
     "city": "Kanpur",
@@ -42,7 +60,11 @@
   {
     "id": "iit-delhi",
     "name": "Indian Institute of Technology Delhi",
-    "aliases": ["IIT Delhi", "IIT, Delhi", "IITD"],
+    "aliases": [
+      "IIT Delhi",
+      "IIT, Delhi",
+      "IITD"
+    ],
     "type": "IIT",
     "state": "Delhi",
     "city": "New Delhi",
@@ -52,7 +74,11 @@
   {
     "id": "iit-guwahati",
     "name": "Indian Institute of Technology Guwahati",
-    "aliases": ["IIT Guwahati", "IIT, Guwahati", "IITG"],
+    "aliases": [
+      "IIT Guwahati",
+      "IIT, Guwahati",
+      "IITG"
+    ],
     "type": "IIT",
     "state": "Assam",
     "city": "Guwahati",
@@ -62,7 +88,11 @@
   {
     "id": "iit-roorkee",
     "name": "Indian Institute of Technology Roorkee",
-    "aliases": ["IIT Roorkee", "IIT, Roorkee", "IITR"],
+    "aliases": [
+      "IIT Roorkee",
+      "IIT, Roorkee",
+      "IITR"
+    ],
     "type": "IIT",
     "state": "Uttarakhand",
     "city": "Roorkee",
@@ -72,7 +102,11 @@
   {
     "id": "iit-bhubaneswar",
     "name": "Indian Institute of Technology Bhubaneswar",
-    "aliases": ["IIT Bhubaneswar", "IIT, Bhubaneswar", "IITBBS"],
+    "aliases": [
+      "IIT Bhubaneswar",
+      "IIT, Bhubaneswar",
+      "IITBBS"
+    ],
     "type": "IIT",
     "state": "Odisha",
     "city": "Bhubaneswar",
@@ -82,7 +116,11 @@
   {
     "id": "iit-gandhinagar",
     "name": "Indian Institute of Technology Gandhinagar",
-    "aliases": ["IIT Gandhinagar", "IIT, Gandhinagar", "IITGN"],
+    "aliases": [
+      "IIT Gandhinagar",
+      "IIT, Gandhinagar",
+      "IITGN"
+    ],
     "type": "IIT",
     "state": "Gujarat",
     "city": "Gandhinagar",
@@ -92,7 +130,11 @@
   {
     "id": "iit-hyderabad",
     "name": "Indian Institute of Technology Hyderabad",
-    "aliases": ["IIT Hyderabad", "IIT, Hyderabad", "IITH"],
+    "aliases": [
+      "IIT Hyderabad",
+      "IIT, Hyderabad",
+      "IITH"
+    ],
     "type": "IIT",
     "state": "Telangana",
     "city": "Hyderabad",
@@ -102,7 +144,11 @@
   {
     "id": "iit-jodhpur",
     "name": "Indian Institute of Technology Jodhpur",
-    "aliases": ["IIT Jodhpur", "IIT, Jodhpur", "IITJ"],
+    "aliases": [
+      "IIT Jodhpur",
+      "IIT, Jodhpur",
+      "IITJ"
+    ],
     "type": "IIT",
     "state": "Rajasthan",
     "city": "Jodhpur",
@@ -112,7 +158,11 @@
   {
     "id": "iit-patna",
     "name": "Indian Institute of Technology Patna",
-    "aliases": ["IIT Patna", "IIT, Patna", "IITP"],
+    "aliases": [
+      "IIT Patna",
+      "IIT, Patna",
+      "IITP"
+    ],
     "type": "IIT",
     "state": "Bihar",
     "city": "Patna",
@@ -122,7 +172,11 @@
   {
     "id": "iit-ropar",
     "name": "Indian Institute of Technology Ropar",
-    "aliases": ["IIT Ropar", "IIT, Ropar", "IITRPR"],
+    "aliases": [
+      "IIT Ropar",
+      "IIT, Ropar",
+      "IITRPR"
+    ],
     "type": "IIT",
     "state": "Punjab",
     "city": "Rupnagar",
@@ -132,7 +186,11 @@
   {
     "id": "iit-indore",
     "name": "Indian Institute of Technology Indore",
-    "aliases": ["IIT Indore", "IIT, Indore", "IITI"],
+    "aliases": [
+      "IIT Indore",
+      "IIT, Indore",
+      "IITI"
+    ],
     "type": "IIT",
     "state": "Madhya Pradesh",
     "city": "Indore",
@@ -142,7 +200,11 @@
   {
     "id": "iit-mandi",
     "name": "Indian Institute of Technology Mandi",
-    "aliases": ["IIT Mandi", "IIT, Mandi", "IITMandi"],
+    "aliases": [
+      "IIT Mandi",
+      "IIT, Mandi",
+      "IITMandi"
+    ],
     "type": "IIT",
     "state": "Himachal Pradesh",
     "city": "Mandi",
@@ -169,7 +231,11 @@
   {
     "id": "iit-palakkad",
     "name": "Indian Institute of Technology Palakkad",
-    "aliases": ["IIT Palakkad", "IIT, Palakkad", "IITPKD"],
+    "aliases": [
+      "IIT Palakkad",
+      "IIT, Palakkad",
+      "IITPKD"
+    ],
     "type": "IIT",
     "state": "Kerala",
     "city": "Palakkad",
@@ -179,7 +245,11 @@
   {
     "id": "iit-tirupati",
     "name": "Indian Institute of Technology Tirupati",
-    "aliases": ["IIT Tirupati", "IIT, Tirupati", "IITTP"],
+    "aliases": [
+      "IIT Tirupati",
+      "IIT, Tirupati",
+      "IITTP"
+    ],
     "type": "IIT",
     "state": "Andhra Pradesh",
     "city": "Tirupati",
@@ -208,7 +278,11 @@
   {
     "id": "iit-bhilai",
     "name": "Indian Institute of Technology Bhilai",
-    "aliases": ["IIT Bhilai", "IIT, Bhilai", "IITBH"],
+    "aliases": [
+      "IIT Bhilai",
+      "IIT, Bhilai",
+      "IITBH"
+    ],
     "type": "IIT",
     "state": "Chhattisgarh",
     "city": "Bhilai",
@@ -218,7 +292,11 @@
   {
     "id": "iit-goa",
     "name": "Indian Institute of Technology Goa",
-    "aliases": ["IIT Goa", "IIT, Goa", "IITGoa"],
+    "aliases": [
+      "IIT Goa",
+      "IIT, Goa",
+      "IITGoa"
+    ],
     "type": "IIT",
     "state": "Goa",
     "city": "Ponda",
@@ -228,7 +306,11 @@
   {
     "id": "iit-jammu",
     "name": "Indian Institute of Technology Jammu",
-    "aliases": ["IIT Jammu", "IIT, Jammu", "IITJMU"],
+    "aliases": [
+      "IIT Jammu",
+      "IIT, Jammu",
+      "IITJMU"
+    ],
     "type": "IIT",
     "state": "Jammu and Kashmir",
     "city": "Jammu",
@@ -238,7 +320,11 @@
   {
     "id": "iit-dharwad",
     "name": "Indian Institute of Technology Dharwad",
-    "aliases": ["IIT Dharwad", "IIT, Dharwad", "IITDH"],
+    "aliases": [
+      "IIT Dharwad",
+      "IIT, Dharwad",
+      "IITDH"
+    ],
     "type": "IIT",
     "state": "Karnataka",
     "city": "Dharwad",
@@ -263,7 +349,12 @@
   {
     "id": "nit-warangal",
     "name": "National Institute of Technology Warangal",
-    "aliases": ["NIT Warangal", "NITW", "REC Warangal", "RECW"],
+    "aliases": [
+      "NIT Warangal",
+      "NITW",
+      "REC Warangal",
+      "RECW"
+    ],
     "type": "NIT",
     "state": "Telangana",
     "city": "Warangal",
@@ -289,7 +380,11 @@
   {
     "id": "nit-rourkela",
     "name": "National Institute of Technology Rourkela",
-    "aliases": ["NIT Rourkela", "NITRKL", "REC Rourkela"],
+    "aliases": [
+      "NIT Rourkela",
+      "NITRKL",
+      "REC Rourkela"
+    ],
     "type": "NIT",
     "state": "Odisha",
     "city": "Rourkela",
@@ -299,7 +394,12 @@
   {
     "id": "nit-calicut",
     "name": "National Institute of Technology Calicut",
-    "aliases": ["NIT Calicut", "NITC", "REC Calicut", "NIT Kozhikode"],
+    "aliases": [
+      "NIT Calicut",
+      "NITC",
+      "REC Calicut",
+      "NIT Kozhikode"
+    ],
     "type": "NIT",
     "state": "Kerala",
     "city": "Kozhikode",
@@ -309,7 +409,11 @@
   {
     "id": "nit-durgapur",
     "name": "National Institute of Technology Durgapur",
-    "aliases": ["NIT Durgapur", "NITDGP", "REC Durgapur"],
+    "aliases": [
+      "NIT Durgapur",
+      "NITDGP",
+      "REC Durgapur"
+    ],
     "type": "NIT",
     "state": "West Bengal",
     "city": "Durgapur",
@@ -319,7 +423,11 @@
   {
     "id": "nit-silchar",
     "name": "National Institute of Technology Silchar",
-    "aliases": ["NIT Silchar", "NITS", "REC Silchar"],
+    "aliases": [
+      "NIT Silchar",
+      "NITS",
+      "REC Silchar"
+    ],
     "type": "NIT",
     "state": "Assam",
     "city": "Silchar",
@@ -329,7 +437,11 @@
   {
     "id": "nit-hamirpur",
     "name": "National Institute of Technology Hamirpur",
-    "aliases": ["NIT Hamirpur", "NITH", "REC Hamirpur"],
+    "aliases": [
+      "NIT Hamirpur",
+      "NITH",
+      "REC Hamirpur"
+    ],
     "type": "NIT",
     "state": "Himachal Pradesh",
     "city": "Hamirpur",
@@ -354,7 +466,11 @@
   {
     "id": "nit-kurukshetra",
     "name": "National Institute of Technology Kurukshetra",
-    "aliases": ["NIT Kurukshetra", "NITKKR", "REC Kurukshetra"],
+    "aliases": [
+      "NIT Kurukshetra",
+      "NITKKR",
+      "REC Kurukshetra"
+    ],
     "type": "NIT",
     "state": "Haryana",
     "city": "Kurukshetra",
@@ -380,7 +496,12 @@
   {
     "id": "nit-bhopal",
     "name": "Maulana Azad National Institute of Technology Bhopal",
-    "aliases": ["NIT Bhopal", "MANIT Bhopal", "MANIT", "MACT Bhopal"],
+    "aliases": [
+      "NIT Bhopal",
+      "MANIT Bhopal",
+      "MANIT",
+      "MACT Bhopal"
+    ],
     "type": "NIT",
     "state": "Madhya Pradesh",
     "city": "Bhopal",
@@ -390,7 +511,12 @@
   {
     "id": "nit-nagpur",
     "name": "Visvesvaraya National Institute of Technology Nagpur",
-    "aliases": ["NIT Nagpur", "VNIT Nagpur", "VNIT", "VRCE Nagpur"],
+    "aliases": [
+      "NIT Nagpur",
+      "VNIT Nagpur",
+      "VNIT",
+      "VRCE Nagpur"
+    ],
     "type": "NIT",
     "state": "Maharashtra",
     "city": "Nagpur",
@@ -400,7 +526,12 @@
   {
     "id": "nit-jaipur",
     "name": "Malaviya National Institute of Technology Jaipur",
-    "aliases": ["NIT Jaipur", "MNIT Jaipur", "MNIT", "MREC Jaipur"],
+    "aliases": [
+      "NIT Jaipur",
+      "MNIT Jaipur",
+      "MNIT",
+      "MREC Jaipur"
+    ],
     "type": "NIT",
     "state": "Rajasthan",
     "city": "Jaipur",
@@ -410,7 +541,10 @@
   {
     "id": "nit-srinagar",
     "name": "National Institute of Technology Srinagar",
-    "aliases": ["NIT Srinagar", "REC Srinagar"],
+    "aliases": [
+      "NIT Srinagar",
+      "REC Srinagar"
+    ],
     "type": "NIT",
     "state": "Jammu and Kashmir",
     "city": "Srinagar",
@@ -420,7 +554,11 @@
   {
     "id": "nit-patna",
     "name": "National Institute of Technology Patna",
-    "aliases": ["NIT Patna", "NITP", "Bihar College of Engineering"],
+    "aliases": [
+      "NIT Patna",
+      "NITP",
+      "Bihar College of Engineering"
+    ],
     "type": "NIT",
     "state": "Bihar",
     "city": "Patna",
@@ -430,7 +568,11 @@
   {
     "id": "nit-raipur",
     "name": "National Institute of Technology Raipur",
-    "aliases": ["NIT Raipur", "NITRR", "GEC Raipur"],
+    "aliases": [
+      "NIT Raipur",
+      "NITRR",
+      "GEC Raipur"
+    ],
     "type": "NIT",
     "state": "Chhattisgarh",
     "city": "Raipur",
@@ -440,7 +582,12 @@
   {
     "id": "nit-surat",
     "name": "Sardar Vallabhbhai National Institute of Technology Surat",
-    "aliases": ["NIT Surat", "SVNIT Surat", "SVNIT", "SVRCET Surat"],
+    "aliases": [
+      "NIT Surat",
+      "SVNIT Surat",
+      "SVNIT",
+      "SVRCET Surat"
+    ],
     "type": "NIT",
     "state": "Gujarat",
     "city": "Surat",
@@ -450,7 +597,11 @@
   {
     "id": "nit-jamshedpur",
     "name": "National Institute of Technology Jamshedpur",
-    "aliases": ["NIT Jamshedpur", "NITJSR", "RIT Jamshedpur"],
+    "aliases": [
+      "NIT Jamshedpur",
+      "NITJSR",
+      "RIT Jamshedpur"
+    ],
     "type": "NIT",
     "state": "Jharkhand",
     "city": "Jamshedpur",
@@ -460,7 +611,10 @@
   {
     "id": "nit-goa",
     "name": "National Institute of Technology Goa",
-    "aliases": ["NIT Goa", "NITGOA"],
+    "aliases": [
+      "NIT Goa",
+      "NITGOA"
+    ],
     "type": "NIT",
     "state": "Goa",
     "city": "Farmagudi",
@@ -470,7 +624,11 @@
   {
     "id": "nit-agartala",
     "name": "National Institute of Technology Agartala",
-    "aliases": ["NIT Agartala", "NITA", "Tripura Engineering College"],
+    "aliases": [
+      "NIT Agartala",
+      "NITA",
+      "Tripura Engineering College"
+    ],
     "type": "NIT",
     "state": "Tripura",
     "city": "Agartala",
@@ -480,7 +638,10 @@
   {
     "id": "nit-arunachal-pradesh",
     "name": "National Institute of Technology Arunachal Pradesh",
-    "aliases": ["NIT Arunachal Pradesh", "NITAP"],
+    "aliases": [
+      "NIT Arunachal Pradesh",
+      "NITAP"
+    ],
     "type": "NIT",
     "state": "Arunachal Pradesh",
     "city": "Jote",
@@ -490,7 +651,10 @@
   {
     "id": "nit-manipur",
     "name": "National Institute of Technology Manipur",
-    "aliases": ["NIT Manipur", "NITMN"],
+    "aliases": [
+      "NIT Manipur",
+      "NITMN"
+    ],
     "type": "NIT",
     "state": "Manipur",
     "city": "Imphal",
@@ -500,7 +664,10 @@
   {
     "id": "nit-meghalaya",
     "name": "National Institute of Technology Meghalaya",
-    "aliases": ["NIT Meghalaya", "NITM"],
+    "aliases": [
+      "NIT Meghalaya",
+      "NITM"
+    ],
     "type": "NIT",
     "state": "Meghalaya",
     "city": "Shillong",
@@ -510,7 +677,10 @@
   {
     "id": "nit-mizoram",
     "name": "National Institute of Technology Mizoram",
-    "aliases": ["NIT Mizoram", "NITMZ"],
+    "aliases": [
+      "NIT Mizoram",
+      "NITMZ"
+    ],
     "type": "NIT",
     "state": "Mizoram",
     "city": "Aizawl",
@@ -520,7 +690,10 @@
   {
     "id": "nit-nagaland",
     "name": "National Institute of Technology Nagaland",
-    "aliases": ["NIT Nagaland", "NITN"],
+    "aliases": [
+      "NIT Nagaland",
+      "NITN"
+    ],
     "type": "NIT",
     "state": "Nagaland",
     "city": "Dimapur",
@@ -530,7 +703,10 @@
   {
     "id": "nit-sikkim",
     "name": "National Institute of Technology Sikkim",
-    "aliases": ["NIT Sikkim", "NITSKM"],
+    "aliases": [
+      "NIT Sikkim",
+      "NITSKM"
+    ],
     "type": "NIT",
     "state": "Sikkim",
     "city": "Ravangla",
@@ -540,7 +716,10 @@
   {
     "id": "nit-uttarakhand",
     "name": "National Institute of Technology Uttarakhand",
-    "aliases": ["NIT Uttarakhand", "NITUK"],
+    "aliases": [
+      "NIT Uttarakhand",
+      "NITUK"
+    ],
     "type": "NIT",
     "state": "Uttarakhand",
     "city": "Srinagar",
@@ -550,7 +729,10 @@
   {
     "id": "nit-puducherry",
     "name": "National Institute of Technology Puducherry",
-    "aliases": ["NIT Puducherry", "NITPY"],
+    "aliases": [
+      "NIT Puducherry",
+      "NITPY"
+    ],
     "type": "NIT",
     "state": "Puducherry",
     "city": "Karaikal",
@@ -560,7 +742,10 @@
   {
     "id": "nit-delhi",
     "name": "National Institute of Technology Delhi",
-    "aliases": ["NIT Delhi", "NITD"],
+    "aliases": [
+      "NIT Delhi",
+      "NITD"
+    ],
     "type": "NIT",
     "state": "Delhi",
     "city": "New Delhi",
@@ -570,7 +755,10 @@
   {
     "id": "nit-andhra-pradesh",
     "name": "National Institute of Technology Andhra Pradesh",
-    "aliases": ["NIT Andhra Pradesh", "NITANP"],
+    "aliases": [
+      "NIT Andhra Pradesh",
+      "NITANP"
+    ],
     "type": "NIT",
     "state": "Andhra Pradesh",
     "city": "Tadepalligudem",
@@ -580,7 +768,12 @@
   {
     "id": "iiest-shibpur",
     "name": "Indian Institute of Engineering Science and Technology Shibpur",
-    "aliases": ["IIEST Shibpur", "IIEST", "BESU Shibpur", "BE College Shibpur"],
+    "aliases": [
+      "IIEST Shibpur",
+      "IIEST",
+      "BESU Shibpur",
+      "BE College Shibpur"
+    ],
     "type": "IIEST",
     "state": "West Bengal",
     "city": "Howrah",
@@ -592,8 +785,10 @@
     "name": "School of Planning and Architecture New Delhi",
     "aliases": [
       "SPA Delhi",
+      "SPA New Delhi",
       "School of Planning and Architecture, New Delhi",
-      "SPA New Delhi"
+      "Schoolof Planning&Architecture, New Delhi",
+      "SchoolofPlanning&Architecture, NewDelhi"
     ],
     "type": "SPA",
     "state": "Delhi",
@@ -604,7 +799,10 @@
   {
     "id": "spa-bhopal",
     "name": "School of Planning and Architecture Bhopal",
-    "aliases": ["SPA Bhopal", "School of Planning and Architecture, Bhopal"],
+    "aliases": [
+      "SPA Bhopal",
+      "School of Planning and Architecture, Bhopal"
+    ],
     "type": "SPA",
     "state": "Madhya Pradesh",
     "city": "Bhopal",
@@ -616,7 +814,9 @@
     "name": "School of Planning and Architecture Vijayawada",
     "aliases": [
       "SPA Vijayawada",
-      "School of Planning and Architecture, Vijayawada"
+      "School of Planning and Architecture, Vijayawada",
+      "Schoolof Planning&Architecture: Vijayawada",
+      "SchoolofPlanning&Architecture: Vijayawada"
     ],
     "type": "SPA",
     "state": "Andhra Pradesh",
@@ -1021,7 +1221,9 @@
   {
     "id": "bit-deoghar",
     "name": "Birla Institute of Technology Deoghar Off-Campus",
-    "aliases": ["Birla Institute of Technology, Deoghar Off-Campus"],
+    "aliases": [
+      "Birla Institute of Technology, Deoghar Off-Campus"
+    ],
     "type": "GFTI",
     "state": "Jharkhand",
     "city": "Deoghar",
@@ -1031,7 +1233,9 @@
   {
     "id": "bit-patna",
     "name": "Birla Institute of Technology Patna Off-Campus",
-    "aliases": ["Birla Institute of Technology, Patna Off-Campus"],
+    "aliases": [
+      "Birla Institute of Technology, Patna Off-Campus"
+    ],
     "type": "GFTI",
     "state": "Bihar",
     "city": "Patna",
@@ -1041,7 +1245,9 @@
   {
     "id": "assam-university",
     "name": "Assam University Silchar",
-    "aliases": ["Assam University, Silchar"],
+    "aliases": [
+      "Assam University, Silchar"
+    ],
     "type": "GFTI",
     "state": "Assam",
     "city": "Silchar",
@@ -1051,7 +1257,10 @@
   {
     "id": "central-univ-jharkhand",
     "name": "Central University of Jharkhand",
-    "aliases": ["CU Jharkhand", "Central University of Jharkhand"],
+    "aliases": [
+      "CU Jharkhand",
+      "Central University of Jharkhand"
+    ],
     "type": "GFTI",
     "state": "Jharkhand",
     "city": "Ranchi",
@@ -1061,7 +1270,9 @@
   {
     "id": "central-univ-haryana",
     "name": "Central University of Haryana",
-    "aliases": ["Central University of Haryana"],
+    "aliases": [
+      "Central University of Haryana"
+    ],
     "type": "GFTI",
     "state": "Haryana",
     "city": "Mahendragarh",
@@ -1071,7 +1282,9 @@
   {
     "id": "central-univ-jammu",
     "name": "Central University of Jammu",
-    "aliases": ["Central University of Jammu"],
+    "aliases": [
+      "Central University of Jammu"
+    ],
     "type": "GFTI",
     "state": "Jammu and Kashmir",
     "city": "Jammu",
@@ -1120,7 +1333,9 @@
   {
     "id": "gati-shakti-vishwavidyalaya",
     "name": "Gati Shakti Vishwavidyalaya Vadodara",
-    "aliases": ["Gati Shakti Vishwavidyalaya, Vadodara"],
+    "aliases": [
+      "Gati Shakti Vishwavidyalaya, Vadodara"
+    ],
     "type": "GFTI",
     "state": "Gujarat",
     "city": "Vadodara",
@@ -1143,7 +1358,9 @@
   {
     "id": "gurukula-kangri-vishwavidyalaya",
     "name": "Gurukula Kangri Vishwavidyalaya Haridwar",
-    "aliases": ["Gurukula Kangri Vishwavidyalaya, Haridwar"],
+    "aliases": [
+      "Gurukula Kangri Vishwavidyalaya, Haridwar"
+    ],
     "type": "GFTI",
     "state": "Uttarakhand",
     "city": "Haridwar",
@@ -1166,7 +1383,9 @@
   {
     "id": "iict-bhadohi",
     "name": "Indian Institute of Carpet Technology Bhadohi",
-    "aliases": ["Indian Institute of Carpet Technology, Bhadohi"],
+    "aliases": [
+      "Indian Institute of Carpet Technology, Bhadohi"
+    ],
     "type": "GFTI",
     "state": "Uttar Pradesh",
     "city": "Bhadohi",
@@ -1201,7 +1420,10 @@
   {
     "id": "iiht-salem",
     "name": "Indian Institute of Handloom Technology Salem",
-    "aliases": ["Indian Institute of Handloom Technology, Salem", "IIHT Salem"],
+    "aliases": [
+      "Indian Institute of Handloom Technology, Salem",
+      "IIHT Salem"
+    ],
     "type": "GFTI",
     "state": "Tamil Nadu",
     "city": "Salem",
@@ -1277,7 +1499,10 @@
   {
     "id": "jnu-delhi",
     "name": "Jawaharlal Nehru University Delhi",
-    "aliases": ["Jawaharlal Nehru University, Delhi", "JNU Delhi"],
+    "aliases": [
+      "Jawaharlal Nehru University, Delhi",
+      "JNU Delhi"
+    ],
     "type": "GFTI",
     "state": "Delhi",
     "city": "New Delhi",
@@ -1287,7 +1512,9 @@
   {
     "id": "mizoram-university",
     "name": "Mizoram University Aizawl",
-    "aliases": ["Mizoram University, Aizawl"],
+    "aliases": [
+      "Mizoram University, Aizawl"
+    ],
     "type": "GFTI",
     "state": "Mizoram",
     "city": "Aizawl",
@@ -1380,7 +1607,10 @@
   {
     "id": "nehu-shillong",
     "name": "North Eastern Hill University Shillong",
-    "aliases": ["North-Eastern Hill University, Shillong", "NEHU Shillong"],
+    "aliases": [
+      "North-Eastern Hill University, Shillong",
+      "NEHU Shillong"
+    ],
     "type": "GFTI",
     "state": "Meghalaya",
     "city": "Shillong",
@@ -1416,7 +1646,10 @@
   {
     "id": "pec-chandigarh",
     "name": "Punjab Engineering College Chandigarh",
-    "aliases": ["Punjab Engineering College, Chandigarh", "PEC Chandigarh"],
+    "aliases": [
+      "Punjab Engineering College, Chandigarh",
+      "PEC Chandigarh"
+    ],
     "type": "GFTI",
     "state": "Chandigarh",
     "city": "Chandigarh",
@@ -1465,7 +1698,10 @@
   {
     "id": "univ-hyderabad",
     "name": "University of Hyderabad",
-    "aliases": ["University of Hyderabad", "UoH"],
+    "aliases": [
+      "University of Hyderabad",
+      "UoH"
+    ],
     "type": "GFTI",
     "state": "Telangana",
     "city": "Hyderabad",

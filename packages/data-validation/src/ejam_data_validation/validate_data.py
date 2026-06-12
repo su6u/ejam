@@ -124,7 +124,9 @@ def classify_file(path: Path) -> str:
     rel = path.relative_to(ROOT).as_posix()
     if rel.endswith("/cutoffs.parquet"):
         return "cutoff"
-    if "seats-matrix" in rel and path.name == "seat-matrix.parquet":
+    if path.name == "seat-matrix.parquet" and (
+        "seats-matrix" in rel or "/csab/vacancy/" in rel
+    ):
         return "seat_matrix"
     if path.parent.name == "dist" and path.name.endswith("_predictor_index.parquet"):
         return "predictor_index"
