@@ -1,4 +1,5 @@
 import type * as React from "react";
+import Image from "next/image";
 import { cn } from "@/lib/utils";
 
 export interface ToolCardItem {
@@ -14,6 +15,10 @@ export interface ToolCardItem {
   cardStyle?: React.CSSProperties;
   fadeBottom?: boolean;
   soon?: boolean;
+  pill?: {
+    label: string;
+    iconSrc: string;
+  };
 }
 
 export interface ToolCardGridProps {
@@ -47,8 +52,8 @@ function ToolCard({
         style={item.cardStyle}
         className={cn(
           compact
-            ? "flex h-52 w-full flex-col overflow-hidden rounded-2xl border transition-colors md:h-56"
-            : "flex h-80 w-full flex-col overflow-hidden rounded-3xl border transition-colors md:h-96",
+            ? "relative flex h-52 w-full flex-col overflow-hidden rounded-2xl border transition-colors md:h-56"
+            : "relative flex h-80 w-full flex-col overflow-hidden rounded-3xl border transition-colors md:h-96",
           item.cardClassName ?? "bg-card",
           item.soon ? "border-dashed border-border" : "border-border",
         )}
@@ -59,10 +64,24 @@ function ToolCard({
           </span>
         )}
 
+        {compact && item.pill ? (
+          <span className="absolute right-5 bottom-4 z-10 inline-flex h-8 items-center gap-1.5 rounded-full bg-[#FDFDFD] pl-2.5 pr-3 text-xs font-medium text-[#2e2e2e] md:right-6 md:bottom-5">
+            <Image
+              src={item.pill.iconSrc}
+              alt=""
+              width={14}
+              height={14}
+              aria-hidden
+              className="size-3.5 shrink-0"
+            />
+            {item.pill.label}
+          </span>
+        ) : null}
+
         <div
           className={cn(
             compact
-              ? "relative flex flex-1 flex-col gap-2 px-3 pt-4 pb-3"
+              ? "relative flex min-h-0 flex-1 flex-col overflow-hidden px-3 pt-4 pb-0 md:px-4"
               : "relative flex flex-1 flex-col gap-3 px-5 pt-6 pb-4",
             item.containerClassName,
           )}
@@ -72,7 +91,7 @@ function ToolCard({
               className={cn(
                 "font-instrument-sans",
                 compact
-                  ? "text-sm font-medium tracking-tight md:text-base"
+                  ? "relative z-10 shrink-0 text-sm font-medium tracking-tight md:text-base"
                   : "text-xl font-medium tracking-tight",
                 item.soon ? "text-muted-foreground/80" : "text-foreground",
               )}
@@ -81,7 +100,22 @@ function ToolCard({
             </span>
           )}
 
-          {item.img && (
+          {compact && item.img ? (
+            <div className="pointer-events-none absolute inset-x-0 bottom-0 flex items-end justify-start pl-1 md:pl-1.5">
+              <img
+                src={item.img}
+                alt=""
+                width={item.imgWidth ?? 200}
+                height={140}
+                className={cn(
+                  "block h-auto w-[58%] max-w-[9rem] object-contain object-bottom md:max-w-[9.5rem]",
+                  item.imgClassName,
+                )}
+              />
+            </div>
+          ) : null}
+
+          {!compact && item.img && (
             <img
               src={item.img}
               alt=""
@@ -93,7 +127,7 @@ function ToolCard({
               )}
             />
           )}
-          {(item.imgLight ?? item.img) && (
+          {!compact && (item.imgLight ?? item.img) && (
             <img
               src={item.imgLight ?? item.img}
               alt=""
