@@ -18,7 +18,7 @@ export const metadata: Metadata = {
   description: "Open-source tools for students around Indian exams",
 };
 
-export default function ToolsHub() {
+export default function HomePage() {
   return (
     <HomeSmoothScroll>
       <div className="home-page bg-[#191919]">
