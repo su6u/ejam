@@ -54,9 +54,10 @@ export function AppSidebar({
                     unoptimized
                     aria-hidden
                     className={cn(
-                      "max-w-full w-auto shrink-0",
+                      "max-w-full shrink-0",
                       identity.logoDisplayClass ?? "h-6",
                     )}
+                    style={{ width: "auto" }}
                   />
                 </Link>
               }
