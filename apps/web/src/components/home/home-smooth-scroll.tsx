@@ -11,7 +11,7 @@ export function HomeSmoothScroll({ children }: { children: React.ReactNode }) {
     if (reduced) return;
 
     const lenis = new Lenis({
-      duration: 0.85,
+      duration: 0.55,
       smoothWheel: true,
     });
 
