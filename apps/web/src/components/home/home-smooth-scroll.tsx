@@ -11,7 +11,7 @@ export function HomeSmoothScroll({ children }: { children: React.ReactNode }) {
     if (reduced) return;
 
     const lenis = new Lenis({
-      duration: 1.1,
+      duration: 0.85,
       smoothWheel: true,
     });
 
@@ -22,7 +22,17 @@ export function HomeSmoothScroll({ children }: { children: React.ReactNode }) {
     };
     frameId = requestAnimationFrame(onFrame);
 
+    const onVisibilityChange = () => {
+      if (document.hidden) {
+        lenis.stop();
+      } else {
+        lenis.start();
+      }
+    };
+    document.addEventListener("visibilitychange", onVisibilityChange);
+
     return () => {
+      document.removeEventListener("visibilitychange", onVisibilityChange);
       cancelAnimationFrame(frameId);
       lenis.destroy();
     };

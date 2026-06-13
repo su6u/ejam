@@ -107,7 +107,8 @@ export function AppHeader({
   }
 
   return (
-    <header
+    <nav
+      aria-label="Site"
       className={cn(
         "flex shrink-0 items-center justify-end gap-2.5 md:gap-3",
         className,
@@ -163,6 +164,6 @@ export function AppHeader({
           skeletonClassName="bg-[#2e2e2e]/25"
         />
       </a>
-    </header>
+    </nav>
   );
 }
