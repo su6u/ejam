@@ -1252,6 +1252,22 @@ input {
     }
   }
 
+  .home-manifesto-scroll-hint {
+    animation: home-manifesto-scroll-bob 1.4s cubic-bezier(0.77, 0, 0.175, 1)
+      infinite;
+  }
+
+  @keyframes home-manifesto-scroll-bob {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+
+    50% {
+      transform: translateY(6px);
+    }
+  }
+
   @media (prefers-reduced-motion: reduce) {
     .home-tagline-part {
       animation: none;
@@ -1263,6 +1279,10 @@ input {
       animation: none;
       opacity: 1;
       transform: none;
+    }
+
+    .home-manifesto-scroll-hint {
+      animation: none;
     }
   }
 }
