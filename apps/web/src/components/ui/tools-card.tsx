@@ -19,6 +19,7 @@ export interface ToolCardItem {
     label: string;
     iconSrc: string;
   };
+  breadcrumb?: string;
 }
 
 export interface ToolCardGridProps {
@@ -86,19 +87,31 @@ function ToolCard({
             item.containerClassName,
           )}
         >
-          {item.name && (
-            <span
-              className={cn(
-                "font-instrument-sans",
-                compact
-                  ? "relative z-10 shrink-0 text-sm font-medium tracking-tight md:text-base"
-                  : "text-xl font-medium tracking-tight",
-                item.soon ? "text-muted-foreground/80" : "text-foreground",
-              )}
-            >
-              {item.name}
-            </span>
-          )}
+          {item.name || item.breadcrumb ? (
+            <div className="relative z-10 flex items-baseline justify-between gap-3">
+              {item.name ? (
+                <span
+                  className={cn(
+                    "font-instrument-sans shrink-0",
+                    compact
+                      ? "text-sm font-medium tracking-tight md:text-base"
+                      : "text-xl font-medium tracking-tight",
+                    item.soon ? "text-muted-foreground/80" : "text-foreground",
+                  )}
+                >
+                  {item.name}
+                </span>
+              ) : null}
+              {compact && item.breadcrumb ? (
+                <nav
+                  aria-label="Breadcrumb"
+                  className="shrink-0 font-instrument-sans text-[10px] text-muted-foreground md:text-xs"
+                >
+                  {item.breadcrumb}
+                </nav>
+              ) : null}
+            </div>
+          ) : null}
 
           {compact && item.img ? (
             <div className="pointer-events-none absolute inset-x-0 bottom-0 flex items-end justify-start pl-1 md:pl-1.5">
