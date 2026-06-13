@@ -14,7 +14,7 @@ export const homeHeaderContainerClass =
 export const homeTaglineColumnClass =
   "mx-auto w-full max-w-[24rem] text-center md:max-w-[28rem]";
 
-/** tools catalog inner column — same box as HomeTagline (pair with items-center wrapper) */
+/** home tools column — same readable width as HomeTagline */
 export const homeHeroColumnClass =
   "mx-auto w-full max-w-[24rem] md:max-w-[28rem]";
 

@@ -40,7 +40,7 @@ export default function HomePage() {
                   height={92}
                   priority
                   aria-hidden
-                  className="h-7 md:h-8"
+                  className="h-7 outline outline-1 -outline-offset-1 outline-white/10 md:h-8"
                   style={{ width: "auto" }}
                 />
               </Link>
