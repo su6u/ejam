@@ -61,7 +61,7 @@ export default function HomePage() {
             <div className="flex w-full shrink-0 justify-center pt-12 md:pt-16">
               <HomeTagline />
             </div>
-            <div className="mt-16 w-full px-4 md:mt-24">
+            <div className="mt-12 flex w-full justify-center md:mt-16">
               <HomeToolsSection />
             </div>
           </main>
