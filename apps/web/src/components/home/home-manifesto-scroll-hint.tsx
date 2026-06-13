@@ -36,12 +36,14 @@ export function HomeManifestoScrollHint() {
     };
   }, []);
 
+  const faded = opacity < 0.15;
+
   return (
     <span
       aria-hidden
       className={cn(
         "home-manifesto-scroll-hint mt-6 transition-opacity duration-200 ease-out",
-        opacity === 0 && "pointer-events-none",
+        faded && "home-manifesto-scroll-hint--paused pointer-events-none",
       )}
       style={{ opacity }}
     >

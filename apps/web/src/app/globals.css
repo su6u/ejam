@@ -1257,6 +1257,10 @@ input {
       infinite;
   }
 
+  .home-manifesto-scroll-hint--paused {
+    animation-play-state: paused;
+  }
+
   @keyframes home-manifesto-scroll-bob {
     0%,
     100% {
