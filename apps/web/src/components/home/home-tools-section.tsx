@@ -4,6 +4,7 @@ import { ToolCardGrid, type ToolCardItem } from "@/components/ui/tools-card";
 const HOME_TOOL_CARDS: ToolCardItem[] = [
   {
     name: "College Predictor",
+    breadcrumb: "engineering / tools",
     href: "/college-predictor",
     img: "/media/magic-cat.png",
     pill: {
