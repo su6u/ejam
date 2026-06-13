@@ -5,6 +5,11 @@ const HOME_TOOL_CARDS: ToolCardItem[] = [
   {
     name: "College Predictor",
     href: "/college-predictor",
+    img: "/media/magic-cat.png",
+    pill: {
+      label: "visit site",
+      iconSrc: "/icons/magic.svg",
+    },
   },
 ];
 
