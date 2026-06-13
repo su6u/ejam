@@ -1298,17 +1298,5 @@ input {
       opacity: 1;
       transform: none;
     }
-
-    .home-folder-enter {
-      animation: none;
-      opacity: 1;
-      transform: none;
-    }
-
-    .home-folder-card.is-shaking {
-      animation: none !important;
-      transform: none !important;
-    }
-
   }
 }
