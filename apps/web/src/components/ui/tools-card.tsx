@@ -1,11 +1,9 @@
-"use client";
-
-import * as React from "react";
+import type * as React from "react";
 import { cn } from "@/lib/utils";
 
-export interface ToolsCard {
+export interface ToolCardItem {
   name: string;
-  description: string;
+  description?: string;
   href?: string;
   img?: string;
   imgLight?: string;
@@ -18,20 +16,20 @@ export interface ToolsCard {
   soon?: boolean;
 }
 
-export interface ToolsCardsProps {
-  items: ToolsCard[];
+export interface ToolCardGridProps {
+  items: ToolCardItem[];
   className?: string;
   compact?: boolean;
   renderLink?: (href: string, children: React.ReactNode) => React.ReactNode;
 }
 
-function ToolsCardItem({
+function ToolCard({
   item,
   renderLink,
   compact,
 }: {
-  item: ToolsCard;
-  renderLink?: ToolsCardsProps["renderLink"];
+  item: ToolCardItem;
+  renderLink?: ToolCardGridProps["renderLink"];
   compact?: boolean;
 }) {
   const inner = (
@@ -86,19 +84,25 @@ function ToolsCardItem({
           {item.img && (
             <img
               src={item.img}
-              alt={item.name}
+              alt=""
               width={item.imgWidth ?? 200}
               height={200}
-              className={cn("hidden h-auto dark:block", item.imgClassName)}
+              className={cn(
+                "hidden h-auto outline outline-1 -outline-offset-1 outline-white/10 dark:block",
+                item.imgClassName,
+              )}
             />
           )}
           {(item.imgLight ?? item.img) && (
             <img
               src={item.imgLight ?? item.img}
-              alt={item.name}
+              alt=""
               width={item.imgWidth ?? 200}
               height={200}
-              className={cn("h-auto dark:hidden", item.imgClassName)}
+              className={cn(
+                "h-auto outline outline-1 -outline-offset-1 outline-black/10 dark:hidden",
+                item.imgClassName,
+              )}
             />
           )}
 
@@ -117,16 +121,16 @@ function ToolsCardItem({
   return inner;
 }
 
-function ToolsCards({
+function ToolCardGrid({
   items,
   className,
   compact,
   renderLink,
-}: ToolsCardsProps) {
+}: ToolCardGridProps) {
   return (
     <div className={cn("grid w-full grid-cols-1 gap-4", className)}>
       {items.map((item) => (
-        <ToolsCardItem
+        <ToolCard
           key={item.name}
           item={item}
           compact={compact}
@@ -137,4 +141,4 @@ function ToolsCards({
   );
 }
 
-export { ToolsCards };
+export { ToolCardGrid };
