@@ -1213,15 +1213,14 @@ input {
 }
 
 @layer components {
-  /* Homepage — light surface overrides dark-only ::selection tokens */
   .home-page ::selection {
-    background-color: rgb(62 62 62 / 0.12);
-    color: #2e2e2e;
+    background-color: rgb(253 253 253 / 0.16);
+    color: #fdfdfd;
   }
 
   .home-page ::-moz-selection {
-    background-color: rgb(62 62 62 / 0.12);
-    color: #2e2e2e;
+    background-color: rgb(253 253 253 / 0.16);
+    color: #fdfdfd;
   }
 
   /* Homepage — staggered blur reveal on hero line */

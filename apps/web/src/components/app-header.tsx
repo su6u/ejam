@@ -2,9 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import type { RefObject } from "react";
 import GitHubStars from "@/components/github-stars";
-import { useProximityHighlight } from "@/hooks/use-proximity-highlight";
 import { headerPillClass, homeHeaderLinkClass } from "@/lib/pressable";
 import { cn } from "@/lib/utils";
 
@@ -24,9 +22,8 @@ export function AppHeader({
 }) {
   const isHome = variant === "home";
   const showDocs = Boolean(docsHref);
-  const { rootRef, onItemEnter } = useProximityHighlight();
   const actionClass = isHome ? homeHeaderLinkClass : headerPillClass;
-  const homeIconClass = "shrink-0";
+  const homeIconClass = "size-3.5 shrink-0";
   const toolHeaderIconClass = "size-4 shrink-0 brightness-0 invert";
 
   if (!isHome) {
@@ -109,78 +106,63 @@ export function AppHeader({
     );
   }
 
-  const secondaryIndex = showToolsLink ? 1 : 0;
-  const githubIndex = secondaryIndex + 1;
-
   return (
-    <header className={cn("flex shrink-0 items-center justify-end", className)}>
-      <div
-        ref={rootRef as unknown as RefObject<HTMLDivElement>}
-        className="home-header-proximity flex items-center gap-4 md:gap-5"
+    <header
+      className={cn(
+        "flex shrink-0 items-center justify-end gap-2.5 md:gap-3",
+        className,
+      )}
+    >
+      {showToolsLink ? (
+        <Link href="/" className={actionClass}>
+          <Image
+            src="/icons/tools.svg"
+            alt=""
+            width={16}
+            height={16}
+            aria-hidden
+            className={homeIconClass}
+          />
+          Tools
+        </Link>
+      ) : null}
+      <a
+        href={SPONSOR_HREF}
+        target="_blank"
+        rel="noopener noreferrer"
+        className={actionClass}
       >
-        {showToolsLink ? (
-          <div className="t-proximity-item">
-            <Link
-              href="/"
-              className={actionClass}
-              onMouseEnter={() => onItemEnter(0)}
-            >
-              <Image
-                src="/icons/tools.svg"
-                alt=""
-                width={16}
-                height={16}
-                aria-hidden
-                className={cn("size-4", homeIconClass)}
-              />
-              Tools
-            </Link>
-          </div>
-        ) : null}
-        <div className="t-proximity-item">
-          <a
-            href={SPONSOR_HREF}
-            target="_blank"
-            rel="noopener noreferrer"
-            className={actionClass}
-            onMouseEnter={() => onItemEnter(secondaryIndex)}
-          >
-            <Image
-              src="/icons/heart.svg"
-              alt=""
-              width={16}
-              height={16}
-              aria-hidden
-              className={cn("size-4", homeIconClass)}
-            />
-            Sponsor
-          </a>
-        </div>
-        <div className="t-proximity-item">
-          <a
-            href={GITHUB_REPO_HREF}
-            target="_blank"
-            rel="noopener noreferrer"
-            className={actionClass}
-            onMouseEnter={() => onItemEnter(githubIndex)}
-          >
-            <Image
-              src="/icons/github.svg"
-              alt=""
-              width={16}
-              height={16}
-              aria-hidden
-              className={cn("size-4", homeIconClass)}
-            />
-            <GitHubStars
-              className="text-[14px]"
-              countClassName="text-[14px] font-medium tabular-nums text-[#2e2e2e]"
-              starsLabelClassName="font-normal text-[#2e2e2e]/55"
-              skeletonClassName="bg-[#2e2e2e]/12"
-            />
-          </a>
-        </div>
-      </div>
+        <Image
+          src="/icons/heart.svg"
+          alt=""
+          width={16}
+          height={16}
+          aria-hidden
+          className={homeIconClass}
+        />
+        Sponsor
+      </a>
+      <a
+        href={GITHUB_REPO_HREF}
+        target="_blank"
+        rel="noopener noreferrer"
+        className={actionClass}
+      >
+        <Image
+          src="/icons/github.svg"
+          alt=""
+          width={16}
+          height={16}
+          aria-hidden
+          className={homeIconClass}
+        />
+        <GitHubStars
+          className="text-xs"
+          countClassName="text-xs font-medium tabular-nums text-[#2e2e2e]"
+          starsLabelClassName="font-normal text-[#2e2e2e]/65"
+          skeletonClassName="bg-[#2e2e2e]/25"
+        />
+      </a>
     </header>
   );
 }
