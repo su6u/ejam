@@ -1204,6 +1204,7 @@ input {
   .font-serif-display {
     font-family:
       var(--font-serif-display), ui-serif, Georgia, "Times New Roman", serif;
+    font-style: italic;
   }
 
   .font-instrument-sans {
