@@ -27,34 +27,36 @@ export interface ToolCardGridProps {
   className?: string;
   compact?: boolean;
   renderLink?: (href: string, children: React.ReactNode) => React.ReactNode;
+  renderPillLink?: (href: string, children: React.ReactNode) => React.ReactNode;
 }
 
 function ToolCard({
   item,
   renderLink,
+  renderPillLink,
   compact,
 }: {
   item: ToolCardItem;
   renderLink?: ToolCardGridProps["renderLink"];
+  renderPillLink?: ToolCardGridProps["renderPillLink"];
   compact?: boolean;
 }) {
+  const pillOnlyLink = Boolean(compact && item.pill && item.href && renderPillLink);
+
   const inner = (
     <div
       className={cn(
         "relative flex w-full flex-col",
-        item.soon
-          ? "cursor-not-allowed opacity-80"
-          : item.href
-            ? "cursor-pointer"
-            : "",
+        item.soon ? "cursor-not-allowed opacity-80" : "",
+        !pillOnlyLink && item.href ? "cursor-pointer" : "",
       )}
     >
       <div
         style={item.cardStyle}
         className={cn(
           compact
-            ? "relative flex h-52 w-full flex-col overflow-hidden rounded-2xl border transition-colors md:h-56"
-            : "relative flex h-80 w-full flex-col overflow-hidden rounded-3xl border transition-colors md:h-96",
+            ? "relative flex h-52 w-full flex-col overflow-hidden rounded-2xl border md:h-56"
+            : "relative flex h-80 w-full flex-col overflow-hidden rounded-3xl border md:h-96",
           item.cardClassName ?? "bg-card",
           item.soon ? "border-dashed border-border" : "border-border",
         )}
@@ -66,17 +68,29 @@ function ToolCard({
         )}
 
         {compact && item.pill ? (
-          <span className="absolute right-5 bottom-4 z-10 inline-flex h-8 items-center gap-1.5 rounded-full bg-[#FDFDFD] pl-2.5 pr-3 text-xs font-medium text-[#2e2e2e] md:right-6 md:bottom-5">
-            <Image
-              src={item.pill.iconSrc}
-              alt=""
-              width={14}
-              height={14}
-              aria-hidden
-              className="size-3.5 shrink-0"
-            />
-            {item.pill.label}
-          </span>
+          (() => {
+            const pillContent = (
+              <>
+                <Image
+                  src={item.pill.iconSrc}
+                  alt=""
+                  width={14}
+                  height={14}
+                  aria-hidden
+                  className="size-3.5 shrink-0"
+                />
+                {item.pill.label}
+              </>
+            );
+            if (pillOnlyLink && item.href && renderPillLink) {
+              return renderPillLink(item.href, pillContent);
+            }
+            return (
+              <span className="absolute right-5 bottom-4 z-10 inline-flex h-9 items-center gap-1.5 rounded-full bg-[#FDFDFD] pl-2 pr-3 text-xs font-medium text-[#2e2e2e] md:right-6 md:bottom-5">
+                {pillContent}
+              </span>
+            );
+          })()
         ) : null}
 
         <div
@@ -103,12 +117,9 @@ function ToolCard({
                 </span>
               ) : null}
               {compact && item.breadcrumb ? (
-                <nav
-                  aria-label="Breadcrumb"
-                  className="shrink-0 font-instrument-sans text-[10px] text-muted-foreground md:text-xs"
-                >
+                <span className="shrink-0 font-instrument-sans text-xs text-muted-foreground">
                   {item.breadcrumb}
-                </nav>
+                </span>
               ) : null}
             </div>
           ) : null}
@@ -161,7 +172,7 @@ function ToolCard({
     </div>
   );
 
-  if (item.href && renderLink) {
+  if (item.href && renderLink && !pillOnlyLink) {
     return renderLink(item.href, inner);
   }
 
@@ -173,6 +184,7 @@ function ToolCardGrid({
   className,
   compact,
   renderLink,
+  renderPillLink,
 }: ToolCardGridProps) {
   return (
     <div className={cn("grid w-full grid-cols-1 gap-4", className)}>
@@ -182,6 +194,7 @@ function ToolCardGrid({
           item={item}
           compact={compact}
           renderLink={renderLink}
+          renderPillLink={renderPillLink}
         />
       ))}
     </div>

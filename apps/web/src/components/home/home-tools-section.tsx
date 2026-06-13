@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ToolCardGrid, type ToolCardItem } from "@/components/ui/tools-card";
+import { homeCardPillClass } from "@/lib/pressable";
 
 const HOME_TOOL_CARDS: ToolCardItem[] = [
   {
@@ -7,6 +8,8 @@ const HOME_TOOL_CARDS: ToolCardItem[] = [
     breadcrumb: "engineering / tools",
     href: "/college-predictor",
     img: "/media/magic-cat.png",
+    cardClassName:
+      "border-transparent bg-[#191919] shadow-[var(--shadow-border)]",
     pill: {
       label: "visit site",
       iconSrc: "/icons/magic.svg",
@@ -24,7 +27,16 @@ export function HomeToolsSection() {
         compact
         className="grid-cols-1 gap-3"
         items={HOME_TOOL_CARDS}
-        renderLink={(href, children) => <Link href={href}>{children}</Link>}
+        renderPillLink={(href, children) => (
+          <Link
+            href={href}
+            prefetch
+            aria-label="Visit College Predictor"
+            className={homeCardPillClass}
+          >
+            {children}
+          </Link>
+        )}
       />
     </div>
   );
