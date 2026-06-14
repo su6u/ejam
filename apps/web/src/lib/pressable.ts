@@ -14,7 +14,7 @@ export const headerPillClass = cn(
 
 /** White pill — header actions and home tool card CTA share one surface. */
 export const homePillClass = cn(
-  "relative inline-flex h-9 items-center gap-1.5 rounded-full bg-[#FDFDFD] pl-2 pr-3 text-xs font-medium text-[#2e2e2e]",
+  "relative inline-flex h-8 items-center gap-1.5 rounded-full bg-[#FDFDFD] pl-2 pr-2.5 text-xs font-medium text-[#2e2e2e]",
   "shadow-[0_0_0_1px_rgb(0_0_0_/0.08)] transition-[box-shadow] duration-150 ease-out",
   "after:absolute after:inset-x-0 after:-inset-y-1 after:content-['']",
   pressableClass,
@@ -25,7 +25,12 @@ export const homeHeaderLinkClass = homePillClass;
 
 export const homeCardPillClass = cn(
   homePillClass,
-  "absolute right-5 bottom-4 z-10 md:right-6 md:bottom-5",
+  "absolute right-2.5 bottom-4 z-10 h-7 gap-1 pl-2 pr-2.5 text-[11px] leading-none",
+);
+
+export const homeCardPillDisabledClass = cn(
+  "absolute right-2.5 bottom-4 z-10 inline-flex h-7 cursor-not-allowed items-center gap-1 rounded-full bg-[#FDFDFD]/75 pl-2 pr-2.5 text-[11px] font-medium leading-none text-[#2e2e2e]/50",
+  "pointer-events-none shadow-[0_0_0_1px_rgb(0_0_0_/0.06)]",
 );
 
 /** Run click work after the press animation paints (double rAF). */
