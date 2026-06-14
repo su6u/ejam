@@ -24,13 +24,13 @@ export default function HomePage() {
     <HomeSmoothScroll>
       <div className="home-page bg-[#191919]">
         <div className="home-hero sticky top-0 z-10 flex h-svh flex-col bg-[#191919]">
-          <header className="w-full shrink-0 pt-6 pb-3 md:pt-7 md:pb-4">
+          <header className="w-full shrink-0 pt-5 pb-2.5 sm:pt-6 sm:pb-3 md:pt-7 md:pb-4">
             <div className={homeHeaderContainerClass}>
               <Link
                 href="/"
                 aria-label="Ejam home"
                 className={cn(
-                  "home-enter-item flex min-h-9 shrink-0 items-center",
+                  "home-enter-item relative flex min-h-10 min-w-10 shrink-0 items-center",
                   pressableClass,
                 )}
               >
@@ -41,13 +41,15 @@ export default function HomePage() {
                   height={92}
                   priority
                   aria-hidden
-                  className="h-6 outline outline-1 -outline-offset-1 outline-white/10 md:h-7"
+                  className="h-5.5 outline outline-1 -outline-offset-1 outline-white/10 sm:h-6 md:h-7"
                   style={{ width: "auto" }}
                 />
               </Link>
               <div
                 className="home-enter-item shrink-0"
-                style={{ animationDelay: "40ms" }}
+                style={
+                  { "--home-enter-delay": "40ms" } as React.CSSProperties
+                }
               >
                 <AppHeader variant="home" />
               </div>
@@ -59,13 +61,13 @@ export default function HomePage() {
               "flex min-h-0 flex-1 flex-col",
             )}
           >
-            <div className="flex w-full shrink-0 justify-center pt-14 md:pt-16">
+            <div className="flex w-full shrink-0 justify-center pt-9 sm:pt-12 md:pt-16">
               <HomeTagline />
             </div>
-            <div className="mt-14 flex w-full justify-center md:mt-16">
+            <div className="mt-9 flex w-full justify-center sm:mt-12 md:mt-16">
               <HomeToolsSection />
             </div>
-            <div className="mt-16 flex w-full justify-center pb-9 md:mt-[4.5rem] md:pb-11">
+            <div className="mt-10 flex w-full justify-center pb-7 sm:mt-14 sm:pb-9 md:mt-[4.5rem] md:pb-11">
               <HomeRequestTool />
             </div>
           </main>

@@ -15,7 +15,11 @@ export const homeCardsRowClass =
 
 /** home hero text — centered readable measure, aligned to content column */
 export const homeTaglineColumnClass =
-  "mx-auto w-full max-w-[22rem] text-center md:max-w-[26rem]";
+  "mx-auto w-full max-w-[19.5rem] text-center sm:max-w-[22rem] md:max-w-[26rem]";
+
+/** home manifesto body — readable measure on narrow viewports */
+export const homeManifestoColumnClass =
+  "mx-auto w-full max-w-[34rem] sm:max-w-[36rem] md:max-w-[38rem]";
 
 /** home tools column — same readable width as HomeTagline */
 export const homeHeroColumnClass =

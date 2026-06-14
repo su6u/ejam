@@ -5,18 +5,20 @@ import { cn } from "@/lib/utils";
 export function HomeRequestTool() {
   return (
     <div className={cn(homeCardsRowClass, "text-center")}>
-      <p className="font-instrument-sans text-pretty text-[15px] leading-[1.55] tracking-normal text-white/45 sm:text-base">
-        There is only one tool shipped so far. If you need something that isn&apos;t here yet, I&apos;d love to hear what would help  
+      <p className="font-instrument-sans text-pretty text-[0.9375rem] leading-[1.55] tracking-normal text-white/45 sm:text-[15px] sm:text-base">
+        There is only one tool shipped so far. If you need something that isn&apos;t here yet, I&apos;d love to hear what would help
         <a
           href={TOOL_REQUEST_ISSUE_URL}
           target="_blank"
           rel="noopener noreferrer"
           className={cn(
-            "inline text-sm font-medium leading-[1.55] text-white/80 transition-colors duration-150 ease-out sm:text-[15px]",
+            "relative inline-flex min-h-10 items-center text-[0.9375rem] font-medium leading-[1.55] text-white/80 transition-[color,transform] duration-150 ease-out sm:text-[15px]",
+            "after:absolute after:-inset-x-2 after:-inset-y-1.5 after:content-['']",
+            "active:scale-[0.96] motion-reduce:active:scale-100",
             "[@media(hover:hover)_and_(pointer:fine)]:hover:text-white",
           )}
         >
-          <span className="relative -top-px inline pl-4 pr-3 leading-[1.55]">
+          <span className="relative -top-px inline pl-3 pr-2 leading-[1.55] sm:pl-4 sm:pr-3">
             <img
               src="/media/loop.svg"
               alt=""

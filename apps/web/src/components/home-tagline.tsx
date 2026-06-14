@@ -19,7 +19,7 @@ export function HomeTagline({ className }: { className?: string }) {
     <p
       className={cn(
         homeTaglineColumnClass,
-        "home-tagline font-instrument-sans text-balance text-[1.5rem] font-normal leading-[1.35] tracking-[-0.01em] text-[#FDFDFD] md:text-[1.75rem] md:leading-[1.32] lg:text-[1.875rem]",
+        "home-tagline font-instrument-sans text-balance text-[clamp(1.3125rem,3.8vw+0.65rem,1.875rem)] font-normal leading-[1.38] tracking-[-0.01em] text-[#FDFDFD] sm:leading-[1.35] md:leading-[1.32]",
         className,
       )}
     >

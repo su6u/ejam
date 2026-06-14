@@ -110,12 +110,12 @@ export function AppHeader({
     <nav
       aria-label="Site"
       className={cn(
-        "flex shrink-0 items-center justify-end gap-2 md:gap-2.5",
+        "flex shrink-0 items-center justify-end gap-1.5 sm:gap-2 md:gap-2.5",
         className,
       )}
     >
       {showToolsLink ? (
-        <Link href="/" className={actionClass}>
+        <Link href="/" className={cn(actionClass, "max-sm:gap-1 max-sm:pl-1.5 max-sm:pr-2 max-sm:after:-inset-y-2")}>
           <Image
             src="/icons/tools.svg"
             alt=""
@@ -131,7 +131,7 @@ export function AppHeader({
         href={SPONSOR_HREF}
         target="_blank"
         rel="noopener noreferrer"
-        className={actionClass}
+        className={cn(actionClass, "max-sm:gap-1 max-sm:pl-1.5 max-sm:pr-2 max-sm:after:-inset-y-2")}
       >
         <Image
           src="/icons/heart.svg"
@@ -147,7 +147,7 @@ export function AppHeader({
         href={GITHUB_REPO_HREF}
         target="_blank"
         rel="noopener noreferrer"
-        className={actionClass}
+        className={cn(actionClass, "max-sm:gap-1 max-sm:pl-1.5 max-sm:pr-2 max-sm:after:-inset-y-2")}
       >
         <Image
           src="/icons/github.svg"

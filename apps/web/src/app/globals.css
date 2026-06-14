@@ -1214,6 +1214,29 @@ input {
 }
 
 @layer components {
+  /* Home layout tokens — keep manifesto sticky offsets in sync across breakpoints */
+  .home-page {
+    --home-header-offset: 5rem;
+    --home-manifesto-arch-height: 13.5rem;
+    --home-manifesto-arch-px: 1.25rem;
+  }
+
+  @media (min-width: 640px) {
+    .home-page {
+      --home-header-offset: 5.5rem;
+      --home-manifesto-arch-height: 14rem;
+      --home-manifesto-arch-px: 1.5rem;
+    }
+  }
+
+  @media (min-width: 768px) {
+    .home-page {
+      --home-header-offset: 6.25rem;
+      --home-manifesto-arch-height: 15rem;
+      --home-manifesto-arch-px: 2.5rem;
+    }
+  }
+
   .home-page ::selection {
     background-color: rgb(253 253 253 / 0.16);
     color: #fdfdfd;
@@ -1243,6 +1266,7 @@ input {
     opacity: 0;
     transform: translateY(8px);
     animation: home-enter 260ms var(--ease-out) forwards;
+    animation-delay: var(--home-enter-delay, 0ms);
   }
 
   @keyframes home-enter {
@@ -1255,6 +1279,7 @@ input {
   .home-manifesto-scroll-hint {
     animation: home-manifesto-scroll-bob 1.4s cubic-bezier(0.77, 0, 0.175, 1)
       infinite;
+    transform-origin: center;
   }
 
   .home-manifesto-scroll-hint--paused {
@@ -1287,6 +1312,7 @@ input {
 
     .home-manifesto-scroll-hint {
       animation: none;
+      transform: none;
     }
 
   }
