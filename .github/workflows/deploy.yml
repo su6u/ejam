@@ -39,7 +39,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Verify data checksums
-        run: pnpm data:fetch
+        run: pnpm data:fetch --download
 
       - name: Typecheck
         run: pnpm typecheck
