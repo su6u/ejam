@@ -206,12 +206,7 @@
   {
     "id": "aerospace",
     "name": "Aerospace Engineering",
-    "aliases": [
-      "AE",
-      "Aero",
-      "Aeronautical Engineering",
-      "Aerospace Engg."
-    ],
+    "aliases": ["AE", "Aero", "Aeronautical Engineering", "Aerospace Engg."],
     "degree": "B.Tech",
     "duration_years": 4
   },
@@ -262,21 +257,14 @@
   {
     "id": "engineering-physics",
     "name": "Engineering Physics",
-    "aliases": [
-      "EP",
-      "Engg Physics"
-    ],
+    "aliases": ["EP", "Engg Physics"],
     "degree": "B.Tech",
     "duration_years": 4
   },
   {
     "id": "mathematics-computing",
     "name": "Mathematics and Computing",
-    "aliases": [
-      "MnC",
-      "Mathematics & Computing",
-      "Maths and Computing"
-    ],
+    "aliases": ["MnC", "Mathematics & Computing", "Maths and Computing"],
     "degree": "B.Tech",
     "duration_years": 4
   },
@@ -342,10 +330,7 @@
   {
     "id": "planning",
     "name": "Planning",
-    "aliases": [
-      "B.Plan",
-      "Planning (4 years)"
-    ],
+    "aliases": ["B.Plan", "Planning (4 years)"],
     "degree": "B.Plan",
     "duration_years": 4
   },
@@ -496,9 +481,7 @@
   {
     "id": "industrial-design",
     "name": "Industrial Design",
-    "aliases": [
-      "Industrial Design (4 Years, Bachelor of Technology)"
-    ],
+    "aliases": ["Industrial Design (4 Years, Bachelor of Technology)"],
     "degree": "B.Tech",
     "duration_years": 4
   },
@@ -587,9 +570,7 @@
   {
     "id": "petroleum-engineering",
     "name": "Petroleum Engineering",
-    "aliases": [
-      "Petroleum Engineering (4 Years, Bachelor of Technology)"
-    ],
+    "aliases": ["Petroleum Engineering (4 Years, Bachelor of Technology)"],
     "degree": "B.Tech",
     "duration_years": 4
   },
@@ -628,9 +609,7 @@
   {
     "id": "food-process-engineering",
     "name": "Food Process Engineering",
-    "aliases": [
-      "Food Process Engineering (4 Years, Bachelor of Technology)"
-    ],
+    "aliases": ["Food Process Engineering (4 Years, Bachelor of Technology)"],
     "degree": "B.Tech",
     "duration_years": 4
   },
@@ -728,18 +707,14 @@
   {
     "id": "chemistry-bs",
     "name": "Chemistry",
-    "aliases": [
-      "Chemistry with Specialization (4 Years, Bachelor of Science)"
-    ],
+    "aliases": ["Chemistry with Specialization (4 Years, Bachelor of Science)"],
     "degree": "B.Sc",
     "duration_years": 4
   },
   {
     "id": "statistics-data-science-bs",
     "name": "Statistics and Data Science",
-    "aliases": [
-      "Statistics and Data Science (4 Years, Bachelor of Science)"
-    ],
+    "aliases": ["Statistics and Data Science (4 Years, Bachelor of Science)"],
     "degree": "B.Sc",
     "duration_years": 4
   },
@@ -892,9 +867,7 @@
   {
     "id": "smart-manufacturing",
     "name": "Smart Manufacturing",
-    "aliases": [
-      "Smart Manufacturing (4 Years, Bachelor of Technology)"
-    ],
+    "aliases": ["Smart Manufacturing (4 Years, Bachelor of Technology)"],
     "degree": "B.Tech",
     "duration_years": 4
   },
@@ -940,9 +913,7 @@
   {
     "id": "animation-vfx",
     "name": "Animation and VFX",
-    "aliases": [
-      "Animation and VFX (4 Years, Bachelor of Technology)"
-    ],
+    "aliases": ["Animation and VFX (4 Years, Bachelor of Technology)"],
     "degree": "B.Tech",
     "duration_years": 4
   },
@@ -980,18 +951,14 @@
   {
     "id": "digital-agriculture",
     "name": "Digital Agriculture",
-    "aliases": [
-      "Digital Agriculture (4 Years, Bachelor of Technology)"
-    ],
+    "aliases": ["Digital Agriculture (4 Years, Bachelor of Technology)"],
     "degree": "B.Tech",
     "duration_years": 4
   },
   {
     "id": "earth-sciences",
     "name": "Earth Sciences",
-    "aliases": [
-      "Earth Sciences (4 Years, Bachelor of Science)"
-    ],
+    "aliases": ["Earth Sciences (4 Years, Bachelor of Science)"],
     "degree": "B.Sc",
     "duration_years": 4
   },
@@ -1016,18 +983,14 @@
   {
     "id": "robotics-ai",
     "name": "Robotics and AI",
-    "aliases": [
-      "Robotics and AI (4 Years, Bachelor of Technology)"
-    ],
+    "aliases": ["Robotics and AI (4 Years, Bachelor of Technology)"],
     "degree": "B.Tech",
     "duration_years": 4
   },
   {
     "id": "cse-ai-ml",
     "name": "Computer Science and Engineering (AI and ML)",
-    "aliases": [
-      "B.Tech in CSE (AI and ML) (4 Years, Bachelor of Technology)"
-    ],
+    "aliases": ["B.Tech in CSE (AI and ML) (4 Years, Bachelor of Technology)"],
     "degree": "B.Tech",
     "duration_years": 4
   },
@@ -1124,29 +1087,21 @@
   {
     "id": "biosciencesand-bioengineering",
     "name": "Biosciencesand Bioengineering",
-    "aliases": [
-      "Biosciencesand Bioengineering"
-    ],
+    "aliases": ["Biosciencesand Bioengineering"],
     "degree": "B.Tech",
     "duration_years": 4
   },
   {
     "id": "cse-data-science-analytics",
     "name": "CSE(Data Science& Analytics)",
-    "aliases": [
-      "CSE(Data Science& Analytics)",
-      "CSE(DataScience& Analytics)"
-    ],
+    "aliases": ["CSE(Data Science& Analytics)", "CSE(DataScience& Analytics)"],
     "degree": "B.Tech",
     "duration_years": 4
   },
   {
     "id": "computer-scienceand-business",
     "name": "Computer Scienceand Business",
-    "aliases": [
-      "Computer Scienceand Business",
-      "ComputerScienceand Business"
-    ],
+    "aliases": ["Computer Scienceand Business", "ComputerScienceand Business"],
     "degree": "B.Tech",
     "duration_years": 4
   },
@@ -1173,20 +1128,14 @@
   {
     "id": "dairy-engineering",
     "name": "Dairy Engineering",
-    "aliases": [
-      "Dairy Engineering",
-      "DairyEngineering"
-    ],
+    "aliases": ["Dairy Engineering", "DairyEngineering"],
     "degree": "B.Tech",
     "duration_years": 4
   },
   {
     "id": "data-scienceand-engineering",
     "name": "Data Scienceand Engineering",
-    "aliases": [
-      "Data Scienceand Engineering",
-      "DataScienceand Engineering"
-    ],
+    "aliases": ["Data Scienceand Engineering", "DataScienceand Engineering"],
     "degree": "B.Tech",
     "duration_years": 4
   },
@@ -1203,9 +1152,7 @@
   {
     "id": "electronicsand-instrumentation",
     "name": "Electronicsand Instrumentation",
-    "aliases": [
-      "Electronicsand Instrumentation"
-    ],
+    "aliases": ["Electronicsand Instrumentation"],
     "degree": "B.Tech",
     "duration_years": 4
   },
@@ -1222,18 +1169,14 @@
   {
     "id": "industrialand-production",
     "name": "Industrialand Production",
-    "aliases": [
-      "Industrialand Production"
-    ],
+    "aliases": ["Industrialand Production"],
     "degree": "B.Tech",
     "duration_years": 4
   },
   {
     "id": "information-technology-business",
     "name": "Information Technology-Business",
-    "aliases": [
-      "Information Technology-Business"
-    ],
+    "aliases": ["Information Technology-Business"],
     "degree": "B.Tech",
     "duration_years": 4
   },
@@ -1252,9 +1195,7 @@
   {
     "id": "sustainableenergy-technologies",
     "name": "SUSTAINABLEENERGY TECHNOLOGIES",
-    "aliases": [
-      "SUSTAINABLEENERGY TECHNOLOGIES"
-    ],
+    "aliases": ["SUSTAINABLEENERGY TECHNOLOGIES"],
     "degree": "B.Tech",
     "duration_years": 4
   },
