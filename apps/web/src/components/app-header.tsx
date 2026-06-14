@@ -23,7 +23,7 @@ export function AppHeader({
   const isHome = variant === "home";
   const showDocs = Boolean(docsHref);
   const actionClass = isHome ? homeHeaderLinkClass : headerPillClass;
-  const homeIconClass = "size-3.5 shrink-0";
+  const homeIconClass = "size-3 shrink-0";
   const toolHeaderIconClass = "size-4 shrink-0 brightness-0 invert";
 
   if (!isHome) {
@@ -110,7 +110,7 @@ export function AppHeader({
     <nav
       aria-label="Site"
       className={cn(
-        "flex shrink-0 items-center justify-end gap-2.5 md:gap-3",
+        "flex shrink-0 items-center justify-end gap-2 md:gap-2.5",
         className,
       )}
     >

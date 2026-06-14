@@ -24,13 +24,13 @@ export default function HomePage() {
     <HomeSmoothScroll>
       <div className="home-page bg-[#191919]">
         <div className="home-hero sticky top-0 z-10 flex h-svh flex-col bg-[#191919]">
-          <header className="w-full shrink-0 pt-8 pb-4 md:pt-10 md:pb-5">
+          <header className="w-full shrink-0 pt-6 pb-3 md:pt-7 md:pb-4">
             <div className={homeHeaderContainerClass}>
               <Link
                 href="/"
                 aria-label="Ejam home"
                 className={cn(
-                  "home-enter-item flex min-h-10 shrink-0 items-center",
+                  "home-enter-item flex min-h-9 shrink-0 items-center",
                   pressableClass,
                 )}
               >
@@ -41,7 +41,7 @@ export default function HomePage() {
                   height={92}
                   priority
                   aria-hidden
-                  className="h-7 outline outline-1 -outline-offset-1 outline-white/10 md:h-8"
+                  className="h-6 outline outline-1 -outline-offset-1 outline-white/10 md:h-7"
                   style={{ width: "auto" }}
                 />
               </Link>
@@ -59,10 +59,10 @@ export default function HomePage() {
               "flex min-h-0 flex-1 flex-col",
             )}
           >
-            <div className="flex w-full shrink-0 justify-center pt-12 md:pt-16">
+            <div className="flex w-full shrink-0 justify-center pt-14 md:pt-16">
               <HomeTagline />
             </div>
-            <div className="mt-12 flex w-full justify-center md:mt-16">
+            <div className="mt-14 flex w-full justify-center md:mt-16">
               <HomeToolsSection />
             </div>
             <div className="mt-16 flex w-full justify-center pb-9 md:mt-[4.5rem] md:pb-11">
