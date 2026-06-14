@@ -1064,7 +1064,7 @@
   },
   {
     "id": "b-tech-and-m-tech-in-engineeringand-computational-mechanics-dual",
-    "name": "B.Tech.and M.Tech. in Engineeringand Computational Mechanics(Dual",
+    "name": "B.Tech. and M.Tech. in Engineering and Computational Mechanics (Dual Degree)",
     "aliases": [
       "B.Tech.and M.Tech. in Engineeringand Computational Mechanics(Dual",
       "B.Tech.andM.Tech. inEngineeringand Computational Mechanics(Dual"
@@ -1074,7 +1074,7 @@
   },
   {
     "id": "b-techin-artificial-intelligenece-and-data-science-transportationand",
-    "name": "B.Techin Artificial Intelligenece and Data Science (Transportationand",
+    "name": "B.Tech in Artificial Intelligence and Data Science (Transportation and Logistics)",
     "aliases": [
       "B.Techin Artificial Intelligenece and Data Science (Transportationand",
       "B.Techin Artificial Intelligenece and Data Science(Transportationand Logistics)",
@@ -1086,28 +1086,28 @@
   },
   {
     "id": "biosciencesand-bioengineering",
-    "name": "Biosciencesand Bioengineering",
+    "name": "Biosciences and Bioengineering",
     "aliases": ["Biosciencesand Bioengineering"],
     "degree": "B.Tech",
     "duration_years": 4
   },
   {
     "id": "cse-data-science-analytics",
-    "name": "CSE(Data Science& Analytics)",
+    "name": "CSE (Data Science & Analytics)",
     "aliases": ["CSE(Data Science& Analytics)", "CSE(DataScience& Analytics)"],
     "degree": "B.Tech",
     "duration_years": 4
   },
   {
     "id": "computer-scienceand-business",
-    "name": "Computer Scienceand Business",
+    "name": "Computer Science and Business",
     "aliases": ["Computer Scienceand Business", "ComputerScienceand Business"],
     "degree": "B.Tech",
     "duration_years": 4
   },
   {
     "id": "computer-scienceand-engineering-cyber-security",
-    "name": "Computer Scienceand Engineering(Cyber Security)",
+    "name": "Computer Science and Engineering (Cyber Security)",
     "aliases": [
       "Computer Scienceand Engineering(Cyber Security)",
       "ComputerScienceand Engineering(Cyber Security)"
@@ -1117,7 +1117,7 @@
   },
   {
     "id": "computer-scienceand-engineering-data-science",
-    "name": "Computer Scienceand Engineering(Data Science)",
+    "name": "Computer Science and Engineering (Data Science)",
     "aliases": [
       "Computer Scienceand Engineering(Data Science)",
       "ComputerScienceand Engineering(Data Science)"
@@ -1134,14 +1134,14 @@
   },
   {
     "id": "data-scienceand-engineering",
-    "name": "Data Scienceand Engineering",
+    "name": "Data Science and Engineering",
     "aliases": ["Data Scienceand Engineering", "DataScienceand Engineering"],
     "degree": "B.Tech",
     "duration_years": 4
   },
   {
     "id": "electricaland-electronics",
-    "name": "Electricaland Electronics",
+    "name": "Electrical and Electronics Engineering",
     "aliases": [
       "Electricaland Electronics",
       "Electricaland Electronics Engineering"
@@ -1151,7 +1151,7 @@
   },
   {
     "id": "electronicsand-instrumentation",
-    "name": "Electronicsand Instrumentation",
+    "name": "Electronics and Instrumentation Engineering",
     "aliases": ["Electronicsand Instrumentation"],
     "degree": "B.Tech",
     "duration_years": 4
@@ -1168,7 +1168,7 @@
   },
   {
     "id": "industrialand-production",
-    "name": "Industrialand Production",
+    "name": "Industrial and Production Engineering",
     "aliases": ["Industrialand Production"],
     "degree": "B.Tech",
     "duration_years": 4
@@ -1182,7 +1182,7 @@
   },
   {
     "id": "materials-scienceand-metallurgical",
-    "name": "Materials Scienceand Metallurgical",
+    "name": "Materials Science and Metallurgical Engineering",
     "aliases": [
       "Materials Scienceand Metallurgical",
       "Materials Scienceand Metallurgical Engineering",
@@ -1194,14 +1194,14 @@
   },
   {
     "id": "sustainableenergy-technologies",
-    "name": "SUSTAINABLEENERGY TECHNOLOGIES",
+    "name": "Sustainable Energy Technologies",
     "aliases": ["SUSTAINABLEENERGY TECHNOLOGIES"],
     "degree": "B.Tech",
     "duration_years": 4
   },
   {
     "id": "vlsidesignand-technology",
-    "name": "VLSIDesignand Technology",
+    "name": "VLSI Design and Technology",
     "aliases": [
       "Electronics and Communication Engineering(VLSIDesignand Technology)",
       "Electronicsand Communication Engineering (VLSIDesignand Technology)",
@@ -1214,7 +1214,7 @@
   },
   {
     "id": "b-tech-in-electronicsand-communication-engineering-and-m-tech-in-communication-s",
-    "name": "B.Tech.in Electronicsand Communication Engineering and M.Tech.in Communication Systems",
+    "name": "B.Tech. in Electronics and Communication Engineering and M.Tech. in Communication Systems",
     "aliases": [
       "B.Tech.in Electronicsand Communication Engineering and M.Tech.in Communication Systems",
       "B.Tech.inElectronicsand CommunicationEngineering andM.Tech.in CommunicationSystems"
@@ -1224,7 +1224,7 @@
   },
   {
     "id": "b-techin-electronics-communication-engineering-rail-engineering",
-    "name": "B.Techin Electronics& Communication Engineering (Rail Engineering)",
+    "name": "B.Tech in Electronics & Communication Engineering (Rail Engineering)",
     "aliases": [
       "B.Techin Electronics& Communication Engineering (Rail Engineering)",
       "B.TechinElectronics& CommunicationEngineering (RailEngineering)"
