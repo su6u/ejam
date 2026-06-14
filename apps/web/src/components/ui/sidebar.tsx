@@ -181,9 +181,7 @@ function SidebarToggleButton({
         "shrink-0 rounded-none border-0 bg-transparent shadow-none transition-transform duration-150 ease-out active:scale-[0.96] hover:bg-muted/50 dark:bg-transparent dark:hover:bg-muted/50",
         className,
       )}
-      aria-label={
-        isOpen ? "Close prediction setup" : "Open prediction setup"
-      }
+      aria-label={isOpen ? "Close prediction setup" : "Open prediction setup"}
       aria-expanded={isOpen}
       {...props}
       onClick={() => onPress()}

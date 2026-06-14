@@ -1,5 +1,5 @@
-import { GradientText } from "@/components/gradient-text";
 import { homeTaglineColumnClass } from "@/components/app-layout";
+import { GradientText } from "@/components/gradient-text";
 import { cn } from "@/lib/utils";
 
 const indianGradientColors = ["#FF671F", "#4D80E6", "#53C266"] as const;

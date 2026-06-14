@@ -6,7 +6,8 @@ export function HomeRequestTool() {
   return (
     <div className={cn(homeCardsRowClass, "text-center")}>
       <p className="font-instrument-sans text-pretty text-[0.9375rem] leading-[1.55] tracking-normal text-white/45 sm:text-[15px] sm:text-base">
-        There is only one tool shipped so far. If you need something that isn&apos;t here yet, I&apos;d love to hear what would help
+        There is only one tool shipped so far. If you need something that
+        isn&apos;t here yet, I&apos;d love to hear what would help
         <a
           href={TOOL_REQUEST_ISSUE_URL}
           target="_blank"

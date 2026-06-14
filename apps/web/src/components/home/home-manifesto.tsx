@@ -22,7 +22,12 @@ export function HomeManifesto() {
           </div>
         </div>
         <div className="min-h-[calc(100svh-var(--home-header-offset)-var(--home-manifesto-arch-height))] bg-[#0a0a0a] px-4 pb-14 sm:px-5 sm:pb-16 md:px-10 md:pb-20">
-          <div className={cn(homeManifestoColumnClass, "-mt-8 sm:-mt-10 md:-mt-12")}>
+          <div
+            className={cn(
+              homeManifestoColumnClass,
+              "-mt-8 sm:-mt-10 md:-mt-12",
+            )}
+          >
             <p className="whitespace-pre-line text-pretty text-left font-instrument-sans text-[clamp(1rem,2.2vw+0.5rem,1.5rem)] leading-[1.72] tracking-[-0.015em] text-white md:leading-[1.68] lg:leading-[1.64]">
               {`ejam began as a personal frustration.
 

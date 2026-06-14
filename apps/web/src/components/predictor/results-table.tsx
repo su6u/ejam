@@ -10,7 +10,10 @@ import type { PredictionProvenance } from "@ejam/data";
 import type { ProgramPrediction } from "@ejam/data/college-predictor";
 import { ChevronRight } from "lucide-react";
 import { useMemo } from "react";
-import { resultsTableScrollClass, stickyGlassTableHeaderClass } from "@/components/app-layout";
+import {
+  resultsTableScrollClass,
+  stickyGlassTableHeaderClass,
+} from "@/components/app-layout";
 import { formatInteger } from "@/components/formatter";
 import { BandBadge } from "@/components/predictor/band-badge";
 import { DataVersionFooter } from "@/components/predictor/data-version-footer";

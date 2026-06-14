@@ -115,7 +115,13 @@ export function AppHeader({
       )}
     >
       {showToolsLink ? (
-        <Link href="/" className={cn(actionClass, "max-sm:gap-1 max-sm:pl-1.5 max-sm:pr-2 max-sm:after:-inset-y-2")}>
+        <Link
+          href="/"
+          className={cn(
+            actionClass,
+            "max-sm:gap-1 max-sm:pl-1.5 max-sm:pr-2 max-sm:after:-inset-y-2",
+          )}
+        >
           <Image
             src="/icons/tools.svg"
             alt=""
@@ -131,7 +137,10 @@ export function AppHeader({
         href={SPONSOR_HREF}
         target="_blank"
         rel="noopener noreferrer"
-        className={cn(actionClass, "max-sm:gap-1 max-sm:pl-1.5 max-sm:pr-2 max-sm:after:-inset-y-2")}
+        className={cn(
+          actionClass,
+          "max-sm:gap-1 max-sm:pl-1.5 max-sm:pr-2 max-sm:after:-inset-y-2",
+        )}
       >
         <Image
           src="/icons/heart.svg"
@@ -147,7 +156,10 @@ export function AppHeader({
         href={GITHUB_REPO_HREF}
         target="_blank"
         rel="noopener noreferrer"
-        className={cn(actionClass, "max-sm:gap-1 max-sm:pl-1.5 max-sm:pr-2 max-sm:after:-inset-y-2")}
+        className={cn(
+          actionClass,
+          "max-sm:gap-1 max-sm:pl-1.5 max-sm:pr-2 max-sm:after:-inset-y-2",
+        )}
       >
         <Image
           src="/icons/github.svg"

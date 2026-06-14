@@ -225,7 +225,9 @@ export function RoundProbabilityBars({
         aria-hidden
       >
         <div className="t-round-bars flex items-end gap-[2px]">
-          {rounds.map((prob, index) => renderBar(prob, index, fillRound, "div"))}
+          {rounds.map((prob, index) =>
+            renderBar(prob, index, fillRound, "div"),
+          )}
         </div>
         <span className="w-10 shrink-0 text-right text-xs tabular-nums text-muted-foreground">
           {overallPct}%

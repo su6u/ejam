@@ -1,10 +1,10 @@
-import type * as React from "react";
 import Image from "next/image";
-import { cn } from "@/lib/utils";
+import type * as React from "react";
 import {
   homeCardPillDisabledClass,
   homeCardPillStaticClass,
 } from "@/lib/pressable";
+import { cn } from "@/lib/utils";
 
 export interface ToolCardItem {
   name?: string;
@@ -46,7 +46,9 @@ function ToolCard({
   renderPillLink?: ToolCardGridProps["renderPillLink"];
   compact?: boolean;
 }) {
-  const pillOnlyLink = Boolean(compact && item.pill && item.href && renderPillLink);
+  const pillOnlyLink = Boolean(
+    compact && item.pill && item.href && renderPillLink,
+  );
 
   const inner = (
     <div
@@ -135,94 +137,96 @@ function ToolCard({
                     "relative z-10 mt-auto flex items-end justify-end gap-1.5 px-2.5 pb-2.5 pt-2 sm:gap-2",
                   )}
                 >
-                  {item.pill ? (
-                    (() => {
-                      const pillContent = (
-                        <>
-                          <Image
-                            src={item.pill.iconSrc}
-                            alt=""
-                            width={14}
-                            height={14}
-                            aria-hidden
-                            className="size-2.5 shrink-0 sm:size-3"
-                          />
-                          {item.pill.label}
-                        </>
-                      );
-                      if (pillOnlyLink && item.href && renderPillLink) {
-                        return renderPillLink(item.href, pillContent);
-                      }
-                      const pillDisabled = !item.href;
-                      return (
-                        <span
-                          className={cn(
-                            pillDisabled
-                              ? homeCardPillDisabledClass
-                              : homeCardPillStaticClass,
-                          )}
-                          aria-disabled={pillDisabled || undefined}
-                        >
-                          {pillContent}
-                        </span>
-                      );
-                    })()
-                  ) : null}
+                  {item.pill
+                    ? (() => {
+                        const pillContent = (
+                          <>
+                            <Image
+                              src={item.pill.iconSrc}
+                              alt=""
+                              width={14}
+                              height={14}
+                              aria-hidden
+                              className="size-2.5 shrink-0 sm:size-3"
+                            />
+                            {item.pill.label}
+                          </>
+                        );
+                        if (pillOnlyLink && item.href && renderPillLink) {
+                          return renderPillLink(item.href, pillContent);
+                        }
+                        const pillDisabled = !item.href;
+                        return (
+                          <span
+                            className={cn(
+                              pillDisabled
+                                ? homeCardPillDisabledClass
+                                : homeCardPillStaticClass,
+                            )}
+                            aria-disabled={pillDisabled || undefined}
+                          >
+                            {pillContent}
+                          </span>
+                        );
+                      })()
+                    : null}
                 </div>
               </div>
             ) : null}
           </>
         ) : (
-        <div
-          className={cn(
-            "relative flex flex-1 flex-col gap-3 px-5 pt-6 pb-4",
-            item.containerClassName,
-          )}
-        >
-          {item.name || item.breadcrumb ? (
-            <div className="relative z-10 flex flex-col items-start gap-0.5">
-              {item.name ? (
-                <span
-                  className={cn(
-                    "shrink-0 font-instrument-sans text-xl font-medium leading-tight tracking-tight",
-                    item.soon ? "text-muted-foreground/80" : "text-foreground",
-                  )}
-                >
-                  {item.name}
-                </span>
-              ) : null}
-            </div>
-          ) : null}
+          <div
+            className={cn(
+              "relative flex flex-1 flex-col gap-3 px-5 pt-6 pb-4",
+              item.containerClassName,
+            )}
+          >
+            {item.name || item.breadcrumb ? (
+              <div className="relative z-10 flex flex-col items-start gap-0.5">
+                {item.name ? (
+                  <span
+                    className={cn(
+                      "shrink-0 font-instrument-sans text-xl font-medium leading-tight tracking-tight",
+                      item.soon
+                        ? "text-muted-foreground/80"
+                        : "text-foreground",
+                    )}
+                  >
+                    {item.name}
+                  </span>
+                ) : null}
+              </div>
+            ) : null}
 
-          {!compact && item.img && (
-            <img
-              src={item.img}
-              alt=""
-              width={item.imgWidth ?? 200}
-              height={200}
-              className={cn(
-                "hidden h-auto outline outline-1 -outline-offset-1 outline-white/10 dark:block",
-                item.imgClassName,
-              )}
-            />
-          )}
-          {!compact && (item.imgLight ?? item.img) && (
-            <img
-              src={item.imgLight ?? item.img}
-              alt=""
-              width={item.imgWidth ?? 200}
-              height={200}
-              className={cn(
-                "h-auto outline outline-1 -outline-offset-1 outline-black/10 dark:hidden",
-                item.imgClassName,
-              )}
-            />
-          )}
+            {!compact && item.img && (
+              <img
+                src={item.img}
+                alt=""
+                width={item.imgWidth ?? 200}
+                height={200}
+                className={cn(
+                  "hidden h-auto outline outline-1 -outline-offset-1 outline-white/10 dark:block",
+                  item.imgClassName,
+                )}
+              />
+            )}
+            {!compact && (item.imgLight ?? item.img) && (
+              <img
+                src={item.imgLight ?? item.img}
+                alt=""
+                width={item.imgWidth ?? 200}
+                height={200}
+                className={cn(
+                  "h-auto outline outline-1 -outline-offset-1 outline-black/10 dark:hidden",
+                  item.imgClassName,
+                )}
+              />
+            )}
 
-          {item.fadeBottom && (
-            <div className="pointer-events-none absolute inset-x-0 bottom-0 h-22 bg-gradient-to-t from-card to-transparent" />
-          )}
-        </div>
+            {item.fadeBottom && (
+              <div className="pointer-events-none absolute inset-x-0 bottom-0 h-22 bg-gradient-to-t from-card to-transparent" />
+            )}
+          </div>
         )}
       </div>
     </div>

@@ -7,8 +7,8 @@ import {
   homePageContainerClass,
 } from "@/components/app-layout";
 import { HomeManifesto } from "@/components/home/home-manifesto";
-import { HomeSmoothScroll } from "@/components/home/home-smooth-scroll";
 import { HomeRequestTool } from "@/components/home/home-request-tool";
+import { HomeSmoothScroll } from "@/components/home/home-smooth-scroll";
 import { HomeToolsSection } from "@/components/home/home-tools-section";
 import { HomeTagline } from "@/components/home-tagline";
 import { pressableClass } from "@/lib/pressable";
@@ -47,9 +47,7 @@ export default function HomePage() {
               </Link>
               <div
                 className="home-enter-item shrink-0"
-                style={
-                  { "--home-enter-delay": "40ms" } as React.CSSProperties
-                }
+                style={{ "--home-enter-delay": "40ms" } as React.CSSProperties}
               >
                 <AppHeader variant="home" />
               </div>
