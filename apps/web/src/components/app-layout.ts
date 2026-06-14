@@ -10,13 +10,16 @@ export const homePageContainerClass = "mx-auto w-full max-w-3xl px-4 md:px-6";
 export const homeHeaderContainerClass =
   "mx-auto flex w-full max-w-3xl items-center justify-between gap-4 px-4 md:px-6";
 
+export const homeCardsRowClass =
+  "mx-auto w-full max-w-[30rem] sm:max-w-[32rem]";
+
 /** home hero text — centered readable measure, aligned to content column */
 export const homeTaglineColumnClass =
-  "mx-auto w-full max-w-[24rem] text-center md:max-w-[28rem]";
+  "mx-auto w-full max-w-[22rem] text-center md:max-w-[26rem]";
 
 /** home tools column — same readable width as HomeTagline */
 export const homeHeroColumnClass =
-  "mx-auto w-full max-w-[24rem] md:max-w-[28rem]";
+  "mx-auto w-full max-w-[20rem] md:max-w-[24rem]";
 
 /** frosted sticky chrome — navbar, table headers, etc. */
 export const stickyGlassChromeClass =

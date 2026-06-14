@@ -1,6 +1,8 @@
+import { homeCardsRowClass } from "@/components/app-layout";
 import Link from "next/link";
 import { ToolCardGrid, type ToolCardItem } from "@/components/ui/tools-card";
 import { homeCardPillClass } from "@/lib/pressable";
+import { cn } from "@/lib/utils";
 
 const HOME_TOOL_CARDS: ToolCardItem[] = [
   {
@@ -8,10 +10,24 @@ const HOME_TOOL_CARDS: ToolCardItem[] = [
     breadcrumb: "engineering / tools",
     href: "/college-predictor",
     img: "/media/magic-cat.png",
+    imgClassName: "w-[75%] max-w-[6.5rem] sm:max-w-[7.25rem]",
     cardClassName:
       "border-transparent bg-[#191919] shadow-[var(--shadow-border)]",
     pill: {
       label: "visit site",
+      iconSrc: "/icons/magic.svg",
+    },
+  },
+  {
+    name: "Scholarship Finder",
+    breadcrumb: "generic / tools",
+    img: "/media/hat.png",
+    imgClassName:
+      "w-[75%] max-w-[6.5rem] translate-x-1.5 -translate-y-1.5 sm:max-w-[7.25rem] sm:translate-x-2 sm:-translate-y-2",
+    cardClassName:
+      "border-transparent bg-[#191919] shadow-[var(--shadow-border)]",
+    pill: {
+      label: "soon",
       iconSrc: "/icons/magic.svg",
     },
   },
@@ -20,12 +36,12 @@ const HOME_TOOL_CARDS: ToolCardItem[] = [
 export function HomeToolsSection() {
   return (
     <div
-      className="home-enter-item mx-auto w-full max-w-[calc((100%-0.75rem)/2)]"
+      className={cn("home-enter-item", homeCardsRowClass)}
       style={{ animationDelay: "120ms" }}
     >
       <ToolCardGrid
         compact
-        className="grid-cols-1 gap-3"
+        className="grid-cols-2 gap-2.5"
         items={HOME_TOOL_CARDS}
         renderPillLink={(href, children) => (
           <Link
