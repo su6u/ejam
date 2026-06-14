@@ -42,7 +42,7 @@ export function HomeManifestoScrollHint() {
     <span
       aria-hidden
       className={cn(
-        "home-manifesto-scroll-hint mt-6 transition-opacity duration-200 ease-out",
+        "home-manifesto-scroll-hint mt-2 translate-y-1.5 transition-opacity duration-200 ease-out",
         faded && "home-manifesto-scroll-hint--paused pointer-events-none",
       )}
       style={{ opacity }}
@@ -53,7 +53,7 @@ export function HomeManifestoScrollHint() {
         width={20}
         height={20}
         aria-hidden
-        className="size-5 opacity-80"
+        className="size-4 opacity-80"
       />
     </span>
   );
