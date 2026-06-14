@@ -10,7 +10,6 @@ const HOME_TOOL_CARDS: ToolCardItem[] = [
     breadcrumb: "engineering / tools",
     href: "/college-predictor",
     img: "/media/magic-cat.png",
-    imgClassName: "w-[75%] max-w-[6.5rem] sm:max-w-[7.25rem]",
     cardClassName:
       "border-transparent bg-[#191919] shadow-[var(--shadow-border)]",
     pill: {
@@ -23,7 +22,7 @@ const HOME_TOOL_CARDS: ToolCardItem[] = [
     breadcrumb: "generic / tools",
     img: "/media/hat.png",
     imgClassName:
-      "w-[75%] max-w-[6.5rem] translate-x-1.5 -translate-y-1.5 sm:max-w-[7.25rem] sm:translate-x-2 sm:-translate-y-2",
+      "translate-x-1.5 -translate-y-1.5 sm:translate-x-2 sm:-translate-y-2",
     cardClassName:
       "border-transparent bg-[#191919] shadow-[var(--shadow-border)]",
     pill: {

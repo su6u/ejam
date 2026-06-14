@@ -3,6 +3,7 @@ import Image from "next/image";
 import { cn } from "@/lib/utils";
 import {
   homeCardPillDisabledClass,
+  homeCardPillStaticClass,
 } from "@/lib/pressable";
 
 export interface ToolCardItem {
@@ -12,6 +13,7 @@ export interface ToolCardItem {
   img?: string;
   imgLight?: string;
   imgClassName?: string;
+  mobileImgClassName?: string;
   imgWidth?: number;
   containerClassName?: string;
   cardClassName?: string;
@@ -70,90 +72,125 @@ function ToolCard({
           </span>
         )}
 
-        {compact && item.pill ? (
-          (() => {
-            const pillContent = (
-              <>
-                <Image
-                  src={item.pill.iconSrc}
-                  alt=""
-                  width={14}
-                  height={14}
-                  aria-hidden
-                  className="size-3 shrink-0"
-                />
-                {item.pill.label}
-              </>
-            );
-            if (pillOnlyLink && item.href && renderPillLink) {
-              return renderPillLink(item.href, pillContent);
-            }
-            const pillDisabled = !item.href;
-            return (
-              <span
-                className={cn(
-                  pillDisabled
-                    ? homeCardPillDisabledClass
-                    : "absolute right-2.5 bottom-4 z-10 inline-flex h-7 items-center gap-1 rounded-full bg-[#FDFDFD] pl-2 pr-2.5 text-[11px] font-medium leading-none text-[#2e2e2e]",
-                )}
-                aria-disabled={pillDisabled || undefined}
-              >
-                {pillContent}
-              </span>
-            );
-          })()
-        ) : null}
+        {compact ? (
+          <>
+            {item.name || item.breadcrumb ? (
+              <div className="relative z-10 shrink-0 px-2.5 pt-2.5 pb-1">
+                <div className="flex flex-col items-start gap-0.5 sm:flex-row sm:items-baseline sm:justify-between sm:gap-1">
+                  {item.name ? (
+                    <span
+                      className={cn(
+                        "font-instrument-sans text-[11px] font-medium leading-tight tracking-tight sm:min-w-0 sm:truncate sm:text-sm",
+                        item.soon
+                          ? "text-muted-foreground/80"
+                          : "text-foreground",
+                      )}
+                    >
+                      {item.name}
+                    </span>
+                  ) : null}
+                  {item.breadcrumb ? (
+                    <span className="font-instrument-sans text-[10px] leading-tight text-muted-foreground sm:shrink-0 sm:text-right sm:text-[11px]">
+                      {item.breadcrumb}
+                    </span>
+                  ) : null}
+                </div>
+              </div>
+            ) : null}
 
+            {item.img || item.pill ? (
+              <div className="relative mt-auto flex min-h-0 flex-1 flex-col">
+                {item.img ? (
+                  <div className="pointer-events-none absolute inset-x-0 bottom-0 hidden items-end justify-start pl-0.5 sm:flex md:pl-1">
+                    <img
+                      src={item.img}
+                      alt=""
+                      width={item.imgWidth ?? 200}
+                      height={140}
+                      className={cn(
+                        "block h-auto w-[75%] max-w-[6.5rem] object-contain object-bottom sm:max-w-[7.25rem]",
+                        item.imgClassName,
+                      )}
+                    />
+                  </div>
+                ) : null}
+
+                {item.img ? (
+                  <div className="pointer-events-none absolute bottom-0 left-2.5 z-0 sm:hidden">
+                    <img
+                      src={item.img}
+                      alt=""
+                      width={item.imgWidth ?? 200}
+                      height={140}
+                      className={cn(
+                        "block h-[4rem] w-auto max-w-[4.25rem] object-contain object-bottom object-left",
+                        item.mobileImgClassName,
+                      )}
+                    />
+                  </div>
+                ) : null}
+
+                <div
+                  className={cn(
+                    "relative z-10 mt-auto flex items-end justify-end gap-1.5 px-2.5 pb-2.5 pt-2 sm:gap-2",
+                  )}
+                >
+                  {item.pill ? (
+                    (() => {
+                      const pillContent = (
+                        <>
+                          <Image
+                            src={item.pill.iconSrc}
+                            alt=""
+                            width={14}
+                            height={14}
+                            aria-hidden
+                            className="size-2.5 shrink-0 sm:size-3"
+                          />
+                          {item.pill.label}
+                        </>
+                      );
+                      if (pillOnlyLink && item.href && renderPillLink) {
+                        return renderPillLink(item.href, pillContent);
+                      }
+                      const pillDisabled = !item.href;
+                      return (
+                        <span
+                          className={cn(
+                            pillDisabled
+                              ? homeCardPillDisabledClass
+                              : homeCardPillStaticClass,
+                          )}
+                          aria-disabled={pillDisabled || undefined}
+                        >
+                          {pillContent}
+                        </span>
+                      );
+                    })()
+                  ) : null}
+                </div>
+              </div>
+            ) : null}
+          </>
+        ) : (
         <div
           className={cn(
-            compact
-              ? "relative flex min-h-0 flex-1 flex-col overflow-hidden px-2.5 pt-2.5 pb-0"
-              : "relative flex flex-1 flex-col gap-3 px-5 pt-6 pb-4",
+            "relative flex flex-1 flex-col gap-3 px-5 pt-6 pb-4",
             item.containerClassName,
           )}
         >
           {item.name || item.breadcrumb ? (
-            <div
-              className={cn(
-                "relative z-10 flex gap-1",
-                compact
-                  ? "items-baseline justify-between"
-                  : "flex-col items-start gap-0.5",
-              )}
-            >
+            <div className="relative z-10 flex flex-col items-start gap-0.5">
               {item.name ? (
                 <span
                   className={cn(
-                    "font-instrument-sans leading-tight",
-                    compact
-                      ? "min-w-0 truncate text-[11px] font-medium tracking-tight sm:text-sm"
-                      : "shrink-0 text-xl font-medium tracking-tight",
+                    "shrink-0 font-instrument-sans text-xl font-medium leading-tight tracking-tight",
                     item.soon ? "text-muted-foreground/80" : "text-foreground",
                   )}
                 >
                   {item.name}
                 </span>
               ) : null}
-              {compact && item.breadcrumb ? (
-                <span className="shrink-0 text-right font-instrument-sans text-[10px] leading-tight text-muted-foreground sm:text-[11px]">
-                  {item.breadcrumb}
-                </span>
-              ) : null}
-            </div>
-          ) : null}
-
-          {compact && item.img ? (
-            <div className="pointer-events-none absolute inset-x-0 bottom-0 flex items-end justify-start pl-0.5 md:pl-1">
-              <img
-                src={item.img}
-                alt=""
-                width={item.imgWidth ?? 200}
-                height={140}
-                className={cn(
-                  "block h-auto w-[62%] max-w-[4.5rem] object-contain object-bottom sm:max-w-[5rem]",
-                  item.imgClassName,
-                )}
-              />
             </div>
           ) : null}
 
@@ -186,6 +223,7 @@ function ToolCard({
             <div className="pointer-events-none absolute inset-x-0 bottom-0 h-22 bg-gradient-to-t from-card to-transparent" />
           )}
         </div>
+        )}
       </div>
     </div>
   );

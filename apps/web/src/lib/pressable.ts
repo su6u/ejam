@@ -23,14 +23,19 @@ export const homePillClass = cn(
 
 export const homeHeaderLinkClass = homePillClass;
 
-export const homeCardPillClass = cn(
-  homePillClass,
-  "absolute right-2.5 bottom-4 z-10 h-7 gap-1 pl-2 pr-2.5 text-[11px] leading-none",
-);
+const homeCardPillSizeClass =
+  "inline-flex h-6 shrink-0 items-center gap-0.5 pl-1.5 pr-2 text-[10px] leading-none sm:h-7 sm:gap-1 sm:pl-2 sm:pr-2.5 sm:text-[11px]";
+
+export const homeCardPillClass = cn(homePillClass, homeCardPillSizeClass);
 
 export const homeCardPillDisabledClass = cn(
-  "absolute right-2.5 bottom-4 z-10 inline-flex h-7 cursor-not-allowed items-center gap-1 rounded-full bg-[#FDFDFD]/75 pl-2 pr-2.5 text-[11px] font-medium leading-none text-[#2e2e2e]/50",
+  "inline-flex h-6 shrink-0 cursor-not-allowed items-center gap-0.5 rounded-full bg-[#FDFDFD]/75 pl-1.5 pr-2 text-[10px] font-medium leading-none text-[#2e2e2e]/50 sm:h-7 sm:gap-1 sm:pl-2 sm:pr-2.5 sm:text-[11px]",
   "pointer-events-none shadow-[0_0_0_1px_rgb(0_0_0_/0.06)]",
+);
+
+export const homeCardPillStaticClass = cn(
+  homeCardPillSizeClass,
+  "rounded-full bg-[#FDFDFD] font-medium text-[#2e2e2e] shadow-[0_0_0_1px_rgb(0_0_0_/0.08)]",
 );
 
 /** Run click work after the press animation paints (double rAF). */
