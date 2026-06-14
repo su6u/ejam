@@ -8,6 +8,7 @@ import {
 } from "@/components/app-layout";
 import { HomeManifesto } from "@/components/home/home-manifesto";
 import { HomeSmoothScroll } from "@/components/home/home-smooth-scroll";
+import { HomeRequestTool } from "@/components/home/home-request-tool";
 import { HomeToolsSection } from "@/components/home/home-tools-section";
 import { HomeTagline } from "@/components/home-tagline";
 import { pressableClass } from "@/lib/pressable";
@@ -63,6 +64,9 @@ export default function HomePage() {
             </div>
             <div className="mt-12 flex w-full justify-center md:mt-16">
               <HomeToolsSection />
+            </div>
+            <div className="mt-16 flex w-full justify-center pb-9 md:mt-[4.5rem] md:pb-11">
+              <HomeRequestTool />
             </div>
           </main>
         </div>
