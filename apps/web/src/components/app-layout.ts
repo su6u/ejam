@@ -6,17 +6,24 @@ const appContentGutterClass = "px-4 md:px-6";
 /** home page content column — navbar and body share one width */
 export const homePageContainerClass = "mx-auto w-full max-w-3xl px-4 md:px-6";
 
-/** tools catalog inner column — same box as HomeTagline (pair with items-center wrapper) */
+/** home header bar — logo and actions share the content column width */
+export const homeHeaderContainerClass =
+  "mx-auto flex w-full max-w-3xl items-center justify-between gap-4 px-4 md:px-6";
+
+export const homeCardsRowClass =
+  "mx-auto w-full max-w-[30rem] sm:max-w-[32rem]";
+
+/** home hero text — centered readable measure, aligned to content column */
+export const homeTaglineColumnClass =
+  "mx-auto w-full max-w-[19.5rem] text-center sm:max-w-[22rem] md:max-w-[26rem]";
+
+/** home manifesto body — readable measure on narrow viewports */
+export const homeManifestoColumnClass =
+  "mx-auto w-full max-w-[34rem] sm:max-w-[36rem] md:max-w-[38rem]";
+
+/** home tools column — same readable width as HomeTagline */
 export const homeHeroColumnClass =
-  "w-full max-w-[24rem] -ml-1.5 md:max-w-[28rem] md:-ml-2";
-
-/** header logo — matches catalog column left edge when tagline stays centered */
-export const homeLogoAlignClass =
-  "ml-[calc((100%-min(100%,24rem))/2+1.25rem-0.375rem)] md:ml-[calc((100%-min(100%,28rem))/2+1.75rem-0.5rem)]";
-
-/** header actions — inset left from catalog column right edge */
-export const homeHeaderActionsAlignClass =
-  "mr-[max(0px,calc((100%-min(100%,24rem))/2-1.25rem+0.375rem+0.75rem))] md:mr-[max(0px,calc((100%-min(100%,28rem))/2-1.75rem+0.5rem+1rem))]";
+  "mx-auto w-full max-w-[20rem] md:max-w-[24rem]";
 
 /** frosted sticky chrome — navbar, table headers, etc. */
 export const stickyGlassChromeClass =
@@ -24,11 +31,21 @@ export const stickyGlassChromeClass =
 
 /** sticky table thead — blur on thead, tint on cells so rows scroll beneath */
 export const stickyGlassTableHeaderClass =
-  "sticky top-0 z-10 backdrop-blur-sm [&_th]:bg-background/95 supports-backdrop-filter:[&_th]:bg-background/50";
+  "sticky top-0 z-10 backdrop-blur-sm [&_th]:sticky [&_th]:top-0 [&_th]:z-10 [&_th]:bg-background/95 supports-backdrop-filter:[&_th]:bg-background/50";
+
+/** results table scroll — mobile cards scroll in content; desktop table wrapper owns sticky scroll */
+export const resultsTableScrollClass =
+  "no-scrollbar min-h-0 flex-1 overflow-y-auto lg:overflow-hidden lg:[&_[data-slot=table-container]]:min-h-0 lg:[&_[data-slot=table-container]]:flex-1 lg:[&_[data-slot=table-container]]:overflow-auto lg:[&_[data-slot=table-container]]:no-scrollbar";
 
 /** h-14 top chrome — sidebar logo row and main header actions share one strip height */
 export const appChromeStripClass =
   "flex h-14 shrink-0 items-center border-b border-border";
+
+/** Sidebar logo row — same on desktop rail and mobile drawer (logo flush at px-2) */
+export const appSidebarHeaderClass = cn(
+  appChromeStripClass,
+  "flex flex-row items-center gap-0 p-0 px-2",
+);
 
 /** header right gutter includes the dashboard 1px frame so actions sit on the card edge */
 export const appHeaderGutterClass =

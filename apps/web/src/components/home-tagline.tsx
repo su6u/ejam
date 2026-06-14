@@ -1,3 +1,4 @@
+import { homeTaglineColumnClass } from "@/components/app-layout";
 import { GradientText } from "@/components/gradient-text";
 import { cn } from "@/lib/utils";
 
@@ -17,7 +18,8 @@ export function HomeTagline({ className }: { className?: string }) {
   return (
     <p
       className={cn(
-        "home-tagline font-instrument-sans max-w-[24rem] -ml-1.5 text-center text-[1.625rem] font-normal leading-[1.35] tracking-[-0.01em] [word-spacing:0.08em] text-[#2e2e2e] md:max-w-[28rem] md:-ml-2 md:text-[2rem] md:leading-[1.32]",
+        homeTaglineColumnClass,
+        "home-tagline font-instrument-sans text-balance text-[clamp(1.3125rem,3.8vw+0.65rem,1.875rem)] font-normal leading-[1.38] tracking-[-0.01em] text-[#FDFDFD] sm:leading-[1.35] md:leading-[1.32]",
         className,
       )}
     >

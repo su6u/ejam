@@ -1,50 +1,35 @@
-import { ArrowUpRightIcon } from "lucide-react";
-import Link from "next/link";
-import { pressableClass } from "@/lib/pressable";
-import { toolRequestIssueUrl } from "@/lib/tool-request-issue";
+import { homeCardsRowClass } from "@/components/app-layout";
+import { TOOL_REQUEST_ISSUE_URL } from "@/lib/github";
 import { cn } from "@/lib/utils";
 
-export function HomeRequestTool({
-  className,
-  style,
-}: {
-  className?: string;
-  style?: React.CSSProperties;
-}) {
+export function HomeRequestTool() {
   return (
-    <section
-      aria-labelledby="home-request-tool-label"
-      className={cn("flex flex-col gap-1.5", className)}
-      style={style}
-    >
-      <h2
-        id="home-request-tool-label"
-        className="mb-1.5 font-mono text-[9px] font-medium leading-none tracking-[0.14em] text-[#2e2e2e]/45 uppercase"
-      >
-        Missing something?
-      </h2>
-      <p className="font-instrument-sans text-[13px] leading-snug tracking-[-0.01em] text-[#2e2e2e]/70">
-        Wish a <span className="font-serif-display italic">tool</span> existed?{" "}
-        Tell me what — if I find the time, I&apos;ll try to build it :)
+    <div className={cn(homeCardsRowClass, "text-center")}>
+      <p className="font-instrument-sans text-pretty text-[0.9375rem] leading-[1.55] tracking-normal text-white/45 sm:text-[15px] sm:text-base">
+        There is only one tool shipped so far. If you need something that
+        isn&apos;t here yet, I&apos;d love to hear what would help
+        <a
+          href={TOOL_REQUEST_ISSUE_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={cn(
+            "relative inline-flex min-h-10 items-center text-[0.9375rem] font-medium leading-[1.55] text-white/80 transition-[color,transform] duration-150 ease-out sm:text-[15px]",
+            "after:absolute after:-inset-x-2 after:-inset-y-1.5 after:content-['']",
+            "active:scale-[0.96] motion-reduce:active:scale-100",
+            "[@media(hover:hover)_and_(pointer:fine)]:hover:text-white",
+          )}
+        >
+          <span className="relative -top-px inline pl-3 pr-2 leading-[1.55] sm:pl-4 sm:pr-3">
+            <img
+              src="/media/loop.svg"
+              alt=""
+              aria-hidden
+              className="pointer-events-none absolute left-1/2 top-1/2 h-auto w-[calc(100%+4.5rem)] -translate-x-1/2 -translate-y-1/2 opacity-75"
+            />
+            <span className="relative z-10">Request a tool</span>
+          </span>
+        </a>
       </p>
-      <Link
-        href={toolRequestIssueUrl()}
-        target="_blank"
-        rel="noopener noreferrer"
-        className={cn(
-          "group/request mt-0.5 inline-flex w-fit items-center gap-1 font-instrument-sans text-[13px] font-medium tracking-[-0.01em] text-[#2e2e2e]",
-          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2e2e2e]/20 focus-visible:ring-offset-2 focus-visible:ring-offset-[#F6FBFF]",
-          pressableClass,
-        )}
-      >
-        <span className="border-b border-[#2e2e2e]/25 pb-px transition-colors duration-150 ease-out group-hover/request:border-[#2e2e2e]/60">
-          Request a tool
-        </span>
-        <ArrowUpRightIcon
-          aria-hidden
-          className="size-3.5 shrink-0 translate-y-px transition-transform duration-150 ease-out group-hover/request:translate-x-0.5 group-hover/request:-translate-y-0.5"
-        />
-      </Link>
-    </section>
+    </div>
   );
 }

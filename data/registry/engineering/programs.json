@@ -3,11 +3,66 @@
     "id": "computer-science",
     "name": "Computer Science and Engineering",
     "aliases": [
+      "B.Tech.(Computer Scienceand",
+      "B.Techin CSE(AIand ML)",
+      "B.TechinCSE(AIand ML)",
       "CSE",
-      "Computer Science & Engineering",
+      "Computer Engineering",
       "Computer Sc. and Engg.",
+      "Computer Science & Engineering",
       "Computer Science Engineering",
-      "Computer Science and Engg"
+      "Computer Science Engineering (Artificial Intelligence)",
+      "Computer Science Engineering (Artificiallntelligenceand Machine Learning)",
+      "Computer Science Engineering (Data Science and Analytics)",
+      "Computer Science Engineering (Data Science)",
+      "Computer Science Engineering (Human Computerlnteraction and Gaming Technology)",
+      "Computer Science Engineering(Artificial Intelligence)",
+      "Computer Science Engineering(Artificial lntelligence and Machine Learning)",
+      "Computer Science Engineering(Artificial lntelligenceand Machine Learning)",
+      "Computer Science Engineering(Data",
+      "Computer Science Engineering(Data Science and Analytics)",
+      "Computer Science Engineering(Data Science)",
+      "Computer Science Engineering(Human Computerlnteraction and Gaming",
+      "Computer Science Engineering(Human Computerlnteractionand Gaming Technology)",
+      "Computer Science and Engg",
+      "Computer Scienceand Engineering(Cyber",
+      "Computer Scienceand Engineering(Cyber Physical System)",
+      "Computer Scienceand Engineering(Data",
+      "Computer Scienceand Engineering(Internet of Things,Cyber Securityincluding Block Chain",
+      "Computer Scienceand Engineeringwith Majorin Artificial",
+      "Computer Scienceand Engineeringwith Specializationin Cyber Security",
+      "Computer Scienceand Engineeringwith Specializationin Data",
+      "Computer Scienceand Engineeringwith Specializationin Data Science",
+      "Computer Scienceand Engineeringwith minorin AIand ML",
+      "Computer Scienceand Engineeringwith specializationin Cyber Security",
+      "Computer Scienceand Engineeringwith specializationin Quantum",
+      "ComputerEngineering",
+      "ComputerScience Engineering(Artificial Intelligence)",
+      "ComputerScience Engineering(Artificial lntelligenceand MachineLearning)",
+      "ComputerScience Engineering(Artificial lntelligenceandMachine Learning)",
+      "ComputerScience Engineering(Data",
+      "ComputerScience Engineering(Data Science)",
+      "ComputerScience Engineering(Data ScienceandAnalytics)",
+      "ComputerScience Engineering(Human Computerlnteraction andGaming",
+      "ComputerScience Engineering(Human Computerlnteractionand GamingTechnology)",
+      "ComputerScienceEngineering (ArtificialIntelligence)",
+      "ComputerScienceEngineering (Artificiallntelligenceand MachineLearning)",
+      "ComputerScienceEngineering (DataScience)",
+      "ComputerScienceEngineering (DataScienceandAnalytics)",
+      "ComputerScienceEngineering (HumanComputerlnteraction andGamingTechnology)",
+      "ComputerScienceand Engineering(Cyber",
+      "ComputerScienceand Engineering(Cyber PhysicalSystem)",
+      "ComputerScienceand Engineering(Data",
+      "ComputerScienceand Engineering(Internet ofThings,Cyber Securityincluding BlockChain",
+      "ComputerScienceand Engineeringwith MajorinArtificial",
+      "ComputerScienceand Engineeringwith SpecializationinCyber Security",
+      "ComputerScienceand Engineeringwith SpecializationinData",
+      "ComputerScienceand Engineeringwith SpecializationinData Science",
+      "ComputerScienceand Engineeringwith minorinAIandML",
+      "ComputerScienceand Engineeringwith specializationin Quantum",
+      "ComputerScienceand Engineeringwith specializationinCyber Security",
+      "Integrated B.Tech.-M. Techin Computer Science& Engineering",
+      "IntegratedB.Tech.-M. TechinComputerScience& Engineering"
     ],
     "degree": "B.Tech",
     "duration_years": 4
@@ -15,7 +70,19 @@
   {
     "id": "electrical",
     "name": "Electrical Engineering",
-    "aliases": ["EE", "Electrical Engg.", "Electrical Engg"],
+    "aliases": [
+      "B.Techin Electrical Engineering(Rail Engineering)",
+      "B.TechinElectrical Engineering(Rail Engineering)",
+      "EE",
+      "Electrical Engg",
+      "Electrical Engg.",
+      "Electrical Engineering with Specialization In Power System",
+      "Electrical Engineeringwith Specialization In Power System Engineering",
+      "ElectricalEngineering withSpecializationIn PowerSystem",
+      "ElectricalEngineeringwith SpecializationInPower SystemEngineering",
+      "Integrated B.Tech.-M. Techin Electrical Engineering",
+      "IntegratedB.Tech.-M. TechinElectrical Engineering"
+    ],
     "degree": "B.Tech",
     "duration_years": 4
   },
@@ -23,10 +90,50 @@
     "id": "electronics-communication",
     "name": "Electronics and Communication Engineering",
     "aliases": [
+      "B.Tech.(Electronics and Communication Engineering)-MBA",
+      "B.Tech.(Electronics andCommunication Engineering)-MBA",
+      "B.Tech.in Electronics and Communication Engineeringand M.Tech.in",
+      "B.Tech.in Electronics and Communication Engineeringand M.Tech.in Microelectronicsand",
+      "B.Tech.in Electronicsand Communication Engineering and M.Tech.in VLSIDesign",
+      "B.Tech.inElectronics andCommunication Engineeringand M.Tech.in",
+      "B.Tech.inElectronics andCommunication Engineeringand M.Tech.in Microelectronicsand",
+      "B.Tech.inElectronicsand CommunicationEngineering andM.Tech.inVLSIDesign",
+      "B.Techin Electronics &Communication Engineering(Rail",
+      "B.Techin Electronics and Communication Engineeringwith minorin Wearable",
+      "B.TechinElectronics &Communication Engineering(Rail",
+      "B.TechinElectronics andCommunication Engineeringwith minorinWearable",
       "ECE",
       "Electronics & Communication",
+      "Electronics & Communication Engineering",
       "Electronics and Communication",
-      "Electronics & Communication Engineering"
+      "Electronics and Communication Engineering(Avionics)",
+      "Electronics and Communication Engineering(Internetof Things)",
+      "Electronics and Communication Engineering(with Specialization of Embedded Systemsand Internetof Things)",
+      "Electronicsand Communication Engineering (Avionics)",
+      "Electronicsand Communication Engineering (Internetof Things)",
+      "Electronicsand Communication Engineering (with Specializationof Embedded Systemsand Internetof Things)",
+      "Electronicsand Communication Engineering with Specializationin Microelectronics and VLSI System Design",
+      "Electronicsand Communication Engineering withspecializationin Design and Manufacturing",
+      "Electronicsand Communication Engineering withspecializationin VLSI and Embedded Systems",
+      "Electronicsand Communication Engineering(Avionics)",
+      "Electronicsand Communication Engineering(Internet",
+      "Electronicsand Communication Engineering(VLSI",
+      "Electronicsand Communication Engineering(with Specializationof Embedded Systems",
+      "Electronicsand Communication Engineering(with Specializationof EmbeddedSystems",
+      "Electronicsand Communication Engineeringwith Specializationin Microelectronicsand",
+      "Electronicsand Communication Engineeringwith specializationin",
+      "Electronicsand Communication Engineeringwith specializationin VLSI",
+      "Electronicsand Communication Engineeringwith specializationinVLSI",
+      "Electronicsand CommunicationEngineering (Avionics)",
+      "Electronicsand CommunicationEngineering (InternetofThings)",
+      "Electronicsand CommunicationEngineering (withSpecializationof EmbeddedSystemsand InternetofThings)",
+      "Electronicsand CommunicationEngineering withSpecializationin MicroelectronicsandVLSI SystemDesign",
+      "Electronicsand CommunicationEngineering withspecializationinDesign andManufacturing",
+      "Electronicsand CommunicationEngineering withspecializationinVLSI andEmbeddedSystems",
+      "Electronicsand Telecommunication Engineering",
+      "ElectronicsandCommunication Engineering(Avionics)",
+      "ElectronicsandCommunication Engineering(InternetofThings)",
+      "ElectronicsandCommunication Engineering(withSpecialization ofEmbeddedSystemsand InternetofThings)"
     ],
     "degree": "B.Tech",
     "duration_years": 4
@@ -34,28 +141,72 @@
   {
     "id": "mechanical",
     "name": "Mechanical Engineering",
-    "aliases": ["ME", "Mechanical Engg.", "Mech", "Mechanical Engg"],
+    "aliases": [
+      "B.Tech.(Mechanical Engineering)-MBA",
+      "B.Techin Mechanical Engineering and M.Techin AIand Robotics",
+      "B.Techin Mechanical Engineering(Rail Engineering)",
+      "B.Techin Mechanical Engineeringand M.Techin AIand",
+      "B.TechinMechanical Engineering(Rail Engineering)",
+      "B.TechinMechanical Engineeringand M.TechinAIand",
+      "B.TechinMechanical EngineeringandM.Techin AIandRobotics",
+      "ME",
+      "Mech",
+      "Mechanical Engg",
+      "Mechanical Engg.",
+      "Mechanical Engineering with Specializationin Manufacturingand Industrial Engineering",
+      "Mechanical Engineering withspecializationin Design and Manufacturing",
+      "Mechanical Engineeringwith Specializationin Manufacturing and Industrial Engineering",
+      "Mechanical Engineeringwith Specializationin Manufacturingand",
+      "Mechanical Engineeringwith specializationin Designand",
+      "Mechanical Engineeringwith specializationin Designand Manufacturing",
+      "MechanicalEngineering withSpecializationin Manufacturingand IndustrialEngineering",
+      "MechanicalEngineering withspecializationinDesign andManufacturing",
+      "MechanicalEngineeringwith SpecializationinManufacturing andIndustrialEngineering",
+      "MechanicalEngineeringwith specializationinDesignand Manufacturing",
+      "Mechatronics Engineering",
+      "Mechatronicsand Automation",
+      "Mechatronicsand Automation Engineering",
+      "Mechatronicsand AutomationEngineering"
+    ],
     "degree": "B.Tech",
     "duration_years": 4
   },
   {
     "id": "civil",
     "name": "Civil Engineering",
-    "aliases": ["CE", "Civil Engg.", "Civil Engg"],
+    "aliases": [
+      "B.Tech.(Civil Engineering)-MBA",
+      "B.Techin Civil Engineering (Rail Engineering)",
+      "B.Techin Civil Engineering(Rail",
+      "B.TechinCivil Engineering(Rail",
+      "B.TechinCivilEngineering (RailEngineering)",
+      "CE",
+      "Civil Engg",
+      "Civil Engg.",
+      "Integrated B.Tech.-M. Techin Civil Engineering",
+      "IntegratedB.Tech.-M. TechinCivilEngineering"
+    ],
     "degree": "B.Tech",
     "duration_years": 4
   },
   {
     "id": "chemical",
     "name": "Chemical Engineering",
-    "aliases": ["CHE", "ChE", "Chemical Engg.", "Chem Engg"],
+    "aliases": [
+      "CHE",
+      "ChE",
+      "Chem Engg",
+      "Chemical Engg.",
+      "Chemical Technology",
+      "ChemicalTechnology"
+    ],
     "degree": "B.Tech",
     "duration_years": 4
   },
   {
     "id": "aerospace",
     "name": "Aerospace Engineering",
-    "aliases": ["AE", "Aerospace Engg.", "Aero"],
+    "aliases": ["AE", "Aero", "Aeronautical Engineering", "Aerospace Engg."],
     "degree": "B.Tech",
     "duration_years": 4
   },
@@ -63,11 +214,15 @@
     "id": "metallurgical-materials",
     "name": "Metallurgical and Materials Engineering",
     "aliases": [
+      "Integrated B.Tech.-M.Tech in Metallurgical&Materials Engineering",
+      "IntegratedB.Tech.-M.Tech inMetallurgical&Materials Engineering",
       "MME",
+      "Materials Engineering",
+      "Metallurgical Engg.",
       "Metallurgical Engineering",
       "Metallurgical and Materials",
-      "Metallurgical Engg.",
-      "Materials Engineering"
+      "Metallurgyand Materials Engineering",
+      "Metallurgyand MaterialsEngineering"
     ],
     "degree": "B.Tech",
     "duration_years": 4
@@ -75,14 +230,27 @@
   {
     "id": "biotechnology",
     "name": "Biotechnology",
-    "aliases": ["BT", "Biotech", "Biotechnology Engg.", "Bio Technology"],
+    "aliases": [
+      "BT",
+      "Bio Technology",
+      "Biotech",
+      "Biotechnology Engg.",
+      "Biotechnologyand Biochemical",
+      "Biotechnologyand Biochemical Engineering",
+      "Biotechnologyand BiochemicalEngineering"
+    ],
     "degree": "B.Tech",
     "duration_years": 4
   },
   {
     "id": "production-industrial",
     "name": "Production and Industrial Engineering",
-    "aliases": ["PIE", "Industrial Engineering", "Production Engineering"],
+    "aliases": [
+      "Industrial Engineering",
+      "Industrialand Production Engineering",
+      "PIE",
+      "Production Engineering"
+    ],
     "degree": "B.Tech",
     "duration_years": 4
   },
@@ -103,7 +271,35 @@
   {
     "id": "artificial-intelligence",
     "name": "Artificial Intelligence",
-    "aliases": ["AI", "AI Engineering", "Artificial Intelligence Engineering"],
+    "aliases": [
+      "AI",
+      "AI Engineering",
+      "Artificial Intelligence Engineering",
+      "Artificial Intelligence and Data Engineering",
+      "Artificial Intelligence and Machine Learning",
+      "ArtificialIntelligence andDataEngineering",
+      "ArtificialIntelligence andMachineLearning",
+      "Computer Scienceand Artificial Intelligence",
+      "Computer Scienceand Engineering(Artificial Intelligence&Data",
+      "Computer Scienceand Engineering(Artificial Intelligence&Data Science)",
+      "Computer Scienceand Engineering(Artificial Intelligence)",
+      "Computer Scienceand Engineering(Artificial Intelligenceand Machine Learning)",
+      "Computer Scienceand Engineering(with Specialization of Data Science and Artificial Intelligence)",
+      "Computer Scienceand Engineering(with Specializationof Data Science and Artificial Intelligence)",
+      "Computer Scienceand Engineeringwith Majorin Artificial Intelligence",
+      "Computer Scienceand Engineeringwith specializationin Artificial Intelligence",
+      "Computer Scienceand Engineeringwith specializationin Artificial Intelligence and Data Science",
+      "ComputerScienceand ArtificialIntelligence",
+      "ComputerScienceand Engineering(Artificial Intelligence&Data",
+      "ComputerScienceand Engineering(Artificial Intelligence&DataScience)",
+      "ComputerScienceand Engineering(Artificial Intelligence)",
+      "ComputerScienceand Engineering(Artificial Intelligenceand MachineLearning)",
+      "ComputerScienceand Engineering(with SpecializationofData ScienceandArtificial Intelligence)",
+      "ComputerScienceand Engineering(withSpecialization ofDataScienceandArtificial Intelligence)",
+      "ComputerScienceand Engineeringwith MajorinArtificial Intelligence",
+      "ComputerScienceand Engineeringwith specializationin ArtificialIntelligence",
+      "ComputerScienceand Engineeringwith specializationinArtificial IntelligenceandData Science"
+    ],
     "degree": "B.Tech",
     "duration_years": 4
   },
@@ -122,7 +318,12 @@
   {
     "id": "architecture",
     "name": "Architecture",
-    "aliases": ["B.Arch", "Architecture (5 years)"],
+    "aliases": [
+      "Architecture (5 years)",
+      "Architecture and Planning",
+      "ArchitectureandPlanning",
+      "B.Arch"
+    ],
     "degree": "B.Arch",
     "duration_years": 5
   },
@@ -138,8 +339,11 @@
     "name": "Information Technology",
     "aliases": [
       "IT",
+      "Information",
       "Information Technology (4 Years, Bachelor of Technology)",
-      "Information Technology (5 Years, Bachelor and Master of Technology (Dual Degree))"
+      "Information Technology (5 Years, Bachelor and Master of Technology (Dual Degree))",
+      "Information Technology- Business Informatics",
+      "InformationTechnology- BusinessInformatics"
     ],
     "degree": "B.Tech",
     "duration_years": 4
@@ -149,7 +353,14 @@
     "name": "Electronics Engineering",
     "aliases": [
       "Electronics Engineering (4 Years, Bachelor of Technology)",
-      "Electronics and Electrical Communication Engineering with M.Tech. in any of the listed specializations (5 Years, Bachelor and Master of Technology (Dual Degree))"
+      "Electronics Engineering (VLSIDesignand Technology)",
+      "Electronics Engineering(VLSI",
+      "Electronics Engineering(VLSI Design and Technology)",
+      "Electronics System Engineering",
+      "Electronics and Electrical Communication Engineering with M.Tech. in any of the listed specializations (5 Years, Bachelor and Master of Technology (Dual Degree))",
+      "ElectronicsEngineering (VLSIDesignand Technology)",
+      "ElectronicsEngineering(VLSI DesignandTechnology)",
+      "ElectronicsSystemEngineering"
     ],
     "degree": "B.Tech",
     "duration_years": 4
@@ -195,10 +406,11 @@
     "id": "microelectronics-vlsi",
     "name": "Microelectronics and VLSI Engineering",
     "aliases": [
-      "Microelectronics & VLSI Engineering (4 Years, Bachelor of Technology)",
       "B.Tech in Microelectronics & VLSI (4 Years, Bachelor of Technology)",
-      "VLSI Design and Technology (4 Years, Bachelor of Technology)",
-      "Integrated Circuit Design & Technology (4 Years, Bachelor of Technology)"
+      "Integrated Circuit Design & Technology (4 Years, Bachelor of Technology)",
+      "Microelectronics & VLSI Engineering (4 Years, Bachelor of Technology)",
+      "Microelectronics& VLSIEngineering",
+      "VLSI Design and Technology (4 Years, Bachelor of Technology)"
     ],
     "degree": "B.Tech",
     "duration_years": 4
@@ -207,8 +419,9 @@
     "id": "robotics-automation",
     "name": "Robotics and Automation",
     "aliases": [
+      "Mechatronics and Automation Engineering (4 Years, Bachelor of Technology)",
       "ROBOTICS & AUTOMATION (4 Years, Bachelor of Technology)",
-      "Mechatronics and Automation Engineering (4 Years, Bachelor of Technology)"
+      "ROBOTICS& AUTOMATION"
     ],
     "degree": "B.Tech",
     "duration_years": 4
@@ -257,6 +470,7 @@
     "id": "environmental-engineering",
     "name": "Environmental Engineering",
     "aliases": [
+      "Civiland Environmental Engineering",
       "Environmental Engineering (4 Years, Bachelor of Technology)",
       "Environmental Science and Engineering (4 Years, Bachelor of Technology)",
       "Environmental Science and Engineering (5 Years, Bachelor and Master of Technology (Dual Degree))"
@@ -297,6 +511,8 @@
     "id": "engineering-design",
     "name": "Engineering Design",
     "aliases": [
+      "Design Engineering",
+      "DesignEngineering",
       "Engineering Design (5 Years, Bachelor and Master of Technology (Dual Degree))",
       "Engineering and Computational Mechanics (4 Years, Bachelor of Technology)"
     ],
@@ -321,7 +537,11 @@
     "aliases": [
       "Ceramic Engineering (4 Years, Bachelor of Technology)",
       "Ceramic Engineering (5 Years, Bachelor and Master of Technology (Dual Degree))",
-      "Ceramic Engineering and M.Tech Industrial Ceramic (5 Years, Bachelor and Master of Technology (Dual Degree))"
+      "Ceramic Engineering and M.Tech Industrial",
+      "Ceramic Engineering and M.Tech Industrial Ceramic (5 Years, Bachelor and Master of Technology (Dual Degree))",
+      "Ceramic Engineeringand M.Tech Industrial Ceramic",
+      "CeramicEngineering andM.TechIndustrial",
+      "CeramicEngineeringand M.TechIndustrialCeramic"
     ],
     "degree": "B.Tech",
     "duration_years": 4
@@ -367,7 +587,13 @@
   {
     "id": "textile-technology",
     "name": "Textile Technology",
-    "aliases": ["Textile Technology (4 Years, Bachelor of Technology)"],
+    "aliases": [
+      "Carpet and Textile Technology",
+      "Carpet andTextile Technology",
+      "Handloom and Textile Technology",
+      "HandloomandTextile Technology",
+      "Textile Technology (4 Years, Bachelor of Technology)"
+    ],
     "degree": "B.Tech",
     "duration_years": 4
   },
@@ -391,8 +617,11 @@
     "id": "agricultural-food-engineering",
     "name": "Agricultural and Food Engineering",
     "aliases": [
+      "Agricultural",
+      "Agricultural Engineering",
       "Agricultural and Food Engineering (4 Years, Bachelor of Technology)",
-      "Agricultural and Food Engineering with M.Tech. in any of the listed specializations (5 Years, Bachelor and Master of Technology (Dual Degree))"
+      "Agricultural and Food Engineering with M.Tech. in any of the listed specializations (5 Years, Bachelor and Master of Technology (Dual Degree))",
+      "B.Tech.(Food Engineeringand"
     ],
     "degree": "B.Tech",
     "duration_years": 4
@@ -448,9 +677,19 @@
     "id": "mathematics-bs",
     "name": "Mathematics",
     "aliases": [
-      "BS in Mathematics (4 Years, Bachelor of Science)",
       "Applied Mathematics (5 Years, Integrated Master of Science)",
-      "Computational Mathematics (5 Years, Bachelor and Master of Technology (Dual Degree))"
+      "B.Techin Mathematicsand",
+      "B.Techin Mathematicsand Computing",
+      "BS in Mathematics (4 Years, Bachelor of Science)",
+      "Computational Mathematics",
+      "Computational Mathematics (5 Years, Bachelor and Master of Technology (Dual Degree))",
+      "Mathematicsand",
+      "Mathematicsand Computing Technology",
+      "Mathematicsand ComputingTechnology",
+      "Mathematicsand Data Science",
+      "Mathematicsand DataScience",
+      "Mathematicsand Scientific Computing",
+      "Mathematicsand ScientificComputing"
     ],
     "degree": "B.Sc",
     "duration_years": 4
@@ -458,7 +697,10 @@
   {
     "id": "physics-bs",
     "name": "Physics",
-    "aliases": ["Physics with Specialization (4 Years, Bachelor of Science)"],
+    "aliases": [
+      "Physics with Specialization (4 Years, Bachelor of Science)",
+      "Physicsand Computational"
+    ],
     "degree": "B.Sc",
     "duration_years": 4
   },
@@ -480,10 +722,11 @@
     "id": "economics-bs",
     "name": "Economics",
     "aliases": [
+      "BS in Economics with MBA (IIM Bodh Gaya) (5 Years, Bachelor of Science and MBA (Dual Degree))",
       "Economics (4 Years, Bachelor of Science)",
       "Economics (5 Years, Bachelor of Science and Master of Science (Dual Degree))",
       "Economics (5 Years, Integrated Master of Science)",
-      "BS in Economics with MBA (IIM Bodh Gaya) (5 Years, Bachelor of Science and MBA (Dual Degree))"
+      "Quantitative Economics&Data"
     ],
     "degree": "B.Sc",
     "duration_years": 4
@@ -596,7 +839,13 @@
     "name": "Integrated B.Tech IT and M.Tech IT",
     "aliases": [
       "Integrated B. Tech.(IT) and M. Tech (IT) (5 Years, Integrated B. Tech. and M. Tech. /MBA)",
-      "Integrated B. Tech.(IT) and M. Tech (IT) (5 Years, Integrated B. Tech. and M. Tech.)"
+      "Integrated B. Tech.(IT) and M. Tech (IT) (5 Years, Integrated B. Tech. and M. Tech.)",
+      "Integrated B.Tech.(IT) and M.Tech(IT)",
+      "Integrated B.Tech.(IT)and M. Tech(IT)",
+      "Integrated B.Tech.(IT)and M.Tech(IT)",
+      "IntegratedB.Tech.(IT) andM.Tech(IT)",
+      "IntegratedB.Tech.(IT)and M.Tech(IT)",
+      "IntegratedB.Tech.(IT)andM. Tech(IT)"
     ],
     "degree": "Integrated M.Tech",
     "duration_years": 5
@@ -606,7 +855,11 @@
     "name": "Integrated B.Tech IT and MBA",
     "aliases": [
       "Integrated B. Tech.(IT) and MBA (5 Years, Integrated B. Tech. and M. Tech. /MBA)",
-      "Integrated B. Tech.(IT) and MBA (5 Years, Integrated B. Tech. and MBA)"
+      "Integrated B. Tech.(IT) and MBA (5 Years, Integrated B. Tech. and MBA)",
+      "Integrated B.Tech.(IT) and MBA",
+      "Integrated B.Tech.(IT)and MBA",
+      "IntegratedB.Tech.(IT) andMBA",
+      "IntegratedB.Tech.(IT)and MBA"
     ],
     "degree": "Integrated M.Tech",
     "duration_years": 5
@@ -650,7 +903,9 @@
     "id": "aviation-engineering",
     "name": "Aviation Engineering",
     "aliases": [
-      "B.Tech in Aviation Engineering (4 Years, Bachelor of Technology)"
+      "B.Tech in Aviation Engineering (4 Years, Bachelor of Technology)",
+      "B.Techin Aviation Engineering",
+      "B.TechinAviation Engineering"
     ],
     "degree": "B.Tech",
     "duration_years": 4
@@ -666,7 +921,8 @@
     "id": "engineering-computational-mechanics-dual",
     "name": "Engineering and Computational Mechanics",
     "aliases": [
-      "B. Tech. and M. Tech. in Engineering and Computational Mechanics (Dual Degree) (5 Years, Bachelor and Master of Technology (Dual Degree))"
+      "B. Tech. and M. Tech. in Engineering and Computational Mechanics (Dual Degree) (5 Years, Bachelor and Master of Technology (Dual Degree))",
+      "Engineeringand Computational"
     ],
     "degree": "Dual B.Tech-M.Tech",
     "duration_years": 5
@@ -676,7 +932,9 @@
     "name": "Chemical Science",
     "aliases": [
       "Chemical  Science (5 Years, Integrated Bachelor of Science-Master of Science)",
-      "Chemical Science and Technology (4 Years, Bachelor of Technology)"
+      "Chemical Science and Technology (4 Years, Bachelor of Technology)",
+      "Chemical Scienceand Technology",
+      "ChemicalScienceand Technology"
     ],
     "degree": "B.Tech",
     "duration_years": 4
@@ -749,8 +1007,12 @@
     "id": "civil-construction-management-dual",
     "name": "Civil Engineering with Specialization in Construction Technology and Management",
     "aliases": [
+      "Civil Engineering with Specialization in Construction Technology and Management",
       "Civil Engineering with Specialization in Construction Technology and Management (5 Years, Bachelor and Master of Technology (Dual Degree))",
-      "Civil Engineering with Specialization in Construction Technology and Management"
+      "Civil Engineeringwith Specializationin Construction Technology and Management",
+      "Civil Engineeringwith Specializationin Construction Technologyand",
+      "CivilEngineeringwith Specializationin Construction Technologyand",
+      "CivilEngineeringwith Specializationin ConstructionTechnology andManagement"
     ],
     "degree": "Dual B.Tech-M.Tech",
     "duration_years": 5
@@ -791,12 +1053,183 @@
     "id": "electrical-mba-dual",
     "name": "B.Tech. Electrical Engineering with MBA",
     "aliases": [
+      "B.Tech. (Elctrical Engineering) - MBA",
       "B.Tech. (Elctrical Engineering) - MBA (5 Years, Bachelor of Technology and MBA (Dual Degree))",
       "B.Tech. (Electrical Engineering) - MBA",
-      "B.Tech. (Elctrical Engineering) - MBA",
+      "B.Tech.(Elctrical Engineering)-MBA",
       "Electrical Engineering with MBA"
     ],
     "degree": "Dual B.Tech-MBA",
     "duration_years": 5
+  },
+  {
+    "id": "b-tech-and-m-tech-in-engineeringand-computational-mechanics-dual",
+    "name": "B.Tech. and M.Tech. in Engineering and Computational Mechanics (Dual Degree)",
+    "aliases": [
+      "B.Tech.and M.Tech. in Engineeringand Computational Mechanics(Dual",
+      "B.Tech.andM.Tech. inEngineeringand Computational Mechanics(Dual"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "b-techin-artificial-intelligenece-and-data-science-transportationand",
+    "name": "B.Tech in Artificial Intelligence and Data Science (Transportation and Logistics)",
+    "aliases": [
+      "B.Techin Artificial Intelligenece and Data Science (Transportationand",
+      "B.Techin Artificial Intelligenece and Data Science(Transportationand Logistics)",
+      "B.TechinArtificial IntelligeneceandData Science (Transportationand",
+      "B.TechinArtificial IntelligeneceandData Science(Transportationand Logistics)"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "biosciencesand-bioengineering",
+    "name": "Biosciences and Bioengineering",
+    "aliases": ["Biosciencesand Bioengineering"],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "cse-data-science-analytics",
+    "name": "CSE (Data Science & Analytics)",
+    "aliases": ["CSE(Data Science& Analytics)", "CSE(DataScience& Analytics)"],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "computer-scienceand-business",
+    "name": "Computer Science and Business",
+    "aliases": ["Computer Scienceand Business", "ComputerScienceand Business"],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "computer-scienceand-engineering-cyber-security",
+    "name": "Computer Science and Engineering (Cyber Security)",
+    "aliases": [
+      "Computer Scienceand Engineering(Cyber Security)",
+      "ComputerScienceand Engineering(Cyber Security)"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "computer-scienceand-engineering-data-science",
+    "name": "Computer Science and Engineering (Data Science)",
+    "aliases": [
+      "Computer Scienceand Engineering(Data Science)",
+      "ComputerScienceand Engineering(Data Science)"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "dairy-engineering",
+    "name": "Dairy Engineering",
+    "aliases": ["Dairy Engineering", "DairyEngineering"],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "data-scienceand-engineering",
+    "name": "Data Science and Engineering",
+    "aliases": ["Data Scienceand Engineering", "DataScienceand Engineering"],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "electricaland-electronics",
+    "name": "Electrical and Electronics Engineering",
+    "aliases": [
+      "Electricaland Electronics",
+      "Electricaland Electronics Engineering"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "electronicsand-instrumentation",
+    "name": "Electronics and Instrumentation Engineering",
+    "aliases": ["Electronicsand Instrumentation"],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "energy-and-electrical-vehicle-engineering",
+    "name": "Energy and Electrical Vehicle Engineering",
+    "aliases": [
+      "Energy and Electrical Vehicle Engineering",
+      "EnergyandElectrical VehicleEngineering"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "industrialand-production",
+    "name": "Industrial and Production Engineering",
+    "aliases": ["Industrialand Production"],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "information-technology-business",
+    "name": "Information Technology-Business",
+    "aliases": ["Information Technology-Business"],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "materials-scienceand-metallurgical",
+    "name": "Materials Science and Metallurgical Engineering",
+    "aliases": [
+      "Materials Scienceand Metallurgical",
+      "Materials Scienceand Metallurgical Engineering",
+      "MaterialsScienceand Metallurgical",
+      "MaterialsScienceand MetallurgicalEngineering"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "sustainableenergy-technologies",
+    "name": "Sustainable Energy Technologies",
+    "aliases": ["SUSTAINABLEENERGY TECHNOLOGIES"],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "vlsidesignand-technology",
+    "name": "VLSI Design and Technology",
+    "aliases": [
+      "Electronics and Communication Engineering(VLSIDesignand Technology)",
+      "Electronicsand Communication Engineering (VLSIDesignand Technology)",
+      "Electronicsand CommunicationEngineering (VLSIDesignand Technology)",
+      "ElectronicsandCommunication Engineering(VLSIDesignand Technology)",
+      "VLSIDesignand Technology"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "b-tech-in-electronicsand-communication-engineering-and-m-tech-in-communication-s",
+    "name": "B.Tech. in Electronics and Communication Engineering and M.Tech. in Communication Systems",
+    "aliases": [
+      "B.Tech.in Electronicsand Communication Engineering and M.Tech.in Communication Systems",
+      "B.Tech.inElectronicsand CommunicationEngineering andM.Tech.in CommunicationSystems"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "b-techin-electronics-communication-engineering-rail-engineering",
+    "name": "B.Tech in Electronics & Communication Engineering (Rail Engineering)",
+    "aliases": [
+      "B.Techin Electronics& Communication Engineering (Rail Engineering)",
+      "B.TechinElectronics& CommunicationEngineering (RailEngineering)"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 4
   }
 ]

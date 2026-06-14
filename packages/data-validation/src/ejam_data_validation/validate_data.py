@@ -112,7 +112,11 @@ def load_registry_ids() -> set[str]:
 def discover_parquet_files() -> list[Path]:
     files: list[Path] = []
     if ENGINEERING_ROOT.exists():
-        files.extend(sorted(ENGINEERING_ROOT.rglob("*.parquet")))
+        files.extend(
+            path
+            for path in sorted(ENGINEERING_ROOT.rglob("*.parquet"))
+            if not path.name.startswith("._")
+        )
     for name in ("college_predictor_index.parquet", "csab_predictor_index.parquet"):
         path = DIST_ROOT / name
         if path.exists():
@@ -124,7 +128,9 @@ def classify_file(path: Path) -> str:
     rel = path.relative_to(ROOT).as_posix()
     if rel.endswith("/cutoffs.parquet"):
         return "cutoff"
-    if "seats-matrix" in rel and path.name == "seat-matrix.parquet":
+    if path.name == "seat-matrix.parquet" and (
+        "seats-matrix" in rel or "/csab/vacancy/" in rel
+    ):
         return "seat_matrix"
     if path.parent.name == "dist" and path.name.endswith("_predictor_index.parquet"):
         return "predictor_index"

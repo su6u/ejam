@@ -503,6 +503,32 @@ input {
     animation-delay: 300ms;
   }
 
+  /* Mobile/tablet results cards — capped stagger enter (delay set inline) */
+  .results-card-enter {
+    opacity: 0;
+    animation: results-card-enter 260ms var(--ease-out) both;
+  }
+
+  @keyframes results-card-enter {
+    from {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .results-card-enter {
+      animation: none !important;
+      opacity: 1 !important;
+      transform: none !important;
+    }
+  }
+
   /* Round probability mini-bars — equalizer sparkline in results table */
   .t-round-bars {
     --round-bar-ease: cubic-bezier(0.23, 1, 0.32, 1);
@@ -1178,6 +1204,7 @@ input {
   .font-serif-display {
     font-family:
       var(--font-serif-display), ui-serif, Georgia, "Times New Roman", serif;
+    font-style: italic;
   }
 
   .font-instrument-sans {
@@ -1187,28 +1214,45 @@ input {
 }
 
 @layer components {
-  /* Homepage — light surface overrides dark-only ::selection tokens */
+  /* Home layout tokens — keep manifesto sticky offsets in sync across breakpoints */
+  .home-page {
+    --home-header-offset: 5rem;
+    --home-manifesto-arch-height: 13.5rem;
+    --home-manifesto-arch-px: 1.25rem;
+  }
+
+  @media (min-width: 640px) {
+    .home-page {
+      --home-header-offset: 5.5rem;
+      --home-manifesto-arch-height: 14rem;
+      --home-manifesto-arch-px: 1.5rem;
+    }
+  }
+
+  @media (min-width: 768px) {
+    .home-page {
+      --home-header-offset: 6.25rem;
+      --home-manifesto-arch-height: 15rem;
+      --home-manifesto-arch-px: 2.5rem;
+    }
+  }
+
   .home-page ::selection {
-    background-color: rgb(62 62 62 / 0.12);
-    color: #2e2e2e;
+    background-color: rgb(253 253 253 / 0.16);
+    color: #fdfdfd;
   }
 
   .home-page ::-moz-selection {
-    background-color: rgb(62 62 62 / 0.12);
-    color: #2e2e2e;
+    background-color: rgb(253 253 253 / 0.16);
+    color: #fdfdfd;
   }
 
   /* Homepage — staggered blur reveal on hero line */
-  .home-tagline {
-    text-wrap: balance;
-  }
-
   .home-tagline-part {
     opacity: 0;
     filter: blur(var(--text-swap-blur));
     animation: home-tagline-reveal 280ms var(--text-swap-ease) forwards;
     animation-delay: var(--tagline-delay, 0ms);
-    will-change: opacity;
   }
 
   @keyframes home-tagline-reveal {
@@ -1222,6 +1266,7 @@ input {
     opacity: 0;
     transform: translateY(8px);
     animation: home-enter 260ms var(--ease-out) forwards;
+    animation-delay: var(--home-enter-delay, 0ms);
   }
 
   @keyframes home-enter {
@@ -1231,51 +1276,25 @@ input {
     }
   }
 
-  /* Folder cards — first-load enter stagger (delay set inline per card) */
-  .home-folder-enter {
-    opacity: 0;
-    transform: translateY(8px);
-    animation: home-folder-enter 240ms var(--ease-out) forwards;
+  .home-manifesto-scroll-hint {
+    animation: home-manifesto-scroll-bob 1.4s cubic-bezier(0.77, 0, 0.175, 1)
+      infinite;
+    transform-origin: center;
   }
 
-  @keyframes home-folder-enter {
-    to {
-      opacity: 1;
+  .home-manifesto-scroll-hint--paused {
+    animation-play-state: paused;
+  }
+
+  @keyframes home-manifesto-scroll-bob {
+    0%,
+    100% {
       transform: translateY(0);
     }
-  }
 
-  /* Live tool folder image — layered depth so it reads as actionable */
-  .home-folder-live-img {
-    filter: drop-shadow(0 1px 2px rgb(46 46 46 / 0.1))
-      drop-shadow(0 4px 8px rgb(46 46 46 / 0.06));
-  }
-
-  /* Soon folder — percussive shake on click (transitions-dev error-state pattern) */
-  .home-folder-card {
-    will-change: transform;
-  }
-
-  .home-folder-card.is-shaking {
-    animation: t-input-shake
-      calc(var(--shake-dur-a) * 2 + var(--shake-dur-b) * 2) linear;
-  }
-
-  /* Homepage header */
-  .home-header-proximity .t-proximity-item {
-    transform: none;
-    transition: none;
-    will-change: auto;
-  }
-
-  .home-header-proximity .home-header-link {
-    color: #2e2e2e;
-    background-color: rgb(46 46 46 / calc(var(--proximity, 0) * 0.06));
-  }
-
-  .home-header-proximity .home-header-link img,
-  .home-header-proximity .home-header-link svg {
-    opacity: calc(0.85 + var(--proximity, 0) * 0.15);
+    50% {
+      transform: translateY(6px);
+    }
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -1291,20 +1310,9 @@ input {
       transform: none;
     }
 
-    .home-folder-enter {
+    .home-manifesto-scroll-hint {
       animation: none;
-      opacity: 1;
       transform: none;
-    }
-
-    .home-folder-card.is-shaking {
-      animation: none !important;
-      transform: none !important;
-    }
-
-    .home-header-proximity .t-proximity-item,
-    .home-header-proximity .home-header-link {
-      transition: none !important;
     }
   }
 }

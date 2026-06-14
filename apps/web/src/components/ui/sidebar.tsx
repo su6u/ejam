@@ -3,8 +3,8 @@
 import { mergeProps } from "@base-ui/react/merge-props";
 import { useRender } from "@base-ui/react/use-render";
 import { cva, type VariantProps } from "class-variance-authority";
-import { PanelLeftIcon } from "lucide-react";
 import * as React from "react";
+import { SidebarToggleIcon } from "@/components/sidebar-toggle-icon";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
@@ -99,7 +99,7 @@ function Sidebar({
       data-sidebar="sidebar"
       data-slot="sidebar-inner"
       className={cn(
-        "flex size-full flex-col bg-sidebar",
+        "flex size-full flex-col bg-background",
         variant === "floating" &&
           "rounded-lg shadow-sm ring-1 ring-sidebar-border",
       )}
@@ -116,7 +116,8 @@ function Sidebar({
           data-sidebar="sidebar"
           data-slot="sidebar"
           data-mobile="true"
-          className="w-(--sidebar-width) bg-sidebar p-0 text-sidebar-foreground [&>button]:hidden"
+          showCloseButton={false}
+          className="w-(--sidebar-width) border-border bg-background p-0 text-foreground [&>button]:hidden"
           style={
             {
               "--sidebar-width": SIDEBAR_WIDTH_MOBILE,
@@ -162,32 +163,74 @@ function Sidebar({
   );
 }
 
+function SidebarToggleButton({
+  isOpen,
+  onPress,
+  className,
+  ...props
+}: {
+  isOpen: boolean;
+  onPress: () => void;
+} & Omit<React.ComponentProps<typeof Button>, "onClick">) {
+  return (
+    <Button
+      type="button"
+      variant="ghost"
+      size="icon-sm"
+      className={cn(
+        "shrink-0 rounded-none border-0 bg-transparent shadow-none transition-transform duration-150 ease-out active:scale-[0.96] hover:bg-muted/50 dark:bg-transparent dark:hover:bg-muted/50",
+        className,
+      )}
+      aria-label={isOpen ? "Close prediction setup" : "Open prediction setup"}
+      aria-expanded={isOpen}
+      {...props}
+      onClick={() => onPress()}
+    >
+      <SidebarToggleIcon isOpen={isOpen} className="size-5" />
+    </Button>
+  );
+}
+
 function SidebarTrigger({
   className,
   ...props
 }: React.ComponentProps<typeof Button>) {
-  const { isMobile, setOpenMobile } = useSidebar();
+  const { isMobile, openMobile, setOpenMobile } = useSidebar();
 
   if (!isMobile) {
     return null;
   }
 
   return (
-    <Button
-      type="button"
+    <SidebarToggleButton
       data-sidebar="trigger"
-      variant="outline"
-      size="icon-sm"
-      className={cn(
-        "shrink-0 rounded-none border-border bg-transparent shadow-none dark:bg-transparent dark:hover:bg-transparent",
-        className,
-      )}
-      aria-label="Open prediction setup"
-      onClick={() => setOpenMobile(true)}
+      isOpen={openMobile}
+      onPress={() => setOpenMobile(!openMobile)}
+      className={className}
       {...props}
-    >
-      <PanelLeftIcon aria-hidden />
-    </Button>
+    />
+  );
+}
+
+/** Mobile drawer header — same toggle, closes the setup panel from inside. */
+function SidebarCloseTrigger({
+  className,
+  ...props
+}: React.ComponentProps<typeof Button>) {
+  const { isMobile, openMobile, setOpenMobile } = useSidebar();
+
+  if (!isMobile) {
+    return null;
+  }
+
+  return (
+    <SidebarToggleButton
+      data-sidebar="close"
+      isOpen={openMobile}
+      onPress={() => setOpenMobile(false)}
+      className={className}
+      {...props}
+    />
   );
 }
 
@@ -592,6 +635,7 @@ function SidebarMenuSubButton({
 
 export {
   Sidebar,
+  SidebarCloseTrigger,
   SidebarContent,
   SidebarFooter,
   SidebarGroup,

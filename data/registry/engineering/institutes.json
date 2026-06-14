@@ -592,8 +592,10 @@
     "name": "School of Planning and Architecture New Delhi",
     "aliases": [
       "SPA Delhi",
+      "SPA New Delhi",
       "School of Planning and Architecture, New Delhi",
-      "SPA New Delhi"
+      "Schoolof Planning&Architecture, New Delhi",
+      "SchoolofPlanning&Architecture, NewDelhi"
     ],
     "type": "SPA",
     "state": "Delhi",
@@ -616,7 +618,9 @@
     "name": "School of Planning and Architecture Vijayawada",
     "aliases": [
       "SPA Vijayawada",
-      "School of Planning and Architecture, Vijayawada"
+      "School of Planning and Architecture, Vijayawada",
+      "Schoolof Planning&Architecture: Vijayawada",
+      "SchoolofPlanning&Architecture: Vijayawada"
     ],
     "type": "SPA",
     "state": "Andhra Pradesh",
