@@ -34,7 +34,7 @@ Give it a counselling rank plus category, gender, quota, and home state (for NIT
 | Page | Purpose |
 | --- | --- |
 | [Prediction engine](nerd-stuff/prediction-engine.md) | CDF math, round probabilities, band thresholds |
-| [Index algorithms](nerd-stuff/index-algorithms.md) | DuckDB build, `jam-josaa-v2`, `jam-csab-v2` |
+| [Index algorithms](nerd-stuff/index-algorithms.md) | DuckDB build, `jam-josaa-v3`, `jam-csab-v2` |
 | [Backtest](nerd-stuff/backtest.md) | 2025 holdout methodology and metrics |
 | [Balanced ranking](nerd-stuff/balanced-ranking.md) | $I \times B \times P$ composite score |
 

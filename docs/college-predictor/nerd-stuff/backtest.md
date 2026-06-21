@@ -1,6 +1,8 @@
 # Backtest
 
-Holdout check for `jam-josaa-v2` and `jam-csab-v2`. Rebuilds each index from training cutoffs only, forecasts 2025 closing ranks, and compares to actual 2025 final-round cutoffs.
+Holdout check for `jam-josaa-v3` and `jam-csab-v2`. Rebuilds each index from training cutoffs only, forecasts 2025 closing ranks, and compares to actual 2025 final-round cutoffs.
+
+> `jam-josaa-v2` is deprecated - backtest now runs v3 production hyperparams.
 
 Not a promise for this year's counselling. Useful for catching bad hyperparam changes before shipping.
 
@@ -8,7 +10,7 @@ Not a promise for this year's counselling. Useful for catching bad hyperparam ch
 
 ```bash
 pnpm data:fetch --download   # needs local cutoff parquets
-pnpm backtest
+pnpm exec tsx packages/data-cli/src/backtest/predictor.ts
 ```
 
 Writes `data/dist/backtest-results.json` (gitignored). Exits non-zero if either builder's within-20% rate drops below 30%.
@@ -62,14 +64,16 @@ This is not the same as "did we predict the right band for a random applicant." 
 
 ## Latest results (2025 holdout)
 
-| Metric | JoSAA | CSAB |
+| Metric | JoSAA (`jam-josaa-v3`) | CSAB |
 | --- | --- | --- |
-| ±20% cutoff accuracy | 72.8% | 68.7% |
-| Band boundary hit | 42.0% | 51.9% |
+| ±20% cutoff accuracy | **73.9%** | 68.8% |
+| Band boundary hit | **50.7%** | 51.8% |
 | Programs matched | 11,069 | 1,221 |
-| Median absolute error (ranks) | 455 | 9,927 |
+| Median absolute error (ranks) | 433 | 9,927 |
 
-Reproduce: `pnpm backtest` and read the summary, or open `data/dist/backtest-results.json`.
+Previous `jam-josaa-v2` (deprecated): 72.8% ±20%, 42.0% band boundary.
+
+Reproduce: `pnpm exec tsx packages/data-cli/src/backtest/predictor.ts` and read the summary, or open `data/dist/backtest-results.json`.
 
 ---
-When you change index hyperparams (`packages/data-cli/src/jam/config.ts`, `csab-config.ts`), run `pnpm backtest` before publishing a data release.
+When you change index hyperparams (`packages/data-cli/src/jam/config.ts`, `csab-config.ts`), run the backtest script before publishing a data release.

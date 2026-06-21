@@ -23,7 +23,7 @@ Depends on how stable that program's cutoff history is. Rows tagged `sufficient`
 <details>
 <summary>Why might results differ from other predictors?</summary>
 
-Different years, formulas, or category matching. ejam uses `jam-josaa-v2` / `jam-csab-v2`, round-weighted JoSAA anchors, pool shift on JoSAA only, and a normal-CDF chance model. Many sites treat last year's closing rank as a hard cutoff with no probability band.
+Different years, formulas, or category matching. ejam uses `jam-josaa-v3` / `jam-csab-v2` (v2 deprecated), round-weighted JoSAA anchors, pool shift on JoSAA only, and a normal-CDF chance model. Many sites treat last year's closing rank as a hard cutoff with no probability band.
 
 </details>
 
