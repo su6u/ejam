@@ -1,6 +1,6 @@
 #!/usr/bin/env tsx
 /**
- * builds college_predictor_index.parquet from JoSAA cutoff parquets (jam-josaa-v2)
+ * builds college_predictor_index.parquet from JoSAA cutoff parquets (jam-josaa-v3)
  * prediction_year from EJAM_PREDICTION_YEAR, pool shift from nta-pool-stats or EJAM_POOL_SHIFT_PCT
  **/
 
@@ -8,7 +8,7 @@ import { execSync } from "node:child_process";
 import * as fs from "node:fs";
 import * as path from "node:path";
 import {
-  JAM_JOSAA_V2,
+  JAM_JOSAA_V3,
   JAM_TUNED,
   resolvePoolShiftPct,
   roundWeightCaseSql,
@@ -112,7 +112,7 @@ FROM normalized
 GROUP BY institute_id, program_id, seat_type, quota, gender,
          instype, degree, duration_years, year, round;
 
--- jam-josaa-v2 anchor: per-year round-weighted closing rank (r1=5% … r6=38%)
+-- jam-josaa-v3 anchor: per-year round-weighted closing rank (r1=1% … r6=60%)
 CREATE TEMP TABLE anchor_round AS
 SELECT
   institute_id, program_id, seat_type, quota, gender,
@@ -356,7 +356,7 @@ async function main(): Promise<void> {
   const poolShiftPct = resolvePoolShiftPct();
   console.log("Building college predictor index...");
   console.log(
-    `algorithm=${JAM_JOSAA_V2}  prediction_year=${predictionYear}  pool_shift=${(poolShiftPct * 100).toFixed(2)}%`,
+    `algorithm=${JAM_JOSAA_V3}  prediction_year=${predictionYear}  pool_shift=${(poolShiftPct * 100).toFixed(2)}%`,
   );
 
   const parquetFiles = findAllCutoffParquets();
