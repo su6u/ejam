@@ -53,7 +53,7 @@ Offline DuckDB builds the index. Live predict just reads it.
 
 <br>
 
-For each seat, the index looks at years of closing ranks. Recent years and later rounds (R6 > R1) weigh more; COVID spikes get trimmed. A small trend nudge plus ~1%/yr covers rank inflation. [**[1]**](docs/college-predictor/nerd-stuff/index-algorithms.md#predicted-closing-rank) is the predicted closing rank for this year. [**[2]**](docs/college-predictor/nerd-stuff/index-algorithms.md#sigma-floor) is how uncertain that guess is, wider when history is thin.
+For each seat, the index looks at years of closing ranks. Recent years and later rounds (R6 > R1) weigh more; COVID spikes get trimmed. A small trend nudge plus ~3%/yr covers rank inflation. [**[1]**](docs/college-predictor/nerd-stuff/index-algorithms.md#predicted-closing-rank) is the predicted closing rank for this year. [**[2]**](docs/college-predictor/nerd-stuff/index-algorithms.md#sigma-floor) is how uncertain that guess is, wider when history is thin.
 
 <br>
 

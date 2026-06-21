@@ -86,7 +86,7 @@
       "growth_pct": 4.29,
       "implied_pool_shift_if_literal": 0.0429
     },
-    "sandbox_p7_super_a_default": 0.01,
-    "recommendation": "Empirical backtest winner used +1%/yr, not literal pool growth (+4.3%). Literal pool growth would suggest ~4.3% rank inflation 2025→2026, but that may overshoot — test 1.0–2.5% in sandbox before shipping."
+    "sandbox_p7_super_a_default": 0.03,
+    "recommendation": "Production jam-josaa-v3 uses +3%/yr (sandbox walk-forward winner wf-rw-soft-p30, 2026-06). Literal pool growth (+4.3%) was not used — may overshoot. Override: EJAM_POOL_SHIFT_PCT."
   }
 }

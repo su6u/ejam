@@ -59,7 +59,7 @@ apps/web/next-env.d.ts
 # scraper runtime cache
 apps/scraper/data/cache/
 
-# backtesting — local tuning scripts (CI: predictor.ts only)
-packages/data-cli/src/backtest/*
-!packages/data-cli/src/backtest/predictor.ts
+# backtest + sandbox — local tuning only (not published)
+packages/data-cli/src/backtest/
+packages/data-cli/src/sandbox/
 .vercel
