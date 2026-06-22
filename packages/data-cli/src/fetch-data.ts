@@ -1,4 +1,5 @@
 #!/usr/bin/env tsx
+
 /**
  * verifies local parquet files match the pinned manifest, or downloads a release bundle
  * usage:
@@ -6,8 +7,8 @@
  *   pnpm data:fetch --download   # download release tarball when files are missing
  */
 
-import * as crypto from "node:crypto";
 import { execFileSync } from "node:child_process";
+import * as crypto from "node:crypto";
 import * as fs from "node:fs/promises";
 import * as path from "node:path";
 import {
@@ -15,9 +16,9 @@ import {
   sortManifestVersionsDesc,
 } from "@ejam/data/semver";
 import {
+  type CanonicalManifest,
   dataRootPath,
   findLatestManifestVersion,
-  type CanonicalManifest,
   getGitSha,
   type ManifestDatasetEntry,
   ROOT,
