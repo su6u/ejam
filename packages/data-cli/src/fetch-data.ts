@@ -53,7 +53,7 @@ const GENERATED_DATASET_BUILDERS = [
   },
 ] as const;
 
-const GENERATED_DATASET_PATHS = new Set(
+const GENERATED_DATASET_PATHS: Set<string> = new Set(
   GENERATED_DATASET_BUILDERS.flatMap((builder) => builder.paths),
 );
 
