@@ -18,9 +18,11 @@ import {
   dataRootPath,
   findLatestManifestVersion,
   type CanonicalManifest,
+  getGitSha,
   type ManifestDatasetEntry,
   ROOT,
   readManifest,
+  writeManifest,
 } from "./lib/manifest.js";
 
 class DataReleaseDownloadError extends Error {
@@ -186,23 +188,55 @@ function rebuildGeneratedDatasets(
   }
 }
 
+async function refreshGeneratedDatasetEntries(
+  manifest: CanonicalManifest,
+  changedGeneratedPaths: string[],
+): Promise<CanonicalManifest> {
+  const changed = new Set(changedGeneratedPaths);
+  const datasets: ManifestDatasetEntry[] = [];
+
+  for (const entry of manifest.datasets) {
+    if (!changed.has(entry.path)) {
+      datasets.push(entry);
+      continue;
+    }
+
+    const absolutePath = dataRootPath(entry.path);
+    const stat = await fs.stat(absolutePath);
+    datasets.push({
+      ...entry,
+      sha256: await sha256File(absolutePath),
+      bytes: stat.size,
+    });
+  }
+
+  const hydratedManifest: CanonicalManifest = {
+    ...manifest,
+    generated_at: new Date().toISOString(),
+    git_sha: await getGitSha(),
+    datasets,
+  };
+  await writeManifest(hydratedManifest);
+  return hydratedManifest;
+}
+
 async function hydrateFromPreviousRelease(
   version: string,
   manifest: CanonicalManifest,
-): Promise<boolean> {
+): Promise<CanonicalManifest | null> {
   const previousVersion = await findPreviousManifestVersion(version);
-  if (!previousVersion) return false;
+  if (!previousVersion) return null;
 
   const previousManifest = await readManifest(previousVersion);
   const changedGeneratedPaths = generatedDeltaOnly(manifest, previousManifest);
-  if (!changedGeneratedPaths) return false;
+  if (!changedGeneratedPaths) return null;
 
   console.warn(
     `No release asset for ${version}; bootstrapping from ${previousVersion} and rebuilding generated index datasets.`,
   );
   await downloadRelease(previousVersion);
   rebuildGeneratedDatasets(version, changedGeneratedPaths);
-  return true;
+  return refreshGeneratedDatasetEntries(manifest, changedGeneratedPaths);
 }
 
 async function main(): Promise<void> {
@@ -214,7 +248,7 @@ async function main(): Promise<void> {
     (await findLatestManifestVersion());
 
   console.log(`Using manifest ${version}`);
-  const manifest = await readManifest(version);
+  let manifest = await readManifest(version);
   const failures: string[] = [];
 
   for (const entry of manifest.datasets) {
@@ -244,12 +278,13 @@ async function main(): Promise<void> {
   } catch (err) {
     const shouldHydrate =
       err instanceof DataReleaseDownloadError && err.status === 404;
-    if (
-      !shouldHydrate ||
-      !(await hydrateFromPreviousRelease(version, manifest))
-    ) {
+    const hydratedManifest = shouldHydrate
+      ? await hydrateFromPreviousRelease(version, manifest)
+      : null;
+    if (!hydratedManifest) {
       throw err;
     }
+    manifest = hydratedManifest;
   }
 
   const remaining: string[] = [];

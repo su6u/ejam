@@ -43,11 +43,13 @@ function findAllCutoffParquets(): string[] {
   const files: string[] = [];
   const years = fs
     .readdirSync(CSAB_CUTOFFS)
-    .filter((d) => d.startsWith("year="));
+    .filter((d) => d.startsWith("year="))
+    .sort();
   for (const yearDir of years) {
     const rounds = fs
       .readdirSync(path.join(CSAB_CUTOFFS, yearDir))
-      .filter((d) => d.startsWith("round="));
+      .filter((d) => d.startsWith("round="))
+      .sort();
     for (const roundDir of rounds) {
       const parquetPath = path.join(
         CSAB_CUTOFFS,
