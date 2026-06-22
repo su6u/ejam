@@ -75,6 +75,10 @@ async function* walkParquetFiles(
     }
 
     const inDist = dir === path.join(DATA_DIR, "dist");
+    if (entry.name.startsWith("._")) {
+      continue;
+    }
+
     if (inDist) {
       if (!PREDICTOR_DIST_FILES.has(entry.name)) continue;
     } else if (!entry.name.endsWith(".parquet")) {

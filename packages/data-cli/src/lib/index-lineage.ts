@@ -60,6 +60,9 @@ export function writeIndexLineageSidecar(opts: {
 export async function resolveManifestVersionForBuild(): Promise<
   string | undefined
 > {
+  if (process.env.EJAM_MANIFEST_VERSION)
+    return process.env.EJAM_MANIFEST_VERSION;
+
   try {
     return await findLatestManifestVersion();
   } catch {

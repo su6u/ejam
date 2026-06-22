@@ -7,15 +7,53 @@
  */
 
 import * as crypto from "node:crypto";
+import { execFileSync } from "node:child_process";
 import * as fs from "node:fs/promises";
 import * as path from "node:path";
 import {
+  compareManifestVersions,
+  sortManifestVersionsDesc,
+} from "@ejam/data/semver";
+import {
   dataRootPath,
   findLatestManifestVersion,
+  type CanonicalManifest,
   type ManifestDatasetEntry,
   ROOT,
   readManifest,
 } from "./lib/manifest.js";
+
+class DataReleaseDownloadError extends Error {
+  constructor(
+    message: string,
+    readonly status?: number,
+  ) {
+    super(message);
+  }
+}
+
+const GENERATED_DATASET_BUILDERS = [
+  {
+    name: "JoSAA predictor index",
+    script: "build:predictor-index",
+    paths: [
+      "dist/college_predictor_index.parquet",
+      "dist/college_predictor_index.lineage.json",
+    ],
+  },
+  {
+    name: "CSAB predictor index",
+    script: "build:csab-index",
+    paths: [
+      "dist/csab_predictor_index.parquet",
+      "dist/csab_predictor_index.lineage.json",
+    ],
+  },
+] as const;
+
+const GENERATED_DATASET_PATHS = new Set(
+  GENERATED_DATASET_BUILDERS.flatMap((builder) => builder.paths),
+);
 
 async function sha256File(filePath: string): Promise<string> {
   const data = await fs.readFile(filePath);
@@ -50,8 +88,9 @@ async function downloadRelease(version: string): Promise<void> {
   console.log(`Downloading ${url} ...`);
   const response = await fetch(url);
   if (!response.ok) {
-    throw new Error(
+    throw new DataReleaseDownloadError(
       `release download failed (${response.status}): ${url}\nSet EJAM_DATA_RELEASE_URL to override.`,
+      response.status,
     );
   }
 
@@ -65,6 +104,105 @@ async function downloadRelease(version: string): Promise<void> {
   });
   await fs.unlink(archivePath);
   console.log("Release extracted into data/");
+}
+
+async function listManifestVersions(): Promise<string[]> {
+  const manifestDir = path.join(ROOT, "data", "manifest");
+  const files = await fs.readdir(manifestDir);
+  return sortManifestVersionsDesc(
+    files
+      .filter((file) => file.startsWith("v") && file.endsWith(".json"))
+      .map((file) => file.replace(/\.json$/, "")),
+  );
+}
+
+async function findPreviousManifestVersion(
+  version: string,
+): Promise<string | null> {
+  const versions = await listManifestVersions();
+  return (
+    versions.find(
+      (candidate) => compareManifestVersions(candidate, version) < 0,
+    ) ?? null
+  );
+}
+
+function generatedDeltaOnly(
+  manifest: CanonicalManifest,
+  previousManifest: CanonicalManifest,
+): string[] | null {
+  const previousByPath = new Map(
+    previousManifest.datasets.map((entry) => [entry.path, entry]),
+  );
+  const currentPaths = new Set(manifest.datasets.map((entry) => entry.path));
+  const changedGeneratedPaths: string[] = [];
+
+  for (const entry of manifest.datasets) {
+    const previous = previousByPath.get(entry.path);
+    if (!previous) return null;
+
+    if (previous.sha256 === entry.sha256 && previous.bytes === entry.bytes) {
+      continue;
+    }
+
+    if (!GENERATED_DATASET_PATHS.has(entry.path)) return null;
+    changedGeneratedPaths.push(entry.path);
+  }
+
+  for (const entry of previousManifest.datasets) {
+    if (
+      !currentPaths.has(entry.path) &&
+      !GENERATED_DATASET_PATHS.has(entry.path)
+    ) {
+      return null;
+    }
+  }
+
+  return changedGeneratedPaths;
+}
+
+function rebuildGeneratedDatasets(
+  version: string,
+  changedGeneratedPaths: string[],
+): void {
+  for (const builder of GENERATED_DATASET_BUILDERS) {
+    if (
+      !builder.paths.some((datasetPath) =>
+        changedGeneratedPaths.includes(datasetPath),
+      )
+    ) {
+      continue;
+    }
+
+    console.log(`Rebuilding ${builder.name} for manifest ${version}...`);
+    execFileSync("pnpm", [builder.script], {
+      cwd: ROOT,
+      env: {
+        ...process.env,
+        EJAM_MANIFEST_VERSION: version,
+      },
+      stdio: "inherit",
+    });
+  }
+}
+
+async function hydrateFromPreviousRelease(
+  version: string,
+  manifest: CanonicalManifest,
+): Promise<boolean> {
+  const previousVersion = await findPreviousManifestVersion(version);
+  if (!previousVersion) return false;
+
+  const previousManifest = await readManifest(previousVersion);
+  const changedGeneratedPaths = generatedDeltaOnly(manifest, previousManifest);
+  if (!changedGeneratedPaths) return false;
+
+  console.warn(
+    `No release asset for ${version}; bootstrapping from ${previousVersion} and rebuilding generated index datasets.`,
+  );
+  await downloadRelease(previousVersion);
+  rebuildGeneratedDatasets(version, changedGeneratedPaths);
+  return true;
 }
 
 async function main(): Promise<void> {
@@ -101,7 +239,18 @@ async function main(): Promise<void> {
     process.exit(1);
   }
 
-  await downloadRelease(version);
+  try {
+    await downloadRelease(version);
+  } catch (err) {
+    const shouldHydrate =
+      err instanceof DataReleaseDownloadError && err.status === 404;
+    if (
+      !shouldHydrate ||
+      !(await hydrateFromPreviousRelease(version, manifest))
+    ) {
+      throw err;
+    }
+  }
 
   const remaining: string[] = [];
   for (const entry of manifest.datasets) {

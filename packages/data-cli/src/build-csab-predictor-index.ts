@@ -4,7 +4,6 @@
  * CSAB closing ranks are worse than JoSAA round 6 — stronger candidates already took JoSAA seats
  **/
 
-import { execSync } from "node:child_process";
 import * as fs from "node:fs";
 import * as path from "node:path";
 import {
@@ -16,6 +15,7 @@ import {
   resolveManifestVersionForBuild,
   writeIndexLineageSidecar,
 } from "./lib/index-lineage.js";
+import { runDuckDbSqlFile } from "./lib/run-duckdb-sql.js";
 import { REPO_ROOT as ROOT } from "./repo-root.js";
 
 const CSAB_CUTOFFS = path.join(
@@ -345,7 +345,7 @@ async function main(): Promise<void> {
 
   console.log("Running DuckDB...");
   try {
-    execSync(`duckdb < "${sqlFile}"`, { cwd: ROOT, stdio: "inherit" });
+    await runDuckDbSqlFile(sqlFile);
   } catch (err) {
     console.error("DuckDB build failed:", err);
     process.exit(1);

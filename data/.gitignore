@@ -11,6 +11,9 @@ manifest/runs.jsonl
 dist/sandbox/
 dist/backtest-results.json
 
+# macOS archive sidecars sometimes appear in release tarballs
+**/._*
+
 # Release payloads are published as GitHub Release assets.
 # Keep manifests and small registry/config metadata in git; keep large data local.
 engineering/**/*.parquet
