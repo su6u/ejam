@@ -1,6 +1,6 @@
 /**
  * canonical state names for HS quota — must match `state` values in
- * data/registry/engineering/institutes.json exactly
+ * data/reference/engineering/institutes.json exactly
  */
 export const HOME_STATES = [
   "Andhra Pradesh",

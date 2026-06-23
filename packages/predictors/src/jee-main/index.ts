@@ -56,7 +56,7 @@ const JeeMainInput = z
   .superRefine(refineQuotaRequiresState);
 type JeeMainInput = z.infer<typeof JeeMainInput>;
 
-// values must match the corresponding state strings in data/registry/engineering/institutes.json
+// values must match the corresponding state strings in data/reference/engineering/institutes.json
 // exactly — HS/OS/special-state quota matching does string equality on row.state
 // Ladakh has no institutes in the registry today; keep the entry so a future
 // Ladakh institute (e.g. an upcoming NIT/IIIT) is recognised the moment its row is added

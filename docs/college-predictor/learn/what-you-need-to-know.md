@@ -37,7 +37,7 @@ Quota: **OS**, **HS**, **AI**.
 
 ### JEE Main + CSAB
 
-Separate index (`csab_predictor_index`). Same rank/profile inputs, CSAB cutoff history only. NIT+, IIIT, CFI. No IITs.
+Separate CSAB predictor index. Same rank/profile inputs, CSAB cutoff history only. NIT+, IIIT, CFI. No IITs.
 
 ### JEE Advanced
 

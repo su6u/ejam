@@ -28,10 +28,10 @@ flowchart TB
         U --> W --> R --> P
     end
 
-    subgraph dist["data/dist/"]
+    subgraph tools["data/tools/college-predictor/"]
         direction LR
-        I1[college_predictor_index.parquet]
-        I2[csab_predictor_index.parquet]
+        I1[josaa/predictor-index.parquet]
+        I2[csab/predictor-index.parquet]
     end
 
     subgraph runtime["Live predictors"]
@@ -79,9 +79,9 @@ Data quality labels:
 
 ## jam-josaa-v3 (JoSAA)
 
-**Source:** `data/engineering/jee/josaa/cutoffs/`
+**Source:** `data/datasets/engineering/jee/josaa/cutoffs/`
 
-**Output:** `data/dist/college_predictor_index.parquet`
+**Output:** `data/tools/college-predictor/josaa/predictor-index.parquet`
 
 Shipped 2026-06 after sandbox sweeps (817 configs, walk-forward on 2023–2025). Config: `packages/data-cli/src/jam/config.ts`.
 
@@ -190,9 +190,9 @@ v2 pool shift default was +1%/yr from `nta-pool-stats.json`.
 
 ## jam-csab-v2 (CSAB)
 
-**Source:** `data/engineering/jee/csab/cutoffs/`
+**Source:** `data/datasets/engineering/jee/csab/cutoffs/`
 
-**Output:** `data/dist/csab_predictor_index.parquet`
+**Output:** `data/tools/college-predictor/csab/predictor-index.parquet`
 
 CSAB cutoffs are worse (numerically higher rank) than JoSAA late rounds because strong candidates already took JoSAA seats. CSAB stays in a separate index, not blended into JoSAA.
 

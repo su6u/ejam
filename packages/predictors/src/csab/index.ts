@@ -60,7 +60,7 @@ const CsabInput = z
   .superRefine(refineQuotaRequiresState);
 type CsabInput = z.infer<typeof CsabInput>;
 
-// values must match the corresponding state strings in data/registry/engineering/institutes.json
+// values must match the corresponding state strings in data/reference/engineering/institutes.json
 // exactly — HS/OS/special-state quota matching does string equality on row.state
 const SPECIAL_STATE_QUOTAS: Record<string, string> = {
   GO: "Goa",

@@ -153,7 +153,7 @@ Main inputs sync to the URL: `rank`, `exam`, `counselling`, `category`, `gender`
 <details>
 <summary>Where does the data come from?</summary>
 
-Public JoSAA and CSAB cutoff releases in `data/engineering/jee/`. Source URLs: `data/engineering/jee/_sources.json`. Institute metadata and NIRF ranks: `data/registry/engineering/`.
+Public JoSAA and CSAB cutoff datasets in `data/datasets/engineering/jee/`. Source URLs: `data/sources/engineering/jee.json`. Institute metadata and NIRF ranks: `data/reference/engineering/`.
 
 </details>
 
