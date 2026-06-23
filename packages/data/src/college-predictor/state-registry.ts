@@ -1,6 +1,6 @@
 /**
  * canonical state registry for HS/OS/special-state quota resolution
- * derives the set of valid state names from data/registry/engineering/institutes.json
+ * derives the set of valid state names from data/reference/engineering/institutes.json
  * so quota matching and API input validation share a single source of truth
  *
  * Node-only — uses node:fs synchronously and caches the result in a module-level set

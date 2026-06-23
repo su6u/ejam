@@ -44,7 +44,7 @@ async function assertPathsExist(
 async function main(): Promise<void> {
   const version = resolveVersion();
   const manifest = await readManifest(version);
-  const manifestRel = `manifest/${version}.json`;
+  const manifestRel = `catalog/releases/${version}.json`;
   const archivePaths = [...manifest.datasets.map((d) => d.path), manifestRel];
 
   await assertPathsExist(version, archivePaths);

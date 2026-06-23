@@ -1,5 +1,5 @@
 /**
- * exam config loader — reads YAML files from data/registry/taxonomy, validates, resolves taxonomies
+ * exam config loader — reads YAML files from data/reference/taxonomy, validates, resolves taxonomies
  * Node-only; not imported in browser bundles (reader.ts handles browser side)
  */
 
@@ -19,7 +19,7 @@ import {
   TaxonomySystem as TaxonomySystemSchema,
 } from "./types";
 
-/** resolve REGISTRY_ROOT from env or default to repo-relative data/registry/taxonomy */
+/** resolve taxonomy root from env or default to repo-relative data/reference/taxonomy */
 function taxonomyRoot(): string {
   return resolve(resolveTaxonomyRoot());
 }

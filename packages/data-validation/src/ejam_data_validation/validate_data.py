@@ -20,9 +20,9 @@ except ModuleNotFoundError:
     sys.exit(1)
 
 ROOT = Path(__file__).resolve().parents[4]
-REGISTRY_ROOT = ROOT / "data" / "registry"
-ENGINEERING_ROOT = ROOT / "data" / "engineering"
-DIST_ROOT = ROOT / "data" / "dist"
+REFERENCE_ROOT = ROOT / "data" / "reference"
+DATASETS_ROOT = ROOT / "data" / "datasets"
+TOOLS_ROOT = ROOT / "data" / "tools"
 
 DUAL_CLASS_OK = {"iiest-shibpur"}
 
@@ -102,7 +102,7 @@ class Report:
 
 
 def load_registry_ids() -> set[str]:
-    domain_dir = REGISTRY_ROOT / "engineering"
+    domain_dir = REFERENCE_ROOT / "engineering"
     inst_path = domain_dir / "institutes.json"
     if not inst_path.exists():
         return set()
@@ -111,16 +111,18 @@ def load_registry_ids() -> set[str]:
 
 def discover_parquet_files() -> list[Path]:
     files: list[Path] = []
-    if ENGINEERING_ROOT.exists():
+    if DATASETS_ROOT.exists():
         files.extend(
             path
-            for path in sorted(ENGINEERING_ROOT.rglob("*.parquet"))
+            for path in sorted(DATASETS_ROOT.rglob("*.parquet"))
             if not path.name.startswith("._")
         )
-    for name in ("college_predictor_index.parquet", "csab_predictor_index.parquet"):
-        path = DIST_ROOT / name
-        if path.exists():
-            files.append(path)
+    if TOOLS_ROOT.exists():
+        files.extend(
+            path
+            for path in sorted(TOOLS_ROOT.rglob("predictor-index.parquet"))
+            if not path.name.startswith("._")
+        )
     return files
 
 
@@ -128,11 +130,9 @@ def classify_file(path: Path) -> str:
     rel = path.relative_to(ROOT).as_posix()
     if rel.endswith("/cutoffs.parquet"):
         return "cutoff"
-    if path.name == "seat-matrix.parquet" and (
-        "seats-matrix" in rel or "/csab/vacancy/" in rel
-    ):
+    if path.name == "seat-matrix.parquet" and "/seat-matrix/" in rel:
         return "seat_matrix"
-    if path.parent.name == "dist" and path.name.endswith("_predictor_index.parquet"):
+    if "/tools/college-predictor/" in rel and path.name == "predictor-index.parquet":
         return "predictor_index"
     return "unknown"
 
@@ -293,7 +293,7 @@ def validate_parquet_files() -> int:
     rep = Report()
     files = discover_parquet_files()
     if not files:
-        print("no parquet files found under data/engineering or data/dist")
+        print("no parquet files found under data/datasets or data/tools")
         return 0
 
     inst_ids = load_registry_ids()

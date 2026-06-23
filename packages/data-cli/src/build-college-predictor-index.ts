@@ -1,6 +1,6 @@
 #!/usr/bin/env tsx
 /**
- * builds college_predictor_index.parquet from JoSAA cutoff parquets (jam-josaa-v3)
+ * builds the JoSAA college predictor index from cutoff parquets (jam-josaa-v3)
  * prediction_year from EJAM_PREDICTION_YEAR, pool shift from nta-pool-stats or EJAM_POOL_SHIFT_PCT
  **/
 
@@ -23,13 +23,14 @@ import { REPO_ROOT as ROOT } from "./repo-root.js";
 const JOSAA_CUTOFFS = path.join(
   ROOT,
   "data",
+  "datasets",
   "engineering",
   "jee",
   "josaa",
   "cutoffs",
 );
-const OUTPUT_DIR = path.join(ROOT, "data", "dist");
-const OUTPUT_FILE = path.join(OUTPUT_DIR, "college_predictor_index.parquet");
+const OUTPUT_DIR = path.join(ROOT, "data", "tools", "college-predictor", "josaa");
+const OUTPUT_FILE = path.join(OUTPUT_DIR, "predictor-index.parquet");
 
 function resolvePredictionYear(): number {
   const raw = process.env.EJAM_PREDICTION_YEAR;

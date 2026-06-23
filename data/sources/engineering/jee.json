@@ -171,6 +171,33 @@
       "publisher": "CSAB"
     },
     {
+      "id": "csab-vacancy-2023",
+      "kind": "pdf",
+      "exam": null,
+      "year": 2023,
+      "title": "CSAB 2023 vacant seats after JoSAA rounds",
+      "url": "https://cdnbbsr.s3waas.gov.in/s305a70454516ecd9194c293b0e415777f/uploads/2023/08/2023080562.pdf",
+      "publisher": "CSAB"
+    },
+    {
+      "id": "csab-vacancy-2024",
+      "kind": "pdf",
+      "exam": null,
+      "year": 2024,
+      "title": "CSAB 2024 vacant seats after JoSAA rounds",
+      "url": "https://cdnbbsr.s3waas.gov.in/s305a70454516ecd9194c293b0e415777f/uploads/2024/07/2024073199.pdf",
+      "publisher": "CSAB"
+    },
+    {
+      "id": "csab-vacancy-2025",
+      "kind": "pdf",
+      "exam": null,
+      "year": 2025,
+      "title": "CSAB 2025 vacant seats after JoSAA rounds",
+      "url": "https://cdnbbsr.s3waas.gov.in/s305a70454516ecd9194c293b0e415777f/uploads/2025/07/2025073028.pdf",
+      "publisher": "CSAB"
+    },
+    {
       "id": "josaa.2025.faq",
       "kind": "pdf",
       "exam": null,
