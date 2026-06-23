@@ -1,7 +1,7 @@
 {
   "version": "v0.2.0",
-  "generated_at": "2026-06-23T07:41:35.508Z",
-  "git_sha": "37d728d",
+  "generated_at": "2026-06-23T07:47:55.315Z",
+  "git_sha": "71efce1",
   "datasets": [
     {
       "path": "datasets/engineering/jee/csab/cutoffs/year=2021/round=1/cutoffs.parquet",
