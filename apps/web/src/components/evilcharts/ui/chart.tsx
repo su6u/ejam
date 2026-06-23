@@ -8,6 +8,12 @@ import * as RechartsPrimitive from "@/lib/recharts-client";
 import { cn } from "@/lib/utils";
 
 export { ChartStyle } from "@/components/evilcharts/ui/chart-style";
+export type { ChartConfig } from "@/components/evilcharts/ui/chart-types";
+export {
+  getColorsCount,
+  getLoadingData,
+  getPayloadConfigFromPayload,
+} from "@/components/evilcharts/ui/chart-utils";
 export { LoadingIndicator } from "@/components/evilcharts/ui/loading-indicator";
 
 const THEMES = { light: "", dark: ".dark" } as const;
