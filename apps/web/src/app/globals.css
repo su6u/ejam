@@ -369,6 +369,12 @@ input {
       color 150ms ease;
   }
 
+  @media (hover: hover) and (pointer: fine) {
+    .home-page .pressable:hover:not(:disabled):not([data-static]) {
+      opacity: 0.85;
+    }
+  }
+
   .pressable:active:not(:disabled) {
     scale: 0.96;
   }
@@ -1251,7 +1257,7 @@ input {
   .home-tagline-part {
     opacity: 0;
     filter: blur(var(--text-swap-blur));
-    animation: home-tagline-reveal 280ms var(--text-swap-ease) forwards;
+    animation: home-tagline-reveal 420ms var(--text-swap-ease) forwards;
     animation-delay: var(--tagline-delay, 0ms);
   }
 
@@ -1265,7 +1271,8 @@ input {
   .home-enter-item {
     opacity: 0;
     transform: translateY(8px);
-    animation: home-enter 260ms var(--ease-out) forwards;
+    filter: blur(var(--text-swap-blur));
+    animation: home-enter 380ms var(--ease-out) forwards;
     animation-delay: var(--home-enter-delay, 0ms);
   }
 
@@ -1273,11 +1280,12 @@ input {
     to {
       opacity: 1;
       transform: translateY(0);
+      filter: blur(0);
     }
   }
 
   .home-manifesto-scroll-hint {
-    animation: home-manifesto-scroll-bob 1.4s cubic-bezier(0.77, 0, 0.175, 1)
+    animation: home-manifesto-scroll-bob 1.4s cubic-bezier(0.65, 0, 0.35, 1)
       infinite;
     transform-origin: center;
   }
@@ -1308,6 +1316,7 @@ input {
       animation: none;
       opacity: 1;
       transform: none;
+      filter: none;
     }
 
     .home-manifesto-scroll-hint {

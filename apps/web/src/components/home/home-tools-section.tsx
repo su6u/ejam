@@ -38,7 +38,7 @@ export function HomeToolsSection() {
   return (
     <div
       className={cn("home-enter-item", homeCardsRowClass)}
-      style={{ animationDelay: "120ms" }}
+      style={{ animationDelay: "160ms" }}
     >
       <ToolCardGrid
         compact

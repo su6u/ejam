@@ -47,7 +47,7 @@ export default function HomePage() {
               </Link>
               <div
                 className="home-enter-item shrink-0"
-                style={{ "--home-enter-delay": "40ms" } as React.CSSProperties}
+                style={{ "--home-enter-delay": "60ms" } as React.CSSProperties}
               >
                 <AppHeader variant="home" />
               </div>
