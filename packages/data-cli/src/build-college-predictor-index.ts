@@ -29,7 +29,13 @@ const JOSAA_CUTOFFS = path.join(
   "josaa",
   "cutoffs",
 );
-const OUTPUT_DIR = path.join(ROOT, "data", "tools", "college-predictor", "josaa");
+const OUTPUT_DIR = path.join(
+  ROOT,
+  "data",
+  "tools",
+  "college-predictor",
+  "josaa",
+);
 const OUTPUT_FILE = path.join(OUTPUT_DIR, "predictor-index.parquet");
 
 function resolvePredictionYear(): number {

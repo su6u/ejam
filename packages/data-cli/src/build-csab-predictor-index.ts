@@ -27,7 +27,13 @@ const CSAB_CUTOFFS = path.join(
   "csab",
   "cutoffs",
 );
-const OUTPUT_DIR = path.join(ROOT, "data", "tools", "college-predictor", "csab");
+const OUTPUT_DIR = path.join(
+  ROOT,
+  "data",
+  "tools",
+  "college-predictor",
+  "csab",
+);
 const OUTPUT_FILE = path.join(OUTPUT_DIR, "predictor-index.parquet");
 
 function resolvePredictionYear(): number {
