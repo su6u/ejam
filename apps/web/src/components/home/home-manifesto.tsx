@@ -29,43 +29,33 @@ export function HomeManifesto() {
             )}
           >
             <p className="whitespace-pre-line text-pretty text-left font-instrument-sans text-[clamp(1rem,2.2vw+0.5rem,1.5rem)] leading-[1.72] tracking-[-0.015em] text-white md:leading-[1.68] lg:leading-[1.64]">
-              {`ejam began as a personal frustration.
+              {`ejam was never supposed to be a thing.
+it came out of pure frustration.
 
-students needed useful tools.
-instead we get paywalls,
-or a trade:
-your personal information
-for access to something
-that should never have cost you anything.
+there are so many student tools that should just exist, but instead they are paywalled or made annoying on purpose.
 
-i genuinely never wanted ejam to exist.
+and then there is the privacy.... which makes it worse. why should we give up personal info for something so which doesn't require our infomation?
 
-this should have already been built
-by those so-called "BIG" coaching institutes.
+that part never sat right with me.
 
-the funny part?
+big coaching institutes definitely had the means to build something better.
+they just did not.
 
-they have the data, the teams, the resources,
-and yet, every year,
-the same bargain:
-hand over your privacy
-to use a tool that should just be there.
+most of it is closed source, ads everywhere, heavily data-collecting, and overcomplicated for no fucking reason.
 
-it should not have come to this.
-but it did.
+this is just my small attempt at making something better,
+just something useful that should have existed already.
 
-this is a hobby project.
-built in the open.
-code, data, everything open-sourced.
-
-there is only one tool shipped right now.
-if it gets traction,
-and if it helps the people around me,
+it is just one tool for now.
+if it gets a good traction and actually helps,
 i would love to keep adding more.
 
-ejam will always be open-sourced.
-built by students,
-for students.`}
+TL;DR
+
+open-souce
+no bullsh*t
+for students,
+by students.`}
             </p>
           </div>
         </div>
