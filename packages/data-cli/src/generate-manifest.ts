@@ -1,6 +1,6 @@
 #!/usr/bin/env tsx
 /**
- * generates data/manifest/v*.json from parquet files under data/engineering and data/dist
+ * generates data/catalog/releases/v*.json from data/datasets and data/tools
  * run after ingest or index build: pnpm generate:manifest
  * auto-bumps patch semver when --version is omitted; pass --version=vX.Y.Z to pin
  */
@@ -35,11 +35,11 @@ async function resolveManifestVersion(): Promise<string> {
 async function main(): Promise<void> {
   const version = await resolveManifestVersion();
 
-  console.log(`Generating manifest ${version}...`);
+  console.log(`Generating catalog release ${version}...`);
   const datasets = await collectParquetDatasets();
   if (datasets.length === 0) {
     console.error(
-      "No parquet datasets found under data/engineering or data/dist",
+      "No release payloads found under data/datasets or data/tools",
     );
     process.exit(1);
   }

@@ -5,7 +5,7 @@
   "official_page": "https://josaa.nic.in/document/business-rule/",
   "official_pdf": "https://cdnbbsr.s3waas.gov.in/s313111c20aee51aeb480ecbd988cd8cc9/uploads/2022/03/2022033180.pdf",
   "official_2025_faq_pdf": "https://cdnbbsr.s3waas.gov.in/s313111c20aee51aeb480ecbd988cd8cc9/uploads/2025/06/2025061093.pdf",
-  "cached_text": "data/exams/jee/_raw/josaa.official.business_rules.txt",
+  "cached_text": "data/_cache/official-text/jee/josaa.official.business_rules.txt",
   "note": "Mechanics (registration, choice filling, freeze/float/slide, document verification) are taken from the older official Business Rules PDF linked on josaa.nic.in. Monetary amounts and round count have been refreshed from the official JoSAA 2025 FAQ PDF and JoSAA 2025 announcements on josaa.nic.in.",
   "sections": {
     "registration": {

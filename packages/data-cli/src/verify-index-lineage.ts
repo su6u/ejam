@@ -11,12 +11,12 @@ import { DATA_DIR } from "./lib/manifest.js";
 
 const SIDECARS = [
   {
-    sidecar: "dist/college_predictor_index.lineage.json",
-    cutoffRoot: "engineering/jee/josaa/cutoffs",
+    sidecar: "tools/college-predictor/josaa/predictor-index.lineage.json",
+    cutoffRoot: "datasets/engineering/jee/josaa/cutoffs",
   },
   {
-    sidecar: "dist/csab_predictor_index.lineage.json",
-    cutoffRoot: "engineering/jee/csab/cutoffs",
+    sidecar: "tools/college-predictor/csab/predictor-index.lineage.json",
+    cutoffRoot: "datasets/engineering/jee/csab/cutoffs",
   },
 ] as const;
 

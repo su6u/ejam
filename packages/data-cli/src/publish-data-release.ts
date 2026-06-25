@@ -75,7 +75,7 @@ function resolveTarget(): string | null {
 
 function releaseNotes(version: string): string {
   return [
-    `Manifest: data/manifest/${version}.json`,
+    `Catalog release: data/catalog/releases/${version}.json`,
     "",
     "This release contains the manifest-pinned data tarball for local, CI, and Vercel builds.",
     "",

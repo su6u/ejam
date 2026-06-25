@@ -19,9 +19,9 @@ The predictor compares that rank to historical closing ranks and labels each opt
 flowchart TD
     A[Open College Predictor] --> B{Choose exam}
     B -->|JEE Main| C{Counselling body}
-    C -->|JoSAA| D[Non-IIT institutes via college_predictor_index]
-    C -->|CSAB| E[Supplementary counselling via csab_predictor_index]
-    B -->|JEE Advanced| F[IIT-only via college_predictor_index]
+    C -->|JoSAA| D[Non-IIT institutes via JoSAA predictor index]
+    C -->|CSAB| E[Supplementary counselling via CSAB predictor index]
+    B -->|JEE Advanced| F[IIT-only via JoSAA predictor index]
     D --> G[Enter rank and profile]
     E --> G
     F --> H[Enter rank, category, gender]

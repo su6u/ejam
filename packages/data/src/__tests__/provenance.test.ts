@@ -21,16 +21,24 @@ afterEach(() => {
 
 describe("buildPredictionProvenance", () => {
   it("marks predictor_index loaded and sidecar cutoffs linked", () => {
-    const indexPath = "dist/index.parquet";
-    mkdirSync(join(fixtureRoot, "dist"), { recursive: true });
+    const indexPath = "tools/college-predictor/csab/index.parquet";
+    mkdirSync(join(fixtureRoot, "tools", "college-predictor", "csab"), {
+      recursive: true,
+    });
     writeFileSync(
-      join(fixtureRoot, "dist", "index.lineage.json"),
+      join(
+        fixtureRoot,
+        "tools",
+        "college-predictor",
+        "csab",
+        "index.lineage.json",
+      ),
       JSON.stringify({
         index_dataset: "predictor_index",
         built_at: "2026-01-01T00:00:00.000Z",
         source_cutoffs: [
           {
-            path: "engineering/jee/csab/cutoffs/year=2024/round=1/cutoffs.parquet",
+            path: "datasets/engineering/jee/csab/cutoffs/year=2024/round=1/cutoffs.parquet",
             sha256: "abc",
           },
         ],

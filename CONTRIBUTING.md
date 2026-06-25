@@ -61,7 +61,7 @@ Full walkthrough: [docs/DATA.md — Adding data](docs/DATA.md#adding-data). Shor
 1. `pnpm data:fetch --download`
 2. Add/fix parquets locally, rebuild indices if history changed
 3. `pnpm generate:manifest --version=vX.Y.Z` and run the verify commands in [Before a PR](#before-a-pr)
-4. Open PR with manifest + registry + `_sources.json` only — not parquets
+4. Open PR with catalog release + reference + sources only
 
 <br>
 

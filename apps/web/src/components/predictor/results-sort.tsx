@@ -65,6 +65,9 @@ export function ResultsSort({ sortBy, onChange }: ResultsSortProps) {
     prevActiveIndexRef.current = activeIndex;
   }
 
+  const activeIndexRef = useRef(activeIndex);
+  activeIndexRef.current = activeIndex;
+
   const measureLayout = useCallback(() => {
     const track = trackRef.current;
     if (!track) return;
@@ -87,7 +90,7 @@ export function ResultsSort({ sortBy, onChange }: ResultsSortProps) {
     positionsRef.current = next;
 
     if (!layoutReady) {
-      prevActiveIndexRef.current = activeIndex;
+      prevActiveIndexRef.current = activeIndexRef.current;
       setPositions(next);
       setLayoutReady(true);
       return;
@@ -96,7 +99,7 @@ export function ResultsSort({ sortBy, onChange }: ResultsSortProps) {
     if (changed && performance.now() >= animatingUntilRef.current) {
       setPositions(next);
     }
-  }, [activeIndex, layoutReady]);
+  }, [layoutReady]);
 
   useLayoutEffect(() => {
     measureLayout();

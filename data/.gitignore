@@ -3,16 +3,16 @@
 # Raw scraped sources (regenerable from ejam-ingest)
 **/_raw/
 
-# Ingest runtime logs (versioned manifest pins v*.json stay tracked)
-manifest/sources.jsonl
-manifest/runs.jsonl
+# Ingest runtime logs (versioned catalog releases stay tracked)
+catalog/sources.jsonl
+catalog/runs.jsonl
 
 # Local / experimental outputs
-dist/sandbox/
-dist/backtest-results.json
+_scratch/
+_cache/
 
 # Release payloads are published as GitHub Release assets.
-# Keep manifests and small registry/config metadata in git; keep large data local.
-engineering/**/*.parquet
-dist/*.parquet
-dist/*.lineage.json
+# Keep catalog and small reference/knowledge metadata in git; keep large data local.
+datasets/**/*.parquet
+tools/**/*.parquet
+tools/**/*.lineage.json

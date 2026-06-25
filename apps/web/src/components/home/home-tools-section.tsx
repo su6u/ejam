@@ -9,11 +9,13 @@ const HOME_TOOL_CARDS: ToolCardItem[] = [
     name: "College Predictor",
     breadcrumb: "engineering / tools",
     href: "/college-predictor",
-    img: "/media/magic-cat.png",
+    img: "/media/predict.png",
+    imgClassName: "scale-[0.91]",
+    mobileImgClassName: "scale-[0.91]",
     cardClassName:
       "border-transparent bg-[#191919] shadow-[var(--shadow-border)]",
     pill: {
-      label: "visit site",
+      label: "try tool",
       iconSrc: "/icons/magic.svg",
     },
   },
@@ -36,7 +38,7 @@ export function HomeToolsSection() {
   return (
     <div
       className={cn("home-enter-item", homeCardsRowClass)}
-      style={{ animationDelay: "120ms" }}
+      style={{ animationDelay: "160ms" }}
     >
       <ToolCardGrid
         compact
@@ -46,7 +48,7 @@ export function HomeToolsSection() {
           <Link
             href={href}
             prefetch
-            aria-label="Visit College Predictor"
+            aria-label="Try College Predictor tool"
             className={homeCardPillClass}
           >
             {children}

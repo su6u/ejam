@@ -1,5 +1,5 @@
 /**
- * shared manifest generation — single canonical format for data/manifest/v*.json
+ * shared catalog generation — single canonical format for data/catalog/releases/v*.json
  * used by generate-manifest.ts and fetch-data.ts
  */
 
@@ -26,16 +26,9 @@ export type CanonicalManifest = {
 };
 
 const PARQUET_SCAN_ROOTS = [
-  path.join(DATA_DIR, "engineering"),
-  path.join(DATA_DIR, "dist"),
+  path.join(DATA_DIR, "datasets"),
+  path.join(DATA_DIR, "tools"),
 ];
-
-const PREDICTOR_DIST_FILES = new Set([
-  "college_predictor_index.parquet",
-  "csab_predictor_index.parquet",
-  "college_predictor_index.lineage.json",
-  "csab_predictor_index.lineage.json",
-]);
 
 function isPathInside(root: string, candidate: string): boolean {
   const rel = path.relative(path.resolve(root), path.resolve(candidate));
@@ -74,10 +67,9 @@ async function* walkParquetFiles(
       continue;
     }
 
-    const inDist = dir === path.join(DATA_DIR, "dist");
-    if (inDist) {
-      if (!PREDICTOR_DIST_FILES.has(entry.name)) continue;
-    } else if (!entry.name.endsWith(".parquet")) {
+    const isReleasePayload =
+      entry.name.endsWith(".parquet") || entry.name.endsWith(".lineage.json");
+    if (!isReleasePayload) {
       continue;
     }
 
@@ -130,7 +122,10 @@ export function manifestFilePath(version: string): string {
   const fileName = version.startsWith("v")
     ? `${version}.json`
     : `v${version}.json`;
-  return resolveContainedPath(path.join(DATA_DIR, "manifest"), fileName);
+  return resolveContainedPath(
+    path.join(DATA_DIR, "catalog", "releases"),
+    fileName,
+  );
 }
 
 export async function writeManifest(
@@ -151,7 +146,7 @@ export async function readManifest(
 }
 
 export async function findLatestManifestVersion(): Promise<string> {
-  const manifestDir = path.join(DATA_DIR, "manifest");
+  const manifestDir = path.join(DATA_DIR, "catalog", "releases");
   const latest = pickLatestManifestFile(await fs.readdir(manifestDir));
   if (!latest) {
     throw new Error(`no manifest JSON files found in ${manifestDir}`);

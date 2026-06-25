@@ -4,7 +4,7 @@
   "status": "extracted_from_official_pdf_on_csab_special_page",
   "official_page": "https://csab.nic.in/csab-special/",
   "official_pdf": "https://cdnbbsr.s3waas.gov.in/s305a70454516ecd9194c293b0e415777f/uploads/2025/05/202508181225350702.pdf",
-  "cached_text": "data/exams/jee/_raw/csab.official.business_rules.txt",
+  "cached_text": "data/_cache/official-text/jee/csab.official.business_rules.txt",
   "note": "The live CSAB Special page currently exposes the 2025 official brochure PDF. The rules below are extracted from that official brochure text only.",
   "sections": {
     "eligibility": {

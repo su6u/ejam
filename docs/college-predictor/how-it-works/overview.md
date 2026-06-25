@@ -38,9 +38,9 @@ flowchart TB
 
 | Path | Index | What gets matched |
 | --- | --- | --- |
-| JEE Main + JoSAA | `college_predictor_index` | NIT, IIIT, CFI rows (IIT excluded) |
-| JEE Advanced | `college_predictor_index` | IIT rows only, All India quota |
-| JEE Main + CSAB | `csab_predictor_index` | NIT+, IIIT, CFI from CSAB history |
+| JEE Main + JoSAA | JoSAA predictor index | NIT, IIIT, CFI rows (IIT excluded) |
+| JEE Advanced | JoSAA predictor index | IIT rows only, All India quota |
+| JEE Main + CSAB | CSAB predictor index | NIT+, IIIT, CFI from CSAB history |
 
 JoSAA and CSAB use **separate indexes** on purpose. Vacant-seat CSAB cutoffs are a different pool than main JoSAA rounds.
 

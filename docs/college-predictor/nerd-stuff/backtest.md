@@ -13,7 +13,7 @@ pnpm data:fetch --download   # needs local cutoff parquets
 pnpm exec tsx packages/data-cli/src/backtest/predictor.ts
 ```
 
-Writes `data/dist/backtest-results.json` (gitignored). Exits non-zero if either builder's within-20% rate drops below 30%.
+Writes `data/_scratch/backtest-results.json` (gitignored). Exits non-zero if either builder's within-20% rate drops below 30%.
 
 Implementation: `packages/data-cli/src/backtest/predictor.ts`. Training SQL mirrors the production index builders (`build-college-predictor-index.ts`, `build-csab-predictor-index.ts`).
 
@@ -73,7 +73,7 @@ This is not the same as "did we predict the right band for a random applicant." 
 
 Previous `jam-josaa-v2` (deprecated): 72.8% ±20%, 42.0% band boundary.
 
-Reproduce: `pnpm exec tsx packages/data-cli/src/backtest/predictor.ts` and read the summary, or open `data/dist/backtest-results.json`.
+Reproduce: `pnpm exec tsx packages/data-cli/src/backtest/predictor.ts` and read the summary, or open `data/_scratch/backtest-results.json`.
 
 ---
 When you change index hyperparams (`packages/data-cli/src/jam/config.ts`, `csab-config.ts`), run the backtest script before publishing a data release.

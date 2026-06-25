@@ -1,5 +1,5 @@
 """
-validates structured jee json under data/engineering/jee/
+validates structured JEE source and knowledge JSON under data/
 mirrors packages/data/src/schemas/jee.ts
 """
 from __future__ import annotations
@@ -13,7 +13,11 @@ from typing import Any, Literal
 from pydantic import BaseModel, ConfigDict, Field, HttpUrl, field_validator, model_validator
 
 ROOT = Path(__file__).resolve().parents[4]
-JEE_ROOT = ROOT / "data" / "engineering" / "jee"
+DATA_ROOT = ROOT / "data"
+JEE_JSON_ROOTS = [
+    DATA_ROOT / "sources" / "engineering",
+    DATA_ROOT / "knowledge" / "engineering",
+]
 
 
 class Source(BaseModel):
@@ -112,11 +116,11 @@ class BusinessRulesDocument(BaseModel):
 SchemaEntry = tuple[re.Pattern[str], type[BaseModel], str]
 
 FILE_SCHEMAS: list[SchemaEntry] = [
-    (re.compile(r"/_sources\.json$"), SourcesRegistry, "sources-registry"),
-    (re.compile(r"/jee-main/exam\.json$"), ExamDocument, "jee-main-exam"),
+    (re.compile(r"/sources/engineering/jee\.json$"), SourcesRegistry, "sources-registry"),
+    (re.compile(r"/exams/jee-main\.json$"), ExamDocument, "jee-main-exam"),
     (re.compile(r"/jee-main/syllabus\.json$"), CitedDocument, "syllabus"),
     (re.compile(r"/jee-main/exam-cities\.json$"), CitedDocument, "exam-cities"),
-    (re.compile(r"/jee-advanced/exam\.json$"), ExamDocument, "jee-advanced-exam"),
+    (re.compile(r"/exams/jee-advanced\.json$"), ExamDocument, "jee-advanced-exam"),
     (re.compile(r"/jee-advanced/subject-details\.json$"), CitedDocument, "subject-details"),
     (re.compile(r"/jee-advanced/policies\.json$"), CitedDocument, "policies"),
     (re.compile(r"/jee-advanced/programmes\.json$"), CitedDocument, "programmes-index"),
@@ -128,10 +132,11 @@ FILE_SCHEMAS: list[SchemaEntry] = [
 
 def walk_json_files() -> list[Path]:
     files: list[Path] = []
-    for path in sorted(JEE_ROOT.rglob("*.json")):
-        if "_raw" in path.parts:
+    for root in JEE_JSON_ROOTS:
+        if not root.exists():
             continue
-        files.append(path)
+        for path in sorted(root.rglob("*.json")):
+            files.append(path)
     return files
 
 
@@ -205,8 +210,9 @@ def validate_json_files() -> int:
 
 
 def main() -> int:
-    if not JEE_ROOT.exists():
-        print(f"no jee json directory at {JEE_ROOT}")
+    if not any(root.exists() for root in JEE_JSON_ROOTS):
+        roots = ", ".join(str(root) for root in JEE_JSON_ROOTS)
+        print(f"no jee json directories at {roots}")
         return 0
     return validate_json_files()
 

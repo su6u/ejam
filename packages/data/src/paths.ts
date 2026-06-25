@@ -1,6 +1,6 @@
 /**
  * path helpers for /data lake — single source of truth for dataset layout
- * uniform pattern: data/{stream}/{exam_id}/{counselling_id}/{dataset}/year=YYYY/round=R/file.parquet
+ * uniform pattern: data/datasets/{stream}/{exam_id}/{counselling_id}/{dataset}/year=YYYY/round=R/file.parquet
  * no exam-specific if-branches — layout is generic across all exams
  */
 
@@ -23,18 +23,18 @@ export type SeatMatrixPathArgs = {
 
 /** canonical cutoff parquet path — uniform across all exams */
 export function cutoffPath(args: CutoffPathArgs): string {
-  return `${DATA_ROOT}/${args.stream}/${args.exam_id}/${args.counselling_id}/cutoffs/year=${args.year}/round=${args.round}/cutoffs.parquet`;
+  return `${DATA_ROOT}/datasets/${args.stream}/${args.exam_id}/${args.counselling_id}/cutoffs/year=${args.year}/round=${args.round}/cutoffs.parquet`;
 }
 
 export function seatMatrixPath(args: SeatMatrixPathArgs): string {
-  return `${DATA_ROOT}/${args.stream}/jee/seats-matrix/jossa/year=${args.year}/seat-matrix.parquet`;
+  return `${DATA_ROOT}/datasets/${args.stream}/jee/josaa/seat-matrix/year=${args.year}/seat-matrix.parquet`;
 }
 
-export function registryPath(
+export function referencePath(
   stream: Stream,
   kind: "institutes" | "programs",
 ): string {
-  return `${DATA_ROOT}/registry/${stream}/${kind}.json`;
+  return `${DATA_ROOT}/reference/${stream}/${kind}.json`;
 }
 
 /**

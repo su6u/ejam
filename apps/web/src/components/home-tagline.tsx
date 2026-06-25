@@ -7,8 +7,8 @@ const indianGradientColors = ["#FF671F", "#4D80E6", "#53C266"] as const;
 const taglineRevealStyle = (delayMs: number): React.CSSProperties =>
   ({ "--tagline-delay": `${delayMs}ms` }) as React.CSSProperties;
 
-const WORD_STAGGER_MS = 35;
-const TAGLINE_START_MS = 60;
+const WORD_STAGGER_MS = 55;
+const TAGLINE_START_MS = 80;
 
 function wordDelay(index: number): React.CSSProperties {
   return taglineRevealStyle(TAGLINE_START_MS + index * WORD_STAGGER_MS);

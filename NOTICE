@@ -16,7 +16,7 @@ this repo.
 
    Files under data/ are compiled from publicly available official sources
    for convenience. Source URLs and publishers are listed in
-   data/engineering/jee/_sources.json. Parquet files and predictor indices
+   data/sources/engineering/jee.json. Parquet files and predictor indices
    are processed copies of those records — not official publications.
 
 3. No affiliation

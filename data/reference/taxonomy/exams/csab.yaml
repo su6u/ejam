@@ -21,11 +21,11 @@ cutoff_score_type: rank
 
 data_dependencies:
   - dataset: cutoffs
-    path_template: "data/engineering/jee/csab/cutoffs/year={year}/round={round}/cutoffs.parquet"
+    path_template: "data/datasets/engineering/jee/csab/cutoffs/year={year}/round={round}/cutoffs.parquet"
     required: false
   - dataset: seat_matrix
-    path_template: "data/engineering/jee/seats-matrix/jossa/year={year}/seat-matrix.parquet"
+    path_template: "data/datasets/engineering/jee/csab/seat-matrix/year={year}/seat-matrix.parquet"
     required: false
   - dataset: predictor_index
-    path_template: "data/dist/csab_predictor_index.parquet"
+    path_template: "data/tools/college-predictor/csab/predictor-index.parquet"
     required: true

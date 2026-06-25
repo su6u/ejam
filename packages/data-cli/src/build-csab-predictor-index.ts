@@ -1,6 +1,6 @@
 #!/usr/bin/env tsx
 /**
- * builds csab_predictor_index.parquet from historical CSAB cutoff parquets
+ * builds the CSAB college predictor index from historical CSAB cutoff parquets
  * CSAB closing ranks are worse than JoSAA round 6 — stronger candidates already took JoSAA seats
  **/
 
@@ -21,13 +21,20 @@ import { REPO_ROOT as ROOT } from "./repo-root.js";
 const CSAB_CUTOFFS = path.join(
   ROOT,
   "data",
+  "datasets",
   "engineering",
   "jee",
   "csab",
   "cutoffs",
 );
-const OUTPUT_DIR = path.join(ROOT, "data", "dist");
-const OUTPUT_FILE = path.join(OUTPUT_DIR, "csab_predictor_index.parquet");
+const OUTPUT_DIR = path.join(
+  ROOT,
+  "data",
+  "tools",
+  "college-predictor",
+  "csab",
+);
+const OUTPUT_FILE = path.join(OUTPUT_DIR, "predictor-index.parquet");
 
 function resolvePredictionYear(): number {
   const raw = process.env.EJAM_PREDICTION_YEAR;

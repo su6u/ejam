@@ -12,8 +12,8 @@ export function _resetDataRootCache(): void {
   cachedDataRoot = null;
 }
 
-function hasManifestDir(dataDir: string): boolean {
-  return existsSync(join(dataDir, "manifest"));
+function hasCatalogDir(dataDir: string): boolean {
+  return existsSync(join(dataDir, "catalog", "releases"));
 }
 
 export function resolveDataRoot(): string {
@@ -25,7 +25,7 @@ export function resolveDataRoot(): string {
   let dir = process.cwd();
   for (let depth = 0; depth < 8; depth++) {
     const candidate = join(dir, "data");
-    if (hasManifestDir(candidate)) {
+    if (hasCatalogDir(candidate)) {
       cachedDataRoot = candidate;
       return candidate;
     }
@@ -38,16 +38,19 @@ export function resolveDataRoot(): string {
 }
 
 export function resolveManifestRoot(): string {
-  return process.env.EJAM_MANIFEST_ROOT ?? join(resolveDataRoot(), "manifest");
+  return (
+    process.env.EJAM_MANIFEST_ROOT ??
+    join(resolveDataRoot(), "catalog", "releases")
+  );
 }
 
 export function resolveRegistryRoot(): string {
-  return process.env.EJAM_REGISTRY_ROOT ?? join(resolveDataRoot(), "registry");
+  return process.env.EJAM_REGISTRY_ROOT ?? join(resolveDataRoot(), "reference");
 }
 
 export function resolveTaxonomyRoot(): string {
   return (
     process.env.EJAM_TAXONOMY_ROOT ??
-    join(resolveDataRoot(), "registry", "taxonomy")
+    join(resolveDataRoot(), "reference", "taxonomy")
   );
 }

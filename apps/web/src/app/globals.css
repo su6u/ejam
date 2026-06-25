@@ -144,11 +144,12 @@
 }
 
 .dark {
+  color-scheme: dark;
   --background: oklch(0.145 0 0);
   --foreground: oklch(0.985 0 0);
   --card: oklch(0.205 0 0);
   --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
+  --popover: oklch(0.17 0.005 250);
   --popover-foreground: oklch(0.985 0 0);
   --primary: oklch(0.922 0 0);
   --primary-foreground: oklch(0.205 0 0);
@@ -185,8 +186,8 @@
   /* Scrollbar — matches muted border language, pill thumb ok on macOS */
   --scrollbar-size: 8px;
   --scrollbar-track: transparent;
-  --scrollbar-thumb: oklch(1 0 0 / 20%);
-  --scrollbar-thumb-hover: oklch(1 0 0 / 35%);
+  --scrollbar-thumb: oklch(0.364 0 0);
+  --scrollbar-thumb-hover: oklch(0.483 0 0);
 }
 
 @theme inline {
@@ -367,6 +368,12 @@ input {
       background-color 150ms ease,
       border-color 150ms ease,
       color 150ms ease;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .home-page .pressable:hover:not(:disabled):not([data-static]) {
+      opacity: 0.85;
+    }
   }
 
   .pressable:active:not(:disabled) {
@@ -944,10 +951,10 @@ input {
     bottom: 0;
     box-sizing: border-box;
     opacity: 0;
-    transition:
-      transform var(--sort-slide-dur) var(--ease-out),
-      width var(--sort-slide-dur) var(--ease-out);
-    will-change: transform;
+    transition-property: transform, width;
+    transition-duration: 240ms;
+    transition-timing-function: var(--ease-out);
+    will-change: transform, width;
   }
 
   .sliding-toggle-indicator--sort:not([data-ready]) {
@@ -1251,7 +1258,7 @@ input {
   .home-tagline-part {
     opacity: 0;
     filter: blur(var(--text-swap-blur));
-    animation: home-tagline-reveal 280ms var(--text-swap-ease) forwards;
+    animation: home-tagline-reveal 420ms var(--text-swap-ease) forwards;
     animation-delay: var(--tagline-delay, 0ms);
   }
 
@@ -1265,7 +1272,8 @@ input {
   .home-enter-item {
     opacity: 0;
     transform: translateY(8px);
-    animation: home-enter 260ms var(--ease-out) forwards;
+    filter: blur(var(--text-swap-blur));
+    animation: home-enter 380ms var(--ease-out) forwards;
     animation-delay: var(--home-enter-delay, 0ms);
   }
 
@@ -1273,11 +1281,12 @@ input {
     to {
       opacity: 1;
       transform: translateY(0);
+      filter: blur(0);
     }
   }
 
   .home-manifesto-scroll-hint {
-    animation: home-manifesto-scroll-bob 1.4s cubic-bezier(0.77, 0, 0.175, 1)
+    animation: home-manifesto-scroll-bob 1.4s cubic-bezier(0.65, 0, 0.35, 1)
       infinite;
     transform-origin: center;
   }
@@ -1308,6 +1317,7 @@ input {
       animation: none;
       opacity: 1;
       transform: none;
+      filter: none;
     }
 
     .home-manifesto-scroll-hint {
