@@ -35,7 +35,7 @@ export const stickyGlassTableHeaderClass =
 
 /** results table scroll — mobile cards scroll in content; desktop table wrapper owns sticky scroll */
 export const resultsTableScrollClass =
-  "no-scrollbar min-h-0 flex-1 overflow-y-auto lg:overflow-hidden lg:[&_[data-slot=table-container]]:min-h-0 lg:[&_[data-slot=table-container]]:flex-1 lg:[&_[data-slot=table-container]]:overflow-auto lg:[&_[data-slot=table-container]]:no-scrollbar";
+  "theme-scrollbar min-h-0 flex-1 overflow-y-auto lg:overflow-hidden lg:[&_[data-slot=table-container]]:min-h-0 lg:[&_[data-slot=table-container]]:flex-1 lg:[&_[data-slot=table-container]]:overflow-auto lg:[&_[data-slot=table-container]]:theme-scrollbar";
 
 /** h-14 top chrome — sidebar logo row and main header actions share one strip height */
 export const appChromeStripClass =

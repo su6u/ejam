@@ -144,11 +144,12 @@
 }
 
 .dark {
+  color-scheme: dark;
   --background: oklch(0.145 0 0);
   --foreground: oklch(0.985 0 0);
   --card: oklch(0.205 0 0);
   --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
+  --popover: oklch(0.17 0.005 250);
   --popover-foreground: oklch(0.985 0 0);
   --primary: oklch(0.922 0 0);
   --primary-foreground: oklch(0.205 0 0);
@@ -184,9 +185,9 @@
 
   /* Scrollbar — matches muted border language, pill thumb ok on macOS */
   --scrollbar-size: 8px;
-  --scrollbar-track: transparent;
-  --scrollbar-thumb: oklch(1 0 0 / 20%);
-  --scrollbar-thumb-hover: oklch(1 0 0 / 35%);
+  --scrollbar-track: var(--card);
+  --scrollbar-thumb: oklch(0.364 0 0);
+  --scrollbar-thumb-hover: oklch(0.483 0 0);
 }
 
 @theme inline {
