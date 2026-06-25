@@ -951,10 +951,10 @@ input {
     bottom: 0;
     box-sizing: border-box;
     opacity: 0;
-    transition:
-      transform var(--sort-slide-dur) var(--ease-out),
-      width var(--sort-slide-dur) var(--ease-out);
-    will-change: transform;
+    transition-property: transform, width;
+    transition-duration: 240ms;
+    transition-timing-function: var(--ease-out);
+    will-change: transform, width;
   }
 
   .sliding-toggle-indicator--sort:not([data-ready]) {
