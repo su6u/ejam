@@ -1,9 +1,8 @@
 <p align="center">
-  <picture>
-    <source media="(prefers-color-scheme: light)" srcset="apps/web/public/identity/icon.png">
-    <img src="apps/web/public/identity/logo.svg" alt="ejam" width="80">
-  </picture>
+  <img src="apps/web/public/media/p-readme-logo.png" alt="ejam" width="380">
 </p>
+
+---
 
 <p align="center">
   <a href="docs/README.md">Documentation</a>
@@ -15,33 +14,73 @@
   <a href="NOTICE">Notice</a>
 </p>
 
----
+<br>
+
+## rant (#`^´)／
+
+Indian exam culture sucks. somehow we built an education system where exams matter more than actually learning. and ofcourse wherever fear exists, someone finds a way to sell it.
+
+Offline institutes. Online institutes. Schools. Nobody really cares about the *student.* everyone wants the billboard. ak aur factory. ak aur batch. ak aur advertisement.
 
 <br>
 
-## Why [ejam] exists
+> *"Education is not a race."*
 
-Indian exam season means a flood of websites that promise to help: predictors, rank tools, guides, etc. Most of them are built to harvest your data first and help you second (like why tf do I need to give my data to use a simple tool). Ads everywhere, sign-up walls, phone number mandatory, then spam calls for weeks. Closed source, so you never know if the data/ tools is even reliable.
-
-I started **ejam** as a hobby project to build the kind of tools I wished existed during my own exam season: free, open, no account, code you can read.
+...or at least it shouldn't be. I genuinely never understood why we're so sexually obsessed with ranks. A rank is just supposed to be a by-product. Not the entire purpose of learning. But here we are. Nothing changes because everyone already knows this. We rant. We complain. *fhir dusra batch aja ta hai*
 
 <br>
 
-## [TOOLS]
+Anyway... I completely forgot why I even started writing this. oh yeah! Here's why this repository exists.
+
+**Pure. Frustration. That's it.**
+
+<br>
+
+Every tool for students online somehow manages to suck. Closed-source. Ads everywhere. "Buy this." "Buy that." Yeah buddy... I don't really want to buy those underwears. No, thank you.
+
+And then comes the data collection. Like...
+
+**Alakh sir, do you really need my date of birth, phone-number, rank?**
+
+Papa mummy ka bhi DOB dedu? Time of birth bhi chahiye kya? Blood group? Aadhaar bhi le lo sir. 😭
+
+<br>
+
+*oh my fucking god.* These websites are literally extracting everything because they know students **need** them. And somehow... nothing better exists.
+
+So... I built one at-least for myself and if it helps other too. Not something revolutionary. Not the biggest project ever. Just something I wish existed when I needed it. A collection of genuinely useful exam tools. No bullsh*t. Just tools.
+
+<br>
+
+**For students. From students.**
+
+<br><br><br>
+
+## tools (˶˃ ᵕ ˂˶) .ᐟ.ᐟ
 
 <p align="center">
   <code>Engineering</code> / <code>Tools</code> / <code>College Predictor</code>
 </p>
 
-### [01] College Predictor
-
-A JEE (will try to add more exams soon) counselling predictor. It estimates where your rank could land using years of **JoSAA** and **CSAB** closing ranks. Estimates only, not official allotment.
+<br>
 
 <br>
 
-## [Nerd] Stuff
+<p align="center">
+  <a href="apps/web/public/media/p-info.png"><img src="apps/web/public/media/p-info.png" alt="predictor overview" width="100%"></a>
+</p>
 
-Offline DuckDB builds the index. Live predict just reads it.
+<br>
+
+A college predictor. It takes years of past JoSAA and CSAB closing ranks to estimate what you might actually get. Just a simple tool to save you some headache during counselling. (Will try to add more exams soon, but for now it's just JEE).
+
+<br>
+
+<br>
+
+### how it works?
+
+We use DuckDB offline to crunch the heavy data so the live site doesn't lag. Here's what's happening under the hood:
 
 <br>
 
@@ -53,7 +92,9 @@ Offline DuckDB builds the index. Live predict just reads it.
 
 <br>
 
-For each seat, the index looks at years of closing ranks. Recent years and later rounds (R6 > R1) weigh more; COVID spikes get trimmed. A small trend nudge plus ~3%/yr covers rank inflation. [**[1]**](docs/college-predictor/nerd-stuff/index-algorithms.md#predicted-closing-rank) is the predicted closing rank for this year. [**[2]**](docs/college-predictor/nerd-stuff/index-algorithms.md#sigma-floor) is how uncertain that guess is, wider when history is thin.
+Instead of blindly throwing last year's ranks at you, the offline index analyzes years of historical data. We give recent years heavier weight, mathematically trim out crazy COVID spikes, and bake in a slight trend nudge to account for the ~3% rank inflation we see every year.
+
+This generates two key metrics: [**[1]**](docs/college-predictor/nerd-stuff/index-algorithms.md#predicted-closing-rank) calculates our best guess for where the closing rank will actually land this year, while [**[2]**](docs/college-predictor/nerd-stuff/index-algorithms.md#sigma-floor) determines how confident we are in that guess. If the historical data is sketchy, the margin of error automatically goes up.
 
 <br>
 
@@ -67,26 +108,65 @@ For each seat, the index looks at years of closing ranks. Recent years and later
 
 <br>
 
-At predict time, [**[3]**](docs/college-predictor/nerd-stuff/prediction-engine.md#single-round-probability) compares your rank to that closing rank for each round. [**[4]**](docs/college-predictor/nerd-stuff/prediction-engine.md#round-by-round-cumulative-chance) stacks all six rounds, so a miss in R1 can still leave room in R2–R6. The % on each row is that cumulative chance. Safe / target / reach are labels at 85% / 40% / 10%. Default sort uses [**[5]**](docs/college-predictor/nerd-stuff/balanced-ranking.md#composite-formula): institute and branch quality matter, not just probability. A strong IIT at 60% can rank above a weak branch at 95%.
+When you enter your rank, the live prediction engine immediately goes to work. First, [**[3]**](docs/college-predictor/nerd-stuff/prediction-engine.md#single-round-probability) calculates your exact probability of getting into a specific branch for a single round.
+
+But counselling has 6 rounds. To account for this, [**[4]**](docs/college-predictor/nerd-stuff/prediction-engine.md#round-by-round-cumulative-chance) stacks those probabilities, meaning a miss in Round 1 doesn't mean it's game over if you can slip in by Round 6.
+
+Finally, getting a dead-end branch with 99% probability isn't actually helpful. To fix this, [**[5]**](docs/college-predictor/nerd-stuff/balanced-ranking.md#composite-formula) sorts your results using a composite score based on both *probability* and *institute quality*. This ensures a decent IIT at 60% chance rightly ranks higher than a bottom-tier college at 95%.
 
 <br>
 
-## [Credits]
+### TL;DR
 
-Dashboard layout adapted from [Efferd](https://efferd.com/) by [Shaban](https://x.com/shabanhr).
+```mermaid
+%%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#0A0A0A', 'primaryTextColor': '#FFFFFF', 'primaryBorderColor': '#FFFFFF', 'lineColor': '#FFFFFF', 'nodeBorder': '#FFFFFF', 'mainBkg': '#0A0A0A', 'edgeLabelBackground': 'transparent', 'clusterBkg': 'transparent', 'clusterBorder': 'transparent'}}}%%
+flowchart LR
+    classDef data fill:#0A0A0A,stroke:#888,stroke-width:1px,stroke-dasharray: 4 4,color:#FFF,rx:5px,ry:5px;
+    classDef engine fill:#1A1A1A,stroke:#FFF,stroke-width:1.5px,color:#FFF,rx:5px,ry:5px;
+    classDef output fill:#0A0A0A,stroke:#FFF,stroke-width:2px,color:#FFF,rx:15px,ry:15px;
+
+    subgraph Offline [ Offline Build ]
+        Data[(Past JoSAA/CSAB)]:::data -->|Crunch| Index[DuckDB Index]:::engine
+    end
+
+    subgraph Live ["Live Predictor&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"]
+        User[/Your Rank Input/]:::data -.-> Engine{Prediction Engine}:::engine
+        Index ==> Engine
+        Engine -->|Calculate 6 Rounds| Out([Safe / Target / Reach]):::output
+    end
+```
 
 <br>
 
-## Repo
+<p align="left">
+  <a href="docs/README.md"><code><b>Read the full documentation ↗</b></code></a>
+</p>
 
-| | |
-| --- | --- |
-| **License** | [AGPL-3.0](LICENSE) (code only; see [NOTICE](NOTICE) for data) |
-| **Stack** | Next.js, DuckDB index build, public parquet datasets |
-| **Contributing** | [CONTRIBUTING.md](CONTRIBUTING.md) |
-| **Data releases** | [docs/DATA.md](docs/DATA.md) |
+<br><br><br>
 
-<br>
+## credits [^._.^]ﾉ彡
+
+<p align="center">
+  Dashboard layout adapted from <a href="https://efferd.com/">Efferd</a> by <a href="https://x.com/shabanhr">Shaban</a><br>
+  Charts adapted from <a href="https://evilcharts.com/">EvilCharts</a> by <a href="https://x.com/legionsdev">Gurbinder</a><br>
+  A few illustrations from <a href="https://icons8.com/">Icons8</a>
+</p>
+
+<br><br><br>
+
+## sponsors /ᐠ. ｡.ᐟ\ᵐᵉᵒʷˎˊ˗
+
+<p align="center">
+  <a href="https://github.com/sponsors/su6u"><img src="apps/web/public/media/sponser.png" alt="No sponsors yet" width="30%"></a>
+</p>
+
+Hosting servers and crunching this much data isn't exactly free. If you found these tools useful and want to help keep it running, consider sponsoring. sponsorships go directly toward covering server costs and keeping the site completely ad-free.
+
+<p align="center">
+  <a href="https://github.com/sponsors/su6u"><code><b>Sponsor the project 💖</b></code></a>
+</p>
+
+<br><br><br>
 
 <p align="center">
   <strong>→ <a href="docs/README.md">Documentation</a></strong>
