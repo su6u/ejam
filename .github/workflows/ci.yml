@@ -37,6 +37,8 @@ jobs:
               - 'turbo.json'
               - 'biome.json'
               - 'tsconfig.json'
+              - 'Dockerfile'
+              - '.dockerignore'
             data:
               - 'data/**'
               - 'packages/data/**'
