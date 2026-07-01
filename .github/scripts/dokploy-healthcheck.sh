@@ -16,7 +16,7 @@ while [ "$attempt" -lt "$MAX_ATTEMPTS" ]; do
   attempt=$((attempt + 1))
   echo -n "Attempt ${attempt}/${MAX_ATTEMPTS}: "
 
-  STATUS=$(curl -sS -o /dev/null -w "%{http_code}" \
+  STATUS=$(curl -k -sS -o /dev/null -w "%{http_code}" \
     --max-time 10 \
     --connect-timeout 5 \
     "${HEALTH_URL}" 2>/dev/null || echo "000")
