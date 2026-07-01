@@ -158,7 +158,7 @@ export function usePredictorState(
     [updateParam],
   );
   const setIncludeAll = useCallback(
-    (v: boolean) => updateParam({ include_all: v ? "true" : null }),
+    (v: boolean) => updateParam({ include_all: v ? "true" : "false" }),
     [updateParam],
   );
 

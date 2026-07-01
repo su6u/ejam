@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="apps/web/public/media/p-readme-logo.png" alt="ejam" width="380">
+  <img src="apps/web/public/media/p-readme-logo.png" alt="ejam" width="650">
 </p>
 
 ---
@@ -67,7 +67,9 @@ So... I built one at-least for myself and if it helps other too. Not something r
 <br>
 
 <p align="center">
-  <a href="apps/web/public/media/p-info.png"><img src="apps/web/public/media/p-info.png" alt="predictor overview" width="100%"></a>
+  <a href="apps/web/public/media/p-info1.png"><img src="apps/web/public/media/p-info1.png" alt="predictor overview 1" width="85%"></a>
+  <br><br>
+  <a href="apps/web/public/media/p-info2.png"><img src="apps/web/public/media/p-info2.png" alt="predictor overview 2" width="85%"></a>
 </p>
 
 <br>
@@ -80,7 +82,8 @@ A college predictor. It takes years of past JoSAA and CSAB closing ranks to esti
 
 ### how it works?
 
-We use DuckDB offline to crunch the heavy data so the live site doesn't lag. Here's what's happening under the hood:
+ejam use DuckDB offline to crunch the heavy data so the live site doesn't lag. 
+all this happens when you use the college predector:
 
 <br>
 

@@ -9,6 +9,7 @@ import type { ResultsFilterState } from "@/components/predictor/results-filter-l
 import type { ExamType } from "@/hooks/use-predictor-state";
 import { isJeeMainCounselling } from "@/hooks/use-predictor-state";
 import { BAND_FILTER_OPTIONS } from "@/lib/bands";
+import { deferAfterPress, pressableClass } from "@/lib/pressable";
 import { cn } from "@/lib/utils";
 
 const JEE_MAIN_INSTITUTE_ORDER = ["NIT", "IIIT", "CFI"] as const;
@@ -46,6 +47,8 @@ interface ResultsFiltersProps {
   filters: ResultsFilterState;
   onChange: (next: ResultsFilterState) => void;
   enabled: boolean;
+  includeAll: boolean;
+  onToggleLongShots: () => void;
 }
 
 export function ResultsFilters({
@@ -54,6 +57,8 @@ export function ResultsFilters({
   filters,
   onChange,
   enabled,
+  includeAll,
+  onToggleLongShots,
 }: ResultsFiltersProps) {
   const instituteTypes = availableInstituteTypes(programs, exam);
   const showInstituteGroup =
@@ -123,6 +128,63 @@ export function ResultsFilters({
     </FilterGroup>
   );
 
+  const longShotsGroup = (
+    <fieldset className="min-w-0 border-0 p-0">
+      <div className="mb-1.5 flex items-center justify-between">
+        <legend className="inline-flex shrink-0 items-center gap-1 text-[10px] font-medium tracking-wide text-muted-foreground uppercase">
+          Long-shots
+        </legend>
+      </div>
+      <div className="sliding-toggle-track" data-gap="1">
+        <span
+          aria-hidden
+          className="sliding-toggle-indicator"
+          data-cols="2"
+          data-gap="1"
+          data-index={includeAll ? "0" : "1"}
+        />
+        <div className="sliding-toggle-grid grid grid-cols-2">
+          <button
+            type="button"
+            aria-pressed={includeAll}
+            disabled={!enabled}
+            onClick={() => {
+              if (enabled && !includeAll) deferAfterPress(onToggleLongShots);
+            }}
+            className={cn(
+              "sliding-toggle-tile flex h-8 items-center justify-center rounded-none text-xs font-medium text-muted-foreground outline-none transition-colors",
+              pressableClass,
+              enabled && "hover:text-foreground",
+              "focus-visible:ring-3 focus-visible:ring-ring/50",
+              includeAll && "text-foreground",
+              !enabled && "cursor-not-allowed opacity-40 grayscale",
+            )}
+          >
+            Show
+          </button>
+          <button
+            type="button"
+            aria-pressed={!includeAll}
+            disabled={!enabled}
+            onClick={() => {
+              if (enabled && includeAll) deferAfterPress(onToggleLongShots);
+            }}
+            className={cn(
+              "sliding-toggle-tile flex h-8 items-center justify-center rounded-none text-xs font-medium text-muted-foreground outline-none transition-colors",
+              pressableClass,
+              enabled && "hover:text-foreground",
+              "focus-visible:ring-3 focus-visible:ring-ring/50",
+              !includeAll && "text-foreground",
+              !enabled && "cursor-not-allowed opacity-40 grayscale",
+            )}
+          >
+            Hide
+          </button>
+        </div>
+      </div>
+    </fieldset>
+  );
+
   return (
     <div
       className={cn(
@@ -133,6 +195,7 @@ export function ResultsFilters({
     >
       {instituteGroup}
       {chanceGroup}
+      {longShotsGroup}
     </div>
   );
 }

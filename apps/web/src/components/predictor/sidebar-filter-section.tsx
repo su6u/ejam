@@ -11,6 +11,8 @@ interface SidebarFilterSectionProps {
   programs: ProgramPrediction[];
   filters: ResultsFilterState;
   onChange: (next: ResultsFilterState) => void;
+  includeAll: boolean;
+  onToggleLongShots: () => void;
 }
 
 export function SidebarFilterSection({
@@ -18,8 +20,11 @@ export function SidebarFilterSection({
   programs,
   filters,
   onChange,
+  includeAll,
+  onToggleLongShots,
 }: SidebarFilterSectionProps) {
-  const activeCount = filters.instituteTypes.size + filters.bands.size;
+  const activeCount =
+    filters.instituteTypes.size + filters.bands.size + (includeAll ? 1 : 0);
 
   return (
     <section
@@ -52,6 +57,8 @@ export function SidebarFilterSection({
         filters={filters}
         onChange={onChange}
         enabled
+        includeAll={includeAll}
+        onToggleLongShots={onToggleLongShots}
       />
     </section>
   );

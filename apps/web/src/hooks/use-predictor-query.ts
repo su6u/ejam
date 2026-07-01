@@ -52,9 +52,7 @@ function buildRequestBody(
     has_ews_certificate: opts.has_ews_certificate,
   };
 
-  if (opts.include_all) {
-    body.include_all = true;
-  }
+  body.include_all = true;
 
   if (predictorUsesQuotaHomeState(opts.predictorExamId)) {
     body.quota = uiQuotaToApi(opts.quota);
@@ -73,7 +71,6 @@ function requestInputKey(opts: PredictorQueryOptions): string {
     opts.quota,
     opts.homeState,
     opts.has_ews_certificate,
-    opts.include_all,
   ]);
 }
 

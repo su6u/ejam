@@ -25,6 +25,7 @@ import {
 } from "@/components/predictor/results-card-list";
 import { ResultsCardShell } from "@/components/predictor/results-card-shell";
 import { seatPoolLabel } from "@/components/predictor/results-row-format";
+import { ResultsSearch } from "@/components/predictor/results-search";
 import { ResultsSort } from "@/components/predictor/results-sort";
 import type { ResultsSortKey } from "@/components/predictor/results-sort-logic";
 import { RoundProbabilityBars } from "@/components/predictor/round-probability-bars";
@@ -44,6 +45,8 @@ interface ResultsTableProps {
   allRows: ProgramPrediction[];
   sortBy: ResultsSortKey;
   onSortChange: (next: ResultsSortKey) => void;
+  searchQuery: string;
+  onSearchChange: (next: string) => void;
   selectedId: string | null;
   onSelect: (program: ProgramPrediction) => void;
   onClearFilters?: () => void;
@@ -55,6 +58,8 @@ export function ResultsTable({
   allRows,
   sortBy,
   onSortChange,
+  searchQuery,
+  onSearchChange,
   selectedId,
   onSelect,
   onClearFilters,
@@ -85,7 +90,14 @@ export function ResultsTable({
   return (
     <ResultsCardShell
       contentClassName={resultsTableScrollClass}
-      toolbar={<ResultsSort sortBy={sortBy} onChange={onSortChange} />}
+      toolbar={
+        <div className="flex min-w-0 flex-col-reverse justify-between gap-3 sm:flex-row sm:items-center">
+          <ResultsSort sortBy={sortBy} onChange={onSortChange} />
+          <div className="w-full sm:w-auto">
+            <ResultsSearch value={searchQuery} onChange={onSearchChange} />
+          </div>
+        </div>
+      }
       footer={<DataVersionFooter provenance={provenance} />}
       headerExtra={headerExtra}
     >
