@@ -13,7 +13,6 @@ COPY apps/web/package.json                   apps/web/package.json
 COPY packages/data/package.json              packages/data/package.json
 COPY packages/predictors/package.json        packages/predictors/package.json
 COPY packages/data-cli/package.json          packages/data-cli/package.json
-COPY packages/data-validation/package.json   packages/data-validation/package.json
 
 RUN pnpm install --frozen-lockfile
 
