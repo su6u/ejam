@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="apps/web/public/media/p-readme-logo.png" alt="ejam" width="650">
+  <img src="apps/web/public/media/p-readme-logo.png" alt="ejam" width="600">
 </p>
 
 ---
@@ -67,9 +67,7 @@ So... I built one at-least for myself and if it helps other too. Not something r
 <br>
 
 <p align="center">
-  <a href="apps/web/public/media/p-info1.png"><img src="apps/web/public/media/p-info1.png" alt="predictor overview 1" width="85%"></a>
-  <br><br>
-  <a href="apps/web/public/media/p-info2.png"><img src="apps/web/public/media/p-info2.png" alt="predictor overview 2" width="85%"></a>
+  <a href="apps/web/public/media/p-info1.png"><img src="apps/web/public/media/p-info.png" alt="predictor overview 1" width="85%"></a>
 </p>
 
 <br>
