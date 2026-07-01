@@ -9,8 +9,10 @@ on:
 permissions:
   contents: read
   pull-requests: read
+  packages: write   # needed to push to GHCR
 
 jobs:
+  # ── Path-based change detection ──────────────────────────────────────────────
   changes:
     runs-on: ubuntu-latest
     outputs:
@@ -35,7 +37,6 @@ jobs:
               - 'turbo.json'
               - 'biome.json'
               - 'tsconfig.json'
-              - 'apps/web/vercel.json'
             data:
               - 'data/**'
               - 'packages/data/**'
@@ -49,6 +50,7 @@ jobs:
               - 'pyproject.toml'
               - 'uv.lock'
 
+  # ── App checks (typecheck + lint + build verify) ─────────────────────────────
   app:
     needs: changes
     if: needs.changes.outputs.app == 'true'
@@ -66,7 +68,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 26
+          node-version: 22
           cache: pnpm
 
       - run: pnpm install --frozen-lockfile
@@ -83,58 +85,7 @@ jobs:
       - name: Build
         run: pnpm turbo run build --filter=@ejam/web
 
-  deploy:
-    name: Deploy to production
-    needs: [changes, app, data]
-    if: >-
-      always() &&
-      github.event_name == 'push' &&
-      github.ref == 'refs/heads/main' &&
-      (needs.changes.outputs.app == 'true' || needs.changes.outputs.data == 'true') &&
-      (needs.changes.outputs.app != 'true' || needs.app.result == 'success') &&
-      (needs.changes.outputs.data != 'true' || needs.data.result == 'success')
-    runs-on: ubuntu-latest
-    timeout-minutes: 45
-    environment: production
-    concurrency:
-      group: deploy-production
-      cancel-in-progress: false
-    env:
-      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
-      TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
-      TURBO_TEAM: ${{ vars.TURBO_TEAM }}
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 11.1.3
-          standalone: true
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 26
-          cache: pnpm
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: Prepare Vercel CI link
-        env:
-          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-        run: bash .github/scripts/vercel-ci-setup.sh
-
-      - name: Pull Vercel environment
-        run: pnpm dlx vercel@latest pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
-
-      - name: Build for Vercel
-        run: pnpm dlx vercel@latest build --prod --token=${{ secrets.VERCEL_TOKEN }}
-
-      - name: Deploy to production
-        timeout-minutes: 20
-        run: pnpm dlx vercel@latest deploy --prebuilt --prod --archive=tgz --token=${{ secrets.VERCEL_TOKEN }}
-
+  # ── Data pipeline checks ─────────────────────────────────────────────────────
   data:
     needs: changes
     if: needs.changes.outputs.data == 'true'
@@ -149,7 +100,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 26
+          node-version: 22
           cache: pnpm
 
       - uses: astral-sh/setup-uv@v5
@@ -170,3 +121,104 @@ jobs:
 
       - name: Run @ejam/data tests
         run: pnpm --filter @ejam/data test
+
+  # ── Build Docker image & deploy to Dokploy ───────────────────────────────────
+  # Only runs on main branch pushes after all relevant checks pass.
+  # The image is tagged with both the commit SHA (immutable, for rollbacks)
+  # and 'latest' (rolling, for Dokploy to pull).
+  deploy:
+    name: Build & deploy to production
+    needs: [changes, app, data]
+    if: >-
+      always() &&
+      github.event_name == 'push' &&
+      github.ref == 'refs/heads/main' &&
+      (needs.changes.outputs.app == 'true' || needs.changes.outputs.data == 'true') &&
+      (needs.changes.outputs.app != 'true' || needs.app.result == 'success') &&
+      (needs.changes.outputs.data != 'true' || needs.data.result == 'success')
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    environment: production
+    # Prevent concurrent deploys from racing — queue, never cancel in progress
+    concurrency:
+      group: deploy-production
+      cancel-in-progress: false
+    env:
+      REGISTRY: ghcr.io
+      IMAGE_NAME: ${{ github.repository_owner }}/ejam-web
+      TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+      TURBO_TEAM: ${{ vars.TURBO_TEAM }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # Authenticate to GitHub Container Registry using the auto-generated GITHUB_TOKEN.
+      # This means zero extra secrets for the registry push step.
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # Set up QEMU + buildx for linux/amd64 cross-compilation on the runner
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      # Derive image tags:
+      #   ghcr.io/OWNER/ejam-web:sha-abc1234   ← immutable, used for rollbacks
+      #   ghcr.io/OWNER/ejam-web:latest         ← Dokploy pulls this
+      - name: Derive image metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=sha,prefix=sha-,format=short
+            type=raw,value=latest
+
+      # Build and push the multi-stage image.
+      # The Dockerfile lives in apps/web/ but context is the repo root so
+      # pnpm workspace packages are accessible during the build.
+      - name: Build and push Docker image
+        id: push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: Dockerfile
+          platforms: linux/amd64
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          # Use GitHub Actions cache to speed up repeated layer builds
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      # Signal Dokploy to pull the new image and do a rolling update.
+      # DOKPLOY_WEBHOOK_URL is stored as a repository/environment secret.
+      # Dokploy webhooks are a simple GET/POST that trigger redeploy.
+      - name: Trigger Dokploy redeploy
+        run: |
+          echo "Triggering Dokploy webhook..."
+          STATUS=$(curl -sS -o /tmp/dokploy-response.json -w "%{http_code}" \
+            -X GET \
+            "${{ secrets.DOKPLOY_WEBHOOK_URL }}")
+          echo "Dokploy response (HTTP $STATUS):"
+          cat /tmp/dokploy-response.json
+          if [ "$STATUS" -lt 200 ] || [ "$STATUS" -ge 300 ]; then
+            echo "Webhook call failed with status $STATUS"
+            exit 1
+          fi
+
+      # Wait for the new container to become healthy before marking the deploy as done.
+      # Retries for up to 5 minutes with 15-second intervals.
+      # TODO: remove continue-on-error after DNS is pointed to the VPS
+      - name: Verify deployment health
+        continue-on-error: true
+        timeout-minutes: 6
+        run: bash .github/scripts/dokploy-healthcheck.sh
+        env:
+          HEALTH_URL: https://ejam.in/
