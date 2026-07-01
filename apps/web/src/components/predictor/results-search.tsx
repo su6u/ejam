@@ -110,4 +110,3 @@ export function ResultsSearch({ value, onChange }: ResultsSearchProps) {
     </div>
   );
 }
-
