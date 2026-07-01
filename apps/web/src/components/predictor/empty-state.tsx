@@ -30,6 +30,7 @@ function StateIllustration({ src }: { src: string }) {
         loop={!shouldReduceMotion}
         muted
         playsInline
+        preload="auto"
         aria-hidden
         tabIndex={-1}
         className="h-auto w-full object-contain"
