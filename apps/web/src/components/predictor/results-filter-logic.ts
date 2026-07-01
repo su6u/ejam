@@ -16,8 +16,12 @@ export const EMPTY_RESULTS_FILTERS: ResultsFilterState = {
 export function applyResultsFilters(
   programs: ProgramPrediction[],
   filters: ResultsFilterState,
+  includeAll: boolean = true,
 ): ProgramPrediction[] {
   return programs.filter((program) => {
+    if (!includeAll && program.band === "long-shot") {
+      return false;
+    }
     if (
       filters.instituteTypes.size > 0 &&
       !filters.instituteTypes.has(program.instype)

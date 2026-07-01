@@ -54,7 +54,8 @@ export function HomeStateCombobox({
         aria-controls={listboxId}
         aria-expanded={open}
         className={cn(
-          "flex h-8 w-full items-center justify-between rounded-none border border-input bg-transparent px-2.5 text-sm outline-none",
+          "flex h-8 w-full items-center justify-between rounded-none border border-input px-2.5 text-sm outline-none",
+          "transition-colors duration-200 ease-out bg-transparent shadow-none hover:bg-muted dark:bg-transparent dark:hover:bg-muted/50",
           pressableClass,
           "focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50",
           className,

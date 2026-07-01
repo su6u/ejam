@@ -42,6 +42,8 @@ interface PredictorContextValue {
   setFilters: (next: ResultsFilterState) => void;
   sortBy: ResultsSortKey;
   setSortBy: (next: ResultsSortKey) => void;
+  searchQuery: string;
+  setSearchQuery: (next: string) => void;
   hasResults: boolean;
 }
 
@@ -96,6 +98,7 @@ function PredictorProviderInner({ children }: { children: React.ReactNode }) {
     EMPTY_RESULTS_FILTERS,
   );
   const [sortBy, setSortBy] = useState<ResultsSortKey>(DEFAULT_RESULTS_SORT);
+  const [searchQuery, setSearchQuery] = useState("");
   const rankInputRef = useRef<RankInputHandle>(null);
   const initialUrlParamsRef = useRef<URLSearchParams | null | undefined>(
     undefined,
@@ -110,6 +113,7 @@ function PredictorProviderInner({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     setFilters(EMPTY_RESULTS_FILTERS);
     setSortBy(DEFAULT_RESULTS_SORT);
+    setSearchQuery("");
   }, [state.exam, state.counselling]);
 
   const onPredict = useCallback(async () => {
@@ -130,6 +134,7 @@ function PredictorProviderInner({ children }: { children: React.ReactNode }) {
     if (!fromCache) {
       setFilters(EMPTY_RESULTS_FILTERS);
       setSortBy(DEFAULT_RESULTS_SORT);
+      setSearchQuery("");
     }
   }, [query, state.rank, state.predictorExamId, state.include_all]);
 
@@ -152,9 +157,11 @@ function PredictorProviderInner({ children }: { children: React.ReactNode }) {
       setFilters,
       sortBy,
       setSortBy,
+      searchQuery,
+      setSearchQuery,
       hasResults,
     }),
-    [state, query, onPredict, filters, sortBy, hasResults],
+    [state, query, onPredict, filters, sortBy, searchQuery, hasResults],
   );
 
   return (

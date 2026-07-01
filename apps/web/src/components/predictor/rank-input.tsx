@@ -120,8 +120,9 @@ export function RankInput({
         aria-required
         data-transparent-input=""
         className={cn(
-          "t-input w-full rounded-none tabular-nums",
-          "border-input bg-transparent shadow-none dark:bg-transparent dark:hover:bg-transparent",
+          "t-input w-full rounded-none tabular-nums transition-colors duration-200 ease-out",
+          "border-input bg-transparent shadow-none hover:bg-muted dark:bg-transparent dark:hover:bg-muted/50",
+          "focus:bg-transparent focus:hover:bg-transparent dark:focus:bg-transparent dark:focus:hover:bg-transparent",
           className,
         )}
       />

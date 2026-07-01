@@ -31,7 +31,7 @@ import { cn } from "@/lib/utils";
 
 /** border-only triggers — dropdown panels keep popover surface */
 const sidebarControlClass =
-  "bg-transparent shadow-none dark:bg-transparent dark:hover:bg-transparent";
+  "transition-colors duration-200 ease-out bg-transparent shadow-none hover:bg-muted dark:bg-transparent dark:hover:bg-muted/50";
 
 const EXAM_OPTIONS: Array<{
   id: ExamType;
@@ -283,6 +283,11 @@ function PredictorSidebarPanelInner() {
             programs={programs}
             filters={filters}
             onChange={setFilters}
+            includeAll={state.include_all}
+            onToggleLongShots={() => {
+              const next = !state.include_all;
+              state.setIncludeAll(next);
+            }}
           />
         ) : null}
       </div>

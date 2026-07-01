@@ -12,6 +12,7 @@ import {
   applyResultsFilters,
   EMPTY_RESULTS_FILTERS,
 } from "@/components/predictor/results-filter-logic";
+import { applyResultsSearch } from "@/components/predictor/results-search-logic";
 import {
   applyResultsSort,
   type ResultsSortKey,
@@ -21,15 +22,27 @@ import { EmptyState, ErrorState, LoadingState } from "./empty-state";
 import { ResultsTable } from "./results-table";
 
 export function Dashboard() {
-  const { state, query, rankInputRef, filters, setFilters, sortBy, setSortBy } =
-    usePredictor();
+  const {
+    state,
+    query,
+    rankInputRef,
+    filters,
+    setFilters,
+    sortBy,
+    setSortBy,
+    searchQuery,
+    setSearchQuery,
+  } = usePredictor();
   const [selected, setSelected] = useState<ProgramPrediction | null>(null);
   const [sheetOpen, setSheetOpen] = useState(false);
 
   const programs = query.data?.programs ?? [];
   const hasResults = programs.length > 0;
   const filteredPrograms = applyResultsSort(
-    applyResultsFilters(programs, filters),
+    applyResultsSearch(
+      applyResultsFilters(programs, filters, state.include_all),
+      searchQuery,
+    ),
     sortBy,
     query.data?.metadata.active_filters,
   );
@@ -58,13 +71,18 @@ export function Dashboard() {
     filteredPrograms,
     sortBy,
     onSortChange: setSortBy,
+    searchQuery,
+    onSearchChange: setSearchQuery,
     selectedId,
     provenance: query.provenance,
     onSelect: (p) => {
       setSelected(p);
       setSheetOpen(true);
     },
-    onClearFilters: () => setFilters(EMPTY_RESULTS_FILTERS),
+    onClearFilters: () => {
+      setFilters(EMPTY_RESULTS_FILTERS);
+      setSearchQuery("");
+    },
   });
 
   return (
@@ -97,6 +115,8 @@ function renderMiddle({
   filteredPrograms,
   sortBy,
   onSortChange,
+  searchQuery,
+  onSearchChange,
   selectedId,
   provenance,
   onSelect,
@@ -113,6 +133,8 @@ function renderMiddle({
   filteredPrograms: ProgramPrediction[];
   sortBy: ResultsSortKey;
   onSortChange: (next: ResultsSortKey) => void;
+  searchQuery: string;
+  onSearchChange: (next: string) => void;
   selectedId: string | null;
   provenance: import("@ejam/data").PredictionProvenance | null;
   onSelect: (p: ProgramPrediction) => void;
@@ -138,6 +160,8 @@ function renderMiddle({
       allRows={programs}
       sortBy={sortBy}
       onSortChange={onSortChange}
+      searchQuery={searchQuery}
+      onSearchChange={onSearchChange}
       selectedId={selectedId}
       onSelect={onSelect}
       onClearFilters={onClearFilters}
