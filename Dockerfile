@@ -2,7 +2,7 @@
 # ─── Stage 1: dependency installation ─────────────────────────────────────────
 # Install all workspace dependencies so pnpm's virtual store is fully populated.
 # This layer is cached as long as lockfile + workspace manifests don't change.
-FROM node:22-alpine AS deps
+FROM node:22-bookworm-slim AS deps
 
 RUN corepack enable && corepack prepare pnpm@11.1.3 --activate
 
@@ -19,10 +19,10 @@ RUN pnpm install --frozen-lockfile
 
 # ─── Stage 2: build ───────────────────────────────────────────────────────────
 # Fetch the public data release, build Next.js with Turbo, patch DuckDB NFT traces.
-FROM node:22-alpine AS builder
+FROM node:22-bookworm-slim AS builder
 
 RUN corepack enable && corepack prepare pnpm@11.1.3 --activate
-RUN apk add --no-cache tar
+RUN apt-get update && apt-get install -y --no-install-recommends tar && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /repo
 
@@ -47,9 +47,9 @@ RUN node apps/web/scripts/patch-duckdb-nft.mjs
 # Minimal image: only the Next.js standalone output + data files.
 # next build with outputFileTracingRoot set to monorepo root already traces
 # workspace packages into .next/standalone — we just need to add data/ on top.
-FROM node:22-alpine AS runner
+FROM node:22-bookworm-slim AS runner
 
-RUN apk add --no-cache dumb-init
+RUN apt-get update && apt-get install -y --no-install-recommends dumb-init && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
@@ -58,8 +58,8 @@ ENV NEXT_TELEMETRY_DISABLED=1
 ENV PORT=3000
 ENV HOSTNAME=0.0.0.0
 
-RUN addgroup --system --gid 1001 nodejs && \
-    adduser  --system --uid  1001 nextjs
+RUN groupadd --system --gid 1001 nodejs && \
+    useradd  --system --uid  1001 --gid nodejs nextjs
 
 COPY --from=builder --chown=nextjs:nodejs /repo/apps/web/.next/standalone ./
 
