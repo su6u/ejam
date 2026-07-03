@@ -6,17 +6,17 @@
 
 import type { ProgramPrediction } from "@ejam/data/college-predictor";
 import { useEffect, useState } from "react";
+import {
+  countClientHiddenLongShots,
+  hasOnlyClientHiddenLongShots,
+  withClientHiddenLongShotMetadata,
+} from "@/components/predictor/long-shot-visibility";
 import { usePredictor } from "@/components/predictor/predictor-context";
 import { programKey } from "@/components/predictor/program-key";
 import {
   applyResultsFilters,
   EMPTY_RESULTS_FILTERS,
 } from "@/components/predictor/results-filter-logic";
-import {
-  countClientHiddenLongShots,
-  hasOnlyClientHiddenLongShots,
-  withClientHiddenLongShotMetadata,
-} from "@/components/predictor/long-shot-visibility";
 import { applyResultsSearch } from "@/components/predictor/results-search-logic";
 import {
   applyResultsSort,
