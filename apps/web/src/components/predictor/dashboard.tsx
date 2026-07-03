@@ -12,6 +12,11 @@ import {
   applyResultsFilters,
   EMPTY_RESULTS_FILTERS,
 } from "@/components/predictor/results-filter-logic";
+import {
+  countClientHiddenLongShots,
+  hasOnlyClientHiddenLongShots,
+  withClientHiddenLongShotMetadata,
+} from "@/components/predictor/long-shot-visibility";
 import { applyResultsSearch } from "@/components/predictor/results-search-logic";
 import {
   applyResultsSort,
@@ -37,7 +42,17 @@ export function Dashboard() {
   const [sheetOpen, setSheetOpen] = useState(false);
 
   const programs = query.data?.programs ?? [];
-  const hasResults = programs.length > 0;
+  const clientHiddenLongShots = countClientHiddenLongShots(
+    programs,
+    state.include_all,
+  );
+  const hasResults =
+    programs.length > 0 &&
+    !hasOnlyClientHiddenLongShots(programs, state.include_all);
+  const metadata = withClientHiddenLongShotMetadata(
+    query.data?.metadata,
+    clientHiddenLongShots,
+  );
   const filteredPrograms = applyResultsSort(
     applyResultsSearch(
       applyResultsFilters(programs, filters, state.include_all),
@@ -60,7 +75,7 @@ export function Dashboard() {
     error: query.error,
     hasResults,
     hasPredicted: query.data !== null,
-    metadata: query.data?.metadata,
+    metadata,
     includeAll: state.include_all,
     onShowLongShots: () => {
       state.setIncludeAll(true);
