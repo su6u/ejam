@@ -49,7 +49,10 @@ test("copies libduckdb next to traced standalone duckdb.node", () => {
 
     assert.equal(result.standaloneNodeCount, 1);
     assert.equal(result.copiedCount, 1);
-    assert.equal(fs.readFileSync(fixture.copiedLibPath, "utf8"), "shared library");
+    assert.equal(
+      fs.readFileSync(fixture.copiedLibPath, "utf8"),
+      "shared library",
+    );
   } finally {
     fixture.cleanup();
   }
