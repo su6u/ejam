@@ -16,6 +16,12 @@
 
 <br>
 
+<p align="center">
+  <img src="apps/web/public/media/og.png" alt="ejam" width="700">
+</p>
+
+<br>
+
 ## rant (#`^´)／
 
 Indian exam culture sucks. somehow we built an education system where exams matter more than actually learning. and ofcourse wherever fear exists, someone finds a way to sell it.
