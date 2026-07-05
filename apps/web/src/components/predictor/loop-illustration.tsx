@@ -39,8 +39,22 @@ export function LoopIllustration({
     if (!readyToPlay || shouldReduceMotion) return;
     const video = videoRef.current;
     if (!video) return;
+
+    const startPlayback = () => {
+      void video.play().catch(() => {});
+    };
+
+    if (video.readyState >= HTMLMediaElement.HAVE_FUTURE_DATA) {
+      startPlayback();
+      return;
+    }
+
+    video.addEventListener("canplay", startPlayback, { once: true });
     video.load();
-    void video.play().catch(() => {});
+
+    return () => {
+      video.removeEventListener("canplay", startPlayback);
+    };
   }, [readyToPlay, shouldReduceMotion]);
 
   if (shouldReduceMotion) {

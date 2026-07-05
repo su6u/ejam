@@ -4,8 +4,8 @@ import type { PredictionProvenance } from "@ejam/data";
 import type { CollegePredictionResult } from "@ejam/data/college-predictor";
 import { formatInteger } from "@/components/formatter";
 import { LoadingAnimation } from "@/components/loading-animation";
-import { LoopIllustration } from "@/components/predictor/loop-illustration";
 import { DataVersionFooter } from "@/components/predictor/data-version-footer";
+import { LoopIllustration } from "@/components/predictor/loop-illustration";
 import { ResultsCardShell } from "@/components/predictor/results-card-shell";
 import { Button } from "@/components/ui/button";
 import {
@@ -17,8 +17,8 @@ import {
 } from "@/components/ui/empty";
 import { deferAfterPress } from "@/lib/pressable";
 import {
-  PREDICTOR_ILLUSTRATIONS,
   type LoopIllustrationSource,
+  PREDICTOR_ILLUSTRATIONS,
 } from "@/lib/static-image";
 
 const emptyStateActionClass =
@@ -86,10 +86,7 @@ export function EmptyState({
     >
       <Empty>
         <EmptyHeader>
-          <StateIllustration
-            src={PREDICTOR_ILLUSTRATIONS.empty}
-            priority
-          />
+          <StateIllustration src={PREDICTOR_ILLUSTRATIONS.empty} priority />
           <EmptyDescription>
             {emptyDescription({ hasPredicted, metadata })}
           </EmptyDescription>
