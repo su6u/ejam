@@ -8,6 +8,9 @@ const monorepoRoot = path.join(import.meta.dirname, "../..");
 
 const isProd = process.env.NODE_ENV === "production";
 
+const staticAssetCache =
+  "public, max-age=2592000, stale-while-revalidate=86400";
+
 const nextConfig: NextConfig = {
   // Emit a self-contained server to .next/standalone for Docker deployments.
   // The Dockerfile runner stage copies this directory and launches server.js directly.
@@ -20,6 +23,40 @@ const nextConfig: NextConfig = {
   },
   // DuckDB uses platform-specific .node binaries — must not be bundled by Turbopack
   serverExternalPackages: ["@duckdb/node-api", "@duckdb/node-bindings"],
+  images: {
+    unoptimized: true,
+  },
+  compress: false,
+  async headers() {
+    return [
+      {
+        source: "/media/:path*",
+        headers: [{ key: "Cache-Control", value: staticAssetCache }],
+      },
+      {
+        source: "/exams/:path*",
+        headers: [{ key: "Cache-Control", value: staticAssetCache }],
+      },
+      {
+        source: "/icons/:path*",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=604800, must-revalidate",
+          },
+        ],
+      },
+      {
+        source: "/identity/:path*",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=604800, must-revalidate",
+          },
+        ],
+      },
+    ];
+  },
   turbopack: {
     resolveAlias: isProd
       ? {

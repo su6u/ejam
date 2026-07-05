@@ -18,6 +18,7 @@ import { RankInput } from "@/components/predictor/rank-input";
 import { SidebarFilterSection } from "@/components/predictor/sidebar-filter-section";
 import { Button } from "@/components/ui/button";
 import { useSidebar } from "@/components/ui/sidebar";
+import { StaticPicture } from "@/components/ui/static-picture";
 import {
   Tooltip,
   TooltipContent,
@@ -27,6 +28,12 @@ import {
 import type { CounsellingBody, ExamType } from "@/hooks/use-predictor-state";
 import { isJeeMainCounselling } from "@/hooks/use-predictor-state";
 import { deferAfterPress, pressableClass } from "@/lib/pressable";
+import {
+  EXAM_LOGO_ASSET_PX,
+  EXAM_LOGO_SIZE,
+  EXAM_LOGOS,
+  type StaticImageSource,
+} from "@/lib/static-image";
 import { cn } from "@/lib/utils";
 
 /** border-only triggers — dropdown panels keep popover surface */
@@ -36,17 +43,17 @@ const sidebarControlClass =
 const EXAM_OPTIONS: Array<{
   id: ExamType;
   label: string;
-  logo: string;
+  logo: StaticImageSource;
 }> = [
   {
     id: "jee-main",
     label: "JEE Main",
-    logo: "/exams/jee_main.svg",
+    logo: EXAM_LOGOS["jee-main"],
   },
   {
     id: "jee-advanced",
     label: "JEE Advanced",
-    logo: "/exams/jee_adv.svg",
+    logo: EXAM_LOGOS["jee-advanced"],
   },
 ];
 
@@ -148,16 +155,14 @@ function PredictorSidebarPanelInner() {
                             "focus-visible:ring-3 focus-visible:ring-ring/50",
                           )}
                         >
-                          {/* native img — avoids Next/Image SVG raster edge artifacts */}
-                          {/* biome-ignore lint/performance/noImgElement: SVG exam logos rasterize poorly via next/image */}
-                          <img
+                          <StaticPicture
                             src={exam.logo}
-                            alt=""
-                            width={36}
-                            height={36}
-                            aria-hidden
-                            decoding="async"
-                            className="exam-picker-logo size-9 shrink-0 object-contain transition-[opacity,filter] duration-150"
+                            width={EXAM_LOGO_ASSET_PX}
+                            height={EXAM_LOGO_ASSET_PX}
+                            loading="eager"
+                            sizes={`${EXAM_LOGO_SIZE}px`}
+                            pictureClassName="size-9"
+                            className="exam-picker-logo object-contain transition-[opacity,filter] duration-150"
                           />
                         </button>
                       }

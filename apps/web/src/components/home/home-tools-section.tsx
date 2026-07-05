@@ -9,7 +9,7 @@ const HOME_TOOL_CARDS: ToolCardItem[] = [
     name: "College Predictor",
     breadcrumb: "engineering / tools",
     href: "/college-predictor",
-    img: "/media/predict.png",
+    img: "/media/predict.webp",
     imgClassName: "scale-[0.91]",
     mobileImgClassName: "scale-[0.91]",
     cardClassName:

@@ -2,10 +2,10 @@
 
 import type { PredictionProvenance } from "@ejam/data";
 import type { CollegePredictionResult } from "@ejam/data/college-predictor";
-import { useReducedMotion } from "motion/react";
 import { formatInteger } from "@/components/formatter";
 import { LoadingAnimation } from "@/components/loading-animation";
 import { DataVersionFooter } from "@/components/predictor/data-version-footer";
+import { LoopIllustration } from "@/components/predictor/loop-illustration";
 import { ResultsCardShell } from "@/components/predictor/results-card-shell";
 import { Button } from "@/components/ui/button";
 import {
@@ -16,27 +16,24 @@ import {
   EmptyMedia,
 } from "@/components/ui/empty";
 import { deferAfterPress } from "@/lib/pressable";
+import {
+  type LoopIllustrationSource,
+  PREDICTOR_ILLUSTRATIONS,
+} from "@/lib/static-image";
 
 const emptyStateActionClass =
   "rounded-none border-border bg-transparent text-muted-foreground shadow-none hover:bg-transparent hover:text-foreground dark:bg-transparent dark:hover:bg-transparent";
 
-function StateIllustration({ src }: { src: string }) {
-  const shouldReduceMotion = useReducedMotion();
-
+function StateIllustration({
+  src,
+  priority,
+}: {
+  src: LoopIllustrationSource;
+  priority?: boolean;
+}) {
   return (
-    <EmptyMedia className="mb-0 w-full max-w-72">
-      <video
-        autoPlay={!shouldReduceMotion}
-        loop={!shouldReduceMotion}
-        muted
-        playsInline
-        preload="auto"
-        aria-hidden
-        tabIndex={-1}
-        className="h-auto w-full object-contain"
-      >
-        <source src={src} type="video/webm" />
-      </video>
+    <EmptyMedia className="mb-0 aspect-square w-full max-w-72">
+      <LoopIllustration src={src} priority={priority} />
     </EmptyMedia>
   );
 }
@@ -89,7 +86,7 @@ export function EmptyState({
     >
       <Empty>
         <EmptyHeader>
-          <StateIllustration src="/media/empty.webm" />
+          <StateIllustration src={PREDICTOR_ILLUSTRATIONS.empty} priority />
           <EmptyDescription>
             {emptyDescription({ hasPredicted, metadata })}
           </EmptyDescription>
@@ -128,7 +125,7 @@ export function ErrorState({
     >
       <Empty className="min-h-0" role="alert">
         <EmptyHeader className="my-auto">
-          <StateIllustration src="/media/404.webm" />
+          <StateIllustration src={PREDICTOR_ILLUSTRATIONS.error} />
           <EmptyDescription>
             <span className="mb-1 block font-heading text-sm font-medium tracking-tight text-foreground">
               Prediction failed
