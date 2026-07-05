@@ -217,9 +217,7 @@ jobs:
 
       # Wait for the new container to become healthy before marking the deploy as done.
       # Retries for up to 5 minutes with 15-second intervals.
-      # TODO: remove continue-on-error after DNS is pointed to the VPS
       - name: Verify deployment health
-        continue-on-error: true
         timeout-minutes: 6
         run: bash .github/scripts/dokploy-healthcheck.sh
         env:

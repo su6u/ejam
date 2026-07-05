@@ -85,6 +85,31 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
+      - name: Promote requested image tag to latest
+        if: steps.target.outputs.skip_build == 'true'
+        env:
+          IMAGE_REF: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          DEPLOY_TAG: ${{ steps.target.outputs.tag }}
+        run: |
+          set -euo pipefail
+
+          case "$DEPLOY_TAG" in
+            ""|*[!A-Za-z0-9_.-]*)
+              echo "Invalid image tag: $DEPLOY_TAG"
+              exit 1
+              ;;
+          esac
+
+          if [ "$DEPLOY_TAG" = "latest" ]; then
+            echo "Requested tag is already latest; no promotion needed."
+            exit 0
+          fi
+
+          echo "Promoting ${IMAGE_REF}:${DEPLOY_TAG} to ${IMAGE_REF}:latest..."
+          docker pull "${IMAGE_REF}:${DEPLOY_TAG}"
+          docker tag "${IMAGE_REF}:${DEPLOY_TAG}" "${IMAGE_REF}:latest"
+          docker push "${IMAGE_REF}:latest"
+
       - name: Trigger Dokploy redeploy
         run: |
           echo "Triggering Dokploy webhook..."
