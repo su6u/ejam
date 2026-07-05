@@ -51,11 +51,22 @@ jobs:
       # the existing image — useful for instant rollbacks or hotfix re-deploys.
       - name: Resolve deploy target
         id: target
+        env:
+          REQUESTED_IMAGE_TAG: ${{ inputs.image_tag }}
         run: |
-          if [ -n "${{ inputs.image_tag }}" ]; then
-            echo "Building skipped — deploying existing tag: ${{ inputs.image_tag }}"
+          set -euo pipefail
+
+          if [ -n "$REQUESTED_IMAGE_TAG" ]; then
+            case "$REQUESTED_IMAGE_TAG" in
+              ""|*[!A-Za-z0-9_.-]*)
+                echo "Invalid image tag: $REQUESTED_IMAGE_TAG"
+                exit 1
+                ;;
+            esac
+
+            echo "Building skipped — deploying existing tag: $REQUESTED_IMAGE_TAG"
             echo "skip_build=true" >> "$GITHUB_OUTPUT"
-            echo "tag=${{ inputs.image_tag }}" >> "$GITHUB_OUTPUT"
+            echo "tag=$REQUESTED_IMAGE_TAG" >> "$GITHUB_OUTPUT"
           else
             SHORT_SHA=$(git rev-parse --short HEAD)
             echo "skip_build=false" >> "$GITHUB_OUTPUT"
