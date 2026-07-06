@@ -3,8 +3,8 @@ import { spawnSync } from "node:child_process";
 import { mkdtemp, mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
-import { fileURLToPath } from "node:url";
 import { test } from "node:test";
+import { fileURLToPath } from "node:url";
 
 const scriptPath = fileURLToPath(
   new URL("./patch-duckdb-nft.mjs", import.meta.url),
