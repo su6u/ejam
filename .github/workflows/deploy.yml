@@ -51,11 +51,18 @@ jobs:
       # the existing image — useful for instant rollbacks or hotfix re-deploys.
       - name: Resolve deploy target
         id: target
+        env:
+          REQUESTED_IMAGE_TAG: ${{ inputs.image_tag }}
         run: |
-          if [ -n "${{ inputs.image_tag }}" ]; then
-            echo "Building skipped — deploying existing tag: ${{ inputs.image_tag }}"
+          if [ -n "$REQUESTED_IMAGE_TAG" ]; then
+            if [[ "$REQUESTED_IMAGE_TAG" != "latest" && ! "$REQUESTED_IMAGE_TAG" =~ ^sha-[0-9a-fA-F]+$ ]]; then
+              echo "Unsupported image_tag: $REQUESTED_IMAGE_TAG"
+              echo "Use 'latest' or an immutable sha-* tag produced by CI."
+              exit 1
+            fi
+            echo "Building skipped — deploying existing tag: $REQUESTED_IMAGE_TAG"
             echo "skip_build=true" >> "$GITHUB_OUTPUT"
-            echo "tag=${{ inputs.image_tag }}" >> "$GITHUB_OUTPUT"
+            echo "tag=$REQUESTED_IMAGE_TAG" >> "$GITHUB_OUTPUT"
           else
             SHORT_SHA=$(git rev-parse --short HEAD)
             echo "skip_build=false" >> "$GITHUB_OUTPUT"
@@ -84,6 +91,26 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+      - name: Promote existing image for Dokploy
+        if: steps.target.outputs.skip_build == 'true'
+        env:
+          SOURCE_TAG: ${{ steps.target.outputs.tag }}
+        run: |
+          IMAGE="${REGISTRY}/${IMAGE_NAME}"
+          SOURCE_IMAGE="${IMAGE}:${SOURCE_TAG}"
+          TARGET_IMAGE="${IMAGE}:latest"
+
+          echo "Verifying source image exists: ${SOURCE_IMAGE}"
+          docker buildx imagetools inspect "$SOURCE_IMAGE" >/dev/null
+
+          if [ "$SOURCE_TAG" = "latest" ]; then
+            echo "Source image is already latest; no promotion needed."
+            exit 0
+          fi
+
+          echo "Promoting ${SOURCE_IMAGE} to ${TARGET_IMAGE} for Dokploy"
+          docker buildx imagetools create -t "$TARGET_IMAGE" "$SOURCE_IMAGE"
 
       - name: Trigger Dokploy redeploy
         run: |

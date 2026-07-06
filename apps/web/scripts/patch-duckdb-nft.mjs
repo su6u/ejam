@@ -6,7 +6,13 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-const appDir = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
+const defaultAppDir = path.join(
+  path.dirname(fileURLToPath(import.meta.url)),
+  "..",
+);
+const appDir = process.env.EJAM_WEB_APP_DIR
+  ? path.resolve(process.env.EJAM_WEB_APP_DIR)
+  : defaultAppDir;
 const serverDir = path.join(appDir, ".next/server");
 
 function walkNftFiles(dir, acc = []) {
@@ -91,6 +97,7 @@ if (fs.existsSync(standaloneDir)) {
   );
 
   let copiedCount = 0;
+  const missingSharedLibs = [];
   for (const standaloneNodePath of standaloneNodes) {
     const relativePath = path.relative(standaloneDir, standaloneNodePath);
     const repoPath = path.join(repoRoot, relativePath);
@@ -114,10 +121,31 @@ if (fs.existsSync(standaloneDir)) {
       fs.copyFileSync(srcDylib, destDylib);
       copiedCount++;
     }
+
+    if (!fs.existsSync(destSo) && !fs.existsSync(destDylib)) {
+      missingSharedLibs.push({
+        standaloneNodePath,
+        searched: [srcSo, srcDylib],
+      });
+    }
   }
   console.log(
     `patch-duckdb-nft: copied ${copiedCount} shared library files to standalone`,
   );
+
+  if (missingSharedLibs.length > 0) {
+    console.error(
+      "patch-duckdb-nft: DuckDB native binding(s) in standalone are missing libduckdb shared libraries",
+    );
+    for (const missing of missingSharedLibs) {
+      console.error(`  duckdb.node: ${missing.standaloneNodePath}`);
+      console.error("  searched:");
+      for (const candidate of missing.searched) {
+        console.error(`    ${candidate}`);
+      }
+    }
+    process.exitCode = 1;
+  }
 } else {
   console.log(
     "patch-duckdb-nft: standalone directory not found, skipping file copy",

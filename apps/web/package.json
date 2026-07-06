@@ -9,6 +9,7 @@
     "start": "next start",
     "lint": "biome check .",
     "lint:write": "biome check --write .",
+    "test:duckdb-patch": "node --test scripts/patch-duckdb-nft.test.mjs",
     "format": "biome format --write .",
     "typecheck": "tsc --noEmit"
   },
