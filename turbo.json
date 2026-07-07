@@ -1,6 +1,6 @@
 {
   "globalDependencies": ["**/.env.*local"],
-  "globalEnv": ["NODE_ENV", "EJAM_DATA_ROOT", "LD_LIBRARY_PATH"],
+  "globalEnv": ["NODE_ENV", "EJAM_DATA_ROOT", "LD_LIBRARY_PATH", "LD_PRELOAD"],
   "tasks": {
     "build": {
       "dependsOn": ["^build", "^typecheck"],
