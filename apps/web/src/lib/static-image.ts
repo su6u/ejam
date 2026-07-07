@@ -33,7 +33,7 @@ export const PREDICTOR_ILLUSTRATIONS = {
       webp: "/media/empty.webp",
       fallback: "/media/empty.webp",
       blurDataURL:
-        "data:image/webp;base64,UklGRj4AAABXRUJQVlA4IDIAAACwAQCdASoIAAgABUB8JaQAAlyw3yaAAP7tINuXpV0+hi1qkoqdMW8YTeEOTjwsRAAAAA==",
+        "data:image/webp;base64,UklGRrAAAABXRUJQVlA4WAoAAAAQAAAABwAABwAAQUxQSD0AAAABYBPZtpPzswMEUCEEa3Q5eshggR4JCKHLIiIiQWqF4GdB4hfrEaJJruuK0ETn3gUYiqsFhBdvU+BAA1YAAFZQOCBMAAAA0AEAnQEqCAAIAAOAWiWQAnQA9B0QNgAA/uiGNnCRtbwKhfX1+o1nhlPyiUSLmYR8ycEkmF+NOnPXgWn5VINnee9NuCojRAa98tQAAA==",
     },
     webm: "/media/empty.webm",
   },
@@ -42,7 +42,7 @@ export const PREDICTOR_ILLUSTRATIONS = {
       webp: "/media/404.webp",
       fallback: "/media/404.webp",
       blurDataURL:
-        "data:image/webp;base64,UklGRj4AAABXRUJQVlA4IDIAAACwAQCdASoIAAgABUB8JaQAAlyw3yaAAP7tINuXpV0+hi1qkoXq4Atf3QF0X7v2AAAAAA==",
+        "data:image/webp;base64,UklGRrAAAABXRUJQVlA4WAoAAAAQAAAABwAABwAAQUxQSD8AAAABYFJr25Pn+0eDX7MakIRUyL0cDrUy4KlAEdwOEREJymiEnwVFVK1HgiG7rqvHkJ77FGMprh4QN2yjpwQDaAAAVlA4IEoAAACQAQCdASoIAAgAA4BaJQAAXOsnYgAA/uiGNnCRtcMus0nuSUmbt/8sY8S3QACl8mdGZHqhd2RWv7QC2URIDTX74eIDp8tTxAAAAA==",
     },
     webm: "/media/404.webm",
   },
