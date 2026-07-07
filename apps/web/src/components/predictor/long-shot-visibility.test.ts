@@ -1,0 +1,47 @@
+import type { ProgramPrediction } from "@ejam/data/college-predictor";
+import { describe, expect, it } from "vitest";
+import {
+  countClientHiddenLongShots,
+  hasOnlyClientHiddenLongShots,
+  withClientHiddenLongShotMetadata,
+} from "./long-shot-visibility";
+
+function row(band: ProgramPrediction["band"]): ProgramPrediction {
+  return { band } as ProgramPrediction;
+}
+
+const metadata = {
+  total_matching: 2,
+  total_above_threshold: 0,
+  threshold_used: 0.1,
+  hidden_count: 0,
+  total_matching_programs: 2,
+  displayed_programs: 2,
+  hidden_programs: 0,
+  active_filters: {},
+};
+
+describe("long-shot visibility helpers", () => {
+  it("counts long-shot rows hidden by the client-side toggle", () => {
+    const programs = [row("long-shot"), row("reach"), row("long-shot")];
+
+    expect(countClientHiddenLongShots(programs, false)).toBe(2);
+    expect(countClientHiddenLongShots(programs, true)).toBe(0);
+  });
+
+  it("detects predictions where every returned row is hidden as a long-shot", () => {
+    expect(
+      hasOnlyClientHiddenLongShots([row("long-shot"), row("long-shot")], false),
+    ).toBe(true);
+    expect(
+      hasOnlyClientHiddenLongShots([row("long-shot"), row("reach")], false),
+    ).toBe(false);
+    expect(hasOnlyClientHiddenLongShots([row("long-shot")], true)).toBe(false);
+  });
+
+  it("preserves the show-long-shots CTA after always fetching all rows", () => {
+    expect(withClientHiddenLongShotMetadata(metadata, 2)).toMatchObject({
+      hidden_programs: 2,
+    });
+  });
+});

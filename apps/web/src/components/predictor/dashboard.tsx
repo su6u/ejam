@@ -6,6 +6,11 @@
 
 import type { ProgramPrediction } from "@ejam/data/college-predictor";
 import { useEffect, useState } from "react";
+import {
+  countClientHiddenLongShots,
+  hasOnlyClientHiddenLongShots,
+  withClientHiddenLongShotMetadata,
+} from "@/components/predictor/long-shot-visibility";
 import { usePredictor } from "@/components/predictor/predictor-context";
 import { programKey } from "@/components/predictor/program-key";
 import {
@@ -37,7 +42,17 @@ export function Dashboard() {
   const [sheetOpen, setSheetOpen] = useState(false);
 
   const programs = query.data?.programs ?? [];
-  const hasResults = programs.length > 0;
+  const clientHiddenLongShots = countClientHiddenLongShots(
+    programs,
+    state.include_all,
+  );
+  const hasResults =
+    programs.length > 0 &&
+    !hasOnlyClientHiddenLongShots(programs, state.include_all);
+  const metadata = withClientHiddenLongShotMetadata(
+    query.data?.metadata,
+    clientHiddenLongShots,
+  );
   const filteredPrograms = applyResultsSort(
     applyResultsSearch(
       applyResultsFilters(programs, filters, state.include_all),
@@ -60,7 +75,7 @@ export function Dashboard() {
     error: query.error,
     hasResults,
     hasPredicted: query.data !== null,
-    metadata: query.data?.metadata,
+    metadata,
     includeAll: state.include_all,
     onShowLongShots: () => {
       state.setIncludeAll(true);
