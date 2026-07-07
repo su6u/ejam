@@ -4,8 +4,6 @@
   "buildCommand": "cd ../.. && pnpm data:fetch --download && cp -r data apps/web/data && pnpm turbo run build --filter=@ejam/web",
   "framework": "nextjs",
   "env": {
-    "EJAM_DATA_ROOT": "data",
-    "LD_LIBRARY_PATH": "/var/task/apps/web/node_modules/@duckdb/node-bindings-linux-x64:/var/task/apps/web/.next/node_modules/@duckdb/node-bindings-linux-x64:/var/task/apps/web/.next/server/node_modules/@duckdb/node-bindings-linux-x64",
-    "LD_PRELOAD": "/var/task/apps/web/node_modules/@duckdb/node-bindings-linux-x64/libduckdb.so"
+    "EJAM_DATA_ROOT": "data"
   }
 }

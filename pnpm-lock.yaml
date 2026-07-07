@@ -26,12 +26,6 @@ importers:
       '@base-ui/react':
         specifier: ^1.5.0
         version: 1.5.0(@types/react@19.2.14)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
-      '@duckdb/node-bindings-linux-arm64':
-        specifier: 1.5.2-r.1
-        version: 1.5.2-r.1
-      '@duckdb/node-bindings-linux-x64':
-        specifier: 1.5.2-r.1
-        version: 1.5.2-r.1
       '@ejam/data':
         specifier: workspace:*
         version: link:../../packages/data
@@ -99,9 +93,6 @@ importers:
       '@types/react-dom':
         specifier: ^19.2.3
         version: 19.2.3(@types/react@19.2.14)
-      '@xspect-build/patchelf-linux-x64':
-        specifier: ^0.18.2
-        version: 0.18.2
       agentation:
         specifier: ^3.0.2
         version: 3.0.2(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
@@ -111,22 +102,18 @@ importers:
       vitest:
         specifier: ^3.2.4
         version: 3.2.4(@types/node@25.7.0)(jiti@2.7.0)(lightningcss@1.32.0)(msw@2.14.6(@types/node@25.7.0)(typescript@6.0.3))(tsx@4.22.0)
-    optionalDependencies:
-      '@duckdb/node-bindings-darwin-arm64':
-        specifier: 1.5.2-r.1
-        version: 1.5.2-r.1
-      '@duckdb/node-bindings-darwin-x64':
-        specifier: 1.5.2-r.1
-        version: 1.5.2-r.1
 
   packages/data:
     dependencies:
-      '@duckdb/node-api':
-        specifier: ^1.5.2-r.1
-        version: 1.5.2-r.1
       '@types/js-yaml':
         specifier: ^4.0.9
         version: 4.0.9
+      hyparquet:
+        specifier: ^1.26.2
+        version: 1.26.2
+      hyparquet-compressors:
+        specifier: ^1.1.1
+        version: 1.1.1
       js-yaml:
         specifier: ^4.1.1
         version: 4.1.1
@@ -1609,11 +1596,6 @@ packages:
   '@vitest/utils@3.2.4':
     resolution: {integrity: sha512-fB2V0JFrQSMsCo9HiSq3Ezpdv4iYaXRG1Sx8edX3MwxfyNn83mKiGzOcH+Fkxt4MHxr3y42fQi1oeAInqgX2QA==}
 
-  '@xspect-build/patchelf-linux-x64@0.18.2':
-    resolution: {integrity: sha512-x1y9HEJk3RQrG9SD0nIvMR4h2z0ujTaVxBak7Pz9rsaEpy6NU+OmW7RprhfFhnBcMxSeyrpMbe8lwSGQSXlTfA==}
-    cpu: [x64]
-    os: [linux]
-
   accepts@2.0.0:
     resolution: {integrity: sha512-5cvg6CtKwfgdmVqY1WIiXKc3Q1bkRqGLi+2W/6ao+6Y7gu/RCwRuAhGEzh5B4KlszSuTLgZYuqFqo5bImjNKng==}
     engines: {node: '>= 0.6'}
@@ -2185,6 +2167,9 @@ packages:
   fuzzysort@3.1.0:
     resolution: {integrity: sha512-sR9BNCjBg6LNgwvxlBd0sBABvQitkLzoVY9MYYROQVX/FvfJ4Mai9LsGhDgd8qYdds0bY77VzYd5iuB+v5rwQQ==}
 
+  fzstd@0.1.1:
+    resolution: {integrity: sha512-dkuVSOKKwh3eas5VkJy1AW1vFpet8TA/fGmVA5krThl8YcOVE/8ZIoEA1+U1vEn5ckxxhLirSdY837azmbaNHA==}
+
   gensync@1.0.0-beta.2:
     resolution: {integrity: sha512-3hN7NaskYvMDLQY55gnW3NQ+mesEAepTqlg+VEbj7zzqEMBVNhzcGYYeqFo/TlYz6eQiFcp1HcsCZO+nGgS8zg==}
     engines: {node: '>=6.9.0'}
@@ -2266,6 +2251,15 @@ packages:
   human-signals@8.0.1:
     resolution: {integrity: sha512-eKCa6bwnJhvxj14kZk5NCPc6Hb6BdsU9DZcOnmQKSnO1VKrfV0zCvtttPZUsBvjmNDn8rpcJfpwSYnHBjc95MQ==}
     engines: {node: '>=18.18.0'}
+
+  hyparquet-compressors@1.1.1:
+    resolution: {integrity: sha512-yx7aA3Rhj0YycbdV71+XznQSLAefa4cT0urpgNXy4aM6eSeCknaVDNne8y45Uz74Fb15yyXUzOStlceOJBan7A==}
+
+  hyparquet@1.26.2:
+    resolution: {integrity: sha512-6qjyK7R2tZ4vnYP1J8NpcCeDPK1UIYk3xh5XgtQUnUM1iwkYbvI6Mz3xtmpMd6AfCCeoUoJVbEq29k5GReZRWA==}
+
+  hysnappy@1.0.0:
+    resolution: {integrity: sha512-MNrC4NfwDGPb889O6gIfEtbvEZCSWUsSEhsz4Oq2FRcpGtXHfeVz3KciSPp5Pnnz1NjFMgDQNfxdJozymJEDDA==}
 
   iconv-lite@0.7.2:
     resolution: {integrity: sha512-im9DjEDQ55s9fL4EYzOAv0yMqmMBSZp6G0VvFyTMPKWxiSBHUj9NW/qqLmXUwXrrM7AvqSlTCfvqRb0cM8yYqw==}
@@ -3650,9 +3644,11 @@ snapshots:
   '@duckdb/node-bindings-darwin-x64@1.5.2-r.1':
     optional: true
 
-  '@duckdb/node-bindings-linux-arm64@1.5.2-r.1': {}
+  '@duckdb/node-bindings-linux-arm64@1.5.2-r.1':
+    optional: true
 
-  '@duckdb/node-bindings-linux-x64@1.5.2-r.1': {}
+  '@duckdb/node-bindings-linux-x64@1.5.2-r.1':
+    optional: true
 
   '@duckdb/node-bindings-win32-arm64@1.5.2-r.1':
     optional: true
@@ -4463,8 +4459,6 @@ snapshots:
       loupe: 3.2.1
       tinyrainbow: 2.0.0
 
-  '@xspect-build/patchelf-linux-x64@0.18.2': {}
-
   accepts@2.0.0:
     dependencies:
       mime-types: 3.0.2
@@ -5050,6 +5044,8 @@ snapshots:
 
   fuzzysort@3.1.0: {}
 
+  fzstd@0.1.1: {}
+
   gensync@1.0.0-beta.2: {}
 
   get-caller-file@2.0.5: {}
@@ -5126,6 +5122,15 @@ snapshots:
   human-signals@2.1.0: {}
 
   human-signals@8.0.1: {}
+
+  hyparquet-compressors@1.1.1:
+    dependencies:
+      fzstd: 0.1.1
+      hysnappy: 1.0.0
+
+  hyparquet@1.26.2: {}
+
+  hysnappy@1.0.0: {}
 
   iconv-lite@0.7.2:
     dependencies:

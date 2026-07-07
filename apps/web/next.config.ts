@@ -13,20 +13,10 @@ const staticAssetCache =
 
 const nextConfig: NextConfig = {
   // Trace workspace packages + repo-root data/ into serverless bundles.
-  // libduckdb.{so,dylib}: patched post-build (scripts/patch-duckdb-nft.mjs).
   outputFileTracingRoot: monorepoRoot,
   outputFileTracingIncludes: {
-    "/api/predict/[exam_id]": [
-      "data/**/*",
-      "node_modules/@duckdb/node-bindings-linux-x64/**",
-      "node_modules/@duckdb/node-bindings-linux-arm64/**",
-      "node_modules/.pnpm/@duckdb+node-bindings-linux-x64@*/node_modules/@duckdb/node-bindings-linux-x64/**",
-      "node_modules/.pnpm/@duckdb+node-bindings-linux-arm64@*/node_modules/@duckdb/node-bindings-linux-arm64/**",
-      "apps/web/node_modules/@duckdb/node-bindings-linux-x64/**",
-      "apps/web/node_modules/@duckdb/node-bindings-linux-arm64/**",
-    ],
+    "/api/predict/[exam_id]": ["data/**/*"],
   },
-  serverExternalPackages: ["@duckdb/node-api", "@duckdb/node-bindings"],
   images: {
     unoptimized: true,
   },
