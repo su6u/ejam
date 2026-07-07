@@ -1,6 +1,3 @@
-# Manual production deploy — use after CI is green or to recover from a failed auto deploy.
-# Automatic prod deploys run in ci.yml after relevant app/data checks pass on main.
-
 name: Deploy (manual)
 
 on:
