@@ -136,7 +136,6 @@ function collectBindingMaterializeTargets() {
   return [
     // Next externalizes @duckdb/node-api under .next/node_modules (see route NFT paths).
     path.join(appDir, ".next/node_modules/@duckdb", platformPackage),
-    path.join(appDir, "node_modules", "@duckdb", platformPackage),
     path.join(serverDir, "node_modules", "@duckdb", platformPackage),
   ];
 }
