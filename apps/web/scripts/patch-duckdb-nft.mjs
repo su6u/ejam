@@ -113,7 +113,7 @@ function collectPredictorRuntimeDataFiles(dataRoot) {
 }
 
 function stageAppRuntimeData(appDir, repoDataRoot) {
-  const appDataRoot = path.join(appDir, "predictor-data");
+  const appDataRoot = path.join(appDir, "data");
   const runtimeFiles = collectPredictorRuntimeDataFiles(repoDataRoot);
 
   for (const src of runtimeFiles) {
@@ -125,7 +125,7 @@ function stageAppRuntimeData(appDir, repoDataRoot) {
 
   if (runtimeFiles.length > 0) {
     console.log(
-      `patch-duckdb-nft: staged ${runtimeFiles.length} predictor data file(s) under ${path.relative(appDir, appDataRoot) || "predictor-data"}`,
+      `patch-duckdb-nft: staged ${runtimeFiles.length} predictor data file(s) under ${path.relative(appDir, appDataRoot) || "data"}`,
     );
   }
 
@@ -329,7 +329,7 @@ export function patchDuckdbNft({ appDir = defaultAppDir } = {}) {
   }
 
   let staged = {
-    appDataRoot: path.join(appDir, "predictor-data"),
+    appDataRoot: path.join(appDir, "data"),
     stagedFiles: 0,
   };
   if (fs.existsSync(repoDataRoot)) {
