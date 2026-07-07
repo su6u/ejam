@@ -21,8 +21,10 @@ import {
 } from "../shared/finalize-prediction";
 import {
   createServerCacheKey,
+  getServerCacheEntry,
   indexShaFromDeps,
   type ServerCacheEntry,
+  setServerCacheEntry,
 } from "../shared/predictor-cache";
 import { QuotaApi, refineQuotaRequiresState } from "../shared/quota-input";
 
@@ -156,7 +158,7 @@ export const predictor: ExamPredictor<JeeMainInput, CollegePredictionResult> = {
       index_sha: indexShaFromDeps(deps),
       ...cacheInput,
     });
-    const cached = _serverCache.get(cacheKey);
+    const cached = getServerCacheEntry(_serverCache, cacheKey);
     if (cached) {
       return { result: resultFromCachedPrograms(cached, input.filters) };
     }
@@ -216,7 +218,7 @@ export const predictor: ExamPredictor<JeeMainInput, CollegePredictionResult> = {
       };
     }
 
-    _serverCache.set(cacheKey, {
+    setServerCacheEntry(_serverCache, cacheKey, {
       programs: result.programs,
       metadata: result.metadata,
       ews_comparison: result.ews_comparison,
