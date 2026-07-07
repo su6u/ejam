@@ -1,25 +1,29 @@
 /**
- * DuckDB parquet reader for server-side index loading
- * uses @duckdb/node-api 1.5.x materialized results + result reader
+ * Server-side Parquet reader for manifest-pinned predictor indexes.
  */
 
-function escapeSqlString(value: string): string {
-  return value.replace(/'/g, "''");
-}
+import { readFile } from "node:fs/promises";
+import { parquetRead } from "hyparquet";
+import { compressors } from "hyparquet-compressors";
 
 export async function readParquetRows<T = Record<string, unknown>>(
   filePath: string,
 ): Promise<T[]> {
-  const { DuckDBInstance } = await import("@duckdb/node-api");
-  const instance = await DuckDBInstance.create(":memory:");
-  const connection = await instance.connect();
+  const file = await readFile(filePath);
+  const arrayBuffer = file.buffer.slice(
+    file.byteOffset,
+    file.byteOffset + file.byteLength,
+  );
 
-  try {
-    const reader = await connection.runAndReadAll(
-      `SELECT * FROM read_parquet('${escapeSqlString(filePath)}')`,
-    );
-    return reader.getRowObjectsJS() as T[];
-  } finally {
-    connection.closeSync();
-  }
+  let rows: unknown[] = [];
+  await parquetRead({
+    file: arrayBuffer,
+    rowFormat: "object",
+    compressors,
+    onComplete: (data) => {
+      rows = data;
+    },
+  });
+
+  return rows as T[];
 }
