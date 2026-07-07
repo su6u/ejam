@@ -133,7 +133,20 @@ test("adds exam taxonomy and manifest data to the predictor route trace", () => 
     const trace = JSON.parse(fs.readFileSync(nftPath, "utf8"));
 
     assert.equal(result.patchedPredictorTraces, 1);
+    assert.ok(result.stagedPredictorDataFiles >= 3);
     assert.ok(result.addedPredictorDataFiles >= 3);
+    assert.ok(
+      fs.existsSync(
+        path.join(
+          appDir,
+          "data",
+          "reference",
+          "taxonomy",
+          "exams",
+          "jee-main.yaml",
+        ),
+      ),
+    );
     assert.ok(
       trace.files.some((file) =>
         file.endsWith("reference/taxonomy/exams/jee-main.yaml"),

@@ -112,16 +112,45 @@ function collectPredictorRuntimeDataFiles(dataRoot) {
   return [...files];
 }
 
-function patchPredictorDataTraceFiles(serverDir, repoRoot) {
-  const dataRoot = path.join(repoRoot, "data");
-  if (!fs.existsSync(dataRoot)) {
+function stageAppRuntimeData(appDir, repoDataRoot) {
+  const appDataRoot = path.join(appDir, "data");
+  const runtimeFiles = collectPredictorRuntimeDataFiles(repoDataRoot);
+
+  for (const src of runtimeFiles) {
+    const relativePath = path.relative(repoDataRoot, src);
+    const dest = path.join(appDataRoot, relativePath);
+    fs.mkdirSync(path.dirname(dest), { recursive: true });
+    fs.copyFileSync(src, dest);
+  }
+
+  if (runtimeFiles.length > 0) {
     console.log(
-      "patch-duckdb-nft: data/ not found, skipping predictor data trace patch",
+      `patch-duckdb-nft: staged ${runtimeFiles.length} predictor data file(s) under ${path.relative(appDir, appDataRoot) || "data"}`,
+    );
+  }
+
+  return { appDataRoot, stagedFiles: runtimeFiles.length };
+}
+
+function copyAppDataToStandalone(appDataRoot, standaloneDir) {
+  if (!fs.existsSync(appDataRoot) || !fs.existsSync(standaloneDir)) {
+    return;
+  }
+
+  const dest = path.join(standaloneDir, "data");
+  fs.cpSync(appDataRoot, dest, { force: true, recursive: true });
+  console.log("patch-duckdb-nft: copied staged data into standalone output");
+}
+
+function patchPredictorDataTraceFiles(serverDir, appDataRoot) {
+  if (!fs.existsSync(appDataRoot)) {
+    console.log(
+      "patch-duckdb-nft: app data/ not found, skipping predictor data trace patch",
     );
     return { patchedPredictorTraces: 0, addedPredictorDataFiles: 0 };
   }
 
-  const runtimeFiles = collectPredictorRuntimeDataFiles(dataRoot);
+  const runtimeFiles = collectPredictorRuntimeDataFiles(appDataRoot);
   if (runtimeFiles.length === 0) {
     console.log(
       "patch-duckdb-nft: no predictor runtime data files found to trace",
@@ -290,6 +319,7 @@ export function patchDuckdbNft({ appDir = defaultAppDir } = {}) {
   const serverDir = path.join(appDir, ".next/server");
   const standaloneDir = path.join(appDir, ".next/standalone");
   const repoRoot = path.join(appDir, "../..");
+  const repoDataRoot = path.join(repoRoot, "data");
 
   const patched = patchTraceFiles(serverDir);
   if (patched > 0) {
@@ -298,10 +328,24 @@ export function patchDuckdbNft({ appDir = defaultAppDir } = {}) {
     );
   }
 
-  const predictorTrace = patchPredictorDataTraceFiles(serverDir, repoRoot);
+  let staged = { appDataRoot: path.join(appDir, "data"), stagedFiles: 0 };
+  if (fs.existsSync(repoDataRoot)) {
+    staged = stageAppRuntimeData(appDir, repoDataRoot);
+    copyAppDataToStandalone(staged.appDataRoot, standaloneDir);
+  } else {
+    console.log(
+      "patch-duckdb-nft: repo data/ not found, skipping predictor data staging",
+    );
+  }
+
+  const predictorTrace = patchPredictorDataTraceFiles(
+    serverDir,
+    staged.appDataRoot,
+  );
 
   return {
     patchedTraceCount: patched,
+    stagedPredictorDataFiles: staged.stagedFiles,
     ...predictorTrace,
     ...copyStandaloneDuckdbLibraries(standaloneDir, repoRoot),
   };

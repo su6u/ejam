@@ -16,6 +16,14 @@ function hasCatalogDir(dataDir: string): boolean {
   return existsSync(join(dataDir, "catalog", "releases"));
 }
 
+function hasTaxonomyDir(dataDir: string): boolean {
+  return existsSync(join(dataDir, "reference", "taxonomy", "exams"));
+}
+
+function isValidDataRoot(dataDir: string): boolean {
+  return hasCatalogDir(dataDir) || hasTaxonomyDir(dataDir);
+}
+
 export function resolveDataRoot(): string {
   if (process.env.EJAM_DATA_ROOT) {
     return resolve(process.env.EJAM_DATA_ROOT);
@@ -25,7 +33,7 @@ export function resolveDataRoot(): string {
   let dir = process.cwd();
   for (let depth = 0; depth < 8; depth++) {
     const candidate = join(dir, "data");
-    if (hasCatalogDir(candidate)) {
+    if (isValidDataRoot(candidate)) {
       cachedDataRoot = candidate;
       return candidate;
     }
