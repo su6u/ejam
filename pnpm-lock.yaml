@@ -26,6 +26,12 @@ importers:
       '@base-ui/react':
         specifier: ^1.5.0
         version: 1.5.0(@types/react@19.2.14)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
+      '@duckdb/node-bindings-linux-arm64':
+        specifier: 1.5.2-r.1
+        version: 1.5.2-r.1
+      '@duckdb/node-bindings-linux-x64':
+        specifier: 1.5.2-r.1
+        version: 1.5.2-r.1
       '@ejam/data':
         specifier: workspace:*
         version: link:../../packages/data
@@ -107,12 +113,6 @@ importers:
         specifier: 1.5.2-r.1
         version: 1.5.2-r.1
       '@duckdb/node-bindings-darwin-x64':
-        specifier: 1.5.2-r.1
-        version: 1.5.2-r.1
-      '@duckdb/node-bindings-linux-arm64':
-        specifier: 1.5.2-r.1
-        version: 1.5.2-r.1
-      '@duckdb/node-bindings-linux-x64':
         specifier: 1.5.2-r.1
         version: 1.5.2-r.1
 
@@ -3642,11 +3642,9 @@ snapshots:
   '@duckdb/node-bindings-darwin-x64@1.5.2-r.1':
     optional: true
 
-  '@duckdb/node-bindings-linux-arm64@1.5.2-r.1':
-    optional: true
+  '@duckdb/node-bindings-linux-arm64@1.5.2-r.1': {}
 
-  '@duckdb/node-bindings-linux-x64@1.5.2-r.1':
-    optional: true
+  '@duckdb/node-bindings-linux-x64@1.5.2-r.1': {}
 
   '@duckdb/node-bindings-win32-arm64@1.5.2-r.1':
     optional: true
