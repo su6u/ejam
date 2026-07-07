@@ -12,16 +12,12 @@ const staticAssetCache =
   "public, max-age=2592000, stale-while-revalidate=86400";
 
 const nextConfig: NextConfig = {
-  // Emit a self-contained server to .next/standalone for Docker deployments.
-  // The Dockerfile runner stage copies this directory and launches server.js directly.
-  output: "standalone",
   // Trace workspace packages + repo-root data/ into serverless bundles.
-  // DuckDB libduckdb.{so,dylib}: patched post-build (see scripts/patch-duckdb-nft.mjs) — Turbopack skips includes.
+  // libduckdb.{so,dylib}: patched post-build (scripts/patch-duckdb-nft.mjs).
   outputFileTracingRoot: monorepoRoot,
   outputFileTracingIncludes: {
     "/api/predict/[exam_id]": ["data/**/*"],
   },
-  // DuckDB uses platform-specific .node binaries — must not be bundled by Turbopack
   serverExternalPackages: ["@duckdb/node-api", "@duckdb/node-bindings"],
   images: {
     unoptimized: true,

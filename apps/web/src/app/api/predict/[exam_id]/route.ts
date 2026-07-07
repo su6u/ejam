@@ -283,16 +283,26 @@ async function handlePrediction(
   }
 }
 
+export const runtime = "nodejs";
+
 export async function POST(
   req: NextRequest,
   params: RouteParams,
 ): Promise<NextResponse<PredictionSuccessResponse | PredictionErrorResponse>> {
-  return handlePrediction(req, params, "POST");
+  try {
+    return await handlePrediction(req, params, "POST");
+  } catch (err) {
+    return errResponse(500, "INTERNAL_ERROR", getErrorMessage(err));
+  }
 }
 
 export async function GET(
   req: NextRequest,
   params: RouteParams,
 ): Promise<NextResponse<PredictionSuccessResponse | PredictionErrorResponse>> {
-  return handlePrediction(req, params, "GET");
+  try {
+    return await handlePrediction(req, params, "GET");
+  } catch (err) {
+    return errResponse(500, "INTERNAL_ERROR", getErrorMessage(err));
+  }
 }
