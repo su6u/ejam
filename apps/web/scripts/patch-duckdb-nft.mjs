@@ -171,6 +171,7 @@ function patchDuckdbNodeRpath(pathsToPatch) {
       "patch-duckdb-nft: patchelf binary missing for linux-x64 DuckDB binding",
     );
   }
+  fs.chmodSync(patchelf, 0o755);
 
   let patched = 0;
   const seen = new Set();
