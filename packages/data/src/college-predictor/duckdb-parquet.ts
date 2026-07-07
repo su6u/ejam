@@ -8,15 +8,9 @@ import path from "node:path";
 
 let nativeBindingPrepared = false;
 
-function prepareNativeDuckdbBinding() {
-  if (nativeBindingPrepared) return;
-  nativeBindingPrepared = true;
-
+function duckdbNativeCandidateDirs(): string[] {
   const platformPackage = `node-bindings-${process.platform}-${process.arch}`;
-  const sharedLib =
-    process.platform === "darwin" ? "libduckdb.dylib" : "libduckdb.so";
-
-  const candidateDirs = [
+  return [
     path.join(process.cwd(), ".next/node_modules/@duckdb", platformPackage),
     path.join(process.cwd(), "node_modules/@duckdb", platformPackage),
     path.join(
@@ -25,8 +19,19 @@ function prepareNativeDuckdbBinding() {
       platformPackage,
     ),
   ];
+}
 
-  for (const dir of candidateDirs) {
+function duckdbSharedLibName(): string {
+  return process.platform === "darwin" ? "libduckdb.dylib" : "libduckdb.so";
+}
+
+function prepareNativeDuckdbBinding() {
+  if (nativeBindingPrepared) return;
+  nativeBindingPrepared = true;
+
+  const sharedLib = duckdbSharedLibName();
+
+  for (const dir of duckdbNativeCandidateDirs()) {
     const nodePath = path.join(dir, "duckdb.node");
     const sharedPath = path.join(dir, sharedLib);
     if (!fs.existsSync(nodePath) || !fs.existsSync(sharedPath)) continue;
@@ -50,6 +55,22 @@ function prepareNativeDuckdbBinding() {
   }
 }
 
+function nativeDuckdbDiagnostics(): string {
+  const sharedLib = duckdbSharedLibName();
+  const dirs = duckdbNativeCandidateDirs().map((dir) => {
+    const nodePath = path.join(dir, "duckdb.node");
+    const sharedPath = path.join(dir, sharedLib);
+    return `${dir} duckdb.node=${fs.existsSync(nodePath)} ${sharedLib}=${fs.existsSync(sharedPath)}`;
+  });
+
+  return [
+    `cwd=${process.cwd()}`,
+    `NODE_PATH=${process.env.NODE_PATH ?? ""}`,
+    `LD_LIBRARY_PATH=${process.env.LD_LIBRARY_PATH ?? ""}`,
+    ...dirs,
+  ].join(" | ");
+}
+
 function escapeSqlString(value: string): string {
   return value.replace(/'/g, "''");
 }
@@ -58,7 +79,13 @@ export async function readParquetRows<T = Record<string, unknown>>(
   filePath: string,
 ): Promise<T[]> {
   prepareNativeDuckdbBinding();
-  const { DuckDBInstance } = await import("@duckdb/node-api");
+  let DuckDBInstance: typeof import("@duckdb/node-api")["DuckDBInstance"];
+  try {
+    ({ DuckDBInstance } = await import("@duckdb/node-api"));
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    throw new Error(`${message} | ${nativeDuckdbDiagnostics()}`);
+  }
   const instance = await DuckDBInstance.create(":memory:");
   const connection = await instance.connect();
 
