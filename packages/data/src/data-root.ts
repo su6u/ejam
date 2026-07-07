@@ -26,11 +26,8 @@ function isValidDataRoot(dataDir: string): boolean {
 
 export function resolveDataRoot(): string {
   if (process.env.EJAM_DATA_ROOT) {
-    const configured = resolve(process.cwd(), process.env.EJAM_DATA_ROOT);
-    if (isValidDataRoot(configured)) {
-      cachedDataRoot = configured;
-      return configured;
-    }
+    cachedDataRoot = resolve(process.cwd(), process.env.EJAM_DATA_ROOT);
+    return cachedDataRoot;
   }
   if (cachedDataRoot) return cachedDataRoot;
 
