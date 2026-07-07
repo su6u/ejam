@@ -4,7 +4,7 @@
   "buildCommand": "cd ../.. && pnpm data:fetch --download && pnpm turbo run build --filter=@ejam/web",
   "framework": "nextjs",
   "env": {
-    "EJAM_DATA_ROOT": "data"
+    "EJAM_DATA_ROOT": "predictor-data"
   },
   "functions": {
     "src/app/api/predict/[exam_id]/route.ts": {

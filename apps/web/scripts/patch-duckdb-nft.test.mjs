@@ -139,7 +139,7 @@ test("adds exam taxonomy and manifest data to the predictor route trace", () => 
       fs.existsSync(
         path.join(
           appDir,
-          "data",
+          "predictor-data",
           "reference",
           "taxonomy",
           "exams",

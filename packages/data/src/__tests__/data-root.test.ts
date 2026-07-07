@@ -25,10 +25,10 @@ describe("resolveDataRoot", () => {
     expect(resolveDataRoot()).toBe(join(repoRoot, "data"));
   });
 
-  it("prefers apps/web/data when staged predictor assets exist", () => {
+  it("prefers apps/web/predictor-data when staged predictor assets exist", () => {
     delete process.env.EJAM_DATA_ROOT;
     chdir(join(repoRoot, "apps", "web"));
-    const appData = join(repoRoot, "apps", "web", "data");
+    const appData = join(repoRoot, "apps", "web", "predictor-data");
     if (
       !existsSync(join(appData, "catalog", "releases")) &&
       !existsSync(join(appData, "reference", "taxonomy", "exams"))

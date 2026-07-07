@@ -26,23 +26,26 @@ function isValidDataRoot(dataDir: string): boolean {
 
 export function resolveDataRoot(): string {
   if (process.env.EJAM_DATA_ROOT) {
-    return resolve(process.env.EJAM_DATA_ROOT);
+    cachedDataRoot = resolve(process.cwd(), process.env.EJAM_DATA_ROOT);
+    return cachedDataRoot;
   }
   if (cachedDataRoot) return cachedDataRoot;
 
   let dir = process.cwd();
   for (let depth = 0; depth < 8; depth++) {
-    const candidate = join(dir, "data");
-    if (isValidDataRoot(candidate)) {
-      cachedDataRoot = candidate;
-      return candidate;
+    for (const name of ["predictor-data", "data"]) {
+      const candidate = join(dir, name);
+      if (isValidDataRoot(candidate)) {
+        cachedDataRoot = candidate;
+        return candidate;
+      }
     }
     const parent = resolve(dir, "..");
     if (parent === dir) break;
     dir = parent;
   }
 
-  return join(process.cwd(), "data");
+  return join(process.cwd(), "predictor-data");
 }
 
 export function resolveManifestRoot(): string {
