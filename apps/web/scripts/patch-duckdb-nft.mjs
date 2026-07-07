@@ -6,8 +6,8 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-const appDir = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
-const serverDir = path.join(appDir, ".next/server");
+const scriptPath = fileURLToPath(import.meta.url);
+const defaultAppDir = path.join(path.dirname(scriptPath), "..");
 
 function walkNftFiles(dir, acc = []) {
   if (!fs.existsSync(dir)) return acc;
@@ -33,43 +33,37 @@ function resolveFromPageDir(pageDir, tracePath) {
   return fs.existsSync(abs) ? abs : null;
 }
 
-let patched = 0;
+function patchTraceFiles(serverDir) {
+  let patched = 0;
 
-for (const nftPath of walkNftFiles(serverDir)) {
-  const trace = JSON.parse(fs.readFileSync(nftPath, "utf8"));
-  if (!Array.isArray(trace.files)) continue;
+  for (const nftPath of walkNftFiles(serverDir)) {
+    const trace = JSON.parse(fs.readFileSync(nftPath, "utf8"));
+    if (!Array.isArray(trace.files)) continue;
 
-  const usesDuckdb = trace.files.some((f) => f.includes("duckdb"));
-  if (!usesDuckdb) continue;
+    const usesDuckdb = trace.files.some((f) => f.includes("duckdb"));
+    if (!usesDuckdb) continue;
 
-  const pageDir = path.dirname(nftPath);
-  const existing = new Set(trace.files);
-  const toAdd = [];
+    const pageDir = path.dirname(nftPath);
+    const existing = new Set(trace.files);
+    const toAdd = [];
 
-  for (const file of trace.files) {
-    if (!file.includes("duckdb.node")) continue;
-    for (const candidate of sharedLibForNodeTrace(file)) {
-      if (existing.has(candidate)) continue;
-      if (resolveFromPageDir(pageDir, candidate)) toAdd.push(candidate);
+    for (const file of trace.files) {
+      if (!file.includes("duckdb.node")) continue;
+      for (const candidate of sharedLibForNodeTrace(file)) {
+        if (existing.has(candidate)) continue;
+        if (resolveFromPageDir(pageDir, candidate)) toAdd.push(candidate);
+      }
     }
+
+    if (toAdd.length === 0) continue;
+
+    trace.files.push(...toAdd);
+    fs.writeFileSync(nftPath, JSON.stringify(trace));
+    patched += 1;
   }
 
-  if (toAdd.length === 0) continue;
-
-  trace.files.push(...toAdd);
-  fs.writeFileSync(nftPath, JSON.stringify(trace));
-  patched += 1;
+  return patched;
 }
-
-if (patched > 0) {
-  console.log(
-    `patch-duckdb-nft: updated ${patched} trace file(s) with libduckdb shared libs`,
-  );
-}
-
-// Physical copying of libduckdb.{so,dylib} to standalone directory
-const standaloneDir = path.join(appDir, ".next/standalone");
-const repoRoot = path.join(appDir, "../..");
 
 function walkFiles(dir, matchName, acc = []) {
   if (!fs.existsSync(dir)) return acc;
@@ -84,13 +78,21 @@ function walkFiles(dir, matchName, acc = []) {
   return acc;
 }
 
-if (fs.existsSync(standaloneDir)) {
+function copyStandaloneDuckdbLibraries(standaloneDir, repoRoot) {
+  if (!fs.existsSync(standaloneDir)) {
+    console.log(
+      "patch-duckdb-nft: standalone directory not found, skipping file copy",
+    );
+    return { copiedCount: 0, missingLibraries: [], standaloneNodeCount: 0 };
+  }
+
   const standaloneNodes = walkFiles(standaloneDir, "duckdb.node");
   console.log(
     `patch-duckdb-nft: found ${standaloneNodes.length} duckdb.node file(s) in standalone`,
   );
 
   let copiedCount = 0;
+  const missingLibraries = [];
   for (const standaloneNodePath of standaloneNodes) {
     const relativePath = path.relative(standaloneDir, standaloneNodePath);
     const repoPath = path.join(repoRoot, relativePath);
@@ -104,22 +106,71 @@ if (fs.existsSync(standaloneDir)) {
       "libduckdb.dylib",
     );
 
+    let copiedForNode = 0;
     if (fs.existsSync(srcSo)) {
       console.log(`patch-duckdb-nft: copying ${srcSo} -> ${destSo}`);
       fs.copyFileSync(srcSo, destSo);
       copiedCount++;
+      copiedForNode++;
     }
     if (fs.existsSync(srcDylib)) {
       console.log(`patch-duckdb-nft: copying ${srcDylib} -> ${destDylib}`);
       fs.copyFileSync(srcDylib, destDylib);
       copiedCount++;
+      copiedForNode++;
+    }
+
+    if (copiedForNode === 0) {
+      missingLibraries.push({
+        relativePath,
+        attemptedSources: [srcSo, srcDylib],
+      });
     }
   }
+
   console.log(
     `patch-duckdb-nft: copied ${copiedCount} shared library files to standalone`,
   );
-} else {
-  console.log(
-    "patch-duckdb-nft: standalone directory not found, skipping file copy",
-  );
+
+  if (missingLibraries.length > 0) {
+    const details = missingLibraries
+      .map(
+        (missing) =>
+          `  - ${missing.relativePath} (looked for ${missing.attemptedSources.join(
+            " or ",
+          )})`,
+      )
+      .join("\n");
+    throw new Error(
+      `patch-duckdb-nft: missing libduckdb shared library for ${missingLibraries.length} standalone duckdb.node file(s):\n${details}`,
+    );
+  }
+
+  return {
+    copiedCount,
+    missingLibraries,
+    standaloneNodeCount: standaloneNodes.length,
+  };
+}
+
+export function patchDuckdbNft({ appDir = defaultAppDir } = {}) {
+  const serverDir = path.join(appDir, ".next/server");
+  const standaloneDir = path.join(appDir, ".next/standalone");
+  const repoRoot = path.join(appDir, "../..");
+
+  const patched = patchTraceFiles(serverDir);
+  if (patched > 0) {
+    console.log(
+      `patch-duckdb-nft: updated ${patched} trace file(s) with libduckdb shared libs`,
+    );
+  }
+
+  return {
+    patchedTraceCount: patched,
+    ...copyStandaloneDuckdbLibraries(standaloneDir, repoRoot),
+  };
+}
+
+if (path.resolve(process.argv[1] ?? "") === scriptPath) {
+  patchDuckdbNft();
 }
