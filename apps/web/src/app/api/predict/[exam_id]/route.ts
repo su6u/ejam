@@ -233,7 +233,16 @@ async function handlePrediction(
     return errResponse(400, "INVALID_INPUT", message);
   }
 
-  const validationResult = validateInput(input, predictor.inputSchema);
+  let validationResult: ReturnType<typeof validateInput>;
+  try {
+    validationResult = validateInput(input, predictor.inputSchema);
+  } catch (err) {
+    return errResponse(
+      500,
+      "INTERNAL_ERROR",
+      `input validation failed: ${getErrorMessage(err)}`,
+    );
+  }
   if (!validationResult.ok) return validationResult.response;
 
   let dependencyResult: ReturnType<typeof resolveDatasets>;

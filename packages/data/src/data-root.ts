@@ -33,19 +33,17 @@ export function resolveDataRoot(): string {
 
   let dir = process.cwd();
   for (let depth = 0; depth < 8; depth++) {
-    for (const name of ["predictor-data", "data"]) {
-      const candidate = join(dir, name);
-      if (isValidDataRoot(candidate)) {
-        cachedDataRoot = candidate;
-        return candidate;
-      }
+    const candidate = join(dir, "data");
+    if (isValidDataRoot(candidate)) {
+      cachedDataRoot = candidate;
+      return candidate;
     }
     const parent = resolve(dir, "..");
     if (parent === dir) break;
     dir = parent;
   }
 
-  return join(process.cwd(), "predictor-data");
+  return join(process.cwd(), "data");
 }
 
 export function resolveManifestRoot(): string {
