@@ -1,122 +1,51 @@
-name: Deploy (manual)
+name: Deploy
 
 on:
   workflow_dispatch:
-    inputs:
-      image_tag:
-        description: 'Image tag to deploy (e.g. sha-abc1234 or latest). Leave blank to build fresh from HEAD.'
-        required: false
-        default: ''
+  push:
+    branches: [main]
 
 concurrency:
   group: deploy-production
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 permissions:
   contents: read
-  packages: write
 
 jobs:
   deploy:
-    name: Deploy to production
+    name: Deploy to Vercel
     runs-on: ubuntu-latest
-    timeout-minutes: 45
     environment: production
     env:
-      REGISTRY: ghcr.io
-      IMAGE_NAME: ${{ github.repository_owner }}/ejam-web
-      TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
-      TURBO_TEAM: ${{ vars.TURBO_TEAM }}
-
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
     steps:
       - uses: actions/checkout@v4
 
-      - name: Log in to GHCR
-        uses: docker/login-action@v3
+      - uses: pnpm/action-setup@v4
         with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          version: 11.1.3
+          standalone: true
 
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      # If a specific image_tag was provided, skip the build and just re-deploy
-      # the existing image — useful for instant rollbacks or hotfix re-deploys.
-      - name: Resolve deploy target
-        id: target
-        run: |
-          if [ -n "${{ inputs.image_tag }}" ]; then
-            echo "Building skipped — deploying existing tag: ${{ inputs.image_tag }}"
-            echo "skip_build=true" >> "$GITHUB_OUTPUT"
-            echo "tag=${{ inputs.image_tag }}" >> "$GITHUB_OUTPUT"
-          else
-            SHORT_SHA=$(git rev-parse --short HEAD)
-            echo "skip_build=false" >> "$GITHUB_OUTPUT"
-            echo "tag=sha-${SHORT_SHA}" >> "$GITHUB_OUTPUT"
-          fi
-
-      - name: Derive image metadata
-        if: steps.target.outputs.skip_build == 'false'
-        id: meta
-        uses: docker/metadata-action@v5
+      - uses: actions/setup-node@v4
         with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-          tags: |
-            type=sha,prefix=sha-,format=short
-            type=raw,value=latest
+          node-version: 22
+          cache: pnpm
 
-      - name: Build and push Docker image
-        if: steps.target.outputs.skip_build == 'false'
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          file: Dockerfile
-          platforms: linux/amd64
-          push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+      - run: pnpm install --frozen-lockfile
 
-      - name: Promote existing image to latest
-        if: steps.target.outputs.skip_build == 'true'
-        env:
-          TARGET_TAG: ${{ steps.target.outputs.tag }}
-        run: |
-          IMAGE="${REGISTRY}/${IMAGE_NAME}"
-          TARGET_IMAGE="${IMAGE}:${TARGET_TAG}"
-          LATEST_IMAGE="${IMAGE}:latest"
+      - name: Verify data checksums
+        run: pnpm data:fetch --download
 
-          echo "Verifying existing image: ${TARGET_IMAGE}"
-          docker buildx imagetools inspect "${TARGET_IMAGE}" >/dev/null
+      - name: Install Vercel CLI
+        run: pnpm add -g vercel@latest
 
-          if [ "${TARGET_TAG}" = "latest" ]; then
-            echo "Target is already latest; no promotion needed."
-            exit 0
-          fi
+      - name: Pull Vercel environment
+        run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
 
-          echo "Promoting ${TARGET_IMAGE} to ${LATEST_IMAGE}"
-          docker buildx imagetools create --tag "${LATEST_IMAGE}" "${TARGET_IMAGE}"
+      - name: Build for Vercel
+        run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
 
-      - name: Trigger Dokploy redeploy
-        run: |
-          echo "Triggering Dokploy webhook..."
-          STATUS=$(curl -sS -o /tmp/dokploy-response.json -w "%{http_code}" \
-            -X GET \
-            "${{ secrets.DOKPLOY_WEBHOOK_URL }}")
-          echo "Dokploy response (HTTP $STATUS):"
-          cat /tmp/dokploy-response.json
-          if [ "$STATUS" -lt 200 ] || [ "$STATUS" -ge 300 ]; then
-            echo "Webhook call failed with status $STATUS"
-            exit 1
-          fi
-
-      - name: Verify deployment health
-        timeout-minutes: 6
-        run: bash .github/scripts/dokploy-healthcheck.sh
-        env:
-          HEALTH_URL: https://ejam.in/
+      - name: Deploy to production
+        run: vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}
