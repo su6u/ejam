@@ -99,6 +99,9 @@ importers:
       '@types/react-dom':
         specifier: ^19.2.3
         version: 19.2.3(@types/react@19.2.14)
+      '@xspect-build/patchelf-linux-x64':
+        specifier: ^0.18.2
+        version: 0.18.2
       agentation:
         specifier: ^3.0.2
         version: 3.0.2(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
@@ -1605,6 +1608,11 @@ packages:
 
   '@vitest/utils@3.2.4':
     resolution: {integrity: sha512-fB2V0JFrQSMsCo9HiSq3Ezpdv4iYaXRG1Sx8edX3MwxfyNn83mKiGzOcH+Fkxt4MHxr3y42fQi1oeAInqgX2QA==}
+
+  '@xspect-build/patchelf-linux-x64@0.18.2':
+    resolution: {integrity: sha512-x1y9HEJk3RQrG9SD0nIvMR4h2z0ujTaVxBak7Pz9rsaEpy6NU+OmW7RprhfFhnBcMxSeyrpMbe8lwSGQSXlTfA==}
+    cpu: [x64]
+    os: [linux]
 
   accepts@2.0.0:
     resolution: {integrity: sha512-5cvg6CtKwfgdmVqY1WIiXKc3Q1bkRqGLi+2W/6ao+6Y7gu/RCwRuAhGEzh5B4KlszSuTLgZYuqFqo5bImjNKng==}
@@ -4454,6 +4462,8 @@ snapshots:
       '@vitest/pretty-format': 3.2.4
       loupe: 3.2.1
       tinyrainbow: 2.0.0
+
+  '@xspect-build/patchelf-linux-x64@0.18.2': {}
 
   accepts@2.0.0:
     dependencies:

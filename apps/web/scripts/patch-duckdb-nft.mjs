@@ -4,6 +4,8 @@
  * Vercel also resolves platform bindings through hoisted node_modules symlinks, so we
  * materialize duckdb.node + libduckdb next to the path Node actually loads.
  */
+
+import { execFileSync } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -148,6 +150,44 @@ function materializePlatformBindings(sourceDir) {
   return staged;
 }
 
+function findPatchelfBinary() {
+  const candidate = path.join(
+    appDir,
+    "node_modules",
+    "@xspect-build",
+    "patchelf-linux-x64",
+    "bin",
+    "patchelf",
+  );
+  return fs.existsSync(candidate) ? candidate : null;
+}
+
+function patchDuckdbNodeRpath(pathsToPatch) {
+  if (process.platform !== "linux" || process.arch !== "x64") return 0;
+
+  const patchelf = findPatchelfBinary();
+  if (!patchelf) {
+    throw new Error(
+      "patch-duckdb-nft: patchelf binary missing for linux-x64 DuckDB binding",
+    );
+  }
+
+  let patched = 0;
+  const seen = new Set();
+  for (const filePath of pathsToPatch) {
+    if (!filePath.endsWith("/duckdb.node") || seen.has(filePath)) continue;
+    if (!fs.existsSync(filePath)) continue;
+
+    execFileSync(patchelf, ["--set-rpath", "$ORIGIN", filePath], {
+      stdio: "inherit",
+    });
+    seen.add(filePath);
+    patched += 1;
+  }
+
+  return patched;
+}
+
 function copySharedLibsBesideTracedNodes(pageDir, traceFiles) {
   const copied = [];
   for (const tracePath of traceFiles) {
@@ -275,9 +315,18 @@ function assertPlatformBindingsPresent(bindingDirs, stagedFiles) {
 const bindingDirs = findPlatformBindingDirs();
 const stagedFiles =
   bindingDirs.length > 0 ? materializePlatformBindings(bindingDirs[0]) : [];
+const rpathPatched = patchDuckdbNodeRpath([
+  ...bindingDirs.flatMap(bindingFilesForDir),
+  ...stagedFiles,
+]);
 const patched = patchTraceFiles(serverDir, stagedFiles, bindingDirs);
 assertPlatformBindingsPresent(bindingDirs, stagedFiles);
 
+if (rpathPatched > 0) {
+  console.log(
+    `patch-duckdb-nft: set $ORIGIN rpath on ${rpathPatched} duckdb.node file(s)`,
+  );
+}
 if (stagedFiles.length > 0) {
   console.log(
     `patch-duckdb-nft: materialized ${stagedFiles.length} ${platformPackage} file(s) for runtime resolution`,
