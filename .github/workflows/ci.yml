@@ -39,6 +39,7 @@ jobs:
               - 'tsconfig.json'
               - 'Dockerfile'
               - '.dockerignore'
+              - 'apps/web/vercel.json'
             data:
               - 'data/**'
               - 'packages/data/**'
@@ -124,15 +125,15 @@ jobs:
       - name: Run @ejam/data tests
         run: pnpm --filter @ejam/data test
 
-  # ── Build Docker image & deploy to Dokploy ───────────────────────────────────
-  # Only runs on main branch pushes after all relevant checks pass.
+  # ── Build Docker image & deploy to Dokploy (VPS) ─────────────────────────────
   # The image is tagged with both the commit SHA (immutable, for rollbacks)
   # and 'latest' (rolling, for Dokploy to pull).
   deploy:
-    name: Build & deploy to production
+    name: Build & deploy to VPS (Dokploy)
     needs: [changes, app, data]
     if: >-
       always() &&
+      vars.DEPLOY_TO_VPS == 'true' &&
       github.event_name == 'push' &&
       github.ref == 'refs/heads/main' &&
       (needs.changes.outputs.app == 'true' || needs.changes.outputs.data == 'true') &&
