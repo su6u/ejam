@@ -70,3 +70,84 @@ test("fails when a traced standalone duckdb.node has no libduckdb companion", ()
     fixture.cleanup();
   }
 });
+
+test("adds exam taxonomy and manifest data to the predictor route trace", () => {
+  const repoRoot = fs.mkdtempSync(
+    path.join(os.tmpdir(), "ejam-predictor-nft-"),
+  );
+  const appDir = path.join(repoRoot, "apps", "web");
+  const dataRoot = path.join(repoRoot, "data");
+  const serverDir = path.join(appDir, ".next", "server");
+  const nftPath = path.join(
+    serverDir,
+    "app",
+    "api",
+    "predict",
+    "[exam_id]",
+    "route.js.nft.json",
+  );
+  const examYaml = path.join(
+    dataRoot,
+    "reference",
+    "taxonomy",
+    "exams",
+    "jee-main.yaml",
+  );
+  const manifestPath = path.join(
+    dataRoot,
+    "catalog",
+    "releases",
+    "v0.2.0.json",
+  );
+  const indexPath = path.join(
+    dataRoot,
+    "tools",
+    "college-predictor",
+    "josaa",
+    "predictor-index.parquet",
+  );
+
+  fs.mkdirSync(path.dirname(examYaml), { recursive: true });
+  fs.writeFileSync(examYaml, "id: jee-main\n");
+  fs.mkdirSync(path.dirname(manifestPath), { recursive: true });
+  fs.writeFileSync(
+    manifestPath,
+    JSON.stringify({
+      version: "v0.2.0",
+      datasets: [
+        {
+          path: "tools/college-predictor/josaa/predictor-index.parquet",
+          sha256: "abc",
+          bytes: 1,
+        },
+      ],
+    }),
+  );
+  fs.mkdirSync(path.dirname(indexPath), { recursive: true });
+  fs.writeFileSync(indexPath, "parquet");
+  fs.mkdirSync(path.dirname(nftPath), { recursive: true });
+  fs.writeFileSync(nftPath, JSON.stringify({ version: 1, files: [] }));
+
+  try {
+    const result = patchDuckdbNft({ appDir });
+    const trace = JSON.parse(fs.readFileSync(nftPath, "utf8"));
+
+    assert.equal(result.patchedPredictorTraces, 1);
+    assert.ok(result.addedPredictorDataFiles >= 3);
+    assert.ok(
+      trace.files.some((file) =>
+        file.endsWith("reference/taxonomy/exams/jee-main.yaml"),
+      ),
+    );
+    assert.ok(
+      trace.files.some((file) => file.endsWith("catalog/releases/v0.2.0.json")),
+    );
+    assert.ok(
+      trace.files.some((file) =>
+        file.endsWith("tools/college-predictor/josaa/predictor-index.parquet"),
+      ),
+    );
+  } finally {
+    fs.rmSync(repoRoot, { force: true, recursive: true });
+  }
+});
