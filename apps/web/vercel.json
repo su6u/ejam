@@ -5,11 +5,5 @@
   "framework": "nextjs",
   "env": {
     "EJAM_DATA_ROOT": "data"
-  },
-  "functions": {
-    "src/app/api/predict/[exam_id]/route.ts": {
-      "maxDuration": 30,
-      "memory": 1024
-    }
   }
 }
