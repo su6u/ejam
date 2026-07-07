@@ -1,6 +1,7 @@
 /**
  * Turbopack builds skip outputFileTracingIncludes (no buildTraceContext).
  * NFT traces duckdb.node but not libduckdb.{so,dylib}, which duckdb.node loads via @rpath.
+ * Predictor routes also need exam taxonomy YAML and manifest-pinned data files at runtime.
  */
 import fs from "node:fs";
 import path from "node:path";
@@ -31,6 +32,138 @@ function sharedLibForNodeTrace(nodeTracePath) {
 function resolveFromPageDir(pageDir, tracePath) {
   const abs = path.resolve(pageDir, tracePath);
   return fs.existsSync(abs) ? abs : null;
+}
+
+function walkRegularFiles(dir, acc = []) {
+  if (!fs.existsSync(dir)) return acc;
+  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+    const full = path.join(dir, entry.name);
+    if (entry.isDirectory()) walkRegularFiles(full, acc);
+    else if (entry.isFile()) acc.push(full);
+  }
+  return acc;
+}
+
+function tracePathFromPageDir(pageDir, absolutePath) {
+  return path.relative(pageDir, absolutePath).split(path.sep).join("/");
+}
+
+function isPredictorRouteNft(nftPath) {
+  return nftPath
+    .split(path.sep)
+    .join("/")
+    .endsWith("app/api/predict/[exam_id]/route.js.nft.json");
+}
+
+function readLatestManifestDatasetPaths(dataRoot) {
+  const releasesDir = path.join(dataRoot, "catalog", "releases");
+  if (!fs.existsSync(releasesDir)) return [];
+
+  const manifestFiles = fs
+    .readdirSync(releasesDir)
+    .filter((name) => /^v\d+\.\d+\.\d+\.json$/.test(name));
+  manifestFiles.sort((a, b) => {
+    const pa = a.slice(1, -5).split(".").map(Number);
+    const pb = b.slice(1, -5).split(".").map(Number);
+    for (let i = 0; i < 3; i++) {
+      if (pa[i] !== pb[i]) return pa[i] - pb[i];
+    }
+    return 0;
+  });
+
+  const latest = manifestFiles.at(-1);
+  if (!latest) return [];
+
+  const manifest = JSON.parse(
+    fs.readFileSync(path.join(releasesDir, latest), "utf8"),
+  );
+  if (!Array.isArray(manifest.datasets)) return [];
+  return manifest.datasets.map((entry) => entry.path);
+}
+
+function collectPredictorRuntimeDataFiles(dataRoot) {
+  const files = new Set();
+
+  for (const file of walkRegularFiles(
+    path.join(dataRoot, "reference", "taxonomy"),
+  )) {
+    files.add(file);
+  }
+
+  for (const relative of [
+    path.join("reference", "engineering", "institutes.json"),
+    path.join("reference", "engineering", "programs.json"),
+  ]) {
+    const absolute = path.join(dataRoot, relative);
+    if (fs.existsSync(absolute)) files.add(absolute);
+  }
+
+  for (const file of walkRegularFiles(
+    path.join(dataRoot, "catalog", "releases"),
+  )) {
+    if (file.endsWith(".json")) files.add(file);
+  }
+
+  for (const manifestPath of readLatestManifestDatasetPaths(dataRoot)) {
+    const absolute = path.join(dataRoot, manifestPath);
+    if (fs.existsSync(absolute)) files.add(absolute);
+  }
+
+  return [...files];
+}
+
+function patchPredictorDataTraceFiles(serverDir, repoRoot) {
+  const dataRoot = path.join(repoRoot, "data");
+  if (!fs.existsSync(dataRoot)) {
+    console.log(
+      "patch-duckdb-nft: data/ not found, skipping predictor data trace patch",
+    );
+    return { patchedPredictorTraces: 0, addedPredictorDataFiles: 0 };
+  }
+
+  const runtimeFiles = collectPredictorRuntimeDataFiles(dataRoot);
+  if (runtimeFiles.length === 0) {
+    console.log(
+      "patch-duckdb-nft: no predictor runtime data files found to trace",
+    );
+    return { patchedPredictorTraces: 0, addedPredictorDataFiles: 0 };
+  }
+
+  let patchedPredictorTraces = 0;
+  let addedPredictorDataFiles = 0;
+
+  for (const nftPath of walkNftFiles(serverDir)) {
+    if (!isPredictorRouteNft(nftPath)) continue;
+
+    const trace = JSON.parse(fs.readFileSync(nftPath, "utf8"));
+    if (!Array.isArray(trace.files)) continue;
+
+    const pageDir = path.dirname(nftPath);
+    const existing = new Set(trace.files);
+    const toAdd = [];
+
+    for (const absolutePath of runtimeFiles) {
+      const relativeTrace = tracePathFromPageDir(pageDir, absolutePath);
+      if (existing.has(relativeTrace)) continue;
+      if (!fs.existsSync(path.resolve(pageDir, relativeTrace))) continue;
+      toAdd.push(relativeTrace);
+    }
+
+    if (toAdd.length === 0) continue;
+
+    trace.files.push(...toAdd);
+    fs.writeFileSync(nftPath, JSON.stringify(trace));
+    patchedPredictorTraces += 1;
+    addedPredictorDataFiles += toAdd.length;
+  }
+
+  if (patchedPredictorTraces > 0) {
+    console.log(
+      `patch-duckdb-nft: updated ${patchedPredictorTraces} predictor trace file(s) with ${addedPredictorDataFiles} data file(s)`,
+    );
+  }
+
+  return { patchedPredictorTraces, addedPredictorDataFiles };
 }
 
 function patchTraceFiles(serverDir) {
@@ -165,8 +298,11 @@ export function patchDuckdbNft({ appDir = defaultAppDir } = {}) {
     );
   }
 
+  const predictorTrace = patchPredictorDataTraceFiles(serverDir, repoRoot);
+
   return {
     patchedTraceCount: patched,
+    ...predictorTrace,
     ...copyStandaloneDuckdbLibraries(standaloneDir, repoRoot),
   };
 }
