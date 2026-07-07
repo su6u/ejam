@@ -47,7 +47,9 @@ function resolveBindingDir(dir) {
   if (!fs.existsSync(dir)) return null;
   try {
     const real = fs.realpathSync(dir);
-    return fs.statSync(real).isDirectory() ? real : null;
+    if (!fs.statSync(real).isDirectory()) return null;
+    if (!fs.existsSync(path.join(real, "duckdb.node"))) return null;
+    return real;
   } catch {
     return null;
   }
@@ -130,14 +132,18 @@ function materializeBindingDir(sourceDir, targetDir) {
   return copied;
 }
 
-function materializePlatformBindings(sourceDir) {
-  const targets = [
+function collectBindingMaterializeTargets() {
+  return [
+    // Next externalizes @duckdb/node-api under .next/node_modules (see route NFT paths).
+    path.join(appDir, ".next/node_modules/@duckdb", platformPackage),
     path.join(appDir, "node_modules", "@duckdb", platformPackage),
     path.join(serverDir, "node_modules", "@duckdb", platformPackage),
   ];
+}
 
+function materializePlatformBindings(sourceDir) {
   const staged = [];
-  for (const target of targets) {
+  for (const target of collectBindingMaterializeTargets()) {
     staged.push(...materializeBindingDir(sourceDir, target));
   }
   return staged;
@@ -167,9 +173,38 @@ function copySharedLibsBesideTracedNodes(pageDir, traceFiles) {
   return copied;
 }
 
-function patchTraceFiles(serverDirPath, stagedFiles) {
+function assertTracedNodesHaveSharedLib(pageDir, traceFiles, bindingDirs) {
+  const sourceDir = bindingDirs[0];
+  if (!sourceDir) return;
+
+  const sharedLibName =
+    process.platform === "darwin" ? "libduckdb.dylib" : "libduckdb.so";
+  const sourceSharedLib = path.join(sourceDir, sharedLibName);
+  if (!fs.existsSync(sourceSharedLib)) return;
+
+  const missing = [];
+  for (const tracePath of traceFiles) {
+    if (!tracePath.endsWith("/duckdb.node")) continue;
+    const nodeAbs = resolveFromPageDir(pageDir, tracePath);
+    if (!nodeAbs) continue;
+    const sharedAbs = path.join(path.dirname(nodeAbs), sharedLibName);
+    if (fs.existsSync(sharedAbs)) continue;
+    copyFileEnsuringDir(sourceSharedLib, sharedAbs);
+    if (!fs.existsSync(sharedAbs)) {
+      missing.push(tracePath);
+    }
+  }
+
+  if (missing.length > 0) {
+    throw new Error(
+      `patch-duckdb-nft: missing ${sharedLibName} beside traced duckdb.node:\n${missing.map((entry) => `  - ${entry}`).join("\n")}`,
+    );
+  }
+}
+
+function patchTraceFiles(serverDirPath, stagedFiles, bindingDirs) {
   let patched = 0;
-  const bindingFiles = findPlatformBindingDirs().flatMap(bindingFilesForDir);
+  const bindingFiles = bindingDirs.flatMap(bindingFilesForDir);
 
   for (const nftPath of walkNftFiles(serverDirPath)) {
     const trace = JSON.parse(fs.readFileSync(nftPath, "utf8"));
@@ -183,6 +218,7 @@ function patchTraceFiles(serverDirPath, stagedFiles) {
     const toAdd = [];
 
     copySharedLibsBesideTracedNodes(pageDir, trace.files);
+    assertTracedNodesHaveSharedLib(pageDir, trace.files, bindingDirs);
 
     for (const file of trace.files) {
       if (!file.includes("duckdb.node")) continue;
@@ -240,7 +276,7 @@ function assertPlatformBindingsPresent(bindingDirs, stagedFiles) {
 const bindingDirs = findPlatformBindingDirs();
 const stagedFiles =
   bindingDirs.length > 0 ? materializePlatformBindings(bindingDirs[0]) : [];
-const patched = patchTraceFiles(serverDir, stagedFiles);
+const patched = patchTraceFiles(serverDir, stagedFiles, bindingDirs);
 assertPlatformBindingsPresent(bindingDirs, stagedFiles);
 
 if (stagedFiles.length > 0) {
