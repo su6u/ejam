@@ -10,6 +10,7 @@ import {
   useId,
 } from "react";
 import { sidebarPanelTopInsetClass } from "@/components/app-layout";
+import { AccuracyReportBanner } from "@/components/predictor/accuracy-report-banner";
 import { HomeStateCombobox } from "@/components/predictor/home-state-combobox";
 import { OptionPicker } from "@/components/predictor/option-picker";
 import { PredictButtonLabel } from "@/components/predictor/predict-button-label";
@@ -123,7 +124,7 @@ function PredictorSidebarPanelInner() {
 
   return (
     <TooltipProvider delay={200}>
-      <div className="flex flex-col">
+      <div className="flex min-h-full flex-col">
         <div className={cn("px-2 pb-2", sidebarPanelTopInsetClass)}>
           {/* segmented control — one indicator slides between the exam tiles */}
           <div className="exam-picker-grid sliding-toggle-track" data-gap="2">
@@ -291,6 +292,8 @@ function PredictorSidebarPanelInner() {
             }}
           />
         ) : null}
+
+        <AccuracyReportBanner className="mt-auto" />
       </div>
     </TooltipProvider>
   );

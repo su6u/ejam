@@ -1566,5 +1566,63 @@
     "city": "Indore",
     "established": 1952,
     "nirf_rank": null
+  },
+  {
+    "id": "nitttr-bhopal",
+    "name": "National Institute of Technical Teachers Training and Research Bhopal",
+    "aliases": [
+      "NITTTR Bhopal",
+      "National Institute of Technical Teachers Training and Research, Bhopal",
+      "National Institute of Technical Teachers' Training and Research, Bhopal"
+    ],
+    "type": "GFTI",
+    "state": "Madhya Pradesh",
+    "city": "Bhopal",
+    "established": 1965,
+    "nirf_rank": null
+  },
+  {
+    "id": "central-univ-karnataka",
+    "name": "Central University of Karnataka",
+    "aliases": [
+      "CUK",
+      "Central University of Karnataka, Kalaburagi",
+      "Central University of Karnataka Kalaburagi"
+    ],
+    "type": "GFTI",
+    "state": "Karnataka",
+    "city": "Kalaburagi",
+    "established": 2009,
+    "nirf_rank": null
+  },
+  {
+    "id": "central-univ-punjab",
+    "name": "Central University of Punjab",
+    "aliases": [
+      "Central University of Punjab, Bathinda",
+      "CUP Bathinda",
+      "Central University of Punjab Bathinda"
+    ],
+    "type": "GFTI",
+    "state": "Punjab",
+    "city": "Bathinda",
+    "established": 2009,
+    "nirf_rank": null
+  },
+  {
+    "id": "iisc-bangalore",
+    "name": "Indian Institute of Science Bangalore",
+    "aliases": [
+      "Indian Institute of Science, Bangalore",
+      "IISc Bangalore",
+      "IISc Bengaluru",
+      "Indian Institute of Science, Bengaluru",
+      "Indian Institute of Science"
+    ],
+    "type": "GFTI",
+    "state": "Karnataka",
+    "city": "Bengaluru",
+    "established": 1909,
+    "nirf_rank": null
   }
 ]

@@ -9,7 +9,9 @@
       "CSE",
       "Computer Engineering",
       "Computer Sc. and Engg.",
+      "Computer Science",
       "Computer Science & Engineering",
+      "Computer Science (4 Years, Bachelor of Technology)",
       "Computer Science Engineering",
       "Computer Science Engineering (Artificial Intelligence)",
       "Computer Science Engineering (Artificiallntelligenceand Machine Learning)",
@@ -109,6 +111,8 @@
       "Electronics and Communication Engineering(Avionics)",
       "Electronics and Communication Engineering(Internetof Things)",
       "Electronics and Communication Engineering(with Specialization of Embedded Systemsand Internetof Things)",
+      "Electronics and Electrical Communication Engineering",
+      "Electronics and Electrical Communication Engineering (4 Years, Bachelor of Technology)",
       "Electronicsand Communication Engineering (Avionics)",
       "Electronicsand Communication Engineering (Internetof Things)",
       "Electronicsand Communication Engineering (with Specializationof Embedded Systemsand Internetof Things)",
@@ -218,8 +222,12 @@
       "IntegratedB.Tech.-M.Tech inMetallurgical&Materials Engineering",
       "MME",
       "Materials Engineering",
+      "Materials and Metallurgical Engineering",
+      "Materials and Metallurgical Engineering (4 Years, Bachelor of Technology)",
       "Metallurgical Engg.",
       "Metallurgical Engineering",
+      "Metallurgical Engineering and Materials Science",
+      "Metallurgical Engineering and Materials Science (4 Years, Bachelor of Technology)",
       "Metallurgical and Materials",
       "Metallurgyand Materials Engineering",
       "Metallurgyand MaterialsEngineering"
@@ -643,6 +651,7 @@
     "aliases": [
       "Biological Engineering (4 Years, Bachelor of Technology)",
       "Biological Engineering (5 Years, Bachelor and Master of Technology (Dual Degree))",
+      "Biological Sciences and Bioengineering",
       "Biological Sciences and Bioengineering (4 Years, Bachelor of Technology)",
       "Biosciences and Bioengineering (4 Years, Bachelor of Technology)"
     ],
@@ -838,6 +847,7 @@
     "id": "integrated-it-mtech",
     "name": "Integrated B.Tech IT and M.Tech IT",
     "aliases": [
+      "Integrated B. Tech.(IT) and M. Tech (IT)",
       "Integrated B. Tech.(IT) and M. Tech (IT) (5 Years, Integrated B. Tech. and M. Tech. /MBA)",
       "Integrated B. Tech.(IT) and M. Tech (IT) (5 Years, Integrated B. Tech. and M. Tech.)",
       "Integrated B.Tech.(IT) and M.Tech(IT)",
@@ -854,6 +864,7 @@
     "id": "integrated-it-mba",
     "name": "Integrated B.Tech IT and MBA",
     "aliases": [
+      "Integrated B. Tech.(IT) and MBA",
       "Integrated B. Tech.(IT) and MBA (5 Years, Integrated B. Tech. and M. Tech. /MBA)",
       "Integrated B. Tech.(IT) and MBA (5 Years, Integrated B. Tech. and MBA)",
       "Integrated B.Tech.(IT) and MBA",
@@ -893,6 +904,7 @@
     "id": "artificial-intelligence-data-science",
     "name": "Artificial Intelligence and Data Science",
     "aliases": [
+      "B.Tech in Artificial Intelligenece and Data Science (Transportation and Logistics)",
       "B.Tech in Artificial Intelligenece and Data Science (Transportation and Logistics) (4 Years, Bachelor of Technology)",
       "CSE ( Data Science & Analytics) (4 Years, Bachelor of Technology)"
     ],
@@ -990,7 +1002,12 @@
   {
     "id": "cse-ai-ml",
     "name": "Computer Science and Engineering (AI and ML)",
-    "aliases": ["B.Tech in CSE (AI and ML) (4 Years, Bachelor of Technology)"],
+    "aliases": [
+      "B.Tech in CSE (AI and ML)",
+      "B.Tech in CSE (AI and ML) (4 Years, Bachelor of Technology)",
+      "Computer Science Engineering (Artificial lntelligence and Machine Learning)",
+      "Computer Science Engineering (Artificial lntelligence and Machine Learning) (4 Years, Bachelor of Technology)"
+    ],
     "degree": "B.Tech",
     "duration_years": 4
   },
@@ -1144,7 +1161,9 @@
     "name": "Electrical and Electronics Engineering",
     "aliases": [
       "Electricaland Electronics",
-      "Electricaland Electronics Engineering"
+      "Electricaland Electronics Engineering",
+      "Electronics and Electrical Engineering",
+      "Electronics and Electrical Engineering (4 Years, Bachelor of Technology)"
     ],
     "degree": "B.Tech",
     "duration_years": 4
@@ -1228,6 +1247,1165 @@
     "aliases": [
       "B.Techin Electronics& Communication Engineering (Rail Engineering)",
       "B.TechinElectronics& CommunicationEngineering (RailEngineering)"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "abu-dhabi-campus-chemical-engineering",
+    "name": "Abu Dhabi Campus - Chemical Engineering",
+    "aliases": [
+      "Abu Dhabi Campus - Chemical Engineering",
+      "Abu Dhabi Campus - Chemical Engineering (4 Years, Bachelor of Technology)"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "abu-dhabi-campus-computer-science-and-engineering",
+    "name": "Abu Dhabi Campus - Computer Science and Engineering",
+    "aliases": [
+      "Abu Dhabi Campus - Computer Science and Engineering",
+      "Abu Dhabi Campus - Computer Science and Engineering (4 Years, Bachelor of Technology)"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "abu-dhabi-campus-electrical-engineering",
+    "name": "Abu Dhabi Campus - Electrical Engineering",
+    "aliases": [
+      "Abu Dhabi Campus - Electrical Engineering",
+      "Abu Dhabi Campus - Electrical Engineering (4 Years, Bachelor of Technology)"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "abu-dhabi-campus-energy-engineering",
+    "name": "Abu Dhabi Campus - Energy Engineering",
+    "aliases": [
+      "Abu Dhabi Campus - Energy Engineering",
+      "Abu Dhabi Campus - Energy Engineering (4 Years, Bachelor of Technology)"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "agricultural-engineering-with-data-analytics",
+    "name": "Agricultural Engineering with Data Analytics",
+    "aliases": [
+      "Agricultural Engineering with Data Analytics",
+      "Agricultural Engineering with Data Analytics (4 Years, Bachelor of Technology)"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "applied-and-computational-physics",
+    "name": "Applied and Computational Physics",
+    "aliases": [
+      "Applied and Computational Physics",
+      "Applied and Computational Physics (4 Years, Bachelor of Technology)"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "applied-and-industrial-chemistry",
+    "name": "Applied and Industrial Chemistry",
+    "aliases": [
+      "Applied and Industrial Chemistry",
+      "Applied and Industrial Chemistry (4 Years, Bachelor of Science)"
+    ],
+    "degree": "B.Sc",
+    "duration_years": 4
+  },
+  {
+    "id": "artificial-intelligence-data-science-aviation-systems",
+    "name": "Artificial Intelligence & Data Science - Aviation Systems",
+    "aliases": [
+      "Artificial Intelligence & Data Science - Aviation Systems",
+      "Artificial Intelligence & Data Science - Aviation Systems (4 Years, Bachelor of Technology)"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "artificial-intelligence-and-computing",
+    "name": "Artificial Intelligence and Computing",
+    "aliases": [
+      "Artificial Intelligence and Computing",
+      "Artificial Intelligence and Computing (4 Years, Bachelor of Technology)"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "artificial-intelligence-and-data-analytics",
+    "name": "Artificial Intelligence and Data Analytics",
+    "aliases": [
+      "Artificial Intelligence and Data Analytics",
+      "Artificial Intelligence and Data Analytics (4 Years, Bachelor of Technology)"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "b-tech-in-ce-m-tech-in-geotechnical-engineering",
+    "name": "B. Tech in CE. - M. Tech. in Geotechnical Engineering",
+    "aliases": [
+      "B. Tech in CE. - M. Tech. in Geotechnical Engineering",
+      "B. Tech in CE. - M. Tech. in Geotechnical Engineering (5 Years, B.Tech. + M.Tech./MS (Dual Degree))"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 5
+  },
+  {
+    "id": "b-tech-in-ce-m-tech-in-structural-engineering",
+    "name": "B. Tech in CE. - M. Tech. in Structural Engineering",
+    "aliases": [
+      "B. Tech in CE. - M. Tech. in Structural Engineering",
+      "B. Tech in CE. - M. Tech. in Structural Engineering (5 Years, B.Tech. + M.Tech./MS (Dual Degree))"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 5
+  },
+  {
+    "id": "b-tech-in-electronics-and-communication-engineering-with-minor-in-wearable-electronics",
+    "name": "B. Tech in Electronics and Communication Engineering with minor in Wearable Electronics",
+    "aliases": [
+      "B. Tech in Electronics and Communication Engineering with minor in Wearable Electronics",
+      "B. Tech in Electronics and Communication Engineering with minor in Wearable Electronics (4 Years, Bachelor of Technology)"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "b-tech-cse-and-m-tech-in-cse",
+    "name": "B. Tech. (CSE) and M.Tech in CSE",
+    "aliases": [
+      "B. Tech. (CSE) and M.Tech in CSE",
+      "B. Tech. (CSE) and M.Tech in CSE (5 Years, B.Tech. + M.Tech./MS (Dual Degree))"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 5
+  },
+  {
+    "id": "b-tech-ece-m-tech-in-vlsi",
+    "name": "B. Tech. (ECE) -M. Tech. in VLSI",
+    "aliases": [
+      "B. Tech. (ECE) -M. Tech. in VLSI",
+      "B. Tech. (ECE) -M. Tech. in VLSI (5 Years, B.Tech. + M.Tech./MS (Dual Degree))"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 5
+  },
+  {
+    "id": "b-tech-eee-m-tech-in-power-control",
+    "name": "B. Tech. (EEE)-M. Tech. in (Power &. Control)",
+    "aliases": [
+      "B. Tech. (EEE)-M. Tech. in (Power &. Control)",
+      "B. Tech. (EEE)-M. Tech. in (Power &. Control) (5 Years, B.Tech. + M.Tech./MS (Dual Degree))"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 5
+  },
+  {
+    "id": "b-tech-me-m-tech-in-mechatronics",
+    "name": "B. Tech. (ME) - M. Tech. in Mechatronics",
+    "aliases": [
+      "B. Tech. (ME) - M. Tech. in Mechatronics",
+      "B. Tech. (ME) - M. Tech. in Mechatronics (5 Years, B.Tech. + M.Tech./MS (Dual Degree))"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 5
+  },
+  {
+    "id": "b-tech-mathematics-computing-m-tech-in-mathematics-computing",
+    "name": "B. Tech. (Mathematics & Computing) M. Tech. in (Mathematics & Computing)",
+    "aliases": [
+      "B. Tech. (Mathematics & Computing) M. Tech. in (Mathematics & Computing)",
+      "B. Tech. (Mathematics & Computing) M. Tech. in (Mathematics & Computing) (5 Years, B.Tech. + M.Tech./MS (Dual Degree))"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 5
+  },
+  {
+    "id": "b-tech-information-technology-business-informatics-it-bin-master-of-business-administratio",
+    "name": "B. Tech. Information Technology-Business Informatics (IT- BIn) - Master of Business Administration (MBA)",
+    "aliases": [
+      "B. Tech. Information Technology-Business Informatics (IT- BIn) - Master of Business Administration (MBA)",
+      "B. Tech. Information Technology-Business Informatics (IT- BIn) - Master of Business Administration (MBA) (5 Years, Bachelor of Technology and MBA (Dual Degree))"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 5
+  },
+  {
+    "id": "b-tech-and-m-tech-in-engineering-and-computational-mechanics-dual-degree",
+    "name": "B. Tech. and M. Tech. in Engineering and Computational Mechanics (Dual Degree)",
+    "aliases": [
+      "B. Tech. and M. Tech. in Engineering and Computational Mechanics (Dual Degree)",
+      "B. Tech. and M. Tech. in Engineering and Computational Mechanics (Dual Degree) (5 Years, Bachelor and Master of Technology (Dual Degree))"
+    ],
+    "degree": "Dual B.Tech-M.Tech",
+    "duration_years": 5
+  },
+  {
+    "id": "b-tech-artificial-intelligence-and-data-science-mba-in-digital-business-management-iim-bod",
+    "name": "B.Tech (Artificial Intelligence and Data Science) - MBA in Digital Business Management (IIM Bodh Gaya)",
+    "aliases": [
+      "B.Tech (Artificial Intelligence and Data Science) - MBA in Digital Business Management (IIM Bodh Gaya)",
+      "B.Tech (Artificial Intelligence and Data Science) - MBA in Digital Business Management (IIM Bodh Gaya) (5 Years, Bachelor of Technology and MBA (Dual Degree))"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 5
+  },
+  {
+    "id": "b-tech-chemical-engineering-mba-in-hospital-and-health-care-management-iim-bodh-gaya",
+    "name": "B.Tech (Chemical Engineering) - MBA in Hospital and Health Care Management (IIM Bodh Gaya)",
+    "aliases": [
+      "B.Tech (Chemical Engineering) - MBA in Hospital and Health Care Management (IIM Bodh Gaya)",
+      "B.Tech (Chemical Engineering) - MBA in Hospital and Health Care Management (IIM Bodh Gaya) (5 Years, Bachelor of Technology and MBA (Dual Degree))"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 5
+  },
+  {
+    "id": "b-tech-chemical-science-and-technology-mba-in-hospital-and-health-care-management-iim-bodh",
+    "name": "B.Tech (Chemical Science and Technology) - MBA in Hospital and Health Care Management (IIM Bodh Gaya)",
+    "aliases": [
+      "B.Tech (Chemical Science and Technology) - MBA in Hospital and Health Care Management (IIM Bodh Gaya)",
+      "B.Tech (Chemical Science and Technology) - MBA in Hospital and Health Care Management (IIM Bodh Gaya) (5 Years, Bachelor of Technology and MBA (Dual Degree))"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 5
+  },
+  {
+    "id": "b-tech-civil-engineering-mba-iim-bodh-gaya",
+    "name": "B.Tech (Civil Engineering) - MBA (IIM Bodh Gaya)",
+    "aliases": [
+      "B.Tech (Civil Engineering) - MBA (IIM Bodh Gaya)",
+      "B.Tech (Civil Engineering) - MBA (IIM Bodh Gaya) (5 Years, Bachelor of Technology and MBA (Dual Degree))"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 5
+  },
+  {
+    "id": "b-tech-computer-science-and-engineering-mba-in-digital-business-management-iim-bodh-gaya",
+    "name": "B.Tech (Computer Science and Engineering) - MBA in Digital Business Management (IIM Bodh Gaya)",
+    "aliases": [
+      "B.Tech (Computer Science and Engineering) - MBA in Digital Business Management (IIM Bodh Gaya)",
+      "B.Tech (Computer Science and Engineering) - MBA in Digital Business Management (IIM Bodh Gaya) (5 Years, Bachelor of Technology and MBA (Dual Degree))"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 5
+  },
+  {
+    "id": "b-tech-electrical-and-electronics-engineering-mba-iim-bodh-gaya",
+    "name": "B.Tech (Electrical and Electronics Engineering) - MBA (IIM Bodh Gaya)",
+    "aliases": [
+      "B.Tech (Electrical and Electronics Engineering) - MBA (IIM Bodh Gaya)",
+      "B.Tech (Electrical and Electronics Engineering) - MBA (IIM Bodh Gaya) (5 Years, Bachelor of Technology and MBA (Dual Degree))"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 5
+  },
+  {
+    "id": "b-tech-electronics-and-communication-engineering-mba-in-hospital-and-healthcare-management",
+    "name": "B.Tech (Electronics and Communication Engineering) - MBA in Hospital and Healthcare Management (IIM Bodh Gaya)",
+    "aliases": [
+      "B.Tech (Electronics and Communication Engineering) - MBA in Hospital and Healthcare Management (IIM Bodh Gaya)",
+      "B.Tech (Electronics and Communication Engineering) - MBA in Hospital and Healthcare Management (IIM Bodh Gaya) (5 Years, Bachelor of Technology and MBA (Dual Degree))"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 5
+  },
+  {
+    "id": "b-tech-engineering-physics-mba-iim-bodh-gaya",
+    "name": "B.Tech (Engineering Physics) - MBA (IIM Bodh Gaya)",
+    "aliases": [
+      "B.Tech (Engineering Physics) - MBA (IIM Bodh Gaya)",
+      "B.Tech (Engineering Physics) - MBA (IIM Bodh Gaya) (5 Years, Bachelor of Technology and MBA (Dual Degree))"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 5
+  },
+  {
+    "id": "b-tech-mathematics-and-computing-mba-in-digital-business-management-iim-bodh-gaya",
+    "name": "B.Tech (Mathematics and Computing) - MBA in Digital Business Management (IIM Bodh Gaya)",
+    "aliases": [
+      "B.Tech (Mathematics and Computing) - MBA in Digital Business Management (IIM Bodh Gaya)",
+      "B.Tech (Mathematics and Computing) - MBA in Digital Business Management (IIM Bodh Gaya) (5 Years, Bachelor of Technology and MBA (Dual Degree))"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 5
+  },
+  {
+    "id": "b-tech-mechanical-engineering-mba-iim-mumbai",
+    "name": "B.Tech (Mechanical Engineering) - MBA (IIM Mumbai)",
+    "aliases": [
+      "B.Tech (Mechanical Engineering) - MBA (IIM Mumbai)",
+      "B.Tech (Mechanical Engineering) - MBA (IIM Mumbai) (5 Years, Bachelor of Technology and MBA (Dual Degree))"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 5
+  },
+  {
+    "id": "b-tech-metallurgical-and-materials-engineering-mba-iim-bodh-gaya",
+    "name": "B.Tech (Metallurgical and Materials Engineering) - MBA (IIM Bodh Gaya)",
+    "aliases": [
+      "B.Tech (Metallurgical and Materials Engineering) - MBA (IIM Bodh Gaya)",
+      "B.Tech (Metallurgical and Materials Engineering) - MBA (IIM Bodh Gaya) (5 Years, Bachelor of Technology and MBA (Dual Degree))"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 5
+  },
+  {
+    "id": "b-tech-mining-engineering-and-mba-in-logistic-and-supply-chain-management-iim-mumbai",
+    "name": "B.Tech Mining Engineering and MBA in Logistic and Supply Chain Management (IIM Mumbai)",
+    "aliases": [
+      "B.Tech Mining Engineering and MBA in Logistic and Supply Chain Management (IIM Mumbai)",
+      "B.Tech Mining Engineering and MBA in Logistic and Supply Chain Management (IIM Mumbai) (5 Years, Bachelor of Technology and MBA (Dual Degree))"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 5
+  },
+  {
+    "id": "b-tech-in-civil-engineering-rail-engineering",
+    "name": "B.Tech in Civil Engineering (Rail Engineering)",
+    "aliases": [
+      "B.Tech in Civil Engineering (Rail Engineering)",
+      "B.Tech in Civil Engineering (Rail Engineering) (4 Years, Bachelor of Technology)"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "b-tech-in-electrical-engineering-rail-engineering",
+    "name": "B.Tech in Electrical Engineering ( Rail Engineering)",
+    "aliases": [
+      "B.Tech in Electrical Engineering ( Rail Engineering)",
+      "B.Tech in Electrical Engineering ( Rail Engineering) (4 Years, Bachelor of Technology)"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "b-tech-in-general-engineering",
+    "name": "B.Tech in General Engineering",
+    "aliases": [
+      "B.Tech in General Engineering",
+      "B.Tech in General Engineering (4 Years, Bachelor of Technology)"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "b-tech-in-materials-science-and-engineering",
+    "name": "B.Tech in Materials Science and Engineering",
+    "aliases": [
+      "B.Tech in Materials Science and Engineering",
+      "B.Tech in Materials Science and Engineering (4 Years, Bachelor of Technology)"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "b-tech-in-mechanical-engineering-rail-engineering",
+    "name": "B.Tech in Mechanical Engineering ( Rail Engineering)",
+    "aliases": [
+      "B.Tech in Mechanical Engineering ( Rail Engineering)",
+      "B.Tech in Mechanical Engineering ( Rail Engineering) (4 Years, Bachelor of Technology)"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "b-tech-in-microelectronics-vlsi",
+    "name": "B.Tech in Microelectronics & VLSI",
+    "aliases": [
+      "B.Tech in Microelectronics & VLSI",
+      "B.Tech in Microelectronics & VLSI (4 Years, Bachelor of Technology)"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "b-tech-civil-engineering-mba",
+    "name": "B.Tech. (Civil Engineering) - MBA",
+    "aliases": [
+      "B.Tech. (Civil Engineering) - MBA",
+      "B.Tech. (Civil Engineering) - MBA (5 Years, Bachelor of Technology and MBA (Dual Degree))"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 5
+  },
+  {
+    "id": "b-tech-computer-science-and-engineering-mba",
+    "name": "B.Tech. (Computer Science and Engineering) - MBA",
+    "aliases": [
+      "B.Tech. (Computer Science and Engineering) - MBA",
+      "B.Tech. (Computer Science and Engineering) - MBA (5 Years, Bachelor of Technology and MBA (Dual Degree))"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 5
+  },
+  {
+    "id": "b-tech-electronics-and-communication-engineering-mba",
+    "name": "B.Tech. (Electronics and Communication Engineering) - MBA",
+    "aliases": [
+      "B.Tech. (Electronics and Communication Engineering) - MBA",
+      "B.Tech. (Electronics and Communication Engineering) - MBA (5 Years, Bachelor of Technology and MBA (Dual Degree))"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 5
+  },
+  {
+    "id": "b-tech-food-engineering-and-technology-mba",
+    "name": "B.Tech. (Food Engineering and Technology) - MBA",
+    "aliases": [
+      "B.Tech. (Food Engineering and Technology) - MBA",
+      "B.Tech. (Food Engineering and Technology) - MBA (5 Years, Bachelor of Technology and MBA (Dual Degree))"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 5
+  },
+  {
+    "id": "b-tech-mechanical-engineering-mba",
+    "name": "B.Tech. (Mechanical Engineering) - MBA",
+    "aliases": [
+      "B.Tech. (Mechanical Engineering) - MBA",
+      "B.Tech. (Mechanical Engineering) - MBA (5 Years, Bachelor of Technology and MBA (Dual Degree))"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 5
+  },
+  {
+    "id": "b-tech-in-electronics-and-communication-engineering-and-m-tech-in-microelectronics-and-vls",
+    "name": "B.Tech. in Electronics and Communication Engineering and M.Tech. in Microelectronics and VLSI Systems",
+    "aliases": [
+      "B.Tech. in Electronics and Communication Engineering and M.Tech. in Microelectronics and VLSI Systems",
+      "B.Tech. in Electronics and Communication Engineering and M.Tech. in Microelectronics and VLSI Systems (5 Years, Bachelor and Master of Technology (Dual Degree))"
+    ],
+    "degree": "Dual B.Tech-M.Tech",
+    "duration_years": 5
+  },
+  {
+    "id": "bs-in-chemical-sciences",
+    "name": "BS in Chemical Sciences",
+    "aliases": [
+      "BS in Chemical Sciences",
+      "BS in Chemical Sciences (4 Years, Bachelor of Science)"
+    ],
+    "degree": "B.Sc",
+    "duration_years": 4
+  },
+  {
+    "id": "bs-in-economics-with-mba-iim-bodh-gaya",
+    "name": "BS in Economics with MBA (IIM Bodh Gaya)",
+    "aliases": [
+      "BS in Economics with MBA (IIM Bodh Gaya)",
+      "BS in Economics with MBA (IIM Bodh Gaya) (5 Years, Bachelor of Science and MBA (Dual Degree))"
+    ],
+    "degree": "B.Sc",
+    "duration_years": 5
+  },
+  {
+    "id": "bs-in-mathematics",
+    "name": "BS in Mathematics",
+    "aliases": [
+      "BS in Mathematics",
+      "BS in Mathematics (4 Years, Bachelor of Science)"
+    ],
+    "degree": "B.Sc",
+    "duration_years": 4
+  },
+  {
+    "id": "bio-engineering",
+    "name": "Bio Engineering",
+    "aliases": [
+      "Bio Engineering",
+      "Bio Engineering (4 Years, Bachelor of Technology)"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "biochemical-engineering",
+    "name": "Biochemical Engineering",
+    "aliases": [
+      "Biochemical Engineering",
+      "Biochemical Engineering (4 Years, Bachelor of Technology)"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "biomedical-engineering-and-data-science",
+    "name": "Biomedical Engineering and Data Science",
+    "aliases": [
+      "Biomedical Engineering and Data Science",
+      "Biomedical Engineering and Data Science (4 Years, Bachelor of Technology)"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "biotechnology-and-bioinformatics",
+    "name": "Biotechnology and Bioinformatics",
+    "aliases": [
+      "Biotechnology and Bioinformatics",
+      "Biotechnology and Bioinformatics (4 Years, Bachelor of Technology)"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "chemical-engineering-with-data-analytics",
+    "name": "Chemical Engineering with Data Analytics",
+    "aliases": [
+      "Chemical Engineering with Data Analytics",
+      "Chemical Engineering with Data Analytics (4 Years, Bachelor of Technology)"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "chemical-technology-bioprocess-technology",
+    "name": "Chemical Technology (Bioprocess Technology)",
+    "aliases": [
+      "Chemical Technology (Bioprocess Technology)",
+      "Chemical Technology (Bioprocess Technology) (4 Years, Bachelor of Technology)"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "chemical-and-biochemical-engineering",
+    "name": "Chemical and Biochemical Engineering",
+    "aliases": [
+      "Chemical and Biochemical Engineering",
+      "Chemical and Biochemical Engineering (4 Years, Bachelor of Technology)"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "computational-engineering",
+    "name": "Computational Engineering",
+    "aliases": [
+      "Computational Engineering",
+      "Computational Engineering (4 Years, Bachelor of Technology)"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "computational-engineering-and-mechanics",
+    "name": "Computational Engineering and Mechanics",
+    "aliases": [
+      "Computational Engineering and Mechanics",
+      "Computational Engineering and Mechanics (4 Years, Bachelor of Technology)"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "computer-science-engineering-data-science-and-analytics",
+    "name": "Computer Science & Engineering (Data Science and Analytics)",
+    "aliases": [
+      "Computer Science & Engineering (Data Science and Analytics)",
+      "Computer Science & Engineering (Data Science and Analytics) (4 Years, Bachelor of Technology)"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "computer-science-engineering-human-computer-lnteraction-and-gaming-technology",
+    "name": "Computer Science Engineering (Human Computer lnteraction and Gaming Technology)",
+    "aliases": [
+      "Computer Science Engineering (Human Computer lnteraction and Gaming Technology)",
+      "Computer Science Engineering (Human Computer lnteraction and Gaming Technology) (4 Years, Bachelor of Technology)"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "computer-science-and-engineering-artificial-intelligence-data-science",
+    "name": "Computer Science and Engineering ( Artificial Intelligence & Data Science)",
+    "aliases": [
+      "Computer Science and Engineering ( Artificial Intelligence & Data Science)",
+      "Computer Science and Engineering ( Artificial Intelligence & Data Science) (4 Years, Bachelor of Technology)"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "computer-science-and-engineering-artificial-intelligence-and-data-science",
+    "name": "Computer Science and Engineering (Artificial Intelligence and Data Science)",
+    "aliases": [
+      "Computer Science and Engineering (Artificial Intelligence and Data Science)",
+      "Computer Science and Engineering (Artificial Intelligence and Data Science) (4 Years, Bachelor of Technology)"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "computer-science-and-engineering-artificial-intelligence-and-machine-learning",
+    "name": "Computer Science and Engineering (Artificial Intelligence and Machine Learning)",
+    "aliases": [
+      "Computer Science and Engineering (Artificial Intelligence and Machine Learning)",
+      "Computer Science and Engineering (Artificial Intelligence and Machine Learning) (4 Years, Bachelor of Technology)"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "computer-science-and-engineering-artificial-intelligence",
+    "name": "Computer Science and Engineering (Artificial Intelligence)",
+    "aliases": [
+      "Computer Science and Engineering (Artificial Intelligence)",
+      "Computer Science and Engineering (Artificial Intelligence) (4 Years, Bachelor of Technology)"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "computer-science-and-engineering-cyber-physical-system",
+    "name": "Computer Science and Engineering (Cyber Physical System)",
+    "aliases": [
+      "Computer Science and Engineering (Cyber Physical System)",
+      "Computer Science and Engineering (Cyber Physical System) (4 Years, Bachelor of Technology)"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "computer-science-and-engineering-internet-of-things-cyber-security-including-block-chain-t",
+    "name": "Computer Science and Engineering (Internet of Things, Cyber Security including Block Chain Technology )",
+    "aliases": [
+      "Computer Science and Engineering (Internet of Things, Cyber Security including Block Chain Technology )",
+      "Computer Science and Engineering (Internet of Things, Cyber Security including Block Chain Technology ) (4 Years, Bachelor of Technology)"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "computer-science-and-engineering-with-specialization-of-data-science-and-artificial-intell",
+    "name": "Computer Science and Engineering (with Specialization of Data Science and Artificial Intelligence)",
+    "aliases": [
+      "Computer Science and Engineering (with Specialization of Data Science and Artificial Intelligence)",
+      "Computer Science and Engineering (with Specialization of Data Science and Artificial Intelligence) (4 Years, B. Tech / B. Tech (Hons.))"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "computer-science-and-engineering-with-major-in-artificial-intelligence",
+    "name": "Computer Science and Engineering with Major in Artificial Intelligence",
+    "aliases": [
+      "Computer Science and Engineering with Major in Artificial Intelligence",
+      "Computer Science and Engineering with Major in Artificial Intelligence (4 Years, Bachelor of Technology)"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "computer-science-and-engineering-with-specialization-in-cyber-security",
+    "name": "Computer Science and Engineering with Specialization in Cyber Security",
+    "aliases": [
+      "Computer Science and Engineering with Specialization in Cyber Security",
+      "Computer Science and Engineering with Specialization in Cyber Security (5 Years, Bachelor and Master of Technology (Dual Degree))",
+      "Computer Science and Engineering with specialization in Cyber Security",
+      "Computer Science and Engineering with specialization in Cyber Security (4 Years, Bachelor of Technology)"
+    ],
+    "degree": "Dual B.Tech-M.Tech",
+    "duration_years": 5
+  },
+  {
+    "id": "computer-science-and-engineering-with-specialization-in-data-science",
+    "name": "Computer Science and Engineering with Specialization in Data Science",
+    "aliases": [
+      "Computer Science and Engineering with Specialization in Data Science",
+      "Computer Science and Engineering with Specialization in Data Science (5 Years, Bachelor and Master of Technology (Dual Degree))"
+    ],
+    "degree": "Dual B.Tech-M.Tech",
+    "duration_years": 5
+  },
+  {
+    "id": "computer-science-and-engineering-with-minor-in-ai-and-ml",
+    "name": "Computer Science and Engineering with minor in AI and ML",
+    "aliases": [
+      "Computer Science and Engineering with minor in AI and ML",
+      "Computer Science and Engineering with minor in AI and ML (4 Years, Bachelor of Technology)"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "computer-science-and-engineering-with-specialization-in-artificial-intelligence-and-data-s",
+    "name": "Computer Science and Engineering with specialization in Artificial Intelligence and Data Science",
+    "aliases": [
+      "Computer Science and Engineering with specialization in Artificial Intelligence and Data Science",
+      "Computer Science and Engineering with specialization in Artificial Intelligence and Data Science (4 Years, Bachelor of Technology)"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "computer-science-and-engineering-with-specialization-in-quantum-technologies",
+    "name": "Computer Science and Engineering with specialization in Quantum Technologies",
+    "aliases": [
+      "Computer Science and Engineering with specialization in Quantum Technologies",
+      "Computer Science and Engineering with specialization in Quantum Technologies (4 Years, Bachelor of Technology)"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "cyber-security",
+    "name": "Cyber Security",
+    "aliases": [
+      "Cyber Security",
+      "Cyber Security (4 Years, Bachelor of Technology)"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "design",
+    "name": "Design",
+    "aliases": ["Design", "Design (4 Years, Bachelor of Technology)"],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "electrical-engineering-ic-design-and-technology",
+    "name": "Electrical Engineering (IC Design and Technology)",
+    "aliases": [
+      "Electrical Engineering (IC Design and Technology)",
+      "Electrical Engineering (IC Design and Technology) (4 Years, Bachelor of Technology)"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "electrical-engineering-integrated-circuit-design-and-technology",
+    "name": "Electrical Engineering (Integrated Circuit Design and Technology)",
+    "aliases": [
+      "Electrical Engineering (Integrated Circuit Design and Technology)",
+      "Electrical Engineering (Integrated Circuit Design and Technology) (4 Years, Bachelor of Technology)"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "electrical-engineering-power-and-automation",
+    "name": "Electrical Engineering (Power and Automation)",
+    "aliases": [
+      "Electrical Engineering (Power and Automation)",
+      "Electrical Engineering (Power and Automation) (4 Years, Bachelor of Technology)"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "electrical-engineering-with-e-mobility",
+    "name": "Electrical Engineering with E Mobility",
+    "aliases": [
+      "Electrical Engineering with E Mobility",
+      "Electrical Engineering with E Mobility (4 Years, Bachelor of Technology)"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "electrical-engineering-with-specialization-in-power-system-engineering",
+    "name": "Electrical Engineering with Specialization In Power System Engineering",
+    "aliases": [
+      "Electrical Engineering with Specialization In Power System Engineering",
+      "Electrical Engineering with Specialization In Power System Engineering (5 Years, Bachelor and Master of Technology (Dual Degree))"
+    ],
+    "degree": "Dual B.Tech-M.Tech",
+    "duration_years": 5
+  },
+  {
+    "id": "electrical-and-electronics-engineering-electric-mobility",
+    "name": "Electrical and Electronics Engineering (Electric Mobility)",
+    "aliases": [
+      "Electrical and Electronics Engineering (Electric Mobility)",
+      "Electrical and Electronics Engineering (Electric Mobility) (4 Years, Bachelor of Technology)"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "electronics-communication-and-artificial-intelligence",
+    "name": "Electronics Communication and Artificial Intelligence",
+    "aliases": [
+      "Electronics Communication and Artificial Intelligence",
+      "Electronics Communication and Artificial Intelligence (4 Years, Bachelor of Technology)"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "electronics-engineering-vlsi-design-and-technology",
+    "name": "Electronics Engineering (VLSI Design and Technology)",
+    "aliases": [
+      "Electronics Engineering (VLSI Design and Technology)",
+      "Electronics Engineering (VLSI Design and Technology) (4 Years, Bachelor of Technology)"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "electronics-and-communication-engineering-avionics",
+    "name": "Electronics and Communication Engineering (Avionics)",
+    "aliases": [
+      "Electronics and Communication Engineering (Avionics)",
+      "Electronics and Communication Engineering (Avionics) (4 Years, Bachelor of Technology)"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "electronics-and-communication-engineering-internet-of-things",
+    "name": "Electronics and Communication Engineering (Internet of Things)",
+    "aliases": [
+      "Electronics and Communication Engineering (Internet of Things)",
+      "Electronics and Communication Engineering (Internet of Things) (4 Years, Bachelor of Technology)"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "electronics-and-communication-engineering-vlsi-design-and-technology",
+    "name": "Electronics and Communication Engineering (VLSI Design and Technology)",
+    "aliases": [
+      "Electronics and Communication Engineering (VLSI Design and Technology)",
+      "Electronics and Communication Engineering (VLSI Design and Technology) (4 Years, Bachelor of Technology)"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "electronics-and-communication-engineering-vlsi-design",
+    "name": "Electronics and Communication Engineering (VLSI Design)",
+    "aliases": [
+      "Electronics and Communication Engineering (VLSI Design)",
+      "Electronics and Communication Engineering (VLSI Design) (4 Years, Bachelor of Technology)"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "electronics-and-communication-engineering-with-specialization-of-embedded-systems-and-inte",
+    "name": "Electronics and Communication Engineering (with Specialization of Embedded Systems and Internet of Things)",
+    "aliases": [
+      "Electronics and Communication Engineering (with Specialization of Embedded Systems and Internet of Things)",
+      "Electronics and Communication Engineering (with Specialization of Embedded Systems and Internet of Things) (4 Years, B. Tech / B. Tech (Hons.))"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "electronics-and-communication-engineering-with-specialization-in-microelectronics-and-vlsi",
+    "name": "Electronics and Communication Engineering with Specialization in Microelectronics and VLSI System Design",
+    "aliases": [
+      "Electronics and Communication Engineering with Specialization in Microelectronics and VLSI System Design",
+      "Electronics and Communication Engineering with Specialization in Microelectronics and VLSI System Design (5 Years, Bachelor and Master of Technology (Dual Degree))"
+    ],
+    "degree": "Dual B.Tech-M.Tech",
+    "duration_years": 5
+  },
+  {
+    "id": "electronics-and-communication-engineering-with-specialization-in-design-and-manufacturing",
+    "name": "Electronics and Communication Engineering with specialization in Design and Manufacturing",
+    "aliases": [
+      "Electronics and Communication Engineering with specialization in Design and Manufacturing",
+      "Electronics and Communication Engineering with specialization in Design and Manufacturing (4 Years, Bachelor of Technology)"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "electronics-and-communication-engineering-with-specialization-in-vlsi-and-embedded-systems",
+    "name": "Electronics and Communication Engineering with specialization in VLSI and Embedded Systems",
+    "aliases": [
+      "Electronics and Communication Engineering with specialization in VLSI and Embedded Systems",
+      "Electronics and Communication Engineering with specialization in VLSI and Embedded Systems (4 Years, Bachelor of Technology)"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "engineering-chemistry",
+    "name": "Engineering Chemistry",
+    "aliases": [
+      "Engineering Chemistry",
+      "Engineering Chemistry (4 Years, Bachelor of Science)"
+    ],
+    "degree": "B.Sc",
+    "duration_years": 4
+  },
+  {
+    "id": "engineering-science",
+    "name": "Engineering Science",
+    "aliases": [
+      "Engineering Science",
+      "Engineering Science (4 Years, Bachelor of Technology)"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "environmental-economics-and-sustainable-engineering",
+    "name": "Environmental Economics and Sustainable Engineering",
+    "aliases": [
+      "Environmental Economics and Sustainable Engineering",
+      "Environmental Economics and Sustainable Engineering (4 Years, Bachelor of Technology)"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "environmental-science-and-engineering",
+    "name": "Environmental Science and Engineering",
+    "aliases": [
+      "Environmental Science and Engineering",
+      "Environmental Science and Engineering (4 Years, Bachelor of Technology)"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "exploration-geophysics",
+    "name": "Exploration Geophysics",
+    "aliases": [
+      "Exploration Geophysics",
+      "Exploration Geophysics (4 Years, Bachelor of Science)"
+    ],
+    "degree": "B.Sc",
+    "duration_years": 4
+  },
+  {
+    "id": "geological-engineering",
+    "name": "Geological Engineering",
+    "aliases": [
+      "Geological Engineering",
+      "Geological Engineering (4 Years, Bachelor of Technology)"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "geological-technology",
+    "name": "Geological Technology",
+    "aliases": [
+      "Geological Technology",
+      "Geological Technology (5 Years, Integrated Master of Technology)"
+    ],
+    "degree": "Integrated M.Tech",
+    "duration_years": 5
+  },
+  {
+    "id": "geophysical-technology",
+    "name": "Geophysical Technology",
+    "aliases": [
+      "Geophysical Technology",
+      "Geophysical Technology (5 Years, Integrated Master of Technology)"
+    ],
+    "degree": "Integrated M.Tech",
+    "duration_years": 5
+  },
+  {
+    "id": "industrial-engineering-and-operations-research",
+    "name": "Industrial Engineering and Operations Research",
+    "aliases": [
+      "Industrial Engineering and Operations Research",
+      "Industrial Engineering and Operations Research (4 Years, Bachelor of Technology)"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "instrumentation-and-biomedical-engineering",
+    "name": "Instrumentation and Biomedical Engineering",
+    "aliases": [
+      "Instrumentation and Biomedical Engineering",
+      "Instrumentation and Biomedical Engineering (4 Years, Bachelor of Technology)"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "integrated-circuit-design-technology",
+    "name": "Integrated Circuit Design & Technology",
+    "aliases": [
+      "Integrated Circuit Design & Technology",
+      "Integrated Circuit Design & Technology (4 Years, Bachelor of Technology)"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "intelligent-systems",
+    "name": "Intelligent Systems",
+    "aliases": [
+      "Intelligent Systems",
+      "Intelligent Systems (4 Years, Bachelor of Technology)"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "internet-of-things-iot",
+    "name": "Internet of Things (IoT)",
+    "aliases": [
+      "Internet of Things (IoT)",
+      "Internet of Things (IoT) (4 Years, Bachelor of Technology)"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "major-in-mathematics",
+    "name": "Major in Mathematics",
+    "aliases": [
+      "Major in Mathematics",
+      "Major in Mathematics (4 Years, Bachelor of Science)"
+    ],
+    "degree": "B.Sc",
+    "duration_years": 4
+  },
+  {
+    "id": "major-in-physics",
+    "name": "Major in Physics",
+    "aliases": [
+      "Major in Physics",
+      "Major in Physics (4 Years, Bachelor of Science)"
+    ],
+    "degree": "B.Sc",
+    "duration_years": 4
+  },
+  {
+    "id": "maritime-engineering",
+    "name": "Maritime Engineering",
+    "aliases": [
+      "Maritime Engineering",
+      "Maritime Engineering (4 Years, Bachelor of Technology)"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "mechanical-engineering-with-specialization-in-manufacturing-and-industrial-engineering",
+    "name": "Mechanical Engineering with Specialization in Manufacturing and Industrial Engineering",
+    "aliases": [
+      "Mechanical Engineering with Specialization in Manufacturing and Industrial Engineering",
+      "Mechanical Engineering with Specialization in Manufacturing and Industrial Engineering (5 Years, Bachelor and Master of Technology (Dual Degree))"
+    ],
+    "degree": "Dual B.Tech-M.Tech",
+    "duration_years": 5
+  },
+  {
+    "id": "mechanical-engineering-with-specialization-in-design-and-manufacturing",
+    "name": "Mechanical Engineering with specialization in Design and Manufacturing",
+    "aliases": [
+      "Mechanical Engineering with specialization in Design and Manufacturing",
+      "Mechanical Engineering with specialization in Design and Manufacturing (4 Years, Bachelor of Technology)"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "microelectronics-and-vlsi-design",
+    "name": "Microelectronics and VLSI Design",
+    "aliases": [
+      "Microelectronics and VLSI Design",
+      "Microelectronics and VLSI Design (4 Years, Bachelor of Technology)"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "mineral-and-metallurgical-engineering",
+    "name": "Mineral and Metallurgical Engineering",
+    "aliases": [
+      "Mineral and Metallurgical Engineering",
+      "Mineral and Metallurgical Engineering (4 Years, Bachelor of Technology)"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "naval-architecture-and-ocean-engineering",
+    "name": "Naval Architecture and Ocean Engineering",
+    "aliases": [
+      "Naval Architecture and Ocean Engineering",
+      "Naval Architecture and Ocean Engineering (4 Years, Bachelor of Technology)"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "ocean-engineering-and-naval-architecture",
+    "name": "Ocean Engineering and Naval Architecture",
+    "aliases": [
+      "Ocean Engineering and Naval Architecture",
+      "Ocean Engineering and Naval Architecture (4 Years, Bachelor of Technology)"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "physics-and-computational-engineering",
+    "name": "Physics and Computational Engineering",
+    "aliases": [
+      "Physics and Computational Engineering",
+      "Physics and Computational Engineering (4 Years, Bachelor of Technology)"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "quantum-science-and-engineering",
+    "name": "Quantum Science and Engineering",
+    "aliases": [
+      "Quantum Science and Engineering",
+      "Quantum Science and Engineering (4 Years, Bachelor of Technology)"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "unified-engineering",
+    "name": "Unified Engineering",
+    "aliases": [
+      "Unified Engineering",
+      "Unified Engineering (4 Years, Bachelor of Technology)"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "digital-manufacturing-iot",
+    "name": "Digital Manufacturing and IoT",
+    "aliases": [
+      "Digital Manufacturing and IoT",
+      "Digital Manufacturing and IoT (4 Years, Bachelor of Technology)"
+    ],
+    "degree": "B.Tech",
+    "duration_years": 4
+  },
+  {
+    "id": "mechanics-and-computing",
+    "name": "Mechanics and Computing",
+    "aliases": [
+      "Mechanics and Computing",
+      "Mechanics and Computing (4 Years, Bachelor of Technology)"
     ],
     "degree": "B.Tech",
     "duration_years": 4

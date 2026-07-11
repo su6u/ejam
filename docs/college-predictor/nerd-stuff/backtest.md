@@ -78,3 +78,9 @@ reproduce: `pnpm exec tsx packages/data-cli/src/backtest/predictor.ts` and read 
 ---
 
 when you change index hyperparams (`packages/data-cli/src/jam/config.ts`, `csab-config.ts`), run the backtest script before publishing a data release.
+
+---
+
+## related: 2026 mid-counselling holdout
+
+for a seat-by-seat accuracy report against **2026 JoSAA rounds 1–4** (train ≤2025, no leakage), see [2026 R1–R4 accuracy report](2026-rounds-accuracy-report.md). that run also breaks out institute type, seat type, quota, rank tier, PwD vs non-PwD, and round-trajectory drift.
