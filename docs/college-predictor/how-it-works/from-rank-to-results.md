@@ -1,67 +1,65 @@
-# From rank to results
+# from rank to results
 
-Each result row is one **program seat pool**: institute + branch + seat type + quota + gender. The engine asks: at this rank, how likely was a similar profile to land that seat in past years, adjusted forward to this cycle?
+every row you see is one **seat pool**: institute + branch + seat type + quota + gender. all we're really asking is, at your rank, how often did someone like you actually land that seat in past years, nudged forward to this cycle?
 
-## Index row (already built offline)
+## the index row (built offline)
 
-Before anyone hits Predict, the index builder has already:
+before you ever hit predict, the index builder already did the boring part:
 
-- Weighted multiple years of opening/closing ranks per round
-- Projected a **predicted closing rank** for the upcoming cycle (trend + pool shift on JoSAA)
-- Stored per-round means and a **fill round** (when the seat historically stopped moving)
-- Set $\sigma_{\mathrm{eff}}$ (uncertainty width; wider when data is sparse)
+- weighted a bunch of years of opening/closing ranks per round
+- projected a **predicted closing rank** for this cycle (trend + how the pool shifts on josaa)
+- saved per-round means and a **fill round** (the point where the seat basically stopped moving)
+- set $\sigma_{\mathrm{eff}}$, the uncertainty width, wider when there just isn't much data
 
-The live API does not rebuild this. It reads the row and runs probability math.
+the live api doesn't redo any of this. it grabs the row and runs the probability math.
 
-## Per-round chance
+## your chance per round
 
-For each counselling round up to `fill_round`, rank vs predicted closing rank is treated as a normal distribution:
+for each round up to `fill_round`, we line up your rank against the predicted closing rank and treat it like a normal curve:
 
-$$
-P_i = \Phi\!\left(\frac{\hat{c}_i - r}{\sigma_{\mathrm{eff}}}\right)
-$$
+<p align="center">
+  <img src="../../../apps/web/public/tools/p/formulas/single-round-probability.svg" alt="single-round probability" width="45%">
+</p>
 
-Better rank (lower $r$) → higher $P_i$. Equal rank → about 50%.
+better rank (lower $r$) → higher $P_i$. same rank → around 50%.
 
-Round probabilities combine into one headline **chance** (average cumulative probability through `fill_round`). The round bars in the table show that trajectory.
+then all the rounds get squished into one headline **chance** (average cumulative probability through `fill_round`). the little round bars in the table are just that story drawn out.
 
-Full formulas: [Prediction engine](../nerd-stuff/prediction-engine.md).
+full formulas: [prediction engine](../nerd-stuff/prediction-engine.md).
 
-## Chance bands
+## the bands
 
-Bands group rows for scanning. Thresholds are fixed in code:
+bands are just so you can scan fast. the cutoffs are fixed in code:
 
-| Band | Threshold | Meaning |
+| band | threshold | meaning |
 | --- | --- | --- |
-| **Safe** | $P \geq 0.85$ | Strong historical margin at this rank |
-| **Target** | $0.40 \leq P < 0.85$ | Competitive, plausible |
-| **Reach** | $0.10 \leq P < 0.40$ | Tight; possible but not comfortable |
-| **Long-shot** | $P < 0.10$ | Excluded from default results |
+| **safe** | $P \geq 0.85$ | high chance at this rank |
+| **iffy** | $0.40 \leq P < 0.85$ | possible, but not locked |
+| **delulu** | $0.10 \leq P < 0.40$ | low chance, long shot |
+| **doesn't matter yaar** | $P < 0.10$ | very low chance, hidden by default |
 
-Planning labels only. Not counselling rules and not guarantees. A Safe row can still miss if cutoffs shift.
+under 10% is hidden until you flip **Doesn't matter yaar → Show** in the filters (same thing as `include_all=true` in the url/api).
 
-Programs below 10% are hidden unless the request includes `include_all=true` (URL or API).
+## the closing rank column
 
-## Closing rank column
+**predicted closing rank** ($\hat{c}$) is our guess for where the seat closes this year. **chance** just compares your rank $r$ to that guess using $\sigma_{\mathrm{eff}}$.
 
-**Predicted closing rank** ($\hat{c}$) is the index forecast for where that seat might close this year, not last year's cutoff copied as-is. **Chance** compares entered rank $r$ to that forecast using $\sigma_{\mathrm{eff}}$.
+## sorting
 
-## Sorting after scoring
+default is **balanced**: institute quality $\times$ branch tier $\times$ chance. you can also sort by best chance, closing rank, or institute id. the sidebar filters (institute type, band) work on the client, so nothing re-runs the engine.
 
-Default sort is **Balanced**: institute quality heuristics $\times$ branch tier $\times$ chance. Other modes sort by best chance, closing rank, or institute id. Sidebar filters (institute type, band) apply on the client without re-running the engine.
+balanced formula: [balanced ranking](../nerd-stuff/balanced-ranking.md).
 
-Balanced formula: [Balanced ranking](../nerd-stuff/balanced-ranking.md).
+## data quality
 
-## Data quality
+every row carries a quality tag based on how many years of history backed it:
 
-Each row carries a quality tag from how many years of cutoff history backed the index entry:
-
-| Tag | Years | Trust |
+| tag | years | trust |
 | --- | --- | --- |
-| `sufficient` | 3+ | Steadier |
-| `inferred` | 2 | More uncertainty |
-| `pooled` | 1 | Widest sigma; treat as rough |
+| `sufficient` | 3+ | steadier |
+| `inferred` | 2 | more shaky |
+| `pooled` | 1 | widest sigma, treat as rough |
 
-Check the detail panel on a row for the tag and round chart before treating a number as solid.
+open the detail panel on a row for the tag and the round chart before you trust a number too much.
 
-**Back:** [Overview](overview.md) · [Getting started](../learn/getting-started.md)
+**back:** [getting started](../learn/getting-started.md)

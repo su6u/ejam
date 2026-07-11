@@ -50,7 +50,7 @@ function emptyDescription({
   }
 
   if (metadata && metadata.hidden_programs > 0) {
-    return `Nothing clears our 10% chance cutoff at this rank. ${formatInteger(metadata.hidden_programs)} long-shots are hidden. Try a better (lower) rank to see likely options.`;
+    return `Nothing clears our 10% chance cutoff at this rank. ${formatInteger(metadata.hidden_programs)} "doesn't matter yaar" picks are hidden. Try a better (lower) rank to see likely options.`;
   }
 
   if (metadata && metadata.total_matching_programs === 0) {
@@ -100,7 +100,7 @@ export function EmptyState({
               className={emptyStateActionClass}
               onClick={() => deferAfterPress(onShowLongShots)}
             >
-              Show long-shots
+              Show doesn't matter yaar
             </Button>
           </EmptyContent>
         ) : (

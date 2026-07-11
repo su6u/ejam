@@ -67,8 +67,8 @@ export function ResultsSearch({ value, onChange }: ResultsSearchProps) {
           focused && "bg-ring",
         )}
         style={{
-          maskImage: "url(/media/binoculars.svg)",
-          WebkitMaskImage: "url(/media/binoculars.svg)",
+          maskImage: "url(/icons/search.svg)",
+          WebkitMaskImage: "url(/icons/search.svg)",
           maskSize: "contain",
           WebkitMaskSize: "contain",
           maskRepeat: "no-repeat",

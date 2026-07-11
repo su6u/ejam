@@ -44,10 +44,10 @@ export {
   classifyBand,
   computeProbability,
   DEFAULT_PROBABILITY_DISPLAY_THRESHOLD,
+  DELULU_BAND_MIN_PROBABILITY,
   groupProgramsByBand,
   normalCDF,
   predictPrograms,
-  REACH_BAND_MIN_PROBABILITY,
   sortByChance,
   sortByClosingRank,
 } from "./engine";

@@ -24,25 +24,7 @@
 
 ## rant (#`^´)／
 
-Indian exam culture sucks. somehow we built an education system where exams matter more than actually learning. and ofcourse wherever fear exists, someone finds a way to sell it.
-
-Offline institutes. Online institutes. Schools. Nobody really cares about the *student.* everyone wants the billboard. ak aur factory. ak aur batch. ak aur advertisement.
-
-<br>
-
-> *"Education is not a race."*
-
-...or at least it shouldn't be. I genuinely never understood why we're so sexually obsessed with ranks. A rank is just supposed to be a by-product. Not the entire purpose of learning. But here we are. Nothing changes because everyone already knows this. We rant. We complain. *fhir dusra batch aja ta hai*
-
-<br>
-
-Anyway... I completely forgot why I even started writing this. oh yeah! Here's why this repository exists.
-
-**Pure. Frustration. That's it.**
-
-<br>
-
-Every tool for students online somehow manages to suck. Closed-source. Ads everywhere. "Buy this." "Buy that." Yeah buddy... I don't really want to buy those underwears. No, thank you.
+Every tool for students online somehow manages to suck. Closed-source. Ads everywhere. "Buy this." "Buy that." Yeah buddy... no thank you.
 
 And then comes the data collection. Like...
 
@@ -52,10 +34,7 @@ Papa mummy ka bhi DOB dedu? Time of birth bhi chahiye kya? Blood group? Aadhaar 
 
 <br>
 
-*oh my fucking god.* These websites are literally extracting everything because they know students **need** them. And somehow... nothing better exists.
-
-So... I built one at-least for myself and if it helps other too. Not something revolutionary. Not the biggest project ever. Just something I wish existed when I needed it. A collection of genuinely useful exam tools. No bullsh*t. Just tools.
-
+*oh my fucking god.* these sites squeeze students because they can. So tried to built what I wish existed.
 <br>
 
 **For students. From students.**
@@ -65,15 +44,15 @@ So... I built one at-least for myself and if it helps other too. Not something r
 ## tools (˶˃ ᵕ ˂˶) .ᐟ.ᐟ
 
 <p align="center">
-  <code>Engineering</code> / <code>Tools</code> / <code>College Predictor</code>
+  <code>ejam</code> / <code>tools</code> / <code>college predictor</code>
 </p>
 
 <br>
 
 <br>
 
-<p align="center">
-  <a href="apps/web/public/media/p-info1.png"><img src="apps/web/public/media/p-info.png" alt="predictor overview 1" width="85%"></a>
+<p align="left">
+  <a href="apps/web/public/media/p-info1.png"><img src="apps/web/public/media/p-info.png" alt="predictor overview 1" width="95%"></a>
 </p>
 
 <br>
@@ -86,47 +65,58 @@ A college predictor. It takes years of past JoSAA and CSAB closing ranks to esti
 
 ### how it works?
 
-ejam use DuckDB offline to crunch the heavy data so the live site doesn't lag. 
-all this happens when you use the college predector:
+two stages. first we chew through years of counselling data offline (duckdb, so the site stays fast). then when you type your rank, the live bit just reads that index and scores every seat.
 
 <br>
 
 <p align="center">
-  <span style="color:#0969da">[1]</span>&nbsp;&nbsp; $\large \hat{c} = (\bar{w} + \mathrm{clamp}(m, \pm 0.03\bar{w}) \cdot 0.7 g)(1+s)^{g}$
-  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-  <span style="color:#0969da">[2]</span>&nbsp;&nbsp; $\large \sigma = \max(\sigma_w, 0.025\bar{w})$
+  <a href="docs/college-predictor/nerd-stuff/index-algorithms.md#predicted-closing-rank"><img src="apps/web/public/tools/p/formulas/r-predicted-closing-rank.svg" alt="[1] predicted closing rank" width="55%" style="vertical-align:middle"></a>
+  &nbsp;&nbsp;
+  <a href="docs/college-predictor/nerd-stuff/index-algorithms.md#sigma-floor"><img src="apps/web/public/tools/p/formulas/r-sigma-floor.svg" alt="[2] sigma floor" width="40%" style="vertical-align:middle"></a>
 </p>
 
 <br>
 
-Instead of blindly throwing last year's ranks at you, the offline index analyzes years of historical data. We give recent years heavier weight, mathematically trim out crazy COVID spikes, and bake in a slight trend nudge to account for the ~3% rank inflation we see every year.
+ok so basically... we already did the heavy lifting offline. took years of josaa/csab cutoffs, weighted recent years higher, trimmed out the covid outliers, and accounted for ranks drifting ~3% every year like they always do.
 
-This generates two key metrics: [**[1]**](docs/college-predictor/nerd-stuff/index-algorithms.md#predicted-closing-rank) calculates our best guess for where the closing rank will actually land this year, while [**[2]**](docs/college-predictor/nerd-stuff/index-algorithms.md#sigma-floor) determines how confident we are in that guess. If the historical data is sketchy, the margin of error automatically goes up.
+[**[1]**](docs/college-predictor/nerd-stuff/index-algorithms.md#predicted-closing-rank) is just "where do we think it'll close this year". [**[2]**](docs/college-predictor/nerd-stuff/index-algorithms.md#sigma-floor) is "uhh how wrong could we be". if the old data looks weird we leave more space.
 
 <br>
 
 <p align="center">
-  <span style="color:#0969da">[3]</span>&nbsp;&nbsp; $\large P_i = \Phi\!\left(\frac{\hat{c}_i - r}{\sigma}\right)$
-  &nbsp;&nbsp;&nbsp;&nbsp;
-  <span style="color:#0969da">[4]</span>&nbsp;&nbsp; $\large P_{\mathrm{cum}} = 1 - \prod(1-P_j)$
-  &nbsp;&nbsp;&nbsp;&nbsp;
-  <span style="color:#0969da">[5]</span>&nbsp;&nbsp; $\large \mathrm{score} = \frac{I}{100}\cdot\frac{B}{100}\cdot P$
+  <a href="docs/college-predictor/nerd-stuff/prediction-engine.md#single-round-probability"><img src="apps/web/public/tools/p/formulas/r-single-round-probability.svg" alt="[3] single-round probability" width="30%"></a>
+  &nbsp;&nbsp;
+  <a href="docs/college-predictor/nerd-stuff/prediction-engine.md#round-by-round-cumulative-chance"><img src="apps/web/public/tools/p/formulas/r-cumulative-probability.svg" alt="[4] cumulative probability" width="30%"></a>
+  &nbsp;&nbsp;
+  <a href="docs/college-predictor/nerd-stuff/balanced-ranking.md#composite-formula"><img src="apps/web/public/tools/p/formulas/r-balanced-score.svg" alt="[5] balanced score" width="30%"></a>
 </p>
 
 <br>
 
-When you enter your rank, the live prediction engine immediately goes to work. First, [**[3]**](docs/college-predictor/nerd-stuff/prediction-engine.md#single-round-probability) calculates your exact probability of getting into a specific branch for a single round.
+now you enter your rank. [**[3]**](docs/college-predictor/nerd-stuff/prediction-engine.md#single-round-probability) is like... for one round, what's your chance. better rank = higher P.
 
-But counselling has 6 rounds. To account for this, [**[4]**](docs/college-predictor/nerd-stuff/prediction-engine.md#round-by-round-cumulative-chance) stacks those probabilities, meaning a miss in Round 1 doesn't mean it's game over if you can slip in by Round 6.
+but counselling has ~6 rounds. so [**[4]**](docs/college-predictor/nerd-stuff/prediction-engine.md#round-by-round-cumulative-chance) adds them up. didn't get it in round 1? maybe round 6 still works.
 
-Finally, getting a dead-end branch with 99% probability isn't actually helpful. To fix this, [**[5]**](docs/college-predictor/nerd-stuff/balanced-ranking.md#composite-formula) sorts your results using a composite score based on both *probability* and *institute quality*. This ensures a decent IIT at 60% chance rightly ranks higher than a bottom-tier college at 95%.
+and please don't flex 99% on a branch nobody wants. so [**[5]**](docs/college-predictor/nerd-stuff/balanced-ranking.md#composite-formula) looks at the college and the branch too. a good nit at 70% should beat some random place at 95%.
+
+<br>
+
+<p align="center">
+  <img src="apps/web/public/tools/p/graphs/past-cutoffs-to-prediction.svg" alt="past cutoffs to prediction" width="46%" style="vertical-align:middle">
+  &nbsp;&nbsp;
+  <img src="apps/web/public/tools/p/graphs/rank-to-chance.svg" alt="rank to chance" width="46%" style="vertical-align:middle">
+</p>
+
+<br>
+
+to summarize up, look at the graphs. left shows how past cutoffs turn into this year's **pred**, with the ±σ whisker for uncertainty. right shows your rank r on the chance curve pull across for P, and **Safe** / **Iffy** / **Delulu** are just labels for that number.
 
 <br>
 
 ### TL;DR
 
 ```mermaid
-%%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#0A0A0A', 'primaryTextColor': '#FFFFFF', 'primaryBorderColor': '#FFFFFF', 'lineColor': '#FFFFFF', 'nodeBorder': '#FFFFFF', 'mainBkg': '#0A0A0A', 'edgeLabelBackground': 'transparent', 'clusterBkg': 'transparent', 'clusterBorder': 'transparent'}}}%%
+%%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#0A0A0A', 'primaryTextColor': '#FFFFFF', 'primaryBorderColor': '#FFFFFF', 'lineColor': '#F45611', 'nodeBorder': '#FFFFFF', 'mainBkg': '#0A0A0A', 'edgeLabelBackground': 'transparent', 'clusterBkg': 'transparent', 'clusterBorder': 'transparent'}}}%%
 flowchart LR
     classDef data fill:#0A0A0A,stroke:#888,stroke-width:1px,stroke-dasharray: 4 4,color:#FFF,rx:5px,ry:5px;
     classDef engine fill:#1A1A1A,stroke:#FFF,stroke-width:1.5px,color:#FFF,rx:5px,ry:5px;
@@ -139,7 +129,7 @@ flowchart LR
     subgraph Live ["Live Predictor&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"]
         User[/Your Rank Input/]:::data -.-> Engine{Prediction Engine}:::engine
         Index ==> Engine
-        Engine -->|Calculate 6 Rounds| Out([Safe / Target / Reach]):::output
+        Engine -->|Calculate 6 Rounds| Out([Safe / Iffy / Delulu]):::output
     end
 ```
 

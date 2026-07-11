@@ -132,7 +132,7 @@ export function ResultsFilters({
     <fieldset className="min-w-0 border-0 p-0">
       <div className="mb-1.5 flex items-center justify-between">
         <legend className="inline-flex shrink-0 items-center gap-1 text-[10px] font-medium tracking-wide text-muted-foreground uppercase">
-          Long-shots
+          Doesn't matter yaar
         </legend>
       </div>
       <div className="sliding-toggle-track" data-gap="1">

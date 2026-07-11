@@ -23,7 +23,11 @@ const metadata = {
 
 describe("long-shot visibility helpers", () => {
   it("counts long-shot rows hidden by the client-side toggle", () => {
-    const programs = [row("long-shot"), row("reach"), row("long-shot")];
+    const programs = [
+      row("doesnt-matter"),
+      row("delulu"),
+      row("doesnt-matter"),
+    ];
 
     expect(countClientHiddenLongShots(programs, false)).toBe(2);
     expect(countClientHiddenLongShots(programs, true)).toBe(0);
@@ -31,12 +35,20 @@ describe("long-shot visibility helpers", () => {
 
   it("detects predictions where every returned row is hidden as a long-shot", () => {
     expect(
-      hasOnlyClientHiddenLongShots([row("long-shot"), row("long-shot")], false),
+      hasOnlyClientHiddenLongShots(
+        [row("doesnt-matter"), row("doesnt-matter")],
+        false,
+      ),
     ).toBe(true);
     expect(
-      hasOnlyClientHiddenLongShots([row("long-shot"), row("reach")], false),
+      hasOnlyClientHiddenLongShots(
+        [row("doesnt-matter"), row("delulu")],
+        false,
+      ),
     ).toBe(false);
-    expect(hasOnlyClientHiddenLongShots([row("long-shot")], true)).toBe(false);
+    expect(hasOnlyClientHiddenLongShots([row("doesnt-matter")], true)).toBe(
+      false,
+    );
   });
 
   it("preserves the show-long-shots CTA after always fetching all rows", () => {
