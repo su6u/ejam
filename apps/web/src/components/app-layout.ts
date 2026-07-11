@@ -54,6 +54,12 @@ export const appHeaderGutterClass =
 /** top inset below h-14 chrome — pairs sidebar exam grid with main card header */
 export const sidebarPanelTopInsetClass = "pt-[26px]";
 
+/**
+ * bottom inset so sidebar footer chrome lines up with the results card bottom.
+ * mirrors Dashboard `h-[calc(100dvh-7rem)]` + appShellContent `py-4 md:py-6`.
+ */
+export const sidebarCardBottomAlignClass = "mb-10 md:mb-8";
+
 /** title strip height — exam picker row and results card header (pt-4 + title + pb-4) */
 export const predictorHeaderStripClass = "min-h-[55px]";
 
