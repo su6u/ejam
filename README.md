@@ -49,17 +49,7 @@ Papa mummy ka bhi DOB dedu? Time of birth bhi chahiye kya? Blood group? Aadhaar 
 
 <br>
 
-<br>
-
-<p align="left">
-  <a href="apps/web/public/media/p-info1.png"><img src="apps/web/public/media/p-info.png" alt="predictor overview 1" width="95%"></a>
-</p>
-
-<br>
-
 A college predictor. It takes years of past JoSAA and CSAB closing ranks to estimate what you might actually get. Just a simple tool to save you some headache during counselling. (Will try to add more exams soon, but for now it's just JEE).
-
-<br>
 
 <br>
 
