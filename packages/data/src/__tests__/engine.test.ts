@@ -13,10 +13,10 @@ import {
   computeAverageRoundProbability,
   computeProbability,
   computeRoundProbs,
+  DELULU_BAND_MIN_PROBABILITY,
   normalCDF,
   type ProgramPrediction,
   predictPrograms,
-  DELULU_BAND_MIN_PROBABILITY,
   sortByChance,
   sortByClosingRank,
 } from "../college-predictor/engine";

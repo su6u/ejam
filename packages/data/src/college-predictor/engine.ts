@@ -40,7 +40,8 @@ export type ProbabilityBand = "safe" | "iffy" | "delulu" | "doesnt-matter";
 /** delulu band floor. below this is doesnt-matter; default display hides those */
 export const DELULU_BAND_MIN_PROBABILITY = 0.1;
 
-export const DEFAULT_PROBABILITY_DISPLAY_THRESHOLD = DELULU_BAND_MIN_PROBABILITY;
+export const DEFAULT_PROBABILITY_DISPLAY_THRESHOLD =
+  DELULU_BAND_MIN_PROBABILITY;
 
 export interface ProgramPrediction {
   institute_id: string;
