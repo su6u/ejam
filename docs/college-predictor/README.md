@@ -26,7 +26,6 @@ Give it a counselling rank plus category, gender, quota, and home state (for NIT
 
 | Page | Purpose |
 | --- | --- |
-| [Overview](how-it-works/overview.md) | Cutoffs → index → API → results |
 | [From rank to results](how-it-works/from-rank-to-results.md) | Chance, bands, closing rank, sorting |
 
 ## Nerd stuff

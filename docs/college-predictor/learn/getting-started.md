@@ -1,72 +1,51 @@
-# Getting started
-
-Open-source (AGPL) JEE counselling predictor. Feed it a rank and profile, get a table of likely college/branch options from historical JoSAA and CSAB cutoffs. Not official allotment.
-
-## JEE counselling in one minute
-
-| Body | When | Institutes |
+| body | when | institutes |
 | --- | --- | --- |
-| **JoSAA** | After JEE Main / Advanced results | IITs (Advanced rank), NITs, IIITs, GFTIs |
-| **CSAB** | After JoSAA rounds, for vacant seats | NIT+, IIIT, CFI; separate cutoffs from JoSAA |
+| **JoSAA** | after Main / Advanced | IITs (Advanced rank), NITs, IIITs, GFTIs |
+| **CSAB** | after JoSAA, vacant seats | NIT+, IIIT, CFI; separate cutoffs |
 
-JoSAA runs up to **six rounds** with freeze / float / slide. At NITs, **HS** (Home State) and **OS** (Other State) quotas depend on institute location vs domicile. Allotment uses **counselling rank** (a number), not percentile.
+JoSAA runs up to **six rounds**. at NITs, **HS** / **OS** depends on domicile vs institute state. allotment uses **counselling rank**, not percentile.
 
-The predictor compares that rank to historical closing ranks and labels each option with a chance band. Estimates only; cutoffs move every year.
-
-## Exam routing
+## exam routing
 
 ```mermaid
-flowchart TD
-    A[Open College Predictor] --> B{Choose exam}
-    B -->|JEE Main| C{Counselling body}
-    C -->|JoSAA| D[Non-IIT institutes via JoSAA predictor index]
-    C -->|CSAB| E[Supplementary counselling via CSAB predictor index]
-    B -->|JEE Advanced| F[IIT-only via JoSAA predictor index]
-    D --> G[Enter rank and profile]
-    E --> G
-    F --> H[Enter rank, category, gender]
-    G --> I[Click Predict colleges]
-    H --> I
-    I --> J[View and filter results]
+%%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#0A0A0A', 'primaryTextColor': '#FFFFFF', 'primaryBorderColor': '#FFFFFF', 'lineColor': '#F45611', 'nodeBorder': '#FFFFFF', 'mainBkg': '#0A0A0A', 'edgeLabelBackground': 'transparent', 'clusterBkg': 'transparent', 'clusterBorder': 'transparent'}}}%%
+flowchart LR
+    classDef step fill:#1A1A1A,stroke:#FFF,stroke-width:1.5px,color:#FFF,rx:5px,ry:5px;
+    classDef choice fill:#0A0A0A,stroke:#888,stroke-width:1px,stroke-dasharray: 4 4,color:#FFF,rx:5px,ry:5px;
+    classDef out fill:#0A0A0A,stroke:#FFF,stroke-width:2px,color:#FFF,rx:15px,ry:15px;
+
+    Open[Open tool]:::step --> Exam{Exam}:::choice
+    Exam -->|Main| Body{JoSAA / CSAB}:::choice
+    Exam -->|Advanced| IIT[IITs only]:::step
+    Body -->|JoSAA| NIT[NIT / IIIT / CFI]:::step
+    Body -->|CSAB| Vacant[Vacant seats]:::step
+    NIT --> Rank[Rank + profile]:::step
+    Vacant --> Rank
+    IIT --> Rank
+    Rank --> Predict[Predict]:::step
+    Predict --> Results([Filter / sort]):::out
 ```
 
-## Steps
+## steps
 
-1. **Open the tool**  
-   `/college-predictor` (home `/` redirects here when a share link has predictor params). Also on the tools grid.
+1. **open** `/college-predictor` (or the tools grid). share links with predictor params land here too.
+2. **pick exam**
+   - **JEE Main** → JoSAA (main rounds) or CSAB (vacant seats). NITs, IIITs, CFI.
+   - **JEE Advanced** → IITs only. quota / home-state fields stay hidden (All India).
+3. **rank + profile**
+   - **rank:** counselling integer (not percentile / marks). caps: **500,000** Main/CSAB, **50,000** Advanced. [why](../faqs/faqs.md#what-are-the-rank-limits)
+   - **category:** General, Gen-EWS, OBC-NCL, SC, ST
+   - **gender:** Neutral or Female
+   - Main also needs **quota** (OS / HS / AI), **counselling** (JoSAA / CSAB), and **home state** for OS/HS
+4. **predict.** click **Predict colleges**. inputs sync to the URL. complete URL on load auto-runs (`rank`, `exam`, `counselling`, `category`, `gender`, `quota`, `state`, `ews`, `include_all`).
+5. **filter / sort.** sidebar: institute type, band, long-shot toggle. table: Balanced, Best chance, Closing rank, Institute. click a row for round detail.
 
-2. **Pick an exam**
+## next
 
-   **JEE Main:** NITs, IIITs, CFI through **JoSAA** (main six-round process) or **CSAB** (supplementary vacant seats).
-
-   **JEE Advanced:** IITs only. Quota and home-state fields hidden; IIT JoSAA uses All India quota in this tool.
-
-3. **Enter rank and profile**
-
-   - **Rank:** counselling rank as a plain integer (not percentile, not marks). Caps: **500,000** for Main/CSAB, **50,000** for Advanced. [Why these limits](../faqs/faqs.md#what-are-the-rank-limits).
-   - **Category:** General, Gen-EWS, OBC-NCL, SC, or ST (maps to official seat types).
-   - **Gender:** Neutral or Female (includes supernumerary seats where data exists).
-
-   For JEE Main, also set:
-
-   - **Quota:** OS (default), HS, or AI
-   - **Counselling:** JoSAA or CSAB
-   - **Home state:** required for OS or HS (domicile state for seat-pool matching)
-
-4. **Run prediction**  
-   Click **Predict colleges**. Inputs sync to the URL for bookmarking/sharing.
-
-   Complete URL on load auto-runs. Params: `rank`, `exam`, `counselling`, `category`, `gender`, `quota`, `state`, `ews`, `include_all`.
-
-5. **Filter and sort**  
-   Sidebar: institute type, band. Table header: Balanced, Best chance, Closing rank, Institute. Row click for round-by-round detail.
-
-## Next steps
-
-| Guide | Description |
+| guide | what |
 | --- | --- |
-| [What you need to know](what-you-need-to-know.md) | Rank, category, quota rules, GFTI vs CFI. |
-| [How it works](../how-it-works/overview.md) | What happens under the hood. |
-| [From rank to results](../how-it-works/from-rank-to-results.md) | Bands, chance column, closing rank. |
+| [what you need to know](what-you-need-to-know.md) | rank, category, quota, GFTI vs CFI |
+| [how it works](../how-it-works/overview.md) | under the hood |
+| [from rank to results](../how-it-works/from-rank-to-results.md) | bands, chance, closing rank |
 
-> **Warning:** Rough estimate from historical cutoffs. Not a seat guarantee. Official JoSAA, CSAB, and NTA portals are the source of truth.
+

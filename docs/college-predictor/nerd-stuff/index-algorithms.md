@@ -1,46 +1,44 @@
-# Index algorithms
+# index algorithms
 
-The predictor index is built offline with DuckDB. Each builder reads cutoff parquets, aggregates years of history, and writes one parquet the live API loads.
+the predictor index is built offline with DuckDB. each builder reads cutoff parquets, aggregates years of history, and writes one parquet the live API loads.
 
-Two algorithms on purpose:
+two algorithms on purpose:
 
-- **`jam-josaa-v3`** for JoSAA cutoffs (JEE Main + JEE Advanced) — **production**
+- **`jam-josaa-v3`** for JoSAA cutoffs (JEE Main + JEE Advanced). **production**
 - **`jam-csab-v2`** for CSAB cutoffs (supplementary counselling)
 
-> **`jam-josaa-v2` is deprecated** (2026-06). Replaced by v3: +3%/yr pool shift and softer round weights. See [jam-josaa-v3](#jam-josaa-v3-josaa) and [Deprecated: jam-josaa-v2](#deprecated-jam-josaa-v2).
+> **`jam-josaa-v2` is deprecated** (2026-06). replaced by v3: +3%/yr pool shift and softer round weights. see [jam-josaa-v3](#jam-josaa-v3-josaa) and [deprecated: jam-josaa-v2](#deprecated-jam-josaa-v2).
 
-## Data flow
+## data flow
 
 ```mermaid
-flowchart TB
-    subgraph sources["Cutoff sources"]
-        direction LR
-        J[(JoSAA parquets)]
-        C[(CSAB parquets)]
+%%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#0A0A0A', 'primaryTextColor': '#FFFFFF', 'primaryBorderColor': '#FFFFFF', 'lineColor': '#F45611', 'nodeBorder': '#FFFFFF', 'mainBkg': '#0A0A0A', 'edgeLabelBackground': 'transparent', 'clusterBkg': 'transparent', 'clusterBorder': 'transparent'}}}%%
+flowchart LR
+    classDef data fill:#0A0A0A,stroke:#888,stroke-width:1px,stroke-dasharray: 4 4,color:#FFF,rx:5px,ry:5px;
+    classDef engine fill:#1A1A1A,stroke:#FFF,stroke-width:1.5px,color:#FFF,rx:5px,ry:5px;
+    classDef out fill:#0A0A0A,stroke:#FFF,stroke-width:2px,color:#FFF,rx:15px,ry:15px;
+
+    subgraph Sources [ Cutoffs ]
+        J[(JoSAA)]:::data
+        C[(CSAB)]:::data
     end
 
-    subgraph build["Offline build · DuckDB"]
-        direction TB
-        U[Union + dedupe]
-        W[Year weights + outlier guard]
-        R[Round means + fill_round]
-        P[predicted_closing_rank + sigma_effective]
+    subgraph Build [ Offline DuckDB ]
+        U[Union + dedupe]:::engine
+        W[Weights + outlier guard]:::engine
+        R[Round means + fill_round]:::engine
+        P[pred + sigma]:::engine
         U --> W --> R --> P
     end
 
-    subgraph tools["data/tools/college-predictor/"]
-        direction LR
-        I1[josaa/predictor-index.parquet]
-        I2[csab/predictor-index.parquet]
+    subgraph Index [ Index parquets ]
+        I1[josaa/…]:::data
+        I2[csab/…]:::data
     end
 
-    subgraph runtime["Live predictors"]
-        direction TB
-        F{Exam filter}
-        M[JEE Main · non-IIT]
-        A[JEE Advanced · IIT]
-        S[CSAB · NIT+]
-        OUT[API rows + bands]
+    subgraph Live [ Live ]
+        F{Exam filter}:::engine
+        Out([API rows + bands]):::out
     end
 
     J --> U
@@ -49,29 +47,26 @@ flowchart TB
     P --> I2
     I1 --> F
     I2 --> F
-    F --> M & A & S
-    M --> OUT
-    A --> OUT
-    S --> OUT
+    F --> Out
 ```
 
-## Shared preprocessing
+## shared preprocessing
 
-Both builders:
+both builders:
 
-1. Union all cutoff parquet files.
-2. Cap rounds above 6 into round 6.
-3. Rewrite raw `3IT` institute type to canonical `IIIT`.
-4. Deduplicate: keep the **max** closing rank per program, year, and round (worst closing rank wins ties).
-5. Year weights with a COVID-style **outlier guard**: if a year's closing rank is more than $2.5\,\sigma_{\mathrm{inter}}$ away from the median of other years in the window, that year's weight drops to $0.01$.
-6. Per-round weighted means for the round trajectory columns.
+1. union all cutoff parquet files.
+2. cap rounds above 6 into round 6.
+3. rewrite raw `3IT` institute type to canonical `IIIT`.
+4. dedupe: keep the **max** closing rank per program, year, and round (worst closing rank wins ties).
+5. year weights with a COVID-style **outlier guard**: if a year's closing rank is more than `2.5 * sigma_inter` away from the median of other years in the window, that year's weight drops to `0.01`.
+6. per-round weighted means for the round trajectory columns.
 7. `fill_round` as a weighted average of each year's last round with data.
-8. $\sigma_{\mathrm{base}} = \max(\sigma_w,\; p_{\mathrm{floor}} \cdot \bar{w})$.
-9. Inflate $\sigma_{\mathrm{eff}} \leftarrow 1.5\,\sigma_{\mathrm{base}}$ when years of data is below 3.
+8. sigma floor (see below).
+9. inflate `sigma_eff ← 1.5 * sigma_base` when years of data is below 3.
 
-Data quality labels:
+data quality labels:
 
-| Years of history | Label |
+| years of history | label |
 | --- | --- |
 | 1 | `pooled` |
 | 2 | `inferred` |
@@ -79,67 +74,69 @@ Data quality labels:
 
 ## jam-josaa-v3 (JoSAA)
 
-**Source:** `data/datasets/engineering/jee/josaa/cutoffs/`
+**source:** `data/datasets/engineering/jee/josaa/cutoffs/`
 
-**Output:** `data/tools/college-predictor/josaa/predictor-index.parquet`
+**output:** `data/tools/college-predictor/josaa/predictor-index.parquet`
 
-Shipped 2026-06 after sandbox sweeps (817 configs, walk-forward on 2023–2025). Config: `packages/data-cli/src/jam/config.ts`.
+### anchor closing rank per year
 
-### Anchor closing rank per year
+before year-level stats, each year gets one anchor closing rank. rounds inside that year are combined with fixed weights (later rounds dominate more than v2):
 
-Before year-level stats, each year gets one anchor closing rank. Rounds inside that year are combined with fixed weights (later rounds dominate more than v2):
-
-| Round | Weight $w_r$ |
+| round | weight |
 | --- | --- |
-| 1 | $0.01$ |
-| 2 | $0.02$ |
-| 3 | $0.05$ |
-| 4 | $0.10$ |
-| 5 | $0.22$ |
-| 6 | $0.60$ |
+| 1 | 0.01 |
+| 2 | 0.02 |
+| 3 | 0.05 |
+| 4 | 0.10 |
+| 5 | 0.22 |
+| 6 | 0.60 |
 
-Later rounds count more because that's where seats actually settled. v3 shifts weight toward the final round (R6) compared to v2.
+later rounds count more because that's where seats actually settled. v3 shifts weight toward the final round (R6) compared to v2.
 
-### Year weights (4-year window)
+### year weights (4-year window)
 
-Most recent year first:
+most recent year first:
 
-| Recency (`yr`) | Year weight |
+| recency (`yr`) | year weight |
 | --- | --- |
-| 1 (latest) | $0.50$ |
-| 2 | $0.30$ |
-| 3 | $0.15$ |
-| 4 | $0.05$ |
+| 1 (latest) | 0.50 |
+| 2 | 0.30 |
+| 3 | 0.15 |
+| 4 | 0.05 |
 
-### Weighted statistics
+<p align="center">
+  <img src="../../../apps/web/public/tools/p/formulas/recency-weighted-mean.svg" alt="recency-weighted mean" width="50%">
+</p>
 
-From the anchor series:
+### weighted statistics
+
+from the anchor series:
 
 - **`weighted_mean`**: weighted average closing rank
 - **`weighted_std`**: weighted standard deviation
 - **`trend_slope`**: weighted linear regression slope (rank change per year)
 
-### Predicted closing rank
+### predicted closing rank
 
-Let $g = \mathrm{prediction\_year} - \mathrm{last\_data\_year}$.
+let `g = prediction_year - last_data_year`.
 
-Trend is capped to $\pm 3\%$ of $\bar{w}$ per year, then scaled by $0.7$ before applying the gap:
+trend is capped to ±3% of `weighted_mean` per year, then scaled by `0.7` before applying the gap:
 
-$$
-\delta = \mathrm{clamp}(m,\; \pm 0.03\bar{w}) \cdot 0.7 \cdot g
-$$
+<p align="center">
+  <img src="../../../apps/web/public/tools/p/formulas/trend-delta.svg" alt="trend delta" width="55%">
+</p>
 
-$$
-\hat{c} = \left(\bar{w} + \delta\right) \cdot (1 + s)^{g}
-$$
+<p align="center">
+  <img src="../../../apps/web/public/tools/p/formulas/predicted-closing-rank.svg" alt="predicted closing rank" width="70%">
+</p>
 
-$m$ = `trend_slope`, $\bar{w}$ = `weighted_mean`, $s$ = pool shift.
+`m` = `trend_slope`, `w_bar` = `weighted_mean`, `s` = pool shift.
 
-**Pool shift** models rank inflation as more candidates appear. Production default **+3% per year** (`JAM_POOL_SHIFT_PCT` in `config.ts`, mirrored in `nta-pool-stats.json`). Literal year-on-year unique appeared growth (~4.3% for 2025→2026) was backtested but not used as-is; it may overshoot. Override: `EJAM_POOL_SHIFT_PCT`.
+**pool shift** models rank inflation as more candidates appear. production default **+3% per year** (`JAM_POOL_SHIFT_PCT` in `config.ts`, mirrored in `nta-pool-stats.json`). literal year-on-year unique appeared growth (~4.3% for 2025→2026) was backtested but not used as-is; it may overshoot. override: `EJAM_POOL_SHIFT_PCT`.
 
-**Prediction year** defaults to calendar year. Override: `EJAM_PREDICTION_YEAR`.
+**prediction year** defaults to calendar year. override: `EJAM_PREDICTION_YEAR`.
 
-Same formula in SQL:
+same formula in SQL:
 
 ```sql
 ROUND(
@@ -148,80 +145,78 @@ ROUND(
 )
 ```
 
-### Sigma floor
+### sigma floor
 
-$$
-\sigma_{\mathrm{base}} = \max(\sigma_w,\; 0.025\,\bar{w})
-$$
+<p align="center">
+  <img src="../../../apps/web/public/tools/p/formulas/sigma-floor.svg" alt="sigma floor" width="50%">
+</p>
 
-Uncertainty scales with how high the typical cutoff rank is, instead of a flat $\pm 50$ for everyone.
+uncertainty scales with how high the typical cutoff rank is, instead of a flat ±50 for everyone.
 
-### Walk-forward backtest (sandbox, 2023–2025 avg)
+### walk-forward backtest (2023–2025 avg)
 
-| Config | Avg ±20% | Worst year ±20% |
+| config | avg ±20% | worst year ±20% |
 | --- | --- | --- |
 | **v3 (wf-rw-soft-p30)** | **72.3%** | **69.9%** |
 | v2 baseline | 70.8% | 69.8% |
 
 2025 holdout alone: v3 reaches ~73.9% ±20% vs v2 ~72.8%.
 
-## Deprecated: jam-josaa-v2
+## deprecated: jam-josaa-v2
 
-> **Do not use for new index builds.** Retained in code as `JAM_JOSAA_V2` / `JAM_V2_*` constants for historical comparison and sandbox baselines only.
+> **do not use for new index builds.** retained in code as `JAM_JOSAA_V2` / `JAM_V2_*` constants for historical comparison only.
 
-| Change v2 → v3 | v2 (deprecated) | v3 (production) |
+| change v2 → v3 | v2 (deprecated) | v3 (production) |
 | --- | --- | --- |
-| Pool shift | +1%/yr | **+3%/yr** |
-| Round weights (R1…R6) | 5%, 8%, 12%, 15%, 22%, 38% | **1%, 2%, 5%, 10%, 22%, 60%** |
-| All other hyperparams | unchanged | unchanged |
+| pool shift | +1%/yr | **+3%/yr** |
+| round weights (R1…R6) | 5%, 8%, 12%, 15%, 22%, 38% | **1%, 2%, 5%, 10%, 22%, 60%** |
+| all other hyperparams | unchanged | unchanged |
 
 v2 anchor weights for reference:
 
-| Round | Weight $w_r$ |
+| round | weight |
 | --- | --- |
-| 1 | $0.05$ |
-| 2 | $0.08$ |
-| 3 | $0.12$ |
-| 4 | $0.15$ |
-| 5 | $0.22$ |
-| 6 | $0.38$ |
+| 1 | 0.05 |
+| 2 | 0.08 |
+| 3 | 0.12 |
+| 4 | 0.15 |
+| 5 | 0.22 |
+| 6 | 0.38 |
 
 v2 pool shift default was +1%/yr from `nta-pool-stats.json`.
 
 ## jam-csab-v2 (CSAB)
 
-**Source:** `data/datasets/engineering/jee/csab/cutoffs/`
+**source:** `data/datasets/engineering/jee/csab/cutoffs/`
 
-**Output:** `data/tools/college-predictor/csab/predictor-index.parquet`
+**output:** `data/tools/college-predictor/csab/predictor-index.parquet`
 
 CSAB cutoffs are worse (numerically higher rank) than JoSAA late rounds because strong candidates already took JoSAA seats. CSAB stays in a separate index, not blended into JoSAA.
 
-### Differences from JoSAA
+### differences from JoSAA
 
-| Aspect | JoSAA | CSAB |
+| aspect | JoSAA | CSAB |
 | --- | --- | --- |
-| Year window | 4 years | 2 years |
-| Year weights | $0.50, 0.30, 0.15, 0.05$ | $0.70, 0.30$ |
-| Anchor series | Round-weighted blend | Last round of each year |
-| Pool shift | Yes (+3%/yr default) | No |
-| Default `fill_round` | Weighted from history | 2 |
-| Predicted rank | Single formula | 50/50 ensemble of two profiles |
+| year window | 4 years | 2 years |
+| year weights | 0.50, 0.30, 0.15, 0.05 | 0.70, 0.30 |
+| anchor series | round-weighted blend | last round of each year |
+| pool shift | yes (+3%/yr default) | no |
+| default `fill_round` | weighted from history | 2 |
+| predicted rank | single formula | 50/50 ensemble of two profiles |
 
-### Blended mean (per profile)
+### blended mean (per profile)
 
-Each profile mixes weighted mean and median:
+each profile mixes weighted mean and median:
 
 $$
 \bar{w}_{\mathrm{blend}} = (1 - \beta)\,\bar{w} + \beta\,\tilde{w}
 $$
 
-$\beta$ = `median_blend`, $\tilde{w}$ = median mean.
+$\beta$ = `median_blend`, $\tilde{w}$ = median. `median_blend` varies by institute type (`NIT`, `IIIT`, `CFI`). CFI gets a higher blend because CSAB CFI cutoffs are noisier.
 
-`median_blend` varies by institute type (`NIT`, `IIIT`, `CFI`). CFI gets a higher blend because CSAB CFI cutoffs are noisier.
+### production ensemble
 
-### Production ensemble
-
-Two profiles averaged 50/50:
+two profiles averaged 50/50:
 
 1. **best-split** (default blends per instype)
 2. **cap-cfi10** (tighter trend caps, especially for CFI at 10%)
@@ -230,26 +225,24 @@ $$
 \hat{c} = \mathrm{round}\!\left(\frac{\hat{c}_a + \hat{c}_b}{2}\right)
 $$
 
-Trend cap default $\pm 6\%$ of $\bar{w}$ per year (instype-specific overrides in the cap profile). Trend gap multiplier $1.0$ (full gap, unlike JoSAA's $0.7$).
+trend cap default ±6% of `w_bar` per year (instype-specific overrides in the cap profile). trend gap multiplier `1.0` (full gap, unlike JoSAA's `0.7`).
 
-$$
-\sigma_{\mathrm{base}} = \max(\sigma_w,\; 0.03\,\bar{w})
-$$
+sigma floor for CSAB uses `0.03 * w_bar` instead of JoSAA's `0.025`.
 
-## After the index loads
+## after the index loads
 
-Exam-specific predictors filter and enrich rows:
+exam-specific predictors filter and enrich rows:
 
 ### JEE Main
 
-Drop IIT rows. Attach state and program names from `institutes.json` / `programs.json`. Filter by quota: HS (home state matches institute), OS (different state), AI (all), or special quotas (Goa, J&K, Ladakh, Andhra Pradesh) when passed via API.
+drop IIT rows. attach state and program names from `institutes.json` / `programs.json`. filter by quota: HS (home state matches institute), OS (different state), AI (all), or special quotas (Goa, J&K, Ladakh, Andhra Pradesh) when passed via API.
 
-Seat type `Gen-EWS` from the category dropdown maps to index label `EWS`. Optional `has_ews_certificate` (URL param `ews=true`) runs a second prediction pass on EWS seat rows for side-by-side OPEN vs EWS comparison.
+seat type `Gen-EWS` from the category dropdown maps to index label `EWS`. optional `has_ews_certificate` (URL param `ews=true`) runs a second prediction pass on EWS seat rows for side-by-side OPEN vs EWS comparison.
 
 ### JEE Advanced
 
-Keep IIT rows only. Quota fixed to AI.
+keep IIT rows only. quota fixed to AI.
 
 ### CSAB
 
-Load CSAB index only. Same quota rules as JEE Main.
+load CSAB index only. same quota rules as JEE Main.

@@ -66,25 +66,25 @@ The predictor matches rank against historical closing ranks in the index. JoSAA/
 </details>
 
 <details>
-<summary>What do Safe, Target, Reach, and Long-shot mean?</summary>
+<summary>What do Safe, Iffy, Delulu, and Doesn't matter yaar mean?</summary>
 
 Fixed chance bands for scanning the table:
 
 | Band | Threshold | Rough read |
 | --- | --- | --- |
-| **Safe** | $P \geq 0.85$ | Strong historical margin at this rank |
-| **Target** | $0.40 \leq P < 0.85$ | Competitive, plausible |
-| **Reach** | $0.10 \leq P < 0.40$ | Tight; possible but uncomfortable |
-| **Long-shot** | $P < 0.10$ | Hidden from default results |
+| **Safe** | $P \geq 0.85$ | High chance at this rank |
+| **Iffy** | $0.40 \leq P < 0.85$ | Possible, but not locked |
+| **Delulu** | $0.10 \leq P < 0.40$ | Low chance, long shot |
+| **Doesn't matter yaar** | $P < 0.10$ | Very low chance, hidden by default |
 
-Labels only. Not counselling rules and not guarantees. Math and round bars: [From rank to results](../how-it-works/from-rank-to-results.md).
+Math and round bars: [From rank to results](../how-it-works/from-rank-to-results.md).
 
 </details>
 
 <details>
-<summary>Why are Long-shots hidden by default?</summary>
+<summary>Why are "Doesn't matter yaar" picks hidden by default?</summary>
 
-Below 10% chance they mostly clutter the list. Add `include_all=true` to the URL (or API) to show them.
+Below 10% they mostly clutter the list. Flip **Doesn't matter yaar → Show** in the filters (or pass `include_all=true` in the URL / API).
 
 </details>
 
