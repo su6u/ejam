@@ -35,12 +35,12 @@ export interface CollegePredictorIndexRow {
   fill_round: number;
 }
 
-export type ProbabilityBand = "safe" | "target" | "reach" | "long-shot";
+export type ProbabilityBand = "safe" | "iffy" | "delulu" | "doesnt-matter";
 
-/** reach band floor — long-shots are below this; default display hides long-shots */
-export const REACH_BAND_MIN_PROBABILITY = 0.1;
+/** delulu band floor. below this is doesnt-matter; default display hides those */
+export const DELULU_BAND_MIN_PROBABILITY = 0.1;
 
-export const DEFAULT_PROBABILITY_DISPLAY_THRESHOLD = REACH_BAND_MIN_PROBABILITY;
+export const DEFAULT_PROBABILITY_DISPLAY_THRESHOLD = DELULU_BAND_MIN_PROBABILITY;
 
 export interface ProgramPrediction {
   institute_id: string;
@@ -126,9 +126,9 @@ export function computeProbability(
 
 export function classifyBand(probability: number): ProbabilityBand {
   if (probability >= 0.85) return "safe";
-  if (probability >= 0.4) return "target";
-  if (probability >= REACH_BAND_MIN_PROBABILITY) return "reach";
-  return "long-shot";
+  if (probability >= 0.4) return "iffy";
+  if (probability >= DELULU_BAND_MIN_PROBABILITY) return "delulu";
+  return "doesnt-matter";
 }
 
 export interface CollegePredictorFilters {
@@ -140,9 +140,9 @@ export interface CollegePredictorFilters {
 
 const BAND_ORDER: Record<ProbabilityBand, number> = {
   safe: 0,
-  target: 1,
-  reach: 2,
-  "long-shot": 3,
+  iffy: 1,
+  delulu: 2,
+  "doesnt-matter": 3,
 };
 
 const BRANCH_ALIASES: Record<string, string[]> = {
@@ -206,9 +206,11 @@ export function groupProgramsByBand(
 ): Record<ProbabilityBand, ProgramPrediction[]> {
   return {
     safe: programs.filter((program) => program.band === "safe"),
-    target: programs.filter((program) => program.band === "target"),
-    reach: programs.filter((program) => program.band === "reach"),
-    "long-shot": programs.filter((program) => program.band === "long-shot"),
+    iffy: programs.filter((program) => program.band === "iffy"),
+    delulu: programs.filter((program) => program.band === "delulu"),
+    "doesnt-matter": programs.filter(
+      (program) => program.band === "doesnt-matter",
+    ),
   };
 }
 

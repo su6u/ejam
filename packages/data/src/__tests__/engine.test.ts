@@ -16,7 +16,7 @@ import {
   normalCDF,
   type ProgramPrediction,
   predictPrograms,
-  REACH_BAND_MIN_PROBABILITY,
+  DELULU_BAND_MIN_PROBABILITY,
   sortByChance,
   sortByClosingRank,
 } from "../college-predictor/engine";
@@ -100,19 +100,19 @@ describe("classifyBand", () => {
     expect(classifyBand(1.0)).toBe("safe");
   });
 
-  it("classifies 0.40–0.84 as target", () => {
-    expect(classifyBand(0.4)).toBe("target");
-    expect(classifyBand(0.84)).toBe("target");
+  it("classifies 0.40–0.84 as iffy", () => {
+    expect(classifyBand(0.4)).toBe("iffy");
+    expect(classifyBand(0.84)).toBe("iffy");
   });
 
-  it("classifies 0.10–0.39 as reach", () => {
-    expect(classifyBand(0.1)).toBe("reach");
-    expect(classifyBand(0.39)).toBe("reach");
+  it("classifies 0.10–0.39 as delulu", () => {
+    expect(classifyBand(0.1)).toBe("delulu");
+    expect(classifyBand(0.39)).toBe("delulu");
   });
 
-  it("classifies < 0.10 as long-shot", () => {
-    expect(classifyBand(0.09)).toBe("long-shot");
-    expect(classifyBand(0)).toBe("long-shot");
+  it("classifies < 0.10 as doesnt-matter", () => {
+    expect(classifyBand(0.09)).toBe("doesnt-matter");
+    expect(classifyBand(0)).toBe("doesnt-matter");
   });
 });
 
@@ -234,7 +234,7 @@ function makePrediction(
     predicted_closing_rank: 2000,
     sigma_effective: 200,
     cumulative_probability: 0.5,
-    band: "target",
+    band: "iffy",
     data_quality: "sufficient",
     years_of_data: 4,
     last_data_year: 2024,
@@ -250,13 +250,13 @@ describe("sortByChance", () => {
       makePrediction({
         institute_id: "nit-a",
         cumulative_probability: 0.45,
-        band: "target",
+        band: "iffy",
         predicted_closing_rank: 1000,
       }),
       makePrediction({
         institute_id: "nit-b",
         cumulative_probability: 0.8,
-        band: "target",
+        band: "iffy",
         predicted_closing_rank: 9000,
       }),
     ]);
@@ -269,7 +269,7 @@ describe("sortByChance", () => {
       makePrediction({
         institute_id: "reach",
         cumulative_probability: 0.15,
-        band: "reach",
+        band: "delulu",
       }),
       makePrediction({
         institute_id: "safe",
@@ -333,7 +333,7 @@ describe("sortByClosingRank", () => {
       }),
       makePrediction({
         institute_id: "reach-close",
-        band: "reach",
+        band: "delulu",
         cumulative_probability: 0.15,
         predicted_closing_rank: 500,
       }),
@@ -404,7 +404,7 @@ function makeIndexRows(): CollegePredictorIndexRow[] {
 }
 
 describe("predictPrograms", () => {
-  it("returns programs sorted safe → target → reach → long-shot", () => {
+  it("returns programs sorted safe → iffy → delulu → doesnt-matter", () => {
     const result = predictPrograms({
       indexRows: makeIndexRows(),
       studentRank: 2500,
@@ -413,7 +413,7 @@ describe("predictPrograms", () => {
       includeAll: true,
     });
     const bands = result.programs.map((p) => p.band);
-    const bandOrder = { safe: 0, target: 1, reach: 2, "long-shot": 3 };
+    const bandOrder = { safe: 0, iffy: 1, delulu: 2, "doesnt-matter": 3 };
     for (let i = 0; i < bands.length - 1; i++) {
       const current = bands[i];
       const next = bands[i + 1];
@@ -424,19 +424,19 @@ describe("predictPrograms", () => {
     }
   });
 
-  it("hides long-shot programs below reach band by default", () => {
+  it("hides doesnt-matter programs below delulu band by default", () => {
     const result = predictPrograms({
       indexRows: makeIndexRows(),
       studentRank: 50000,
       seatType: "OPEN",
       gender: "Gender-Neutral",
     });
-    expect(result.metadata.threshold_used).toBe(REACH_BAND_MIN_PROBABILITY);
+    expect(result.metadata.threshold_used).toBe(DELULU_BAND_MIN_PROBABILITY);
     for (const p of result.programs) {
       expect(p.cumulative_probability).toBeGreaterThanOrEqual(
-        REACH_BAND_MIN_PROBABILITY,
+        DELULU_BAND_MIN_PROBABILITY,
       );
-      expect(p.band).not.toBe("long-shot");
+      expect(p.band).not.toBe("doesnt-matter");
     }
   });
 
@@ -498,9 +498,9 @@ describe("predictPrograms", () => {
     });
     const fromGroups = [
       ...result.grouped_by_band.safe,
-      ...result.grouped_by_band.target,
-      ...result.grouped_by_band.reach,
-      ...result.grouped_by_band["long-shot"],
+      ...result.grouped_by_band.iffy,
+      ...result.grouped_by_band.delulu,
+      ...result.grouped_by_band["doesnt-matter"],
     ];
     expect(fromGroups.length).toBe(result.programs.length);
   });

@@ -2,12 +2,23 @@ import type { ProgramPrediction } from "@ejam/data/college-predictor";
 import { genderShort } from "@/components/predictor/results-row-format";
 import { BAND_STYLES } from "@/lib/bands";
 
-// aliases so users can type "longshot", "long shot", "long" and still match
+// aliases so users can type old or slang band names and still match
 const BAND_ALIASES: Record<string, string[]> = {
   safe: ["safe"],
-  target: ["target"],
-  reach: ["reach"],
-  "long-shot": ["long-shot", "longshot", "long shot", "long"],
+  iffy: ["iffy", "target"],
+  delulu: ["delulu", "reach"],
+  "doesnt-matter": [
+    "doesnt-matter",
+    "doesn't matter yaar",
+    "doesnt matter yaar",
+    "doesn't matter",
+    "doesnt matter",
+    "long-shot",
+    "longshot",
+    "long shot",
+    "long",
+    "yaar",
+  ],
 };
 
 // Smart aliases for Indian engineering branches

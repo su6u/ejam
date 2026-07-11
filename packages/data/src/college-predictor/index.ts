@@ -47,7 +47,7 @@ export {
   groupProgramsByBand,
   normalCDF,
   predictPrograms,
-  REACH_BAND_MIN_PROBABILITY,
+  DELULU_BAND_MIN_PROBABILITY,
   sortByChance,
   sortByClosingRank,
 } from "./engine";

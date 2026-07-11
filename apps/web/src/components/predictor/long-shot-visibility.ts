@@ -11,7 +11,7 @@ export function countClientHiddenLongShots(
 ): number {
   if (includeAll) return 0;
   return programs.reduce(
-    (count, program) => count + (program.band === "long-shot" ? 1 : 0),
+    (count, program) => count + (program.band === "doesnt-matter" ? 1 : 0),
     0,
   );
 }

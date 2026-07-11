@@ -52,7 +52,7 @@ const CsabInput = z
         state: z.array(z.string()).optional(),
         branch_name: z.union([z.string(), z.array(z.string())]).optional(),
         band: z
-          .array(z.enum(["safe", "target", "reach", "long-shot"]))
+          .array(z.enum(["safe", "iffy", "delulu", "doesnt-matter"]))
           .optional(),
       })
       .optional(),

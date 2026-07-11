@@ -19,7 +19,7 @@ export function applyResultsFilters(
   includeAll: boolean = true,
 ): ProgramPrediction[] {
   return programs.filter((program) => {
-    if (!includeAll && program.band === "long-shot") {
+    if (!includeAll && program.band === "doesnt-matter") {
       return false;
     }
     if (
