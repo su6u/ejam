@@ -33,16 +33,56 @@ const instrumentSans = Instrument_Sans({
   variable: "--font-instrument-sans",
 });
 
+const siteUrl = "https://ejam.in";
+const siteDescription = "Open-source tools for students around Indian exams";
+const ogImage = {
+  url: "/media/og.png",
+  width: 1200,
+  height: 600,
+  alt: "ejam",
+};
+
 export const metadata: Metadata = {
-  title: "ejam",
-  description: "Open-source tools for students around Indian exams",
+  metadataBase: new URL(siteUrl),
+  title: {
+    default: "ejam",
+    template: "%s · ejam",
+  },
+  description: siteDescription,
+  applicationName: "ejam",
+  manifest: "/identity/site.webmanifest",
   icons: {
     icon: [
-      { url: "/identity/favicon.ico", sizes: "any" },
-      { url: "/identity/icon.svg", type: "image/svg+xml" },
-      { url: "/identity/icon.png", type: "image/png", sizes: "32x32" },
+      { url: "/identity/favicon.ico", sizes: "48x48" },
+      { url: "/identity/favicon.svg", type: "image/svg+xml" },
+      {
+        url: "/identity/favicon-96x96.png",
+        type: "image/png",
+        sizes: "96x96",
+      },
     ],
-    apple: "/identity/apple-icon.png",
+    apple: [
+      {
+        url: "/identity/apple-touch-icon.png",
+        sizes: "180x180",
+        type: "image/png",
+      },
+    ],
+  },
+  openGraph: {
+    type: "website",
+    locale: "en_IN",
+    url: siteUrl,
+    siteName: "ejam",
+    title: "ejam",
+    description: siteDescription,
+    images: [ogImage],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "ejam",
+    description: siteDescription,
+    images: [ogImage.url],
   },
 };
 

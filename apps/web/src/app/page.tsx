@@ -15,8 +15,13 @@ import { pressableClass } from "@/lib/pressable";
 import { cn } from "@/lib/utils";
 
 export const metadata: Metadata = {
-  title: "ejam",
+  title: {
+    absolute: "ejam",
+  },
   description: "Open-source tools for students around Indian exams",
+  alternates: {
+    canonical: "/",
+  },
 };
 
 export default function HomePage() {
