@@ -1,5 +1,5 @@
-import type { ProgramPrediction } from "@ejam/data/college-predictor";
+import type { PredictorDisplayProgram } from "@/lib/predictor-adapters";
 
-export function programKey(p: ProgramPrediction): string {
-  return `${p.institute_id}::${p.program_id}::${p.seat_type}::${p.quota}::${p.gender}`;
+export function programKey(p: PredictorDisplayProgram): string {
+  return p.key;
 }

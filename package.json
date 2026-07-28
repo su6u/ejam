@@ -21,6 +21,10 @@
     "publish:data-release": "pnpm --filter @ejam/data-cli publish-data-release",
     "build:predictor-index": "pnpm --filter @ejam/data-cli build-predictor-index",
     "build:csab-index": "pnpm --filter @ejam/data-cli build-csab-index",
+    "mht-cet:snapshot": "pnpm --filter @ejam/data-cli mht-cet:snapshot",
+    "mht-cet:build-index": "pnpm --filter @ejam/data-cli mht-cet:build-index",
+    "mht-cet:normalize": "pnpm --filter @ejam/data-cli mht-cet:normalize",
+    "mht-cet:validate-seat-matrix": "pnpm --filter @ejam/data-cli mht-cet:validate-seat-matrix",
     "verify:index-lineage": "pnpm --filter @ejam/data-cli verify-index-lineage"
   },
   "devDependencies": {

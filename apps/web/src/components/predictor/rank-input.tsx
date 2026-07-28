@@ -27,6 +27,8 @@ interface RankInputProps {
   onValueChange: (value: string) => void;
   className?: string;
   id?: string;
+  "aria-label"?: string;
+  emptyErrorMessage?: string;
   ref?: Ref<RankInputHandle>;
 }
 
@@ -36,6 +38,8 @@ export function RankInput({
   onValueChange,
   className,
   id,
+  "aria-label": ariaLabel,
+  emptyErrorMessage,
   ref,
 }: RankInputProps) {
   const [draft, setDraft] = useState("");
@@ -118,6 +122,7 @@ export function RankInput({
         maxLength={MAX_RANK_LENGTH}
         required
         aria-required
+        aria-label={ariaLabel}
         data-transparent-input=""
         className={cn(
           "t-input w-full rounded-none tabular-nums transition-colors duration-200 ease-out",
@@ -127,7 +132,10 @@ export function RankInput({
         )}
       />
       <p className="t-error-msg text-[10px] leading-snug text-destructive">
-        <RankInputErrorMessage error={validationError} />
+        <RankInputErrorMessage
+          error={validationError}
+          emptyMessage={emptyErrorMessage}
+        />
       </p>
     </div>
   );

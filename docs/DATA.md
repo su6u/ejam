@@ -99,6 +99,12 @@ Parquet files stay on disk for your build but are gitignored. The catalog checks
    pnpm generate:manifest --version=v0.2.0
    ```
 
+   Manifest generation inherits the latest catalog by default, so a partial
+   local dataset checkout cannot silently remove previously published paths.
+   Use `--base-version=vX.Y.Z` to select a different base. Use `--replace`
+   only for an intentional full replacement; it cannot be combined with
+   `--base-version`.
+
 6. **Verify locally**:
 
    ```bash

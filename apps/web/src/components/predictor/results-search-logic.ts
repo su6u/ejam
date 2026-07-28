@@ -1,6 +1,5 @@
-import type { ProgramPrediction } from "@ejam/data/college-predictor";
-import { genderShort } from "@/components/predictor/results-row-format";
 import { BAND_STYLES } from "@/lib/bands";
+import type { PredictorDisplayProgram } from "@/lib/predictor-adapters";
 
 // aliases so users can type old or slang band names and still match
 const BAND_ALIASES: Record<string, string[]> = {
@@ -50,19 +49,22 @@ function bandMatchesToken(band: string, token: string): boolean {
 }
 
 /** build a compact searchable string per row — cached by callers */
-function buildSearchText(row: ProgramPrediction): string {
+function buildSearchText(row: PredictorDisplayProgram): string {
   let text = [
-    row.institute_id,
-    row.program_name ?? "",
-    row.program_id,
-    row.degree,
-    row.instype,
-    row.seat_type,
-    row.quota.toUpperCase(),
-    genderShort(row.gender),
-    String(row.predicted_closing_rank),
-    `${row.duration_years}yr`,
-    `${row.duration_years} year`,
+    row.instituteName,
+    row.instituteCode ?? "",
+    row.programName,
+    row.programId,
+    row.choiceCode ?? "",
+    row.degree ?? "",
+    row.instituteType,
+    row.seatPoolLabel,
+    row.gender ?? "",
+    row.homeState ?? "",
+    row.fillRound ? `round ${row.fillRound}` : "",
+    String(row.predictedClosingRank),
+    row.durationYears ? `${row.durationYears}yr` : "",
+    row.durationYears ? `${row.durationYears} year` : "",
   ]
     .join(" ")
     .toLowerCase();
@@ -78,9 +80,9 @@ function buildSearchText(row: ProgramPrediction): string {
 }
 
 /** weak map so we only build the search text once per object reference */
-const searchTextCache = new WeakMap<ProgramPrediction, string>();
+const searchTextCache = new WeakMap<PredictorDisplayProgram, string>();
 
-function getSearchText(row: ProgramPrediction): string {
+function getSearchText(row: PredictorDisplayProgram): string {
   let text = searchTextCache.get(row);
   if (!text) {
     text = buildSearchText(row);
@@ -136,9 +138,9 @@ function tokenMatchesText(token: string, text: string): boolean {
 }
 
 export function applyResultsSearch(
-  programs: ProgramPrediction[],
+  programs: PredictorDisplayProgram[],
   query: string,
-): ProgramPrediction[] {
+): PredictorDisplayProgram[] {
   const trimmed = query.trim().toLowerCase();
   if (!trimmed) return programs;
 

@@ -22,13 +22,15 @@ import { cn } from "@/lib/utils";
 export function AppShell({
   children,
   identity = ejamIdentity,
+  mhtCetEnabled = false,
 }: {
   children: React.ReactNode;
   identity?: AppIdentity;
+  mhtCetEnabled?: boolean;
 }) {
   return (
     <Suspense fallback={null}>
-      <PredictorProvider>
+      <PredictorProvider mhtCetEnabled={mhtCetEnabled}>
         <SidebarProvider>
           <AppSidebar identity={identity} />
           <SidebarInset className="flex min-h-svh flex-col">

@@ -28,6 +28,10 @@
     "./csab": {
       "import": "./src/csab/index.ts",
       "types": "./src/csab/index.ts"
+    },
+    "./mht-cet": {
+      "import": "./src/mht-cet/index.ts",
+      "types": "./src/mht-cet/index.ts"
     }
   },
   "scripts": {

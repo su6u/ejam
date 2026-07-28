@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useLayoutEffect, useRef, useState } from "react";
+import { useCallback, useLayoutEffect, useMemo, useRef, useState } from "react";
 import type { ResultsSortKey } from "@/components/predictor/results-sort-logic";
 import { cn } from "@/lib/utils";
 import { ChipIcon } from "./chip-icon";
@@ -30,6 +30,8 @@ interface IndicatorPosition {
 interface ResultsSortProps {
   sortBy: ResultsSortKey;
   onChange: (next: ResultsSortKey) => void;
+  supportedModes?: readonly ResultsSortKey[];
+  compactMobile?: boolean;
 }
 
 function positionsChanged(
@@ -48,7 +50,12 @@ function positionsChanged(
   });
 }
 
-export function ResultsSort({ sortBy, onChange }: ResultsSortProps) {
+export function ResultsSort({
+  sortBy,
+  onChange,
+  supportedModes,
+  compactMobile = false,
+}: ResultsSortProps) {
   const trackRef = useRef<HTMLDivElement>(null);
   const itemRefs = useRef<Array<HTMLButtonElement | null>>([]);
   const positionsRef = useRef<IndicatorPosition[]>([]);
@@ -58,7 +65,14 @@ export function ResultsSort({ sortBy, onChange }: ResultsSortProps) {
   const [layoutReady, setLayoutReady] = useState(false);
   const [positions, setPositions] = useState<IndicatorPosition[]>([]);
 
-  const activeIndex = SORT_OPTIONS.findIndex((option) => option.id === sortBy);
+  const options = useMemo(
+    () =>
+      supportedModes
+        ? SORT_OPTIONS.filter((option) => supportedModes.includes(option.id))
+        : SORT_OPTIONS,
+    [supportedModes],
+  );
+  const activeIndex = options.findIndex((option) => option.id === sortBy);
 
   if (layoutReady && prevActiveIndexRef.current !== activeIndex) {
     animatingUntilRef.current = performance.now() + SLIDE_MS + 32;
@@ -73,7 +87,7 @@ export function ResultsSort({ sortBy, onChange }: ResultsSortProps) {
     if (!track) return;
 
     const trackRect = track.getBoundingClientRect();
-    const next = SORT_OPTIONS.map((_, index) => {
+    const next = options.map((_, index) => {
       const button = itemRefs.current[index];
       if (!button) return { width: 0, x: 0 };
 
@@ -99,7 +113,7 @@ export function ResultsSort({ sortBy, onChange }: ResultsSortProps) {
     if (changed && performance.now() >= animatingUntilRef.current) {
       setPositions(next);
     }
-  }, [layoutReady]);
+  }, [layoutReady, options]);
 
   useLayoutEffect(() => {
     measureLayout();
@@ -136,7 +150,12 @@ export function ResultsSort({ sortBy, onChange }: ResultsSortProps) {
 
   return (
     <div className="flex min-w-0 items-center gap-1.5">
-      <span className="inline-flex shrink-0 items-center gap-1 text-[10px] font-medium tracking-wide text-muted-foreground uppercase">
+      <span
+        className={cn(
+          "inline-flex shrink-0 items-center gap-1 text-[10px] font-medium tracking-wide text-muted-foreground uppercase",
+          compactMobile && "max-sm:hidden",
+        )}
+      >
         Sort by
       </span>
       <div
@@ -158,7 +177,7 @@ export function ResultsSort({ sortBy, onChange }: ResultsSortProps) {
           onTransitionEnd={handleTransitionEnd}
         />
         <div className="sliding-toggle-grid grid">
-          {SORT_OPTIONS.map((option, index) => {
+          {options.map((option, index) => {
             const isActive = sortBy === option.id;
 
             return (

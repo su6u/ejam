@@ -33,6 +33,14 @@
       "import": "./src/college-predictor/index.ts",
       "types": "./src/college-predictor/index.ts"
     },
+    "./mht-cet": {
+      "import": "./src/mht-cet/index.ts",
+      "types": "./src/mht-cet/index.ts"
+    },
+    "./mht-cet/browser": {
+      "import": "./src/mht-cet/browser.ts",
+      "types": "./src/mht-cet/browser.ts"
+    },
     "./semver": {
       "import": "./src/semver.ts",
       "types": "./src/semver.ts"

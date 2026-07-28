@@ -1,18 +1,21 @@
 "use client";
 
-import type { ProgramPrediction } from "@ejam/data/college-predictor";
+import type { ProbabilityBand } from "@ejam/data/college-predictor";
 import { SlidersHorizontal } from "lucide-react";
 import type { ResultsFilterState } from "@/components/predictor/results-filter-logic";
 import { ResultsFilters } from "@/components/predictor/results-filters";
 import type { ExamType } from "@/hooks/use-predictor-state";
+import type { PredictorDisplayProgram } from "@/lib/predictor-adapters";
 
 interface SidebarFilterSectionProps {
   exam: ExamType;
-  programs: ProgramPrediction[];
+  programs: PredictorDisplayProgram[];
   filters: ResultsFilterState;
   onChange: (next: ResultsFilterState) => void;
   includeAll: boolean;
   onToggleLongShots: () => void;
+  instituteTypeFacets?: Array<{ value: string; count: number }>;
+  bandFacets?: Record<ProbabilityBand, number>;
 }
 
 export function SidebarFilterSection({
@@ -22,6 +25,8 @@ export function SidebarFilterSection({
   onChange,
   includeAll,
   onToggleLongShots,
+  instituteTypeFacets,
+  bandFacets,
 }: SidebarFilterSectionProps) {
   const activeCount =
     filters.instituteTypes.size + filters.bands.size + (includeAll ? 1 : 0);
@@ -59,6 +64,8 @@ export function SidebarFilterSection({
         enabled
         includeAll={includeAll}
         onToggleLongShots={onToggleLongShots}
+        instituteTypeFacets={instituteTypeFacets}
+        bandFacets={bandFacets}
       />
     </section>
   );

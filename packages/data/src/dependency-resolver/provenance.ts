@@ -19,6 +19,23 @@ export function buildPredictionProvenance(opts: {
       sha256: entry.sha256,
       role: "linked" as const,
     })) ?? [];
+  const linkedReferences =
+    lineage?.source_references?.map((entry) => ({
+      dataset: entry.dataset,
+      path: entry.path,
+      sha256: entry.sha256,
+      role: "linked" as const,
+    })) ?? [];
+  const linkedModelConfiguration = lineage?.model_configuration
+    ? [
+        {
+          dataset: "model_configuration",
+          path: lineage.model_configuration.path,
+          sha256: lineage.model_configuration.sha256,
+          role: "linked" as const,
+        },
+      ]
+    : [];
 
   return {
     exam_id: opts.examId,
@@ -31,6 +48,8 @@ export function buildPredictionProvenance(opts: {
         role: "loaded",
       },
       ...linkedCutoffs,
+      ...linkedReferences,
+      ...linkedModelConfiguration,
     ],
     ...(lineage ? { index_lineage: lineage.source_cutoffs } : {}),
     generated_at: new Date().toISOString(),

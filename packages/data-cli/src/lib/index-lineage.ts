@@ -16,7 +16,7 @@ export function lineageSidecarPath(indexParquetPath: string): string {
   return indexParquetPath.replace(/\.parquet$/, ".lineage.json");
 }
 
-function sha256File(filePath: string): string {
+export function sha256File(filePath: string): string {
   const data = fs.readFileSync(filePath);
   return crypto.createHash("sha256").update(data).digest("hex");
 }
@@ -44,6 +44,8 @@ export function writeIndexLineageSidecar(opts: {
   indexParquetPath: string;
   indexDataset: string;
   sourceCutoffPaths: string[];
+  sourceReferences?: Array<{ dataset: string; path: string }>;
+  modelConfigurationPath?: string;
   manifestVersion?: string;
 }): string {
   const sidecarPath = lineageSidecarPath(opts.indexParquetPath);
@@ -52,6 +54,27 @@ export function writeIndexLineageSidecar(opts: {
     built_at: new Date().toISOString(),
     manifest_version: opts.manifestVersion,
     source_cutoffs: collectSourceCutoffs(opts.sourceCutoffPaths),
+    ...(opts.sourceReferences
+      ? {
+          source_references: opts.sourceReferences
+            .map((reference) => ({
+              dataset: reference.dataset,
+              path: toManifestRelativePath(reference.path),
+              sha256: sha256File(reference.path),
+            }))
+            .sort((a, b) =>
+              `${a.dataset}:${a.path}`.localeCompare(`${b.dataset}:${b.path}`),
+            ),
+        }
+      : {}),
+    ...(opts.modelConfigurationPath
+      ? {
+          model_configuration: {
+            path: toManifestRelativePath(opts.modelConfigurationPath),
+            sha256: sha256File(opts.modelConfigurationPath),
+          },
+        }
+      : {}),
   };
   fs.writeFileSync(sidecarPath, `${JSON.stringify(lineage, null, 2)}\n`);
   return sidecarPath;
