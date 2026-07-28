@@ -78,6 +78,16 @@ function profileKey(
   });
 }
 
+function nonRankProfileKeyFromInput(input: MhtCetPredictionInput): string {
+  return JSON.stringify({
+    candidature_type_id: input.candidature_type_id,
+    category_id: input.category_id,
+    ladies_seat_eligible: input.ladies_seat_eligible,
+    home_university_id: input.home_university_id ?? null,
+    eligibilities: input.eligibilities,
+  });
+}
+
 function resultFilters(options: PredictorQueryOptions) {
   const instituteTypes = Array.from(options.filters.instituteTypes).sort();
   const bands = Array.from(options.filters.bands).sort();
@@ -238,21 +248,47 @@ export function useMhtCetPagedQuery(
     sort,
   });
   const queryKey = [QUERY_PREFIX, key] as const;
+  const optionsNonRankKey = nonRankProfileKeyFromInput(
+    baseRequest(options, "0", false),
+  );
+  const optionsRank = options.rank;
   const hasActiveSubmission =
-    enabled && submitted !== null && submittedProfileKey === currentProfileKey;
+    enabled &&
+    submitted !== null &&
+    submittedProfileKey !== null &&
+    (submittedProfileKey === currentProfileKey ||
+      (nonRankProfileKeyFromInput(submitted) === optionsNonRankKey &&
+        (!optionsRank || Number(optionsRank) === submitted.rank)));
 
   useEffect(() => {
-    if (
-      !enabled ||
-      (submittedProfileKey !== null &&
-        submittedProfileKey !== currentProfileKey)
-    ) {
+    if (!enabled) {
       setSubmitted(null);
       setSubmittedProfileKey(null);
       void queryClient.cancelQueries({ queryKey: [QUERY_PREFIX] });
       queryClient.removeQueries({ queryKey: [QUERY_PREFIX] });
+      return;
     }
-  }, [currentProfileKey, enabled, queryClient, submittedProfileKey]);
+    if (submitted === null || submittedProfileKey === null) return;
+    if (
+      submittedProfileKey === currentProfileKey ||
+      (nonRankProfileKeyFromInput(submitted) === optionsNonRankKey &&
+        (!optionsRank || Number(optionsRank) === submitted.rank))
+    ) {
+      return;
+    }
+    setSubmitted(null);
+    setSubmittedProfileKey(null);
+    void queryClient.cancelQueries({ queryKey: [QUERY_PREFIX] });
+    queryClient.removeQueries({ queryKey: [QUERY_PREFIX] });
+  }, [
+    currentProfileKey,
+    enabled,
+    optionsNonRankKey,
+    optionsRank,
+    queryClient,
+    submitted,
+    submittedProfileKey,
+  ]);
 
   const query = useInfiniteQuery({
     queryKey,

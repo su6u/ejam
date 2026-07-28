@@ -291,4 +291,85 @@ describe("MHT-CET paged query isolation", () => {
       result_options: { limit: 100 },
     });
   });
+
+  it("keeps the override rank while the URL rank catches up", async () => {
+    const fetchMock = vi.fn(
+      async (_input: RequestInfo | URL, _init?: RequestInit) => ({
+        ok: true,
+        status: 200,
+        json: async () => PAGE_RESPONSE,
+      }),
+    );
+    vi.stubGlobal("fetch", fetchMock);
+    const queryClient = new QueryClient({
+      defaultOptions: {
+        queries: { retry: false },
+      },
+    });
+    const wrapper = ({ children }: PropsWithChildren) => (
+      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+    );
+    const emptyRankOptions = { ...MHT_OPTIONS, rank: "" };
+    const { result, rerender } = renderHook(
+      ({ options }) => useMhtCetPagedQuery(options),
+      {
+        initialProps: { options: emptyRankOptions },
+        wrapper,
+      },
+    );
+
+    await act(async () => {
+      await result.current.trigger("12345");
+    });
+    await waitFor(() => expect(result.current.data).not.toBeNull());
+    expect(fetchMock).toHaveBeenCalled();
+
+    rerender({ options: { ...MHT_OPTIONS, rank: "12345" } });
+    await waitFor(() => expect(result.current.data).not.toBeNull());
+    expect(
+      JSON.parse(String(fetchMock.mock.calls[0]?.[1]?.body)),
+    ).toMatchObject({
+      rank: 12345,
+    });
+  });
+
+  it("clears results when the non-rank profile changes", async () => {
+    const fetchMock = vi.fn(
+      async (_input: RequestInfo | URL, _init?: RequestInit) => ({
+        ok: true,
+        status: 200,
+        json: async () => PAGE_RESPONSE,
+      }),
+    );
+    vi.stubGlobal("fetch", fetchMock);
+    const queryClient = new QueryClient({
+      defaultOptions: {
+        queries: { retry: false },
+      },
+    });
+    const wrapper = ({ children }: PropsWithChildren) => (
+      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+    );
+    const { result, rerender } = renderHook(
+      ({ options }) => useMhtCetPagedQuery(options),
+      {
+        initialProps: { options: MHT_OPTIONS },
+        wrapper,
+      },
+    );
+
+    await act(async () => {
+      await result.current.trigger();
+    });
+    await waitFor(() => expect(result.current.data).not.toBeNull());
+
+    rerender({
+      options: {
+        ...MHT_OPTIONS,
+        mhtCategory: "obc",
+      },
+    });
+    expect(result.current.data).toBeNull();
+    expect(result.current.isLoading).toBe(false);
+  });
 });
