@@ -12,10 +12,10 @@ const staticAssetCache =
   "public, max-age=2592000, stale-while-revalidate=86400";
 
 const nextConfig: NextConfig = {
-  // Trace workspace packages + repo-root data/ into serverless bundles.
+  // Trace workspace packages + data/ into serverless bundles.
   outputFileTracingRoot: monorepoRoot,
   outputFileTracingIncludes: {
-    "/api/predict/[exam_id]": ["data/**/*"],
+    "/api/predict/[exam_id]": ["./data/**/*", "../../data/**/*"],
   },
   images: {
     unoptimized: true,

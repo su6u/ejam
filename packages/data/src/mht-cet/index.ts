@@ -33,6 +33,7 @@ export {
 } from "./evaluation";
 export {
   _resetMhtCetPredictorIndexCache,
+  getMhtCetIndex,
   getMhtCetPredictorIndexFromDeps,
   type MhtCetIndexDeps,
 } from "./index-loader";

@@ -60,6 +60,29 @@ function normalizeParquetRow(
   return normalized;
 }
 
+/** @deprecated kept so Next file tracing includes the MHT index on Vercel */
+export async function getMhtCetIndex(): Promise<MhtCetPredictorIndexRow[]> {
+  const { join, resolve } = await import("node:path");
+  const { resolveDataRoot } = await import("../data-root");
+  const indexPath = resolve(
+    process.env.EJAM_DIST_DATA_ROOT ??
+      join(resolveDataRoot(), "tools", "college-predictor", "maharashtra-cap"),
+    "predictor-index.parquet",
+  );
+  const rawRows = await readParquetRows(indexPath);
+  return rawRows.map((row, index) => {
+    const parsed = MhtCetPredictorIndexRowSchema.safeParse(
+      normalizeParquetRow(row as Record<string, unknown>, index),
+    );
+    if (!parsed.success) {
+      throw new Error(
+        `MHT-CET predictor index row ${index} failed validation: ${parsed.error.message}`,
+      );
+    }
+    return parsed.data;
+  });
+}
+
 export async function getMhtCetPredictorIndexFromDeps(
   deps: MhtCetIndexDeps,
 ): Promise<MhtCetPredictorIndexRow[]> {
