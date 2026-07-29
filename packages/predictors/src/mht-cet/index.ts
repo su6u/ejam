@@ -1,5 +1,6 @@
 import type { ExamPredictor } from "@ejam/data";
 import {
+  getMhtCetIndex,
   getMhtCetPredictorIndexFromDeps,
   loadMhtCetSeatPoolRegistry,
   MhtCetPredictionInput,
@@ -13,6 +14,9 @@ import {
   setServerCacheEntry,
 } from "../shared/predictor-cache";
 import { processMhtCetResult, unfilteredMhtInput } from "./result-processing";
+
+// Keep the static maharashtra-cap path in the serverless trace graph.
+void getMhtCetIndex;
 
 const fullResultCache = new Map<string, MhtCetPredictionResultType>();
 const FULL_RESULT_CACHE_MAX_ENTRIES = 1;
