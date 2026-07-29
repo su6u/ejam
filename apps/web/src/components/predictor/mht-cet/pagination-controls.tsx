@@ -1,7 +1,7 @@
 "use client";
 
 import { LoaderCircle } from "lucide-react";
-import { useEffect, useRef, type RefObject } from "react";
+import { type RefObject, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 
 /** Sentinel + status footer — pages load on scroll, not via Load more. */
@@ -68,10 +68,7 @@ export function ResultsScrollStatus({
           role="status"
           className="flex items-center gap-1.5 text-xs text-muted-foreground"
         >
-          <LoaderCircle
-            className="size-3.5 animate-spin"
-            aria-hidden
-          />
+          <LoaderCircle className="size-3.5 animate-spin" aria-hidden />
           Loading more…
         </div>
       ) : null}

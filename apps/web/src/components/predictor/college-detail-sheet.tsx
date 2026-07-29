@@ -11,20 +11,20 @@ import { DashboardCard } from "@/components/dashboard-card";
 import {
   ActiveDot,
   Area,
-  Dot,
-  EvilAreaChart,
   Grid as AreaGrid,
   Tooltip as AreaTooltip,
   XAxis as AreaXAxis,
   YAxis as AreaYAxis,
+  Dot,
+  EvilAreaChart,
 } from "@/components/evilcharts/charts/area-chart";
 import {
   Bar,
-  EvilBarChart,
   Grid as BarGrid,
   Tooltip as BarTooltip,
   XAxis as BarXAxis,
   YAxis as BarYAxis,
+  EvilBarChart,
 } from "@/components/evilcharts/charts/bar-chart";
 import type { ChartConfig } from "@/components/evilcharts/ui/chart-types";
 import { formatInteger } from "@/components/formatter";
@@ -223,13 +223,21 @@ function DetailBody({ program }: { program: PredictorDisplayProgram }) {
         </h3>
         <dl className="mt-2 grid grid-cols-[7.5rem_minmax(0,1fr)] gap-x-3 gap-y-2 text-[12px]">
           <DetailTerm>Signal</DetailTerm>
-          <DetailValue className="capitalize">{program.dataQuality}</DetailValue>
+          <DetailValue className="capitalize">
+            {program.dataQuality}
+          </DetailValue>
           <DetailTerm>Years of data</DetailTerm>
-          <DetailValue className="tabular-nums">{program.yearsOfData}</DetailValue>
+          <DetailValue className="tabular-nums">
+            {program.yearsOfData}
+          </DetailValue>
           <DetailTerm>Most recent</DetailTerm>
-          <DetailValue className="tabular-nums">{program.latestYear}</DetailValue>
+          <DetailValue className="tabular-nums">
+            {program.latestYear}
+          </DetailValue>
           <DetailTerm>Supported rounds</DetailTerm>
-          <DetailValue className="tabular-nums">{program.roundCount}</DetailValue>
+          <DetailValue className="tabular-nums">
+            {program.roundCount}
+          </DetailValue>
         </dl>
       </section>
 
@@ -262,7 +270,9 @@ function ProgramMetricCard({
         <div className="text-lg font-semibold tabular-nums text-foreground">
           {value}
         </div>
-        <CardDescription className="mt-0.5 text-[11px]">{caption}</CardDescription>
+        <CardDescription className="mt-0.5 text-[11px]">
+          {caption}
+        </CardDescription>
       </CardContent>
     </DashboardCard>
   );
@@ -293,9 +303,7 @@ function RoundProbabilityChart({
   const isMhtCet = program.exam === "mht-cet";
   const rows = program.roundProbabilities.map((value, index) => {
     const chance =
-      value === null
-        ? null
-        : Math.round(Math.min(1, Math.max(0, value)) * 100);
+      value === null ? null : Math.round(Math.min(1, Math.max(0, value)) * 100);
     return {
       round: `R${index + 1}`,
       chance,
@@ -419,9 +427,9 @@ function MhtSeatPoolDetails({
   bestRoundDetail,
 }: {
   matchedPool: string;
-  bestRoundDetail:
-    | NonNullable<NonNullable<PredictorDisplayProgram["roundDetails"]>[number]>
-    | null;
+  bestRoundDetail: NonNullable<
+    NonNullable<PredictorDisplayProgram["roundDetails"]>[number]
+  > | null;
 }) {
   return (
     <div className="mt-2.5 space-y-3">
@@ -494,9 +502,7 @@ function MhtSeatPoolsConsidered({
           );
           const isMatched = pool.source_code === matchedPool;
           const roundsLabel =
-            pool.rounds.length === 4
-              ? "R1–R4"
-              : `R${pool.rounds.join(", R")}`;
+            pool.rounds.length === 4 ? "R1–R4" : `R${pool.rounds.join(", R")}`;
           const sameScope =
             pool.source_seat_scope_id === pool.effective_allocation_scope_id;
           const scopeLabel = sameScope
@@ -566,20 +572,19 @@ function DetailValue({
   className?: string;
 }) {
   return (
-    <dd className={cn("min-w-0 text-[12px] text-pretty text-foreground", className)}>
+    <dd
+      className={cn(
+        "min-w-0 text-[12px] text-pretty text-foreground",
+        className,
+      )}
+    >
       {children}
     </dd>
   );
 }
 
 /** Quiet label→value stack — hierarchy via weight, not oversized type. */
-function MetaRow({
-  label,
-  value,
-}: {
-  label: string;
-  value: ReactNode;
-}) {
+function MetaRow({ label, value }: { label: string; value: ReactNode }) {
   return (
     <div className="min-w-0">
       <p className="text-[10px] font-medium tracking-[0.06em] text-muted-foreground/80 uppercase">
@@ -611,13 +616,7 @@ function shortScopeLabel(scopeId: string): string {
   }
 }
 
-function ConversionBadge({
-  label,
-  title,
-}: {
-  label: string;
-  title?: string;
-}) {
+function ConversionBadge({ label, title }: { label: string; title?: string }) {
   return (
     <span
       title={title ?? label}

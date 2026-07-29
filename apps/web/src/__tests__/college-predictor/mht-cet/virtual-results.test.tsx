@@ -151,9 +151,7 @@ describe("MHT-CET virtual results", () => {
     );
     expect(mountedPrograms.length).toBeGreaterThan(0);
     expect(mountedPrograms.length).toBeLessThanOrEqual(40);
-    expect(
-      screen.queryByRole("button", { name: /Load \d+ more/i }),
-    ).toBeNull();
+    expect(screen.queryByRole("button", { name: /Load \d+ more/i })).toBeNull();
 
     await waitFor(() => {
       expect(loadMore).toHaveBeenCalled();
@@ -200,8 +198,8 @@ describe("MHT-CET virtual results", () => {
     );
 
     expect(
-      container.querySelector('[role="table"]')?.getAttribute("aria-rowcount"),
-    ).toBe("2072");
+      screen.getByRole("region", { name: "MHT-CET prediction results" }),
+    ).not.toBeNull();
     expect(
       container.querySelector("[aria-posinset]")?.getAttribute("aria-setsize"),
     ).toBe("2072");

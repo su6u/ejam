@@ -47,7 +47,7 @@ function MhtVirtualTable({
   onSelect,
   onLoadMore,
 }: MhtCetVirtualResultsProps) {
-  const scrollRef = useRef<HTMLDivElement>(null);
+  const scrollRef = useRef<HTMLElement>(null);
   const virtualizer = useVirtualizer({
     count: rows.length,
     getScrollElement: () => scrollRef.current,
@@ -62,52 +62,30 @@ function MhtVirtualTable({
   }, [resultKey]);
 
   return (
-    <div
+    <section
       ref={scrollRef}
       className="theme-scrollbar hidden min-h-0 flex-1 overflow-auto lg:block"
       aria-busy={loadingMore}
+      aria-label="MHT-CET prediction results"
     >
-      <div
-        role="table"
-        aria-label="MHT-CET prediction results"
-        aria-rowcount={total}
-        className="w-full min-w-0 text-sm"
-      >
-        <div
-          role="rowgroup"
-          className="sticky top-0 z-10 border-b border-border bg-background/95 backdrop-blur-sm supports-backdrop-filter:bg-background/50"
-        >
+      <div className="w-full min-w-0 text-sm">
+        <div className="sticky top-0 z-10 border-b border-border bg-background/95 backdrop-blur-sm supports-backdrop-filter:bg-background/50">
           <div
-            role="row"
             className="grid w-full"
             style={{ gridTemplateColumns: RESULT_TABLE_COLUMNS }}
           >
-            <div role="columnheader" className={cn(headerCellClass, "ps-6")}>
-              Institute
-            </div>
-            <div role="columnheader" className={headerCellClass}>
-              Program
-            </div>
-            <div role="columnheader" className={headerCellClass}>
-              Band
-            </div>
-            <div role="columnheader" className={headerCellClass}>
-              Chance
-            </div>
-            <div
-              role="columnheader"
-              className={cn(headerCellClass, "tabular-nums")}
-            >
+            <div className={cn(headerCellClass, "ps-6")}>Institute</div>
+            <div className={headerCellClass}>Program</div>
+            <div className={headerCellClass}>Band</div>
+            <div className={headerCellClass}>Chance</div>
+            <div className={cn(headerCellClass, "tabular-nums")}>
               Closing rank
             </div>
-            <div role="columnheader" className={headerCellClass}>
-              Seat pool
-            </div>
-            <div role="columnheader" className="pe-6" />
+            <div className={headerCellClass}>Seat pool</div>
+            <div className="pe-6" />
           </div>
         </div>
         <div
-          role="rowgroup"
           className="relative w-full"
           style={{ height: virtualizer.getTotalSize() }}
         >
@@ -120,7 +98,6 @@ function MhtVirtualTable({
                 selectedId={selectedId}
                 onSelect={onSelect}
                 virtual
-                ariaRowIndex={virtualRow.index + 1}
                 style={{
                   height: virtualRow.size,
                   transform: `translateY(${virtualRow.start}px)`,
@@ -139,7 +116,7 @@ function MhtVirtualTable({
         onLoadMore={onLoadMore}
         scrollRootRef={scrollRef}
       />
-    </div>
+    </section>
   );
 }
 

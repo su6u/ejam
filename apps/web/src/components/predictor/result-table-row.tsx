@@ -23,19 +23,17 @@ export function ResultTableRow({
   onSelect,
   style,
   virtual,
-  ariaRowIndex,
 }: {
   row: PredictorDisplayProgram;
   selectedId: string | null;
   onSelect: (program: PredictorDisplayProgram) => void;
   style?: CSSProperties;
   virtual?: boolean;
-  ariaRowIndex?: number;
 }) {
   const id = programKey(row);
   const isSelected = id === selectedId;
   const handleKeyDown = (
-    event: KeyboardEvent<HTMLTableRowElement | HTMLDivElement>,
+    event: KeyboardEvent<HTMLTableRowElement | HTMLButtonElement>,
   ) => {
     if (event.key === "Enter" || event.key === " ") {
       event.preventDefault();
@@ -71,6 +69,7 @@ export function ResultTableRow({
       roundDetails={row.roundDetails}
       roundAvailability={row.roundAvailability}
       roundCount={row.roundCount}
+      interactive={false}
     />
   );
 
@@ -91,11 +90,9 @@ export function ResultTableRow({
 
   if (virtual) {
     return (
-      <div
-        role="row"
+      <button
+        type="button"
         data-state={isSelected ? "selected" : undefined}
-        tabIndex={0}
-        aria-rowindex={ariaRowIndex}
         aria-label={`${row.instituteName}, ${row.programName}`}
         onClick={() => onSelect(row)}
         onKeyDown={handleKeyDown}
@@ -104,36 +101,22 @@ export function ResultTableRow({
           display: "grid",
           gridTemplateColumns: RESULT_TABLE_COLUMNS,
         }}
-        className={cn(rowClass, "absolute inset-x-0 top-0")}
+        className={cn(rowClass, "absolute inset-x-0 top-0 w-full text-left")}
       >
-        <div role="cell" className={cn(cellClass, "ps-6")}>
-          {institute}
-        </div>
-        <div role="cell" className={cellClass}>
-          {program}
-        </div>
-        <div role="cell" className={cellClass}>
+        <div className={cn(cellClass, "ps-6")}>{institute}</div>
+        <div className={cellClass}>{program}</div>
+        <div className={cellClass}>
           <BandBadge band={row.band} />
         </div>
-        <div role="cell" className={cellClass}>
-          {chance}
-        </div>
-        <div
-          role="cell"
-          className={cn(cellClass, "whitespace-nowrap tabular-nums")}
-        >
+        <div className={cellClass}>{chance}</div>
+        <div className={cn(cellClass, "whitespace-nowrap tabular-nums")}>
           {formatInteger(row.predictedClosingRank)}
         </div>
-        <div role="cell" className={cn(cellClass, "text-muted-foreground")}>
+        <div className={cn(cellClass, "text-muted-foreground")}>
           <span className="truncate">{row.seatPoolLabel}</span>
         </div>
-        <div
-          role="cell"
-          className="flex items-center justify-end pe-6"
-        >
-          {chevron}
-        </div>
-      </div>
+        <div className="flex items-center justify-end pe-6">{chevron}</div>
+      </button>
     );
   }
 
