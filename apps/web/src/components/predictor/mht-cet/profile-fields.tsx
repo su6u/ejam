@@ -95,11 +95,7 @@ export function MhtCetProfileFields() {
 
   return (
     <>
-      <SetupField
-        label="CAP candidature"
-        required
-        hint="Use the type shown on your CAP application."
-      >
+      <SetupField label="CAP candidature" required>
         <OptionPicker
           value={state.mhtCandidatureType}
           onValueChange={(value) =>
@@ -148,7 +144,6 @@ export function MhtCetProfileFields() {
 
       <EligibilitySwitch
         label="Eligible for ladies seats"
-        description="Include ladies-only seat pools."
         checked={state.mhtLadiesSeatEligible}
         onCheckedChange={state.setMhtLadiesSeatEligible}
       />

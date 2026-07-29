@@ -42,11 +42,7 @@ export function buildMhtCetPredictionMetadata(options: {
     total_matching_offerings: options.totalMatching,
     displayed_offerings: options.programs.length,
     hidden_offerings: options.totalMatching - options.programs.length,
-    warnings: [
-      "MHT-CET estimates use two historical cycles; one-cycle and round-four rows use pooled uncertainty.",
-      "Official conversion stages are evaluated independently for every round and candidate profile.",
-      "Probabilities are empirical estimates, not official CAP allotment decisions.",
-    ],
+    warnings: [],
     pagination: {
       returned: options.programs.length,
       limit: null,
