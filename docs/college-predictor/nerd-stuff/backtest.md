@@ -15,7 +15,7 @@ pnpm exec tsx packages/data-cli/src/backtest/predictor.ts
 
 writes `data/_scratch/backtest-results.json` (gitignored). exits non-zero if either builder's within-20% rate drops below 30%.
 
-implementation: `packages/data-cli/src/backtest/predictor.ts`. training SQL mirrors the production index builders (`build-college-predictor-index.ts`, `build-csab-predictor-index.ts`).
+implementation: `packages/data-cli/src/backtest/predictor.ts`. training SQL mirrors the production index builders (`jee/josaa/build-index.ts`, `jee/csab/build-index.ts`).
 
 ## train / holdout split
 
@@ -77,7 +77,7 @@ reproduce: `pnpm exec tsx packages/data-cli/src/backtest/predictor.ts` and read 
 
 ---
 
-when you change index hyperparams (`packages/data-cli/src/jam/config.ts`, `csab-config.ts`), run the backtest script before publishing a data release.
+when you change index hyperparameters (`packages/data-cli/src/jee/josaa/model-config.ts`, `packages/data-cli/src/jee/csab/model-config.ts`), run the backtest script before publishing a data release.
 
 ---
 

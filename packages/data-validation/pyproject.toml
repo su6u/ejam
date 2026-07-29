@@ -2,10 +2,18 @@
 name = "ejam-data-validation"
 version = "0.0.0"
 requires-python = ">=3.11"
-dependencies = ["polars>=1.0", "pydantic>=2.0"]
+dependencies = [
+  "beautifulsoup4>=4.12",
+  "pdfplumber>=0.11",
+  "polars>=1.0",
+  "pydantic>=2.0",
+]
 
 [project.scripts]
 validate-data = "ejam_data_validation.validate_data:main"
+extract-mht-cet-cutoffs = "ejam_data_validation.mht_cet.extract.cutoffs:main"
+extract-mht-cet-institutes = "ejam_data_validation.mht_cet.extract.institutes:main"
+extract-mht-cet-seat-matrix = "ejam_data_validation.mht_cet.extract.seat_matrix:main"
 
 [build-system]
 requires = ["hatchling"]

@@ -1,4 +1,4 @@
-import type { PredictorExamId } from "@/hooks/use-predictor-state";
+import type { PredictorExamId } from "@/lib/predictor-adapters";
 
 export const RANK_LIMITS_DOC_URL =
   "https://github.com/su6u/ejam/blob/main/docs/college-predictor/faqs/faqs.md#what-are-the-rank-limits";
@@ -9,6 +9,7 @@ export type RankValidationError =
   | { type: "out_of_range"; maxRank: number };
 
 function getMaxRankForExam(predictorExamId: PredictorExamId): number {
+  if (predictorExamId === "mht-cet") return 1_000_000;
   return predictorExamId === "jee-advanced" ? 50_000 : 500_000;
 }
 

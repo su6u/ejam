@@ -4,7 +4,6 @@
 
 "use client";
 
-import type { ProgramPrediction } from "@ejam/data/college-predictor";
 import { useEffect, useState } from "react";
 import {
   countClientHiddenLongShots,
@@ -22,6 +21,11 @@ import {
   applyResultsSort,
   type ResultsSortKey,
 } from "@/components/predictor/results-sort-logic";
+import { useSidebar } from "@/components/ui/sidebar";
+import {
+  type PredictorDisplayProgram,
+  supportedSortModes,
+} from "@/lib/predictor-adapters";
 import { CollegeDetailSheet } from "./college-detail-sheet";
 import { EmptyState, ErrorState, LoadingState } from "./empty-state";
 import { ResultsTable } from "./results-table";
@@ -38,43 +42,54 @@ export function Dashboard() {
     searchQuery,
     setSearchQuery,
   } = usePredictor();
-  const [selected, setSelected] = useState<ProgramPrediction | null>(null);
+  const { isMobile, setOpenMobile } = useSidebar();
+  const [selected, setSelected] = useState<PredictorDisplayProgram | null>(
+    null,
+  );
   const [sheetOpen, setSheetOpen] = useState(false);
 
   const programs = query.data?.programs ?? [];
-  const clientHiddenLongShots = countClientHiddenLongShots(
-    programs,
-    state.include_all,
-  );
+  const serverManaged = query.data?.resultMode === "server-paged";
+  const clientHiddenLongShots = serverManaged
+    ? 0
+    : countClientHiddenLongShots(programs, state.include_all);
   const hasResults =
-    programs.length > 0 &&
-    !hasOnlyClientHiddenLongShots(programs, state.include_all);
+    serverManaged ||
+    (programs.length > 0 &&
+      !hasOnlyClientHiddenLongShots(programs, state.include_all));
   const metadata = withClientHiddenLongShotMetadata(
-    query.data?.metadata,
+    query.data?.jeeResult?.metadata,
     clientHiddenLongShots,
   );
-  const filteredPrograms = applyResultsSort(
-    applyResultsSearch(
-      applyResultsFilters(programs, filters, state.include_all),
-      searchQuery,
-    ),
-    sortBy,
-    query.data?.metadata.active_filters,
-  );
+  const filteredPrograms = serverManaged
+    ? programs
+    : applyResultsSort(
+        applyResultsSearch(
+          applyResultsFilters(programs, filters, state.include_all),
+          searchQuery,
+        ),
+        sortBy,
+        query.data?.jeeResult?.metadata.active_filters,
+      );
+  const hasActiveResultControls =
+    searchQuery.trim().length > 0 ||
+    filters.instituteTypes.size > 0 ||
+    filters.bands.size > 0;
 
   const selectedId = selected ? programKey(selected) : null;
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: reset drawer when exam or counselling changes
+  // biome-ignore lint/correctness/useExhaustiveDependencies: reset drawer when the result identity changes
   useEffect(() => {
     setSheetOpen(false);
     setSelected(null);
-  }, [state.exam, state.counselling]);
+  }, [state.exam, state.counselling, query.resultKey]);
 
   const middle = renderMiddle({
     isLoading: query.isLoading,
     error: query.error,
     hasResults,
     hasPredicted: query.data !== null,
+    exam: state.exam,
     metadata,
     includeAll: state.include_all,
     onShowLongShots: () => {
@@ -82,6 +97,8 @@ export function Dashboard() {
       const flushedRank = rankInputRef.current?.flush() ?? state.rank;
       void query.trigger(flushedRank, { include_all: true });
     },
+    onOpenSetup:
+      isMobile && query.data === null ? () => setOpenMobile(true) : undefined,
     programs,
     filteredPrograms,
     sortBy,
@@ -90,6 +107,18 @@ export function Dashboard() {
     onSearchChange: setSearchQuery,
     selectedId,
     provenance: query.provenance,
+    warnings: query.data?.metadata.warnings ?? [],
+    serverManaged,
+    totalRows: query.data?.metadata.displayedPrograms ?? programs.length,
+    isUpdating: query.isUpdating,
+    resultKey: query.resultKey,
+    hasNextPage: query.hasNextPage,
+    isFetchingNextPage: query.isFetchingNextPage,
+    nextPageError: query.nextPageError,
+    onLoadMore: () => {
+      void query.loadMore();
+    },
+    supportedSortModes: supportedSortModes(state.predictorExamId),
     onSelect: (p) => {
       setSelected(p);
       setSheetOpen(true);
@@ -98,6 +127,8 @@ export function Dashboard() {
       setFilters(EMPTY_RESULTS_FILTERS);
       setSearchQuery("");
     },
+    hasActiveFilters: hasActiveResultControls,
+    hiddenRows: query.data?.metadata.hiddenPrograms ?? 0,
   });
 
   return (
@@ -123,9 +154,11 @@ function renderMiddle({
   error,
   hasResults,
   hasPredicted,
+  exam,
   metadata,
   includeAll,
   onShowLongShots,
+  onOpenSetup,
   programs,
   filteredPrograms,
   sortBy,
@@ -136,34 +169,62 @@ function renderMiddle({
   provenance,
   onSelect,
   onClearFilters,
+  warnings,
+  supportedSortModes,
+  serverManaged,
+  totalRows,
+  isUpdating,
+  resultKey,
+  hasNextPage,
+  isFetchingNextPage,
+  nextPageError,
+  onLoadMore,
+  hasActiveFilters,
+  hiddenRows,
 }: {
   isLoading: boolean;
   error: string | null;
   hasResults: boolean;
   hasPredicted: boolean;
+  exam: import("@/hooks/use-predictor-state").ExamType;
   metadata?: import("@ejam/data/college-predictor").CollegePredictionResult["metadata"];
   includeAll: boolean;
   onShowLongShots: () => void;
-  programs: ProgramPrediction[];
-  filteredPrograms: ProgramPrediction[];
+  onOpenSetup?: () => void;
+  programs: PredictorDisplayProgram[];
+  filteredPrograms: PredictorDisplayProgram[];
   sortBy: ResultsSortKey;
   onSortChange: (next: ResultsSortKey) => void;
   searchQuery: string;
   onSearchChange: (next: string) => void;
   selectedId: string | null;
   provenance: import("@ejam/data").PredictionProvenance | null;
-  onSelect: (p: ProgramPrediction) => void;
+  onSelect: (p: PredictorDisplayProgram) => void;
   onClearFilters: () => void;
+  warnings: string[];
+  supportedSortModes: readonly ResultsSortKey[];
+  serverManaged: boolean;
+  totalRows: number;
+  isUpdating: boolean;
+  resultKey: string;
+  hasNextPage: boolean;
+  isFetchingNextPage: boolean;
+  nextPageError: string | null;
+  onLoadMore: () => void;
+  hasActiveFilters: boolean;
+  hiddenRows: number;
 }) {
   if (error) return <ErrorState message={error} provenance={provenance} />;
   if (!hasResults) {
     if (isLoading) return <LoadingState provenance={provenance} />;
     return (
       <EmptyState
+        exam={exam}
         hasPredicted={hasPredicted}
         metadata={metadata}
         includeAll={includeAll}
         onShowLongShots={onShowLongShots}
+        onOpenSetup={onOpenSetup}
         provenance={provenance}
       />
     );
@@ -180,7 +241,20 @@ function renderMiddle({
       selectedId={selectedId}
       onSelect={onSelect}
       onClearFilters={onClearFilters}
+      hasActiveFilters={hasActiveFilters}
+      hiddenRows={includeAll ? 0 : hiddenRows}
+      onShowLongShots={onShowLongShots}
       provenance={provenance}
+      warnings={warnings}
+      supportedSortModes={supportedSortModes}
+      serverManaged={serverManaged}
+      totalRows={totalRows}
+      isUpdating={isUpdating}
+      resultKey={resultKey}
+      hasNextPage={hasNextPage}
+      isFetchingNextPage={isFetchingNextPage}
+      nextPageError={nextPageError}
+      onLoadMore={onLoadMore}
     />
   );
 }

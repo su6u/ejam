@@ -26,14 +26,17 @@ function isValidDataRoot(dataDir: string): boolean {
 
 export function resolveDataRoot(): string {
   if (process.env.EJAM_DATA_ROOT) {
-    cachedDataRoot = resolve(process.cwd(), process.env.EJAM_DATA_ROOT);
+    cachedDataRoot = resolve(
+      /* turbopackIgnore: true */ process.cwd(),
+      process.env.EJAM_DATA_ROOT,
+    );
     return cachedDataRoot;
   }
   if (cachedDataRoot) return cachedDataRoot;
 
   let dir = process.cwd();
   for (let depth = 0; depth < 8; depth++) {
-    const candidate = join(dir, "data");
+    const candidate = join(/* turbopackIgnore: true */ dir, "data");
     if (isValidDataRoot(candidate)) {
       cachedDataRoot = candidate;
       return candidate;
@@ -43,7 +46,7 @@ export function resolveDataRoot(): string {
     dir = parent;
   }
 
-  return join(process.cwd(), "data");
+  return join(/* turbopackIgnore: true */ process.cwd(), "data");
 }
 
 export function resolveManifestRoot(): string {

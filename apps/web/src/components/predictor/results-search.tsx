@@ -17,9 +17,14 @@ import { cn } from "@/lib/utils";
 interface ResultsSearchProps {
   value: string;
   onChange: (query: string) => void;
+  maxLength?: number;
 }
 
-export function ResultsSearch({ value, onChange }: ResultsSearchProps) {
+export function ResultsSearch({
+  value,
+  onChange,
+  maxLength,
+}: ResultsSearchProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [focused, setFocused] = useState(false);
 
@@ -81,6 +86,7 @@ export function ResultsSearch({ value, onChange }: ResultsSearchProps) {
       <input
         ref={inputRef}
         type="text"
+        maxLength={maxLength}
         value={value}
         onChange={(event) => onChange(event.target.value)}
         onFocus={() => setFocused(true)}

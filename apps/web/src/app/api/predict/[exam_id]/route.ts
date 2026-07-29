@@ -8,6 +8,7 @@ import type {
   PredictionErrorResponse,
   PredictionSuccessResponse,
 } from "@ejam/data";
+import { PredictionInputError } from "@ejam/data";
 import { decodeCollegePredictorUrlParams } from "@ejam/data/college-predictor";
 import {
   buildPredictionProvenance,
@@ -15,6 +16,11 @@ import {
   resolveExamDependencies,
 } from "@ejam/data/dependency-resolver";
 import { loadExamConfig } from "@ejam/data/exam-config";
+import {
+  decodeMhtCetUrlParams,
+  encodeMhtCetPagedPredictionResult,
+  MhtCetPredictionResult,
+} from "@ejam/data/mht-cet/browser";
 import { getPredictor } from "@ejam/predictors/registry";
 import { type NextRequest, NextResponse } from "next/server";
 
@@ -67,10 +73,13 @@ async function readPostBody(req: NextRequest): Promise<unknown> {
 async function readInput(
   req: NextRequest,
   method: "GET" | "POST",
+  examId: string,
 ): Promise<unknown> {
   const url = new URL(req.url);
   const queryInput = url.searchParams.has("rank")
-    ? decodeCollegePredictorUrlParams(url.searchParams)
+    ? examId === "mht-cet"
+      ? decodeMhtCetUrlParams(url.searchParams)
+      : decodeCollegePredictorUrlParams(url.searchParams)
     : null;
 
   if (method === "GET") return queryInput;
@@ -152,6 +161,15 @@ function getErrorMessage(err: unknown): string {
   return err instanceof Error ? err.message : "unknown error";
 }
 
+function isMissingDependencyError(err: unknown): boolean {
+  return (
+    err !== null &&
+    typeof err === "object" &&
+    "code" in err &&
+    err.code === "ENOENT"
+  );
+}
+
 function buildFieldErrors(
   issues: Array<{ path: PropertyKey[]; message: string }>,
 ): Record<string, string> {
@@ -163,6 +181,14 @@ function buildFieldErrors(
     fieldErrors[path] = issue.message;
   }
   return fieldErrors;
+}
+
+function encodeResultForTransport(examId: string, result: unknown): unknown {
+  if (examId !== "mht-cet") return result;
+  const parsed = MhtCetPredictionResult.parse(result);
+  return parsed.metadata.pagination.limit === null
+    ? result
+    : encodeMhtCetPagedPredictionResult(parsed);
 }
 
 function validateInput(
@@ -205,6 +231,45 @@ function validateInput(
   };
 }
 
+function unsupportedMhtCetDefenceInput(
+  input: unknown,
+  url: URL,
+): NextResponse<PredictionErrorResponse> | null {
+  if (
+    url.searchParams.has("defence_category_id") ||
+    url.searchParams.has("defence")
+  ) {
+    return errResponse(
+      400,
+      "INVALID_INPUT",
+      "Defence reservation prediction is not supported",
+      {
+        "eligibilities.defence_category_id":
+          "Defence reservation prediction is not supported",
+      },
+    );
+  }
+  if (
+    input !== null &&
+    typeof input === "object" &&
+    "eligibilities" in input &&
+    input.eligibilities !== null &&
+    typeof input.eligibilities === "object" &&
+    Object.hasOwn(input.eligibilities, "defence_category_id")
+  ) {
+    return errResponse(
+      400,
+      "INVALID_INPUT",
+      "Defence reservation prediction is not supported",
+      {
+        "eligibilities.defence_category_id":
+          "Defence reservation prediction is not supported",
+      },
+    );
+  }
+  return null;
+}
+
 async function handlePrediction(
   req: NextRequest,
   { params }: RouteParams,
@@ -214,6 +279,13 @@ async function handlePrediction(
   const url = new URL(req.url);
   const configured = loadConfiguredExam(exam_id);
   if (!configured.ok) return configured.response;
+  if (exam_id === "mht-cet" && process.env.MHT_CET_ENABLED === "false") {
+    return errResponse(
+      503,
+      "DEPENDENCY_UNAVAILABLE",
+      "MHT-CET predictor is disabled by configuration",
+    );
+  }
 
   const predictor = await getPredictor(exam_id);
   if (!predictor) {
@@ -224,13 +296,17 @@ async function handlePrediction(
     );
   }
 
-  const input = await readInput(req, method);
+  const input = await readInput(req, method, exam_id);
   if (!input) {
     const message =
       method === "GET"
         ? "query params must include a valid rank"
         : "request body must be valid JSON or query params must include rank";
     return errResponse(400, "INVALID_INPUT", message);
+  }
+  if (exam_id === "mht-cet") {
+    const defenceError = unsupportedMhtCetDefenceInput(input, url);
+    if (defenceError) return defenceError;
   }
 
   let validationResult: ReturnType<typeof validateInput>;
@@ -250,6 +326,13 @@ async function handlePrediction(
     dependencyResult = resolveDatasets(exam_id, configured.examConfig, url);
   } catch (err) {
     const msg = getErrorMessage(err);
+    if (exam_id === "mht-cet") {
+      return errResponse(
+        503,
+        "DEPENDENCY_UNAVAILABLE",
+        `MHT-CET data manifest is unavailable: ${msg}`,
+      );
+    }
     return errResponse(
       500,
       "INTERNAL_ERROR",
@@ -269,7 +352,7 @@ async function handlePrediction(
     const body: PredictionSuccessResponse = {
       ok: true,
       exam_id,
-      result,
+      result: encodeResultForTransport(exam_id, result),
       provenance: buildPredictionProvenance({
         examId: exam_id,
         manifestVersion: dependencyResult.manifestVersion,
@@ -278,8 +361,18 @@ async function handlePrediction(
     };
     return NextResponse.json(body, { status: 200 });
   } catch (err) {
-    const msg = getErrorMessage(err);
-    return errResponse(500, "INTERNAL_ERROR", msg);
+    if (err instanceof PredictionInputError) {
+      return errResponse(400, "INVALID_INPUT", err.message, err.fieldErrors);
+    }
+    if (isMissingDependencyError(err)) {
+      return errResponse(
+        503,
+        "DEPENDENCY_UNAVAILABLE",
+        `predictor data is unavailable for "${exam_id}"`,
+      );
+    }
+    console.error(`prediction failed for "${exam_id}"`, err);
+    return errResponse(500, "INTERNAL_ERROR", "prediction failed");
   }
 }
 

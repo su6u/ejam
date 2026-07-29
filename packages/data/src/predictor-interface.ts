@@ -6,6 +6,16 @@
 
 import { z } from "zod";
 
+export class PredictionInputError extends Error {
+  readonly fieldErrors: Record<string, string>;
+
+  constructor(message: string, fieldErrors: Record<string, string>) {
+    super(message);
+    this.name = "PredictionInputError";
+    this.fieldErrors = fieldErrors;
+  }
+}
+
 export const PredictionError = z.object({
   code: z.enum([
     "EXAM_NOT_FOUND",

@@ -50,10 +50,10 @@ export function createServerCacheKey(value: unknown): string {
   return createHash("sha256").update(stableStringify(value)).digest("hex");
 }
 
-export function getServerCacheEntry(
-  cache: ServerResultCache,
+export function getServerCacheEntry<Entry>(
+  cache: Map<string, Entry>,
   key: string,
-): ServerCacheEntry | undefined {
+): Entry | undefined {
   const entry = cache.get(key);
   if (!entry) return undefined;
 
@@ -62,10 +62,10 @@ export function getServerCacheEntry(
   return entry;
 }
 
-export function setServerCacheEntry(
-  cache: ServerResultCache,
+export function setServerCacheEntry<Entry>(
+  cache: Map<string, Entry>,
   key: string,
-  entry: ServerCacheEntry,
+  entry: Entry,
   maxEntries = SERVER_RESULT_CACHE_MAX_ENTRIES,
 ): void {
   if (maxEntries < 1) {

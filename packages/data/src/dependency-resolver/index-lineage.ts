@@ -13,11 +13,17 @@ const IndexLineageEntry = z.object({
   sha256: z.string(),
 });
 
+const IndexLineageReference = IndexLineageEntry.extend({
+  dataset: z.string(),
+});
+
 export const IndexLineage = z.object({
   index_dataset: z.string(),
   built_at: z.string(),
   manifest_version: z.string().optional(),
   source_cutoffs: z.array(IndexLineageEntry),
+  source_references: z.array(IndexLineageReference).optional(),
+  model_configuration: IndexLineageEntry.optional(),
 });
 export type IndexLineage = z.infer<typeof IndexLineage>;
 

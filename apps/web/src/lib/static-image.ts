@@ -21,6 +21,10 @@ export const EXAM_LOGOS = {
     webp: "/exams/jee_adv.webp",
     fallback: "/exams/jee_adv.webp",
   },
+  "mht-cet": {
+    webp: "/exams/mht_cet.webp",
+    fallback: "/exams/mht_cet.webp",
+  },
   bitsat: {
     webp: "/exams/bitsat.webp",
     fallback: "/exams/bitsat.webp",
