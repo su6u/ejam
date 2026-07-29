@@ -645,6 +645,15 @@ input {
       transform: scaleY(calc(var(--bar-scale, 1) * 1.1));
     }
 
+    .t-round-bars[data-hovering] .t-round-bar[data-unavailable] {
+      opacity: 0.35;
+    }
+
+    .t-round-bar-hit[data-active] .t-round-bar[data-unavailable],
+    .t-round-bar-hit:focus-visible .t-round-bar[data-unavailable] {
+      opacity: 0.7;
+    }
+
     .t-round-bar-hit[data-active] .t-round-bar[data-fill-round],
     .t-round-bar-hit:focus-visible .t-round-bar[data-fill-round] {
       box-shadow: 0 0 0 1px rgb(255 255 255 / 0.35);
@@ -1008,6 +1017,19 @@ input {
     transform: translateX(calc(200% + 0.5rem));
   }
 
+  /* 3 columns, gap 0.5rem (exam picker with MHT-CET) */
+  .sliding-toggle-indicator[data-cols="3"][data-gap="2"] {
+    width: calc((100% - 1rem) / 3);
+  }
+
+  .sliding-toggle-indicator[data-cols="3"][data-gap="2"][data-index="1"] {
+    transform: translateX(calc(100% + 0.5rem));
+  }
+
+  .sliding-toggle-indicator[data-cols="3"][data-gap="2"][data-index="2"] {
+    transform: translateX(calc(200% + 1rem));
+  }
+
   /* 2×2 grid, gap 0.375rem (filter chips) */
   .sliding-toggle-track[data-rows="2"]
   .sliding-toggle-indicator[data-gap="15"] {
@@ -1084,6 +1106,10 @@ input {
 
   .exam-picker-grid .sliding-toggle-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .exam-picker-grid[data-cols="3"] .sliding-toggle-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
   .exam-picker-tile {

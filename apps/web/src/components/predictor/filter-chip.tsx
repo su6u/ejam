@@ -6,6 +6,7 @@ import { ChipIcon } from "./chip-icon";
 
 export function FilterChip({
   label,
+  title,
   iconSrc,
   active,
   disabled,
@@ -16,6 +17,8 @@ export function FilterChip({
   className,
 }: {
   label: string;
+  /** Tooltip / accessible name when the visible label is abbreviated */
+  title?: string;
   iconSrc?: string;
   active: boolean;
   disabled?: boolean;
@@ -29,6 +32,8 @@ export function FilterChip({
   return (
     <button
       type="button"
+      title={title}
+      aria-label={title || undefined}
       aria-pressed={active}
       disabled={disabled}
       onClick={() => (instant ? onClick() : deferAfterPress(onClick))}

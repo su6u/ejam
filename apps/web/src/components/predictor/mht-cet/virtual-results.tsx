@@ -2,15 +2,15 @@
 
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { useEffect, useRef } from "react";
-import { ResultsLoadMore } from "@/components/predictor/mht-cet/pagination-controls";
+import { ResultsScrollStatus } from "@/components/predictor/mht-cet/pagination-controls";
 import { programKey } from "@/components/predictor/program-key";
 import { ResultCard } from "@/components/predictor/result-card";
 import {
   RESULT_TABLE_COLUMNS,
   ResultTableRow,
 } from "@/components/predictor/result-table-row";
-import { TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import type { PredictorDisplayProgram } from "@/lib/predictor-adapters";
+import { cn } from "@/lib/utils";
 
 interface MhtCetVirtualResultsProps {
   rows: PredictorDisplayProgram[];
@@ -23,6 +23,9 @@ interface MhtCetVirtualResultsProps {
   onSelect: (program: PredictorDisplayProgram) => void;
   onLoadMore: () => void;
 }
+
+const headerCellClass =
+  "flex h-10 min-w-0 items-center px-2 text-left text-sm font-medium whitespace-nowrap text-foreground";
 
 export function MhtCetVirtualResults(props: MhtCetVirtualResultsProps) {
   return (
@@ -44,7 +47,7 @@ function MhtVirtualTable({
   onSelect,
   onLoadMore,
 }: MhtCetVirtualResultsProps) {
-  const scrollRef = useRef<HTMLDivElement>(null);
+  const scrollRef = useRef<HTMLElement>(null);
   const virtualizer = useVirtualizer({
     count: rows.length,
     getScrollElement: () => scrollRef.current,
@@ -59,31 +62,31 @@ function MhtVirtualTable({
   }, [resultKey]);
 
   return (
-    <div
+    <section
       ref={scrollRef}
       className="theme-scrollbar hidden min-h-0 flex-1 overflow-auto lg:block"
       aria-busy={loadingMore}
+      aria-label="MHT-CET prediction results"
     >
-      <table
-        className="w-full min-w-[72rem] caption-bottom text-sm"
-        aria-rowcount={total}
-      >
-        <TableHeader className="sticky top-0 z-10 grid bg-background/95 backdrop-blur-sm supports-backdrop-filter:bg-background/50">
-          <TableRow
-            className="grid hover:bg-transparent"
+      <div className="w-full min-w-0 text-sm">
+        <div className="sticky top-0 z-10 border-b border-border bg-background/95 backdrop-blur-sm supports-backdrop-filter:bg-background/50">
+          <div
+            className="grid w-full"
             style={{ gridTemplateColumns: RESULT_TABLE_COLUMNS }}
           >
-            <TableHead className="ps-6">Institute</TableHead>
-            <TableHead>Program</TableHead>
-            <TableHead>Band</TableHead>
-            <TableHead>Chance</TableHead>
-            <TableHead>Closing rank</TableHead>
-            <TableHead>Seat pool</TableHead>
-            <TableHead />
-          </TableRow>
-        </TableHeader>
-        <tbody
-          className="relative grid [&_tr:first-child]:border-t-0"
+            <div className={cn(headerCellClass, "ps-6")}>Institute</div>
+            <div className={headerCellClass}>Program</div>
+            <div className={headerCellClass}>Band</div>
+            <div className={headerCellClass}>Chance</div>
+            <div className={cn(headerCellClass, "tabular-nums")}>
+              Closing rank
+            </div>
+            <div className={headerCellClass}>Seat pool</div>
+            <div className="pe-6" />
+          </div>
+        </div>
+        <div
+          className="relative w-full"
           style={{ height: virtualizer.getTotalSize() }}
         >
           {virtualizer.getVirtualItems().map((virtualRow) => {
@@ -95,7 +98,6 @@ function MhtVirtualTable({
                 selectedId={selectedId}
                 onSelect={onSelect}
                 virtual
-                ariaRowIndex={virtualRow.index + 1}
                 style={{
                   height: virtualRow.size,
                   transform: `translateY(${virtualRow.start}px)`,
@@ -103,17 +105,18 @@ function MhtVirtualTable({
               />
             );
           })}
-        </tbody>
-      </table>
-      <ResultsLoadMore
+        </div>
+      </div>
+      <ResultsScrollStatus
         loaded={rows.length}
         total={total}
         hasMore={hasMore}
         loading={loadingMore}
         error={pageError}
         onLoadMore={onLoadMore}
+        scrollRootRef={scrollRef}
       />
-    </div>
+    </section>
   );
 }
 
@@ -175,13 +178,14 @@ function MhtVirtualCards({
           );
         })}
       </ul>
-      <ResultsLoadMore
+      <ResultsScrollStatus
         loaded={rows.length}
         total={total}
         hasMore={hasMore}
         loading={loadingMore}
         error={pageError}
         onLoadMore={onLoadMore}
+        scrollRootRef={scrollRef}
       />
     </div>
   );

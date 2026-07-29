@@ -66,7 +66,7 @@ describe("round probability bars", () => {
 
     await user.tab();
     await user.tab();
-    expect(screen.getAllByText("—").length).toBeGreaterThanOrEqual(2);
+    expect(screen.getByText("—")).toBeTruthy();
   });
 
   it("keeps the compact non-interactive view screen-reader complete", () => {

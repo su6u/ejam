@@ -11,8 +11,11 @@ import { TableCell, TableRow } from "@/components/ui/table";
 import type { PredictorDisplayProgram } from "@/lib/predictor-adapters";
 import { cn } from "@/lib/utils";
 
+/** Shared desktop column track — fixed metrics, flexible institute/program. */
 export const RESULT_TABLE_COLUMNS =
-  "minmax(15rem,1.15fr) minmax(16rem,1.25fr) minmax(6rem,.55fr) minmax(6rem,.55fr) minmax(7rem,.55fr) minmax(7rem,.6fr) 2.5rem";
+  "minmax(0,1.7fr) minmax(0,1.35fr) 4.25rem 5.5rem 5.75rem 4.5rem 2.5rem";
+
+const cellClass = "flex min-w-0 items-center overflow-hidden px-2";
 
 export function ResultTableRow({
   row,
@@ -20,96 +23,129 @@ export function ResultTableRow({
   onSelect,
   style,
   virtual,
-  ariaRowIndex,
 }: {
   row: PredictorDisplayProgram;
   selectedId: string | null;
   onSelect: (program: PredictorDisplayProgram) => void;
   style?: CSSProperties;
   virtual?: boolean;
-  ariaRowIndex?: number;
 }) {
   const id = programKey(row);
   const isSelected = id === selectedId;
-  const handleKeyDown = (event: KeyboardEvent<HTMLTableRowElement>) => {
+  const handleKeyDown = (
+    event: KeyboardEvent<HTMLTableRowElement | HTMLButtonElement>,
+  ) => {
     if (event.key === "Enter" || event.key === " ") {
       event.preventDefault();
       onSelect(row);
     }
   };
 
+  const institute = (
+    <div className="flex min-w-0 items-center gap-2">
+      <InstituteTypeBadge type={row.instituteType} />
+      <span className="min-w-0 flex-1 truncate font-medium">
+        {row.instituteName}
+      </span>
+    </div>
+  );
+
+  const program = (
+    <div className="min-w-0 truncate">
+      <span>{row.programName}</span>
+      {row.degree ? (
+        <span className="ms-1.5 text-[10px] text-muted-foreground uppercase">
+          {row.degree}
+        </span>
+      ) : null}
+    </div>
+  );
+
+  const chance = (
+    <RoundProbabilityBars
+      className="min-w-0"
+      roundProbs={row.roundProbabilities}
+      overallProbability={row.overallProbability}
+      roundDetails={row.roundDetails}
+      roundAvailability={row.roundAvailability}
+      roundCount={row.roundCount}
+      interactive={false}
+    />
+  );
+
+  const chevron = (
+    <ChevronRight
+      className={cn(
+        "size-4 text-muted-foreground/70 transition-transform duration-150 ease-out",
+        isSelected && "translate-x-0.5 text-foreground",
+      )}
+      aria-hidden
+    />
+  );
+
+  const rowClass = cn(
+    "h-12 cursor-pointer border-b border-border transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted",
+    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+  );
+
+  if (virtual) {
+    return (
+      <button
+        type="button"
+        data-state={isSelected ? "selected" : undefined}
+        aria-label={`${row.instituteName}, ${row.programName}`}
+        onClick={() => onSelect(row)}
+        onKeyDown={handleKeyDown}
+        style={{
+          ...style,
+          display: "grid",
+          gridTemplateColumns: RESULT_TABLE_COLUMNS,
+        }}
+        className={cn(rowClass, "absolute inset-x-0 top-0 w-full text-left")}
+      >
+        <div className={cn(cellClass, "ps-6")}>{institute}</div>
+        <div className={cellClass}>{program}</div>
+        <div className={cellClass}>
+          <BandBadge band={row.band} />
+        </div>
+        <div className={cellClass}>{chance}</div>
+        <div className={cn(cellClass, "whitespace-nowrap tabular-nums")}>
+          {formatInteger(row.predictedClosingRank)}
+        </div>
+        <div className={cn(cellClass, "text-muted-foreground")}>
+          <span className="truncate">{row.seatPoolLabel}</span>
+        </div>
+        <div className="flex items-center justify-end pe-6">{chevron}</div>
+      </button>
+    );
+  }
+
   return (
     <TableRow
       data-state={isSelected ? "selected" : undefined}
       tabIndex={0}
-      role={virtual ? "row" : "button"}
-      aria-rowindex={ariaRowIndex}
+      role="button"
       aria-label={`${row.instituteName}, ${row.programName}`}
       onClick={() => onSelect(row)}
       onKeyDown={handleKeyDown}
-      style={
-        virtual
-          ? {
-              ...style,
-              display: "grid",
-              gridTemplateColumns: RESULT_TABLE_COLUMNS,
-            }
-          : style
-      }
-      className={cn(
-        "h-12 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
-        virtual && "absolute top-0 left-0 w-full",
-      )}
+      style={style}
+      className={rowClass}
     >
       <TableCell className="min-w-0 overflow-hidden ps-6">
-        <div className="flex min-w-0 items-center gap-2 overflow-hidden">
-          <InstituteTypeBadge type={row.instituteType} />
-          <span className="min-w-0 flex-1 truncate font-medium">
-            {row.instituteName}
-          </span>
-        </div>
+        {institute}
       </TableCell>
-      <TableCell className="min-w-0 overflow-hidden truncate">
-        <span>{row.programName}</span>
-        {row.degree ? (
-          <span className="ms-1.5 text-[10px] text-muted-foreground uppercase">
-            {row.degree}
-          </span>
-        ) : null}
-        {row.choiceCode ? (
-          <span className="ms-1.5 text-[10px] text-muted-foreground">
-            {row.choiceCode}
-          </span>
-        ) : null}
-      </TableCell>
-      <TableCell className="min-w-24">
+      <TableCell className="min-w-0 overflow-hidden">{program}</TableCell>
+      <TableCell className="min-w-0 overflow-hidden">
         <BandBadge band={row.band} />
       </TableCell>
-      <TableCell className="min-w-24">
-        <RoundProbabilityBars
-          className="shrink-0"
-          roundProbs={row.roundProbabilities}
-          overallProbability={row.overallProbability}
-          roundDetails={row.roundDetails}
-          roundAvailability={row.roundAvailability}
-          roundCount={row.roundCount}
-        />
-      </TableCell>
-      <TableCell className="pe-6 whitespace-nowrap tabular-nums">
+      <TableCell className="min-w-0 overflow-hidden">{chance}</TableCell>
+      <TableCell className="min-w-0 overflow-hidden whitespace-nowrap tabular-nums">
         {formatInteger(row.predictedClosingRank)}
       </TableCell>
-      <TableCell className="min-w-28 truncate text-muted-foreground">
+      <TableCell className="min-w-0 truncate text-muted-foreground">
         {row.seatPoolLabel}
       </TableCell>
-      <TableCell className="pe-6 text-right">
-        <ChevronRight
-          className={cn(
-            "size-4 text-muted-foreground/70 transition-transform duration-150 ease-out",
-            isSelected && "translate-x-0.5 text-foreground",
-          )}
-          aria-hidden
-        />
-      </TableCell>
+      <TableCell className="pe-6 text-right">{chevron}</TableCell>
     </TableRow>
   );
 }

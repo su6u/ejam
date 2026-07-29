@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 
-import { cleanup, render, screen } from "@testing-library/react";
+import { cleanup, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import axe from "axe-core";
 import { afterEach, beforeAll, describe, expect, it, vi } from "vitest";
@@ -27,6 +27,26 @@ vi.mock("@tanstack/react-virtual", () => ({
     measureElement: () => {},
   }),
 }));
+
+type ObserverEntry = {
+  isIntersecting: boolean;
+  target: Element;
+};
+
+let observerCallback: ((entries: ObserverEntry[]) => void) | null = null;
+
+class TestIntersectionObserver {
+  constructor(callback: (entries: ObserverEntry[]) => void) {
+    observerCallback = callback;
+  }
+
+  observe() {
+    observerCallback?.([{ isIntersecting: true, target: document.body }]);
+  }
+
+  disconnect() {}
+  unobserve() {}
+}
 
 class TestResizeObserver {
   readonly callback: ResizeObserverCallback;
@@ -77,6 +97,7 @@ function displayProgram(index: number): PredictorDisplayProgram {
 
 beforeAll(() => {
   vi.stubGlobal("ResizeObserver", TestResizeObserver);
+  vi.stubGlobal("IntersectionObserver", TestIntersectionObserver);
   HTMLElement.prototype.scrollTo = vi.fn();
   Object.defineProperty(HTMLElement.prototype, "clientHeight", {
     configurable: true,
@@ -100,16 +121,18 @@ beforeAll(() => {
     }) as DOMRect;
 });
 
-afterEach(() => cleanup());
+afterEach(() => {
+  cleanup();
+  observerCallback = null;
+});
 
 describe("MHT-CET virtual results", () => {
-  it("bounds mounted programs and loads only after an explicit press", async () => {
-    const user = userEvent.setup();
+  it("bounds mounted programs and loads more on scroll near the end", async () => {
     const loadMore = vi.fn();
     const rows = Array.from({ length: 100 }, (_, index) =>
       displayProgram(index),
     );
-    const { container, rerender } = render(
+    const { container } = render(
       <MhtCetVirtualResults
         rows={rows}
         total={2_072}
@@ -128,26 +151,32 @@ describe("MHT-CET virtual results", () => {
     );
     expect(mountedPrograms.length).toBeGreaterThan(0);
     expect(mountedPrograms.length).toBeLessThanOrEqual(40);
-    expect(loadMore).not.toHaveBeenCalled();
+    expect(screen.queryByRole("button", { name: /Load \d+ more/i })).toBeNull();
 
-    const buttons = screen.getAllByRole("button", { name: "Load 100 more" });
-    await user.click(buttons[0]);
-    expect(loadMore).toHaveBeenCalledTimes(1);
+    await waitFor(() => {
+      expect(loadMore).toHaveBeenCalled();
+    });
+  });
 
-    rerender(
+  it("keeps a retry control when paging fails", async () => {
+    const user = userEvent.setup();
+    const loadMore = vi.fn();
+    render(
       <MhtCetVirtualResults
-        rows={Array.from({ length: 200 }, (_, index) => displayProgram(index))}
+        rows={[displayProgram(0)]}
         total={2_072}
         selectedId={null}
         resultKey="first"
         hasMore
         loadingMore={false}
-        pageError={null}
+        pageError="Could not load the next page"
         onSelect={() => {}}
         onLoadMore={loadMore}
       />,
     );
-    expect(document.activeElement).toBe(buttons[0]);
+
+    await user.click(screen.getAllByRole("button", { name: "Try again" })[0]);
+    expect(loadMore).toHaveBeenCalled();
   });
 
   it("exposes total-position metadata without serious axe violations", async () => {
@@ -169,8 +198,8 @@ describe("MHT-CET virtual results", () => {
     );
 
     expect(
-      container.querySelector("table")?.getAttribute("aria-rowcount"),
-    ).toBe("2072");
+      screen.getByRole("region", { name: "MHT-CET prediction results" }),
+    ).not.toBeNull();
     expect(
       container.querySelector("[aria-posinset]")?.getAttribute("aria-setsize"),
     ).toBe("2072");

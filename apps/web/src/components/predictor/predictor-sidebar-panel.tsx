@@ -85,22 +85,15 @@ function PredictorSidebarPanelInner() {
     ? undefined
     : !state.rank.trim()
       ? isMhtCet
-        ? "Enter your MHT-CET merit rank"
+        ? undefined
         : "Enter your counselling rank"
       : needsHomeState && !state.homeState.trim()
         ? "Select your home state for OS or HS quota"
-        : needsMhtHomeUniversity && !state.mhtHomeUniversity.trim()
-          ? "Select your home university for Maharashtra candidature"
-          : hasPredictedForInputs
-            ? "Change rank or profile to predict again"
-            : undefined;
+        : undefined;
 
   return (
     <div className="flex min-h-full flex-col">
       <div className={cn("px-2 pb-2", sidebarPanelTopInsetClass)}>
-        <p className="mb-2 text-[10px] font-medium tracking-wide text-muted-foreground uppercase">
-          Choose exam
-        </p>
         <ExamPicker
           value={state.exam}
           onValueChange={state.setExam}
@@ -116,11 +109,6 @@ function PredictorSidebarPanelInner() {
             value={state.rank}
             onValueChange={state.setRank}
             aria-label={isMhtCet ? "MHT-CET merit rank" : "Rank"}
-            emptyErrorMessage={
-              isMhtCet
-                ? "Enter your MHT-CET merit rank to predict colleges."
-                : undefined
-            }
           />
         </SetupField>
 
