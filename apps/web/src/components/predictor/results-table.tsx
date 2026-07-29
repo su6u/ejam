@@ -202,17 +202,17 @@ function JeeResults({
         onSelect={onSelect}
       />
       <div className="hidden lg:contents">
-        <Table>
+        <Table className="table-fixed">
           <TableHeader className={stickyGlassTableHeaderClass}>
             <TableRow className="hover:bg-transparent">
-              <TableHead className="ps-6">Institute</TableHead>
-              <TableHead>Program</TableHead>
-              <TableHead className="min-w-24">Band</TableHead>
-              <TableHead className="min-w-24">Chance</TableHead>
-              <TableHead className="w-0 pe-6 whitespace-nowrap tabular-nums">
+              <TableHead className="w-[18%] ps-6">Institute</TableHead>
+              <TableHead className="w-[30%]">Program</TableHead>
+              <TableHead className="w-[9%]">Band</TableHead>
+              <TableHead className="w-[12%]">Chance</TableHead>
+              <TableHead className="w-[12%] whitespace-nowrap tabular-nums">
                 Closing rank
               </TableHead>
-              <TableHead className="min-w-[7rem]">Seat pool</TableHead>
+              <TableHead className="w-[14%]">Seat pool</TableHead>
               <TableHead className="w-10 pe-6 text-right" />
             </TableRow>
           </TableHeader>

@@ -6,6 +6,17 @@ import { uiQuotaToApi } from "@ejam/predictors/shared/quota-input";
 import { z } from "zod";
 import type { PredictorDisplayProgram, PredictorDisplayResult } from "./types";
 
+function jeeSeatPoolLabel(program: ProgramPrediction): string {
+  const gender = program.gender.startsWith("Gender")
+    ? "GN"
+    : program.gender.startsWith("Female")
+      ? "F"
+      : program.gender;
+  return [program.seat_type, program.quota.toUpperCase(), gender]
+    .filter(Boolean)
+    .join(" · ");
+}
+
 const JeeProgramResult = z.looseObject({
   institute_id: z.string(),
   program_id: z.string(),
@@ -114,7 +125,7 @@ function jeeDisplayProgram(
     predictedClosingRank: program.predicted_closing_rank,
     roundProbabilities: program.round_probs,
     roundCount: 6,
-    seatPoolLabel: `${program.seat_type} · ${program.quota.toUpperCase()}`,
+    seatPoolLabel: jeeSeatPoolLabel(program),
     dataQuality: program.data_quality,
     yearsOfData: program.years_of_data,
     latestYear: program.last_data_year,
