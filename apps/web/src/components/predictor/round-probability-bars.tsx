@@ -90,22 +90,19 @@ function renderBar(
   const roundNum = index + 1;
   if (prob === null) {
     const unavailableLabel = `Round ${roundNum}: ${unavailableReason ?? "No official eligible cutoff published for this round"}`;
-    const isActive = wrapperProps?.["data-active"] !== undefined;
     const bar = (
-      <span
-        className="t-round-bar inline-flex h-3 w-[7px] shrink-0 items-center justify-center text-[9px] leading-none text-muted-foreground/60"
+      <div
+        className="t-round-bar h-3 w-[3px] shrink-0 rounded-none bg-muted-foreground/25"
         data-round={roundNum}
         data-unavailable=""
-        style={{
-          animation: "none",
-          opacity: isActive ? 0.85 : 0.5,
-          transform: "none",
-          transition: "opacity var(--round-bar-dur) var(--round-bar-ease)",
-        }}
+        style={
+          {
+            "--bar-scale": "1",
+            animation: "none",
+          } as React.CSSProperties
+        }
         aria-hidden
-      >
-        —
-      </span>
+      />
     );
     if (Wrapper === "div") {
       return (
