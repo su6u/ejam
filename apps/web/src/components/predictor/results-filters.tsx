@@ -2,6 +2,7 @@
 
 import type { ProbabilityBand } from "@ejam/data/college-predictor";
 import { FilterChip, FilterGroup } from "@/components/predictor/filter-chips";
+import { shortInstituteTypeLabel } from "@/components/predictor/institute-type-badge";
 import type { ResultsFilterState } from "@/components/predictor/results-filter-logic";
 import type { ExamType } from "@/hooks/use-predictor-state";
 import { isJeeMainCounselling } from "@/hooks/use-predictor-state";
@@ -106,25 +107,29 @@ export function ResultsFilters({
       grid={2}
       slidingIndex={instituteSlidingIndex}
     >
-      {instituteTypes.map((type) => (
-        <FilterChip
-          key={type}
-          label={
-            instituteTypeFacets
-              ? `${type} · ${instituteFacetCounts.get(type) ?? 0}`
-              : type
-          }
-          active={filters.instituteTypes.has(type)}
-          disabled={
-            !enabled ||
-            (instituteTypeFacets !== undefined &&
-              (instituteFacetCounts.get(type) ?? 0) === 0 &&
-              !filters.instituteTypes.has(type))
-          }
-          fullWidth
-          onClick={() => toggleInstitute(type)}
-        />
-      ))}
+      {instituteTypes.map((type) => {
+        const shortLabel = shortInstituteTypeLabel(type);
+        const count = instituteFacetCounts.get(type) ?? 0;
+        const fullLabel = instituteTypeFacets ? `${type} · ${count}` : type;
+        return (
+          <FilterChip
+            key={type}
+            label={
+              instituteTypeFacets ? `${shortLabel} · ${count}` : shortLabel
+            }
+            title={fullLabel}
+            active={filters.instituteTypes.has(type)}
+            disabled={
+              !enabled ||
+              (instituteTypeFacets !== undefined &&
+                count === 0 &&
+                !filters.instituteTypes.has(type))
+            }
+            fullWidth
+            onClick={() => toggleInstitute(type)}
+          />
+        );
+      })}
     </FilterGroup>
   ) : null;
 
