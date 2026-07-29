@@ -1,7 +1,5 @@
-import type {
-  ProbabilityBand,
-  ProgramPrediction,
-} from "@ejam/data/college-predictor";
+import type { ProbabilityBand } from "@ejam/data/college-predictor";
+import type { PredictorDisplayProgram } from "@/lib/predictor-adapters";
 
 export interface ResultsFilterState {
   instituteTypes: Set<string>;
@@ -14,17 +12,17 @@ export const EMPTY_RESULTS_FILTERS: ResultsFilterState = {
 };
 
 export function applyResultsFilters(
-  programs: ProgramPrediction[],
+  programs: PredictorDisplayProgram[],
   filters: ResultsFilterState,
   includeAll: boolean = true,
-): ProgramPrediction[] {
+): PredictorDisplayProgram[] {
   return programs.filter((program) => {
     if (!includeAll && program.band === "doesnt-matter") {
       return false;
     }
     if (
       filters.instituteTypes.size > 0 &&
-      !filters.instituteTypes.has(program.instype)
+      !filters.instituteTypes.has(program.instituteType)
     ) {
       return false;
     }

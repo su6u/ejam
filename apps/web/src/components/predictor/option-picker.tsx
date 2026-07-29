@@ -13,6 +13,7 @@ import { cn } from "@/lib/utils";
 interface OptionPickerOption {
   value: string;
   label: string;
+  description?: string;
 }
 
 interface OptionPickerProps {
@@ -91,13 +92,19 @@ export function OptionPicker({
                     });
                   }}
                   className={cn(
-                    "flex h-8 w-full items-center rounded-none px-2 text-left text-sm outline-none",
+                    "flex w-full flex-col items-start justify-center rounded-none px-2 text-left text-sm outline-none",
+                    option.description ? "min-h-11 py-1.5" : "h-8",
                     pressableClass,
                     "hover:bg-muted hover:text-foreground",
                     isSelected ? "text-foreground" : "text-muted-foreground",
                   )}
                 >
-                  {option.label}
+                  <span>{option.label}</span>
+                  {option.description ? (
+                    <span className="text-[10px] leading-snug text-muted-foreground">
+                      {option.description}
+                    </span>
+                  ) : null}
                 </button>
               </li>
             );

@@ -25,6 +25,9 @@ const REGISTRY: Record<string, RegistryEntry> = {
   csab: {
     load: () => import("./csab/index").then((m) => m.predictor),
   },
+  "mht-cet": {
+    load: () => import("./mht-cet/index").then((m) => m.predictor),
+  },
 };
 
 /** returns the predictor for the given exam_id, or null if unregistered */

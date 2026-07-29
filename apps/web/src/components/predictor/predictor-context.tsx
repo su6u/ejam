@@ -1,6 +1,7 @@
 "use client";
 
 import { quotaRequiresHomeState } from "@ejam/predictors/shared/quota-input";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useSearchParams } from "next/navigation";
 import {
   createContext,
@@ -24,6 +25,7 @@ import {
 import { usePredictorQuery } from "@/hooks/use-predictor-query";
 import {
   counsellingToPredictorExam,
+  type ExamType,
   type PredictorStateReturn,
   parseCounsellingBody,
   predictorUsesQuotaHomeState,
@@ -45,6 +47,7 @@ interface PredictorContextValue {
   searchQuery: string;
   setSearchQuery: (next: string) => void;
   hasResults: boolean;
+  mhtCetEnabled: boolean;
 }
 
 const PredictorContext = createContext<PredictorContextValue | null>(null);
@@ -54,14 +57,24 @@ function captureInitialUrlParams(): URLSearchParams | null {
   return new URLSearchParams(window.location.search);
 }
 
-function shareLinkReadyToPredict(params: URLSearchParams): boolean {
+function shareLinkReadyToPredict(
+  params: URLSearchParams,
+  mhtCetEnabled: boolean,
+): boolean {
   if (!params.get("rank")?.trim()) return false;
-  const exam = params.get("exam") ?? "jee-main";
+  const rawExam = params.get("exam");
+  const exam: ExamType =
+    rawExam === "jee-advanced" || rawExam === "mht-cet" ? rawExam : "jee-main";
+  if (exam === "mht-cet" && !mhtCetEnabled) return false;
+  if (
+    exam === "mht-cet" &&
+    (params.get("mht_candidature") ?? "type-a") !== "type-e" &&
+    !params.get("mht_home_university")?.trim()
+  ) {
+    return false;
+  }
   const counselling = parseCounsellingBody(params.get("counselling"));
-  const predictorExamId = counsellingToPredictorExam(
-    exam as "jee-main" | "jee-advanced",
-    counselling,
-  );
+  const predictorExamId = counsellingToPredictorExam(exam, counselling);
   const quota = params.get("quota") ?? "os";
   if (
     predictorUsesQuotaHomeState(predictorExamId) &&
@@ -73,17 +86,62 @@ function shareLinkReadyToPredict(params: URLSearchParams): boolean {
   return true;
 }
 
-export function PredictorProvider({ children }: { children: React.ReactNode }) {
+export function PredictorProvider({
+  children,
+  mhtCetEnabled = false,
+}: {
+  children: React.ReactNode;
+  mhtCetEnabled?: boolean;
+}) {
+  const [queryClient] = useState(
+    () =>
+      new QueryClient({
+        defaultOptions: {
+          queries: {
+            staleTime: 5 * 60 * 1000,
+            gcTime: 10 * 60 * 1000,
+            refetchOnWindowFocus: false,
+            refetchOnReconnect: false,
+          },
+        },
+      }),
+  );
   return (
-    <Suspense fallback={null}>
-      <PredictorProviderInner>{children}</PredictorProviderInner>
-    </Suspense>
+    <QueryClientProvider client={queryClient}>
+      <Suspense fallback={null}>
+        <PredictorProviderInner mhtCetEnabled={mhtCetEnabled}>
+          {children}
+        </PredictorProviderInner>
+      </Suspense>
+    </QueryClientProvider>
   );
 }
 
-function PredictorProviderInner({ children }: { children: React.ReactNode }) {
+function PredictorProviderInner({
+  children,
+  mhtCetEnabled,
+}: {
+  children: React.ReactNode;
+  mhtCetEnabled: boolean;
+}) {
   const params = useSearchParams();
-  const state = usePredictorState(params);
+  const requestedState = usePredictorState(params);
+  const state: PredictorStateReturn =
+    !mhtCetEnabled && requestedState.exam === "mht-cet"
+      ? {
+          ...requestedState,
+          exam: "jee-main",
+          predictorExamId: counsellingToPredictorExam(
+            "jee-main",
+            requestedState.counselling,
+          ),
+        }
+      : requestedState;
+  const [filters, setFilters] = useState<ResultsFilterState>(
+    EMPTY_RESULTS_FILTERS,
+  );
+  const [sortBy, setSortBy] = useState<ResultsSortKey>(DEFAULT_RESULTS_SORT);
+  const [searchQuery, setSearchQuery] = useState("");
   const query = usePredictorQuery({
     predictorExamId: state.predictorExamId,
     rank: state.rank,
@@ -93,12 +151,18 @@ function PredictorProviderInner({ children }: { children: React.ReactNode }) {
     homeState: state.homeState,
     has_ews_certificate: state.has_ews_certificate,
     include_all: state.include_all,
+    mhtCandidatureType: state.mhtCandidatureType,
+    mhtCategory: state.mhtCategory,
+    mhtLadiesSeatEligible: state.mhtLadiesSeatEligible,
+    mhtHomeUniversity: state.mhtHomeUniversity,
+    mhtTfwsEligible: state.mhtTfwsEligible,
+    mhtPwdCategory: state.mhtPwdCategory,
+    mhtOrphanCertificate: state.mhtOrphanCertificate,
+    mhtMinorityCommunity: state.mhtMinorityCommunity,
+    filters,
+    sortBy,
+    searchQuery,
   });
-  const [filters, setFilters] = useState<ResultsFilterState>(
-    EMPTY_RESULTS_FILTERS,
-  );
-  const [sortBy, setSortBy] = useState<ResultsSortKey>(DEFAULT_RESULTS_SORT);
-  const [searchQuery, setSearchQuery] = useState("");
   const rankInputRef = useRef<RankInputHandle>(null);
   const initialUrlParamsRef = useRef<URLSearchParams | null | undefined>(
     undefined,
@@ -107,12 +171,23 @@ function PredictorProviderInner({ children }: { children: React.ReactNode }) {
     initialUrlParamsRef.current = captureInitialUrlParams();
   }
   const shareLinkAutoPredictDone = useRef(false);
-  const hasResults = (query.data?.programs.length ?? 0) > 0;
+  const hasResults =
+    query.data?.resultMode === "server-paged"
+      ? query.data !== null
+      : (query.data?.programs.length ?? 0) > 0;
+
+  useEffect(() => {
+    if (!mhtCetEnabled && requestedState.exam === "mht-cet") {
+      requestedState.setExam("jee-main");
+    }
+  }, [mhtCetEnabled, requestedState.exam, requestedState.setExam]);
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: reset filters when exam or counselling changes
   useEffect(() => {
     setFilters(EMPTY_RESULTS_FILTERS);
-    setSortBy(DEFAULT_RESULTS_SORT);
+    setSortBy(
+      state.predictorExamId === "mht-cet" ? "chance" : DEFAULT_RESULTS_SORT,
+    );
     setSearchQuery("");
   }, [state.exam, state.counselling]);
 
@@ -131,7 +206,7 @@ function PredictorProviderInner({ children }: { children: React.ReactNode }) {
       flushedRank,
       state.include_all ? { include_all: true } : undefined,
     );
-    if (!fromCache) {
+    if (!fromCache && state.predictorExamId !== "mht-cet") {
       setFilters(EMPTY_RESULTS_FILTERS);
       setSortBy(DEFAULT_RESULTS_SORT);
       setSearchQuery("");
@@ -141,11 +216,16 @@ function PredictorProviderInner({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (shareLinkAutoPredictDone.current) return;
     const initialParams = initialUrlParamsRef.current;
-    if (!initialParams || !shareLinkReadyToPredict(initialParams)) return;
+    if (
+      !initialParams ||
+      !shareLinkReadyToPredict(initialParams, mhtCetEnabled)
+    ) {
+      return;
+    }
 
     shareLinkAutoPredictDone.current = true;
     void onPredict();
-  }, [onPredict]);
+  }, [mhtCetEnabled, onPredict]);
 
   const contextValue = useMemo(
     () => ({
@@ -160,8 +240,18 @@ function PredictorProviderInner({ children }: { children: React.ReactNode }) {
       searchQuery,
       setSearchQuery,
       hasResults,
+      mhtCetEnabled,
     }),
-    [state, query, onPredict, filters, sortBy, searchQuery, hasResults],
+    [
+      state,
+      query,
+      onPredict,
+      filters,
+      sortBy,
+      searchQuery,
+      hasResults,
+      mhtCetEnabled,
+    ],
   );
 
   return (

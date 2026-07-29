@@ -1,14 +1,6 @@
-import type {
-  CollegePredictorFilters,
-  ProgramPrediction,
-} from "@ejam/data/college-predictor";
-import {
-  applyBalancedRanking,
-  branchFilterActive,
-  instituteMetaFromPrograms,
-  sortByChance,
-  sortByClosingRank,
-} from "@ejam/data/college-predictor";
+import type { CollegePredictorFilters } from "@ejam/data/college-predictor";
+import type { PredictorDisplayProgram } from "@/lib/predictor-adapters";
+import { applyJeeBalancedSort } from "./jee/balanced-sort";
 
 export type ResultsSortKey =
   | "balanced"
@@ -19,35 +11,40 @@ export type ResultsSortKey =
 export const DEFAULT_RESULTS_SORT: ResultsSortKey = "balanced";
 
 export function applyResultsSort(
-  programs: ProgramPrediction[],
+  programs: PredictorDisplayProgram[],
   sortBy: ResultsSortKey,
   apiFilters?: CollegePredictorFilters,
-): ProgramPrediction[] {
+): PredictorDisplayProgram[] {
   const sorted = [...programs];
 
   switch (sortBy) {
     case "balanced":
-      return applyBalancedRanking(sorted, {
-        instituteMeta: instituteMetaFromPrograms(sorted),
-        branchFilterActive: branchFilterActive(apiFilters),
-      });
+      if (sorted.some((program) => !program.jeeProgram)) {
+        return applyResultsSort(sorted, "chance", apiFilters);
+      }
+      return applyJeeBalancedSort(sorted, apiFilters);
     case "closing-rank":
-      return sortByClosingRank(sorted);
+      sorted.sort((a, b) => {
+        const rank = a.predictedClosingRank - b.predictedClosingRank;
+        return rank !== 0 ? rank : a.key.localeCompare(b.key);
+      });
+      return sorted;
     case "institute":
       sorted.sort((a, b) => {
-        let cmp = a.institute_id.localeCompare(b.institute_id);
+        let cmp = a.instituteName.localeCompare(b.instituteName);
         if (cmp !== 0) return cmp;
-        cmp = a.program_id.localeCompare(b.program_id);
-        if (cmp !== 0) return cmp;
-        cmp = a.seat_type.localeCompare(b.seat_type);
-        if (cmp !== 0) return cmp;
-        cmp = a.quota.localeCompare(b.quota);
-        if (cmp !== 0) return cmp;
-        return a.gender.localeCompare(b.gender);
+        cmp = a.programName.localeCompare(b.programName);
+        return cmp !== 0 ? cmp : a.key.localeCompare(b.key);
       });
       break;
     case "chance":
-      return sortByChance(sorted);
+      sorted.sort((a, b) => {
+        const probability = b.overallProbability - a.overallProbability;
+        if (probability !== 0) return probability;
+        const rank = a.predictedClosingRank - b.predictedClosingRank;
+        return rank !== 0 ? rank : a.key.localeCompare(b.key);
+      });
+      return sorted;
   }
 
   return sorted;

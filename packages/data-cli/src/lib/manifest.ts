@@ -1,6 +1,6 @@
 /**
  * shared catalog generation — single canonical format for data/catalog/releases/v*.json
- * used by generate-manifest.ts and fetch-data.ts
+ * used by release/generate-manifest.ts and release/fetch-data.ts
  */
 
 import * as crypto from "node:crypto";

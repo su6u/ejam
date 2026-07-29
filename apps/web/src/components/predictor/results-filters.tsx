@@ -1,14 +1,12 @@
 "use client";
 
-import type {
-  ProbabilityBand,
-  ProgramPrediction,
-} from "@ejam/data/college-predictor";
+import type { ProbabilityBand } from "@ejam/data/college-predictor";
 import { FilterChip, FilterGroup } from "@/components/predictor/filter-chips";
 import type { ResultsFilterState } from "@/components/predictor/results-filter-logic";
 import type { ExamType } from "@/hooks/use-predictor-state";
 import { isJeeMainCounselling } from "@/hooks/use-predictor-state";
 import { BAND_FILTER_OPTIONS } from "@/lib/bands";
+import type { PredictorDisplayProgram } from "@/lib/predictor-adapters";
 import { deferAfterPress, pressableClass } from "@/lib/pressable";
 import { cn } from "@/lib/utils";
 
@@ -32,23 +30,26 @@ function singleActiveSlidingIndex<T>(
 }
 
 function availableInstituteTypes(
-  programs: ProgramPrediction[],
+  programs: PredictorDisplayProgram[],
   exam: ExamType,
 ): string[] {
-  if (!isJeeMainCounselling(exam)) return [];
-
-  const present = new Set(programs.map((p) => p.instype));
-  return JEE_MAIN_INSTITUTE_ORDER.filter((type) => present.has(type));
+  const present = new Set(programs.map((p) => p.instituteType));
+  if (isJeeMainCounselling(exam)) {
+    return JEE_MAIN_INSTITUTE_ORDER.filter((type) => present.has(type));
+  }
+  return Array.from(present).sort();
 }
 
 interface ResultsFiltersProps {
   exam: ExamType;
-  programs: ProgramPrediction[];
+  programs: PredictorDisplayProgram[];
   filters: ResultsFilterState;
   onChange: (next: ResultsFilterState) => void;
   enabled: boolean;
   includeAll: boolean;
   onToggleLongShots: () => void;
+  instituteTypeFacets?: Array<{ value: string; count: number }>;
+  bandFacets?: Record<ProbabilityBand, number>;
 }
 
 export function ResultsFilters({
@@ -59,10 +60,21 @@ export function ResultsFilters({
   enabled,
   includeAll,
   onToggleLongShots,
+  instituteTypeFacets,
+  bandFacets,
 }: ResultsFiltersProps) {
-  const instituteTypes = availableInstituteTypes(programs, exam);
-  const showInstituteGroup =
-    isJeeMainCounselling(exam) && instituteTypes.length > 0;
+  const instituteFacetCounts = new Map(
+    instituteTypeFacets?.map((facet) => [facet.value, facet.count]),
+  );
+  const instituteTypes = instituteTypeFacets
+    ? Array.from(
+        new Set([
+          ...instituteTypeFacets.map((facet) => facet.value),
+          ...filters.instituteTypes,
+        ]),
+      ).sort()
+    : availableInstituteTypes(programs, exam);
+  const showInstituteGroup = instituteTypes.length > 0;
 
   function toggleInstitute(type: string) {
     const next = new Set(filters.instituteTypes);
@@ -97,9 +109,18 @@ export function ResultsFilters({
       {instituteTypes.map((type) => (
         <FilterChip
           key={type}
-          label={type}
+          label={
+            instituteTypeFacets
+              ? `${type} · ${instituteFacetCounts.get(type) ?? 0}`
+              : type
+          }
           active={filters.instituteTypes.has(type)}
-          disabled={!enabled}
+          disabled={
+            !enabled ||
+            (instituteTypeFacets !== undefined &&
+              (instituteFacetCounts.get(type) ?? 0) === 0 &&
+              !filters.instituteTypes.has(type))
+          }
           fullWidth
           onClick={() => toggleInstitute(type)}
         />
@@ -117,9 +138,14 @@ export function ResultsFilters({
       {BAND_FILTER_OPTIONS.map(({ id, label, color }) => (
         <FilterChip
           key={id}
-          label={label}
+          label={bandFacets ? `${label} · ${bandFacets[id]}` : label}
           active={filters.bands.has(id)}
-          disabled={!enabled}
+          disabled={
+            !enabled ||
+            (bandFacets !== undefined &&
+              bandFacets[id] === 0 &&
+              !filters.bands.has(id))
+          }
           fullWidth
           accentColor={color}
           onClick={() => toggleBand(id)}

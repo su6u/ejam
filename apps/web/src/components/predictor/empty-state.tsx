@@ -15,6 +15,7 @@ import {
   EmptyHeader,
   EmptyMedia,
 } from "@/components/ui/empty";
+import type { ExamType } from "@/hooks/use-predictor-state";
 import { deferAfterPress } from "@/lib/pressable";
 import {
   type LoopIllustrationSource,
@@ -23,6 +24,33 @@ import {
 
 const emptyStateActionClass =
   "rounded-none border-border bg-transparent text-muted-foreground shadow-none hover:bg-transparent hover:text-foreground dark:bg-transparent dark:hover:bg-transparent";
+
+export function getEmptyStateDescription({
+  hasPredicted,
+  metadata,
+  exam,
+}: {
+  hasPredicted: boolean;
+  metadata?: CollegePredictionResult["metadata"];
+  exam?: ExamType;
+}): string {
+  if (!hasPredicted) {
+    if (exam === "mht-cet") {
+      return "MHT-CET is selected. Add your CAP merit rank and complete your candidature profile to see Maharashtra engineering options.";
+    }
+    return "Pick an exam, enter your rank, then run Predict colleges to see options ranked by admission chance.";
+  }
+
+  if (metadata && metadata.hidden_programs > 0) {
+    return `Nothing clears our 10% chance cutoff at this rank. ${formatInteger(metadata.hidden_programs)} "doesn't matter yaar" picks are hidden. Try a better (lower) rank to see likely options.`;
+  }
+
+  if (metadata && metadata.total_matching_programs === 0) {
+    return "No seats match your category, gender, and quota at this rank.";
+  }
+
+  return "No colleges with a meaningful chance at this rank. Try a better (lower) rank.";
+}
 
 function StateIllustration({
   src,
@@ -38,39 +66,21 @@ function StateIllustration({
   );
 }
 
-function emptyDescription({
-  hasPredicted,
-  metadata,
-}: {
-  hasPredicted: boolean;
-  metadata?: CollegePredictionResult["metadata"];
-}): string {
-  if (!hasPredicted) {
-    return "Pick an exam, enter your rank, then run Predict colleges to see options ranked by admission chance.";
-  }
-
-  if (metadata && metadata.hidden_programs > 0) {
-    return `Nothing clears our 10% chance cutoff at this rank. ${formatInteger(metadata.hidden_programs)} "doesn't matter yaar" picks are hidden. Try a better (lower) rank to see likely options.`;
-  }
-
-  if (metadata && metadata.total_matching_programs === 0) {
-    return "No seats match your category, gender, and quota at this rank.";
-  }
-
-  return "No colleges with a meaningful chance at this rank. Try a better (lower) rank.";
-}
-
 export function EmptyState({
+  exam,
   hasPredicted = false,
   metadata,
   includeAll = false,
   onShowLongShots,
+  onOpenSetup,
   provenance,
 }: {
+  exam?: ExamType;
   hasPredicted?: boolean;
   metadata?: CollegePredictionResult["metadata"];
   includeAll?: boolean;
   onShowLongShots?: () => void;
+  onOpenSetup?: () => void;
   provenance?: PredictionProvenance | null;
 }) {
   const showLongShotsAction =
@@ -88,7 +98,7 @@ export function EmptyState({
         <EmptyHeader>
           <StateIllustration src={PREDICTOR_ILLUSTRATIONS.empty} priority />
           <EmptyDescription>
-            {emptyDescription({ hasPredicted, metadata })}
+            {getEmptyStateDescription({ hasPredicted, metadata, exam })}
           </EmptyDescription>
         </EmptyHeader>
         {showLongShotsAction ? (
@@ -101,6 +111,20 @@ export function EmptyState({
               onClick={() => deferAfterPress(onShowLongShots)}
             >
               Show doesn't matter yaar
+            </Button>
+          </EmptyContent>
+        ) : onOpenSetup ? (
+          <EmptyContent>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className={emptyStateActionClass}
+              onClick={() => deferAfterPress(onOpenSetup)}
+            >
+              {exam === "mht-cet"
+                ? "Set up MHT-CET prediction"
+                : "Set up prediction"}
             </Button>
           </EmptyContent>
         ) : (

@@ -9,11 +9,13 @@ const learnMoreClassName =
 
 export function RankInputErrorMessage({
   error,
+  emptyMessage = "Enter your JEE rank to predict colleges.",
 }: {
   error: RankValidationError;
+  emptyMessage?: string;
 }) {
   if (error.type === "empty") {
-    return <>Enter your JEE rank to predict colleges.</>;
+    return <>{emptyMessage}</>;
   }
 
   if (error.type === "invalid") {

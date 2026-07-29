@@ -1,12 +1,10 @@
-import type {
-  CollegePredictionResult,
-  ProgramPrediction,
-} from "@ejam/data/college-predictor";
+import type { CollegePredictionResult } from "@ejam/data/college-predictor";
+import type { PredictorDisplayProgram } from "@/lib/predictor-adapters";
 
 type PredictionMetadata = CollegePredictionResult["metadata"];
 
 export function countClientHiddenLongShots(
-  programs: ProgramPrediction[],
+  programs: PredictorDisplayProgram[],
   includeAll: boolean,
 ): number {
   if (includeAll) return 0;
@@ -17,7 +15,7 @@ export function countClientHiddenLongShots(
 }
 
 export function hasOnlyClientHiddenLongShots(
-  programs: ProgramPrediction[],
+  programs: PredictorDisplayProgram[],
   includeAll: boolean,
 ): boolean {
   return (
